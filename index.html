@@ -11,6 +11,12 @@
             padding: 0;
             height: 100%;
             overflow: hidden;
+            background-color: #1c1c1c;
+            color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
         }
         #root {
             width: 100%;
@@ -18,10 +24,28 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #f0f0f0;
+        }
+        #error-message {
+            color: red;
+            font-size: 20px;
         }
     </style>
-    <script type="application/javascript" src="composeApp.js"></script>
+    <script type="application/javascript">
+        function detectSafari() {
+            return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+        }
+
+        if (detectSafari()) {
+            document.write('<div id="error-message">Sorry, this application is not supported on Safari. Please use another browser.</div>');
+        } else {
+            window.onload = function() {
+                // Your other scripts here
+                var script = document.createElement('script');
+                script.src = "composeApp.js";
+                document.head.appendChild(script);
+            };
+        }
+    </script>
 </head>
 <body>
 <div id="root">
