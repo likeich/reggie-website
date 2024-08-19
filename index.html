@@ -2,48 +2,32 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Loading or Error</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reggie.Bot</title>
+    <link rel="icon" href="/favicon.png" type="image/png">
     <style>
         body, html {
-            background-color: #1a1a1a;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            background-color: #1c1c1c;
+            color: #f0f0f0;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
-            padding: 0;
-            flex-direction: column;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
+            font-family: Arial, sans-serif;
         }
-
         #root {
             width: 100%;
             height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: 0;
-            padding: 0;
         }
-
-        canvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-
-        img {
-            max-width: 100%;
-            height: auto;
-        }
-
-        p {
-            text-align: center;
-            font-size: 1.5em;
-            color: #ffffff;
-            font-weight: bold;
+        #error-message {
+            color: red;
+            font-size: 20px;
         }
     </style>
     <script type="application/javascript">
@@ -51,39 +35,41 @@
             return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
         }
 
-        document.addEventListener("DOMContentLoaded", function() {
-            const messageElement = document.getElementById('message');
+        function adjustForKeyboard() {
+            const root = document.getElementById('root');
+            const initialViewportHeight = window.innerHeight;
 
-            if (detectSafari()) {
-                messageElement.textContent = "Reggie.Bot is not supported on Safari or iOS browsers for now";
-            } else {
-                // Update the message to indicate loading
-                messageElement.textContent = "Loading, please wait...";
+            window.addEventListener('resize', function() {
+                const currentViewportHeight = window.innerHeight;
 
-                // Load the WASM app
+                if (currentViewportHeight < initialViewportHeight) {
+                    // Keyboard is probably open
+                    root.style.height = `${currentViewportHeight}px`;
+                } else {
+                    // Keyboard is probably closed
+                    root.style.height = '100%';
+                }
+            });
+        }
+
+        if (detectSafari()) {
+            document.write('<div id="error-message">Sorry, this application is not supported on Safari. Please use another browser.</div>');
+        } else {
+            window.onload = function() {
+                adjustForKeyboard();
+                // Your other scripts here
                 var script = document.createElement('script');
                 script.src = "composeApp.js";
-                script.onload = function() {
-                    // Hide the loading message once WASM is loaded
-                    document.body.innerHTML = ''; // Clear the body content
-                    var rootDiv = document.createElement('div');
-                    rootDiv.id = 'root';
-                    document.body.appendChild(rootDiv);
-
-                    var canvas = document.createElement('canvas');
-                    canvas.id = 'ComposeTarget';
-                    canvas.setAttribute('aria-label', 'Interactive application area');
-                    rootDiv.appendChild(canvas);
-                };
                 document.head.appendChild(script);
-            }
-        });
+            };
+        }
     </script>
 </head>
 <body>
-
-<img src="icon_round.png" alt="Centered Image">
-<p id="message">Loading, please wait...</p>
-
+<div id="root">
+    <canvas id="ComposeTarget" aria-label="Interactive application area">
+        Your browser does not support the canvas element.
+    </canvas>
+</div>
 </body>
 </html>
