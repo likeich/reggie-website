@@ -35,28 +35,10 @@
             return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
         }
 
-        function adjustForKeyboard() {
-            const root = document.getElementById('root');
-            const initialViewportHeight = window.innerHeight;
-
-            window.addEventListener('resize', function() {
-                const currentViewportHeight = window.innerHeight;
-
-                if (currentViewportHeight < initialViewportHeight) {
-                    // Keyboard is probably open
-                    root.style.height = `${currentViewportHeight}px`;
-                } else {
-                    // Keyboard is probably closed
-                    root.style.height = '100%';
-                }
-            });
-        }
-
         if (detectSafari()) {
             document.write('<div id="error-message">Sorry, this application is not supported on Safari. Please use another browser.</div>');
         } else {
             window.onload = function() {
-                adjustForKeyboard();
                 // Your other scripts here
                 var script = document.createElement('script');
                 script.src = "composeApp.js";
