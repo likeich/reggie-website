@@ -36,7 +36,9 @@
             window.location.href = "unsupported_browser.html";
         } else {
             window.onload = function() {
-                // Your other scripts here
+                var canvas = document.getElementById('ComposeTarget');
+                canvas.focus();
+
                 var script = document.createElement('script');
                 script.src = "composeApp.js";
                 document.head.appendChild(script);
@@ -46,7 +48,7 @@
 </head>
 <body>
 <div id="root">
-    <canvas id="ComposeTarget" aria-label="Interactive application area">
+    <canvas id="ComposeTarget" aria-label="Interactive application area" tabindex="0">
         Your browser does not support the canvas element.
     </canvas>
 </div>
