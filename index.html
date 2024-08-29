@@ -37,6 +37,21 @@
         gtag('config', 'G-CEQC3WB0MN');
     </script>
     <script type="application/javascript">
+        function waitForFunctions(functionNames, callback) {
+            function checkFunctions() {
+                for (let i = 0; i < functionNames.length; i++) {
+                    if (typeof window[functionNames[i]] !== "function") {
+                        setTimeout(checkFunctions, 100);
+                        return;
+                    }
+                }
+                // If all functions are available, execute the callback
+                callback();
+            }
+
+            checkFunctions();
+        }
+
         // JavaScript function to create param-value object, used in Kotlin
         function createParamValueObject(params, values) {
             const paramArray = params.split(',');
@@ -62,24 +77,20 @@
             window.location.href = "unsupported_browser.html";
         } else {
             window.onload = function() {
-                // Function to check if gtag is available
-                function waitForGtag(callback) {
-                    if (typeof gtag === "function") {
-                        callback();
-                    } else {
-                        setTimeout(function() { waitForGtag(callback); }, 100);
-                    }
-                }
-
-                // Wait for gtag to be available, then load the WebAssembly app
-                waitForGtag(function() {
+                function loadWasm() {
                     var canvas = document.getElementById('ComposeTarget');
                     canvas.focus();
 
                     var script = document.createElement('script');
                     script.src = "composeApp.js";
                     document.head.appendChild(script);
-                });
+                }
+
+                // List of functions to wait for
+                const functionsToWaitFor = ["createParamValueObject", "gtag"];
+
+                // Wait for all functions before loading Wasm
+                waitForFunctions(functionsToWaitFor, loadWasm);
             };
         }
     </script>
