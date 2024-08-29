@@ -45,12 +45,24 @@
             window.location.href = "unsupported_browser.html";
         } else {
             window.onload = function() {
-                var canvas = document.getElementById('ComposeTarget');
-                canvas.focus();
+                // Function to check if gtag is available
+                function waitForGtag(callback) {
+                    if (typeof gtag === "function") {
+                        callback();
+                    } else {
+                        setTimeout(function() { waitForGtag(callback); }, 100);
+                    }
+                }
 
-                var script = document.createElement('script');
-                script.src = "composeApp.js";
-                document.head.appendChild(script);
+                // Wait for gtag to be available, then load the WebAssembly app
+                waitForGtag(function() {
+                    var canvas = document.getElementById('ComposeTarget');
+                    canvas.focus();
+
+                    var script = document.createElement('script');
+                    script.src = "composeApp.js";
+                    document.head.appendChild(script);
+                });
             };
         }
     </script>
