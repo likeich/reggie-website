@@ -37,6 +37,23 @@
         gtag('config', 'G-CEQC3WB0MN');
     </script>
     <script type="application/javascript">
+        // JavaScript function to create param-value object, used in Kotlin
+        function createParamValueObject(params, values) {
+            const paramArray = params.split(',');
+            const valueArray = values.split(',');
+
+            if (paramArray.length !== valueArray.length) {
+                throw new Error('The number of parameters must match the number of values');
+            }
+
+            const result = {};
+            for (let i = 0; i < paramArray.length; i++) {
+                result[paramArray[i].trim()] = valueArray[i].trim();
+            }
+
+            return result;
+        }
+
         function detectSafari() {
             return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
         }
