@@ -37,23 +37,8 @@
         gtag('config', 'G-CEQC3WB0MN');
     </script>
     <script type="application/javascript">
-        function waitForFunctions(functionNames, callback) {
-            function checkFunctions() {
-                for (let i = 0; i < functionNames.length; i++) {
-                    if (typeof window[functionNames[i]] !== "function") {
-                        setTimeout(checkFunctions, 100);
-                        return;
-                    }
-                }
-                // If all functions are available, execute the callback
-                callback();
-            }
-
-            checkFunctions();
-        }
-
         // JavaScript function to create param-value object, used in Kotlin
-        function createParamValueObject(params, values) {
+        window.createParamValueObject = function(params, values) {
             const paramArray = params.split(',');
             const valueArray = values.split(',');
 
@@ -67,6 +52,21 @@
             }
 
             return result;
+        };
+
+        function waitForFunctions(functionNames, callback) {
+            function checkFunctions() {
+                for (let i = 0; i < functionNames.length; i++) {
+                    if (typeof window[functionNames[i]] !== "function") {
+                        setTimeout(checkFunctions, 100);
+                        return;
+                    }
+                }
+                // If all functions are available, execute the callback
+                callback();
+            }
+
+            checkFunctions();
         }
 
         function detectSafari() {
