@@ -37,22 +37,22 @@
         gtag('config', 'G-CEQC3WB0MN');
     </script>
     <script type="application/javascript">
-        // JavaScript function to create param-value object, used in Kotlin
-        window.createParamValueObject = function(params, values) {
-            const paramArray = params.split(',');
-            const valueArray = values.split(',');
+        // Function to create an object from a list of parameters and values
+        function createParamValueObject(params, values) {
+            var paramArray = params.split(',');
+            var valueArray = values.split(',');
 
             if (paramArray.length !== valueArray.length) {
                 throw new Error('The number of parameters must match the number of values');
             }
 
-            const result = {};
-            for (let i = 0; i < paramArray.length; i++) {
+            var result = {};
+            for (var i = 0; i < paramArray.length; i++) {
                 result[paramArray[i].trim()] = valueArray[i].trim();
             }
 
             return result;
-        };
+        }
 
         function waitForFunctions(functionNames, callback) {
             function checkFunctions() {
