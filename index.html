@@ -55,6 +55,23 @@
             return result;
         }
 
+        function shareContent(text) {
+            const url = window.location.href; // Get the current page URL
+            if (navigator.share) {
+                navigator.share({
+                    title: document.title,
+                    text: text,
+                    url: url
+                }).then(() => {
+                    console.log('Successfully shared');
+                }).catch((error) => {
+                    console.error('Error sharing:', error);
+                });
+            } else {
+                console.error('Web Share API not supported in this browser');
+            }
+        }
+
         function waitForFunctions(functionNames, callback) {
             function checkFunctions() {
                 for (let i = 0; i < functionNames.length; i++) {
@@ -88,7 +105,7 @@
                 }
 
                 // List of functions to wait for
-                const functionsToWaitFor = ["createParamValueObject", "gtag"];
+                const functionsToWaitFor = ["createParamValueObject", "gtag", "shareContent"];
 
                 // Wait for all functions before loading Wasm
                 waitForFunctions(functionsToWaitFor, loadWasm);
