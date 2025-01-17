@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="An AI-powered search engine designed to help users quickly find and explore U.S. Army regulations. Get accurate answers in seconds.">
-    <title>Reggie: Army Regulation AI Search</title>
+    <title>Army Regulation AI Search</title>
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <style>
         body, html {
@@ -87,11 +87,22 @@
             checkFunctions();
         }
 
-        function detectSafari() {
-            return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+        function detectUnsupportedBrowser() {
+            const userAgent = navigator.userAgent;
+            const safariMatch = /^((?!chrome|android).)*safari/i.test(userAgent);
+
+            if (safariMatch) {
+                // Extract the Safari version from the userAgent
+                const versionMatch = userAgent.match(/Version\/(\d+\.\d+)/);
+                if (versionMatch) {
+                    const safariVersion = parseFloat(versionMatch[1]);
+                    return safariVersion < 18.2;
+                }
+            }
+            return false;
         }
 
-        if (detectSafari()) {
+        if (detectUnsupportedBrowser()) {
             window.location.href = "unsupported_browser.html";
         } else {
             window.onload = function() {
