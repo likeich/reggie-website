@@ -96,6 +96,7 @@
                 const versionMatch = userAgent.match(/Version\/(\d+\.\d+)/);
                 if (versionMatch) {
                     const safariVersion = parseFloat(versionMatch[1]);
+                    console.log(`Safari version detected: ${safariVersion}`);
                     return safariVersion < 18.2;
                 }
             }
