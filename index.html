@@ -89,9 +89,11 @@
 
         function detectUnsupportedBrowser() {
             const userAgent = navigator.userAgent;
-            const safariMatch = /^((?!chrome|android).)*safari/i.test(userAgent);
 
-            if (safariMatch) {
+            // Check if the browser is Safari and not Chrome or Firefox on iOS
+            const isSafari = /^((?!chrome|android|crios|fxios).)*safari/i.test(userAgent);
+
+            if (isSafari) {
                 // Extract the Safari version from the userAgent
                 const versionMatch = userAgent.match(/Version\/(\d+\.\d+)/);
                 if (versionMatch) {
