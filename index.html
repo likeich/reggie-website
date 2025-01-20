@@ -21,11 +21,21 @@
         }
 
         #root {
+            overflow: hidden;
             width: 100%;
             height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
+        }
+
+        canvas {
+            display: block; /* Removes extra space around the canvas */
+            max-width: 100%; /* Ensures the canvas stays within screen bounds */
+            max-height: 100%; /* Ensures the canvas does not exceed screen height */
+            position: fixed; /* Fixes the canvas position */
+            top: 0;
+            left: 0;
         }
     </style>
     <!-- Google tag (gtag.js) -->
