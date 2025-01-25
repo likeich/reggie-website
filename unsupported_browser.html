@@ -1,55 +1,122 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CEQC3WB0MN"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
+    <head>
+        <!-- Google tag (gtag.js) -->
+        <script
+            async
+            src="https://www.googletagmanager.com/gtag/js?id=G-CEQC3WB0MN"
+        ></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+            gtag("js", new Date());
 
-        gtag('config', 'G-CEQC3WB0MN');
-    </script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Error - Unsupported Browser</title>
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            overflow: hidden;
-            background-color: #0a0a0a;
-            color: #f0f0f0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: Arial, sans-serif;
-        }
-        #error-container {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
-        #error-image {
-            max-width: 150px;
-            margin-bottom: 20px;
-        }
-        #error-message {
-            color: white;
-            font-size: 20px;
-            font-weight: bold;
-            font-family: 'Roboto', Arial, sans-serif;
-        }
-    </style>
-</head>
-<body>
-<div id="error-container">
-    <img src="icon_round.png" alt="Error Image" id="error-image">
-    <div id="error-message">Reggie.Bot is not supported on Safari or iOS browsers older than v18.2</div>
-</div>
-</body>
+            gtag("config", "G-CEQC3WB0MN");
+        </script>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Error - Unsupported Browser</title>
+        <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+        <style>
+            body,
+            html {
+                margin: 0;
+                padding: 0;
+                height: 100%;
+                overflow: hidden;
+                background-color: #0a0a0a;
+                color: #f0f0f0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-family: Arial, sans-serif;
+            }
+            #error-container {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+            }
+            #error-image {
+                max-width: 150px;
+                margin-bottom: 20px;
+            }
+            #error-message {
+                color: white;
+                font-size: 20px;
+                font-weight: bold;
+                font-family: "Roboto", Arial, sans-serif;
+            }
+            #browser-info {
+                color: white;
+                font-size: 14px;
+                margin-top: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="error-container">
+            <img src="icon_round.png" alt="Error Image" id="error-image" />
+            <div id="error-message">
+                Reggie.Bot is not supported on Safari or iOS browsers older than
+                v18.2
+            </div>
+            <div id="browser-info"></div>
+        </div>
+
+        <script>
+            // Get the user agent string
+            var userAgent = navigator.userAgent;
+            var browserName = "Unknown";
+            var browserVersion = "Unknown";
+            var osName = "Unknown";
+
+            // Check for Safari and extract version
+            if (
+                userAgent.indexOf("Safari") > -1 &&
+                userAgent.indexOf("Chrome") == -1
+            ) {
+                browserName = "Safari";
+                // Extract the version of Safari
+                var safariVersionMatch = userAgent.match(/Version\/(\d+\.\d+)/);
+                if (safariVersionMatch) {
+                    browserVersion = safariVersionMatch[1]; // Extracted version
+                }
+            }
+            // Other browsers like Chrome, Firefox, Edge can be detected similarly
+            else if (userAgent.indexOf("Chrome") > -1) {
+                browserName = "Chrome";
+                var chromeVersionMatch = userAgent.match(
+                    /Chrome\/(\d+\.\d+\.\d+\.\d+)/,
+                );
+                if (chromeVersionMatch) {
+                    browserVersion = chromeVersionMatch[1]; // Extracted version
+                }
+            }
+
+            // Check for operating system (OS)
+            if (userAgent.indexOf("Mac OS X") > -1) {
+                osName = "macOS";
+            } else if (userAgent.indexOf("Windows NT") > -1) {
+                osName = "Windows";
+            } else if (userAgent.indexOf("Linux") > -1) {
+                osName = "Linux";
+            }
+
+            // Display the browser and OS info in a readable format
+            var browserInfo =
+                "Browser: " +
+                browserName +
+                " " +
+                browserVersion +
+                " | OS: " +
+                osName;
+
+            // Display the browser information below the error message
+            document.getElementById("browser-info").textContent = browserInfo;
+        </script>
+    </body>
 </html>
