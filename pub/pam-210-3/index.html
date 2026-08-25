@@ -70,6 +70,15 @@
 }
     </script>
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <!-- Installable. theme-color paints the browser chrome and the splash
+         screen; without apple-touch-icon iOS renders a screenshot instead. -->
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#141414">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Reggie.Bot">
     <style>
         /* The flex centering that used to live here sized #root to its
            content rather than stretching it, so the app rendered in a narrow
@@ -278,6 +287,16 @@
                 }
 
                 dismissWhenComposePaints();
+
+                // Registered after load, and deliberately after the wasm has
+                // been asked for: the app is ~15MB and the worker must not
+                // compete with it on a first visit. It pays off on the second.
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('/sw.js').catch(function (e) {
+                        // Not fatal - the app works without it.
+                        console.warn('service worker registration failed', e);
+                    });
+                }
 
                 function loadWasm() {
                     var canvas = document.getElementById('ComposeTarget');
