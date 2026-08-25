@@ -8,7 +8,7 @@
          asks for /pub/composeResources/... and 404s, which throws out of
          composition and freezes the canvas. Must precede the first script. -->
     <base href="/">
-    <meta name="description" content="PAM 25-2-13, Army Identity, Credential, And Access Management And Public Key Infrastructure Implementing Instructions. Dated 04/27/2023. Proponent G-6. Status ACTIVE. Read it or ask Reggie.Bot a question about it.">
+    <meta name="description" content="PAM 25-2-13 governs Army identity, credential, access management, and public key infrastructure standards and procedures.">
     <title>PAM 25-2-13 - Army Identity, Credential, And Access Management And Public Key Infrastructure Implementing Instructions | Reggie.Bot</title>
     <link rel="canonical" href="https://reggie.bot/pub/pam-25-2-13">
     <meta name="keywords" content="Army regulations, AR 670-1, Army publications, armypubs, DA PAM, ATP, field manual, Army doctrine, military regulations search">
@@ -17,14 +17,17 @@
     <meta property="og:url" content="https://reggie.bot/pub/pam-25-2-13">
     <meta property="og:site_name" content="Reggie.Bot">
     <meta property="og:title" content="PAM 25-2-13 - Army Identity, Credential, And Access Management And Public Key Infrastructure Implementing Instructions | Reggie.Bot">
-    <meta property="og:description" content="PAM 25-2-13, Army Identity, Credential, And Access Management And Public Key Infrastructure Implementing Instructions. Dated 04/27/2023. Proponent G-6. Status ACTIVE. Read it or ask Reggie.Bot a question about it.">
+    <meta property="og:description" content="PAM 25-2-13 governs Army identity, credential, access management, and public key infrastructure standards and procedures.">
     <meta property="og:image" content="https://reggie.bot/icon_round.png">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="PAM 25-2-13 - Army Identity, Credential, And Access Management And Public Key Infrastructure Implementing Instructions | Reggie.Bot">
-    <meta name="twitter:description" content="PAM 25-2-13, Army Identity, Credential, And Access Management And Public Key Infrastructure Implementing Instructions. Dated 04/27/2023. Proponent G-6. Status ACTIVE. Read it or ask Reggie.Bot a question about it.">
+    <meta name="twitter:description" content="PAM 25-2-13 governs Army identity, credential, access management, and public key infrastructure standards and procedures.">
     <meta name="twitter:image" content="https://reggie.bot/icon_round.png">
 
     <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
 {
   "@context": "https://schema.org",
   "@type": "Report",
@@ -36,6 +39,39 @@
   "datePublished": "04/27/2023",
   "sameAs": "https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1023550",
   "publisher": {"@type": "Organization", "name": "United States Army"}
+},
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What credentials do Army systems use for user identification and authentication?",
+      "acceptedAnswer": {"@type": "Answer", "text": "Per DoDI 8520.03, all Army systems will use PKI credentials as the primary means of user ID and authentication."}
+    },
+    {
+      "@type": "Question",
+      "name": "Which networks use CAC and SIPR tokens for access?",
+      "acceptedAnswer": {"@type": "Answer", "text": "The CAC is issued to support NIPRNet access, while a separate SIPR token is used on the SIPRNet."}
+    },
+    {
+      "@type": "Question",
+      "name": "What types of subscribers can receive SIPRNet and NIPRNet PKI certificates?",
+      "acceptedAnswer": {"@type": "Answer", "text": "The SIPRNet and NIPRNet PKIs support issuing certificates to three types of subscribers: name, role, and system or device (also called a NPE)."}
+    },
+    {
+      "@type": "Question",
+      "name": "How long are Army or DoD policy exceptions limited?",
+      "acceptedAnswer": {"@type": "Answer", "text": "Exceptions to Army or DoD policy for users or systems unable to comply with SIPRNet or NIPRNet token use or PKE requirements are limited to 12 months (1 year) but may be renewed."}
+    },
+    {
+      "@type": "Question",
+      "name": "When must policy exceptions be requested?",
+      "acceptedAnswer": {"@type": "Answer", "text": "Exceptions must be requested and received prior to system deployment and use."}
+    }
+  ]
+}
+  ]
 }
     </script>
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
@@ -294,7 +330,7 @@
              instant before the app boots. -->
         <div id="seo-fallback">
             <h1>PAM 25-2-13 &mdash; Army Identity, Credential, And Access Management And Public Key Infrastructure Implementing Instructions</h1>
-            <p>PAM 25-2-13, Army Identity, Credential, And Access Management And Public Key Infrastructure Implementing Instructions. Dated 04/27/2023. Proponent G-6. Status ACTIVE. Read it or ask Reggie.Bot a question about it.</p>
+            <p>PAM 25-2-13 governs Army identity, credential, access management, and public key infrastructure standards and procedures.</p>
             <ul>
                 <li><strong>Publication number:</strong> PAM 25-2-13</li>
                 <li><strong>Title:</strong> ARMY IDENTITY, CREDENTIAL, AND ACCESS MANAGEMENT AND PUBLIC KEY INFRASTRUCTURE IMPLEMENTING INSTRUCTIONS</li>
@@ -307,6 +343,31 @@
             <ul>
                 <li><a href="/pub/ar-25-2">AR 25-2</a></li>
             </ul>
+            <hr>
+            <p>PAM 25-2-13 covers electronic identity authentication, authorization, PKI credentials, token issuance, and access controls. It addresses exceptions, alternate multi-factor authentication, external PKI trust, and registration authorities.</p>
+            <p><strong>Applies to:</strong> This pamphlet institutes identity, credential, and access management (ICAM) and public key infrastructure (PKI) standards and procedures for all information technology (IT) capabilities used in and by the Army.</p>
+            <h2>Topics covered</h2>
+            <ul>
+                <li>Identity authentication</li>
+                <li>Authorization and access privileges</li>
+                <li>Public key infrastructure credentials</li>
+                <li>Alternate multi-factor authentication</li>
+                <li>PKI policy exceptions</li>
+                <li>Token issuance and revocation</li>
+                <li>Registration Authorities and Local Registration Authorities</li>
+                <li>External PKI trust</li>
+            </ul>
+            <h2>Questions and answers</h2>
+            <h3>What credentials do Army systems use for user identification and authentication?</h3>
+            <blockquote>Per DoDI 8520.03, all Army systems will use PKI credentials as the primary means of user ID and authentication. (paragraph 3-3)</blockquote>
+            <h3>Which networks use CAC and SIPR tokens for access?</h3>
+            <blockquote>The CAC is issued to support NIPRNet access, while a separate SIPR token is used on the SIPRNet. (paragraph 3-3)</blockquote>
+            <h3>What types of subscribers can receive SIPRNet and NIPRNet PKI certificates?</h3>
+            <blockquote>The SIPRNet and NIPRNet PKIs support issuing certificates to three types of subscribers: name, role, and system or device (also called a NPE). (paragraph 4-1)</blockquote>
+            <h3>How long are Army or DoD policy exceptions limited?</h3>
+            <blockquote>Exceptions to Army or DoD policy for users or systems unable to comply with SIPRNet or NIPRNet token use or PKE requirements are limited to 12 months (1 year) but may be renewed. (paragraph 8-2)</blockquote>
+            <h3>When must policy exceptions be requested?</h3>
+            <blockquote>Exceptions must be requested and received prior to system deployment and use. (paragraph 8-1)</blockquote>
             <p><a href="/">Ask Reggie.Bot a question about PAM 25-2-13</a></p>
         </div>
     </div>
