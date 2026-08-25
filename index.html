@@ -8,38 +8,30 @@
          asks for /pub/composeResources/... and 404s, which throws out of
          composition and freezes the canvas. Must precede the first script. -->
     <base href="/">
-    <meta name="description" content="Ask a question about US Army regulations and get an answer citing the governing regulation, with paragraph and page references. Searches the full text of 1,500+ publications from armypubs, including AR, DA PAM, ATP, FM and TC.">
-    <title>Reggie.Bot &mdash; AI Search for US Army Regulations</title>
+    <meta name="description" content="Ask a question about US Army regulations and get an answer citing the governing regulation, with paragraph and page references. Searches the full text of 1,500+ publications from armypubs.">
+    <title>Reggie.Bot — AI Search for US Army Regulations</title>
     <link rel="canonical" href="https://reggie.bot/">
     <meta name="keywords" content="Army regulations, AR 670-1, Army publications, armypubs, DA PAM, ATP, field manual, Army doctrine, military regulations search">
 
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://reggie.bot/">
     <meta property="og:site_name" content="Reggie.Bot">
-    <meta property="og:title" content="Reggie.Bot &mdash; AI Search for US Army Regulations">
-    <meta property="og:description" content="Ask a question about Army regulations and get an answer citing the governing regulation, with paragraph and page references. Searches 1,500+ publications from armypubs.">
+    <meta property="og:title" content="Reggie.Bot — AI Search for US Army Regulations">
+    <meta property="og:description" content="Ask a question about US Army regulations and get an answer citing the governing regulation, with paragraph and page references. Searches the full text of 1,500+ publications from armypubs.">
     <meta property="og:image" content="https://reggie.bot/icon_round.png">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Reggie.Bot &mdash; AI Search for US Army Regulations">
-    <meta name="twitter:description" content="Ask a question about Army regulations and get an answer citing the governing regulation, with paragraph and page references.">
+    <meta name="twitter:title" content="Reggie.Bot — AI Search for US Army Regulations">
+    <meta name="twitter:description" content="Ask a question about US Army regulations and get an answer citing the governing regulation, with paragraph and page references. Searches the full text of 1,500+ publications from armypubs.">
     <meta name="twitter:image" content="https://reggie.bot/icon_round.png">
 
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "Reggie.Bot",
-      "alternateName": "Reggie",
-      "url": "https://reggie.bot/",
-      "description": "AI search over US Army regulations, doctrine and publications, answering questions with citations to the governing regulation.",
-      "inLanguage": "en-US",
-      "isAccessibleForFree": true,
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://reggie.bot/?q={search_term_string}",
-        "query-input": "required name=search_term_string"
-      }
-    }
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Reggie.Bot — AI Search for US Army Regulations",
+  "description": "Ask a question about US Army regulations and get an answer citing the governing regulation, with paragraph and page references. Searches the full text of 1,500+ publications from armypubs.",
+  "url": "https://reggie.bot/"
+}
     </script>
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <style>
@@ -60,6 +52,7 @@
         #ComposeTarget {
             width: 100%;
             height: 100%;
+            position: relative;
         }
 
         /* Readable if the app never boots, invisible the moment it does. */
@@ -78,6 +71,60 @@
         #root {
             width: 100%;
             height: 100%;
+        }
+
+        /* The SEO copy has to be real markup in the initial response, but a
+           wall of unstyled text is not what a visitor should stare at for the
+           seconds wasm takes to boot. #boot covers it with the app's own
+           colours; both are removed the moment Compose paints. */
+        /* Absolute within #ComposeTarget, never fixed over the whole page: a
+           full-viewport overlay sits on top of the canvas, and Compose then
+           swallowed the first click anywhere in the app because the pointer
+           had never entered the canvas. Inside the container it is also torn
+           down by Compose itself on mount. */
+        #boot {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.25rem;
+            background: #141414;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #AFAFAF;
+            transition: opacity .35s ease;
+        }
+
+        #boot.done { opacity: 0; pointer-events: none; }
+
+        #boot img {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+        }
+
+        #boot-spinner {
+            width: 34px;
+            height: 34px;
+            border: 3px solid #2D2D2D;
+            border-top-color: #FFCB05;
+            border-radius: 50%;
+            animation: boot-spin .9s linear infinite;
+        }
+
+        #boot-label {
+            font-size: .95rem;
+            letter-spacing: .04em;
+        }
+
+        @keyframes boot-spin { to { transform: rotate(360deg); } }
+
+        /* Respect a reduced-motion preference: keep the indicator, drop the
+           spin. */
+        @media (prefers-reduced-motion: reduce) {
+            #boot-spinner { animation: none; border-top-color: #FFCB05; }
         }
     </style>
     <!-- Google tag (gtag.js) -->
@@ -162,6 +209,40 @@
             window.location.href = "unsupported_browser.html";
         } else {
             window.onload = function() {
+                function dismissBootScreen() {
+                    var boot = document.getElementById('boot');
+                    if (!boot || boot.classList.contains('done')) return;
+                    boot.classList.add('done');
+                    setTimeout(function () { boot.remove(); }, 400);
+                }
+
+                // Compose creates its own <canvas> inside the container when it
+                // mounts, so that is the signal that the app is really up. Two
+                // frames later it has painted, and the overlay can go without
+                // exposing a blank canvas.
+                function dismissWhenComposePaints() {
+                    var target = document.getElementById('ComposeTarget');
+                    if (!target) return;
+                    var observer = new MutationObserver(function () {
+                        if (!target.querySelector('canvas')) return;
+                        observer.disconnect();
+                        requestAnimationFrame(function () {
+                            requestAnimationFrame(dismissBootScreen);
+                        });
+                    });
+                    observer.observe(target, { childList: true, subtree: true });
+
+                    // If wasm never boots, uncover the fallback text rather
+                    // than spinning forever - it at least says what the site
+                    // is and links onward.
+                    setTimeout(function () {
+                        observer.disconnect();
+                        dismissBootScreen();
+                    }, 25000);
+                }
+
+                dismissWhenComposePaints();
+
                 function loadWasm() {
                     var canvas = document.getElementById('ComposeTarget');
                     canvas.focus();
@@ -194,28 +275,21 @@
          engines cannot read at all, leaving the site with no indexable text
          whatsoever. This is the only content Google gets today. -->
     <div id="ComposeTarget" aria-label="Interactive application area" tabindex="0">
+        <!-- The loading indicator lives inside the container so that Compose
+             removes it along with everything else when it mounts, and so that
+             nothing is ever layered over the canvas. -->
+        <div id="boot" role="status" aria-live="polite">
+            <img src="/icon_round.png" alt="" width="72" height="72">
+            <div id="boot-spinner"></div>
+            <div id="boot-label">Loading Reggie.Bot&hellip;</div>
+        </div>
         <!-- Not wrapped in <noscript>: crawlers that execute JS ignore it, and
              this needs to be real markup in the initial response. Compose
              clears the container when it mounts, so users see it only for the
              instant before the app boots. -->
         <div id="seo-fallback">
-            <h1>Reggie.Bot &mdash; AI search for US Army regulations</h1>
-            <p>Reggie.Bot answers questions about US Army regulations, doctrine
-               and publications, citing the governing regulation with paragraph
-               and page references. It searches the full text of more than 1,500
-               publications from armypubs.army.mil, including Army Regulations
-               (AR), Department of the Army Pamphlets (DA PAM), Army Techniques
-               Publications (ATP), Field Manuals (FM), Training Circulars (TC)
-               and Army Directives.</p>
-            <h2>Examples of what you can ask</h2>
-            <ul>
-                <li>What are the rules on beards and grooming standards?</li>
-                <li>What is the Army body composition program?</li>
-                <li>How does nonjudicial punishment under Article 15 work?</li>
-                <li>What are the rules for emergency leave?</li>
-                <li>How do officer evaluation reports work?</li>
-            </ul>
-            <noscript><p>This application requires JavaScript and WebAssembly.</p></noscript>
+            <h1>Reggie.Bot — AI Search for US Army Regulations</h1>
+            <p>Ask a question about US Army regulations and get an answer that cites the governing regulation, with paragraph and page references.</p>
         </div>
     </div>
 </div>

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Compose resolves relative asset paths (./composeResources/...) against
+         the document URL. Without this, every deep link such as /pub/ar-670-1
+         asks for /pub/composeResources/... and 404s, which throws out of
+         composition and freezes the canvas. Must precede the first script. -->
+    <base href="/">
+    <meta name="description" content="AR 290-5, Army Cemeteries. Dated 10/21/2020. Proponent OAC. Status ACTIVE. Read it or ask Reggie.Bot a question about it.">
+    <title>AR 290-5 - Army Cemeteries | Reggie.Bot</title>
+    <link rel="canonical" href="https://reggie.bot/pub/ar-290-5">
+    <meta name="keywords" content="Army regulations, AR 670-1, Army publications, armypubs, DA PAM, ATP, field manual, Army doctrine, military regulations search">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://reggie.bot/pub/ar-290-5">
+    <meta property="og:site_name" content="Reggie.Bot">
+    <meta property="og:title" content="AR 290-5 - Army Cemeteries | Reggie.Bot">
+    <meta property="og:description" content="AR 290-5, Army Cemeteries. Dated 10/21/2020. Proponent OAC. Status ACTIVE. Read it or ask Reggie.Bot a question about it.">
+    <meta property="og:image" content="https://reggie.bot/icon_round.png">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="AR 290-5 - Army Cemeteries | Reggie.Bot">
+    <meta name="twitter:description" content="AR 290-5, Army Cemeteries. Dated 10/21/2020. Proponent OAC. Status ACTIVE. Read it or ask Reggie.Bot a question about it.">
+    <meta name="twitter:image" content="https://reggie.bot/icon_round.png">
+
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Report",
+  "name": "AR 290-5 - Army Cemeteries",
+  "alternateName": "AR 290-5",
+  "url": "https://reggie.bot/pub/ar-290-5",
+  "inLanguage": "en",
+  "isAccessibleForFree": true,
+  "datePublished": "10/21/2020",
+  "sameAs": "https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1020658",
+  "publisher": {"@type": "Organization", "name": "United States Army"}
+}
+    </script>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <style>
+        /* The flex centering that used to live here sized #root to its
+           content rather than stretching it, so the app rendered in a narrow
+           column once ComposeViewport replaced the fixed-size canvas. */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #0a0a0a;
+            color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+
+        #ComposeTarget {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        /* Readable if the app never boots, invisible the moment it does. */
+        #seo-fallback {
+            max-width: 46rem;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            font-family: Arial, sans-serif;
+            line-height: 1.5;
+        }
+
+        /* No flex centering here: it existed to centre the old fixed-size
+           canvas. As a flex item the Compose container sized to its content
+           (300px) instead of stretching, so the app rendered in a narrow
+           column. ComposeViewport fills whatever container it is given. */
+        #root {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* The SEO copy has to be real markup in the initial response, but a
+           wall of unstyled text is not what a visitor should stare at for the
+           seconds wasm takes to boot. #boot covers it with the app's own
+           colours; both are removed the moment Compose paints. */
+        /* Absolute within #ComposeTarget, never fixed over the whole page: a
+           full-viewport overlay sits on top of the canvas, and Compose then
+           swallowed the first click anywhere in the app because the pointer
+           had never entered the canvas. Inside the container it is also torn
+           down by Compose itself on mount. */
+        #boot {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.25rem;
+            background: #141414;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #AFAFAF;
+            transition: opacity .35s ease;
+        }
+
+        #boot.done { opacity: 0; pointer-events: none; }
+
+        #boot img {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+        }
+
+        #boot-spinner {
+            width: 34px;
+            height: 34px;
+            border: 3px solid #2D2D2D;
+            border-top-color: #FFCB05;
+            border-radius: 50%;
+            animation: boot-spin .9s linear infinite;
+        }
+
+        #boot-label {
+            font-size: .95rem;
+            letter-spacing: .04em;
+        }
+
+        @keyframes boot-spin { to { transform: rotate(360deg); } }
+
+        /* Respect a reduced-motion preference: keep the indicator, drop the
+           spin. */
+        @media (prefers-reduced-motion: reduce) {
+            #boot-spinner { animation: none; border-top-color: #FFCB05; }
+        }
+    </style>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CEQC3WB0MN"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-CEQC3WB0MN');
+    </script>
+    <script type="application/javascript">
+        // Function to create an object from a list of parameters and values
+        function createParamValueObject(params, values) {
+            var paramArray = params.split(',');
+            var valueArray = values.split(',');
+
+            if (paramArray.length !== valueArray.length) {
+                throw new Error('The number of parameters must match the number of values');
+            }
+
+            var result = {};
+            for (var i = 0; i < paramArray.length; i++) {
+                result[paramArray[i].trim()] = valueArray[i].trim();
+            }
+
+            return result;
+        }
+
+        function shareContent(text) {
+            const url = window.location.href; // Get the current page URL
+            if (navigator.share) {
+                navigator.share({
+                    title: document.title,
+                    text: text,
+                    url: url
+                }).then(() => {
+                    console.log('Successfully shared');
+                }).catch((error) => {
+                    console.error('Error sharing:', error);
+                });
+            } else {
+                console.error('Web Share API not supported in this browser');
+            }
+        }
+
+        function waitForFunctions(functionNames, callback) {
+            function checkFunctions() {
+                for (let i = 0; i < functionNames.length; i++) {
+                    if (typeof window[functionNames[i]] !== "function") {
+                        setTimeout(checkFunctions, 100);
+                        return;
+                    }
+                }
+                // If all functions are available, execute the callback
+                callback();
+            }
+
+            checkFunctions();
+        }
+
+        function detectUnsupportedBrowser() {
+            const userAgent = navigator.userAgent;
+
+            // Check if the browser is Safari and not Chrome or Firefox on iOS
+            const isSafari = /^((?!chrome|android|crios|fxios).)*safari/i.test(userAgent);
+
+            if (isSafari) {
+                // Extract the Safari version from the userAgent
+                const versionMatch = userAgent.match(/Version\/(\d+\.\d+)/);
+                if (versionMatch) {
+                    const safariVersion = parseFloat(versionMatch[1]);
+                    console.log(`Safari version detected: ${safariVersion}`);
+                    return safariVersion < 18.2;
+                }
+            }
+            console.log("Browser is not Safari or version not detected.");
+            return false;
+        }
+
+        if (detectUnsupportedBrowser()) {
+            window.location.href = "unsupported_browser.html";
+        } else {
+            window.onload = function() {
+                function dismissBootScreen() {
+                    var boot = document.getElementById('boot');
+                    if (!boot || boot.classList.contains('done')) return;
+                    boot.classList.add('done');
+                    setTimeout(function () { boot.remove(); }, 400);
+                }
+
+                // Compose creates its own <canvas> inside the container when it
+                // mounts, so that is the signal that the app is really up. Two
+                // frames later it has painted, and the overlay can go without
+                // exposing a blank canvas.
+                function dismissWhenComposePaints() {
+                    var target = document.getElementById('ComposeTarget');
+                    if (!target) return;
+                    var observer = new MutationObserver(function () {
+                        if (!target.querySelector('canvas')) return;
+                        observer.disconnect();
+                        requestAnimationFrame(function () {
+                            requestAnimationFrame(dismissBootScreen);
+                        });
+                    });
+                    observer.observe(target, { childList: true, subtree: true });
+
+                    // If wasm never boots, uncover the fallback text rather
+                    // than spinning forever - it at least says what the site
+                    // is and links onward.
+                    setTimeout(function () {
+                        observer.disconnect();
+                        dismissBootScreen();
+                    }, 25000);
+                }
+
+                dismissWhenComposePaints();
+
+                function loadWasm() {
+                    var canvas = document.getElementById('ComposeTarget');
+                    canvas.focus();
+
+                    var script = document.createElement('script');
+                    // Absolute: this same file is served at /news, /pubs and
+                    // friends so deep links work, and a relative path would
+                    // look for /news/composeApp.js and never boot.
+                    script.src = "/composeApp.js";
+                    document.head.appendChild(script);
+                }
+
+                // List of functions to wait for
+                const functionsToWaitFor = ["createParamValueObject", "gtag", "shareContent"];
+
+                // Wait for all functions before loading Wasm
+                waitForFunctions(functionsToWaitFor, loadWasm);
+            };
+        }
+    </script>
+</head>
+<body>
+<!-- ComposeViewport (Compose Multiplatform 1.11, which replaced
+     CanvasBasedWindow) attaches to a CONTAINER and creates its own canvas
+     inside it. Leaving a <canvas> here gives an unsized 300x150 default that
+     renders nothing, and a second canvas nested inside it. -->
+<div id="root">
+    <!-- Compose replaces the contents of #ComposeTarget on boot, so users never
+         see this. Crawlers do: the app renders to a <canvas>, which search
+         engines cannot read at all, leaving the site with no indexable text
+         whatsoever. This is the only content Google gets today. -->
+    <div id="ComposeTarget" aria-label="Interactive application area" tabindex="0">
+        <!-- The loading indicator lives inside the container so that Compose
+             removes it along with everything else when it mounts, and so that
+             nothing is ever layered over the canvas. -->
+        <div id="boot" role="status" aria-live="polite">
+            <img src="/icon_round.png" alt="" width="72" height="72">
+            <div id="boot-spinner"></div>
+            <div id="boot-label">Loading Reggie.Bot&hellip;</div>
+        </div>
+        <!-- Not wrapped in <noscript>: crawlers that execute JS ignore it, and
+             this needs to be real markup in the initial response. Compose
+             clears the container when it mounts, so users see it only for the
+             instant before the app boots. -->
+        <div id="seo-fallback">
+            <h1>AR 290-5 &mdash; Army Cemeteries</h1>
+            <p>AR 290-5, Army Cemeteries. Dated 10/21/2020. Proponent OAC. Status ACTIVE. Read it or ask Reggie.Bot a question about it.</p>
+            <ul>
+                <li><strong>Publication number:</strong> AR 290-5</li>
+                <li><strong>Title:</strong> ARMY CEMETERIES</li>
+                <li><strong>Date:</strong> 10/21/2020</li>
+                <li><strong>Proponent:</strong> OAC</li>
+                <li><strong>Status:</strong> ACTIVE</li>
+            </ul>
+            <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1020658">View AR 290-5 on armypubs.army.mil</a></p>
+            <p><a href="/">Ask Reggie.Bot a question about AR 290-5</a></p>
+        </div>
+    </div>
+</div>
+</body>
+</html>
