@@ -1,0 +1,10 @@
+# reggie.bot - AI search over US Army regulations
+User-agent: *
+Allow: /
+
+# Build artefacts: no content, and crawling them wastes budget.
+Disallow: /composeResources/
+Disallow: /*.wasm$
+Disallow: /*.js.map$
+
+Sitemap: https://reggie.bot/sitemap.xml
