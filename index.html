@@ -7,25 +7,32 @@
     <title>Army Regulation AI Search</title>
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <style>
+        /* The flex centering that used to live here sized #root to its
+           content rather than stretching it, so the app rendered in a narrow
+           column once ComposeViewport replaced the fixed-size canvas. */
         body, html {
             margin: 0;
             padding: 0;
+            width: 100%;
             height: 100%;
             overflow: hidden;
             background-color: #0a0a0a;
             color: #f0f0f0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             font-family: Arial, sans-serif;
         }
 
+        #ComposeTarget {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* No flex centering here: it existed to centre the old fixed-size
+           canvas. As a flex item the Compose container sized to its content
+           (300px) instead of stretching, so the app rendered in a narrow
+           column. ComposeViewport fills whatever container it is given. */
         #root {
             width: 100%;
             height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
     </style>
     <!-- Google tag (gtag.js) -->
@@ -129,10 +136,12 @@
     </script>
 </head>
 <body>
+<!-- ComposeViewport (Compose Multiplatform 1.11, which replaced
+     CanvasBasedWindow) attaches to a CONTAINER and creates its own canvas
+     inside it. Leaving a <canvas> here gives an unsized 300x150 default that
+     renders nothing, and a second canvas nested inside it. -->
 <div id="root">
-    <canvas id="ComposeTarget" aria-label="Interactive application area" tabindex="0">
-        Your browser does not support the canvas element.
-    </canvas>
+    <div id="ComposeTarget" aria-label="Interactive application area" tabindex="0"></div>
 </div>
 </body>
 </html>
