@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Compose resolves relative asset paths (./composeResources/...) against
+         the document URL. Without this, every deep link such as /pub/ar-670-1
+         asks for /pub/composeResources/... and 404s, which throws out of
+         composition and freezes the canvas. Must precede the first script. -->
+    <base href="/">
     <meta name="description" content="Ask a question about US Army regulations and get an answer citing the governing regulation, with paragraph and page references. Searches the full text of 1,500+ publications from armypubs, including AR, DA PAM, ATP, FM and TC.">
     <title>Reggie.Bot &mdash; AI Search for US Army Regulations</title>
     <link rel="canonical" href="https://reggie.bot/">
