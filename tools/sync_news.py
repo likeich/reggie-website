@@ -9,6 +9,10 @@ table the client already has access to.
 
     SUPABASE_SERVICE_KEY=... python sync_news.py            # dry run
     SUPABASE_SERVICE_KEY=... python sync_news.py --apply
+
+The scheduled job that runs this lives in likeich/reggie-website (tools/), not
+here: that repo is public and public repos get unlimited Actions minutes. Keep
+the two copies in step.
 """
 import argparse
 import os
@@ -28,7 +32,46 @@ REQUIRED = ('id', 'title', 'short_title', 'body', 'url', 'page_url', 'author',
 OPTIONAL = ('ga_id',)
 
 
-def news_row(lead):
+BUCKET = 'news-images'
+
+
+def storage_url(name):
+    return f'{SUPABASE_URL}/storage/v1/object/public/{BUCKET}/{name}'
+
+
+def upload_image(key, url, session=None):
+    """Mirror a lead image into Supabase storage, returning its public URL.
+
+    The images live on api.army.mil alongside the leads, so they are blocked
+    for the browser and for our Cloud Run proxy exactly the same way. Leaving
+    the upstream URL in the row means every image 403s. Returns None if the
+    image cannot be fetched, which drops the story rather than rendering it
+    broken.
+    """
+    get = (session or requests).get
+    try:
+        r = get(url, headers={'accept': 'image/*'}, timeout=120)
+        if r.status_code != 200 or not r.content:
+            return None
+        ext = 'png' if r.content[:8].startswith(b'\x89PNG') else 'jpg'
+        name = f'{key}.{ext}'
+        put = requests.post(
+            f'{SUPABASE_URL}/storage/v1/object/{BUCKET}/{name}',
+            headers={'apikey': os.environ['SUPABASE_SERVICE_KEY'],
+                     'Authorization': f"Bearer {os.environ['SUPABASE_SERVICE_KEY']}",
+                     'Content-Type': r.headers.get('Content-Type', 'image/jpeg'),
+                     'x-upsert': 'true'},
+            data=r.content, timeout=120)
+        if put.status_code >= 300:
+            print(f'  WARN image upload {name}: {put.status_code} {put.text[:120]}')
+            return None
+        return storage_url(name)
+    except Exception as e:
+        print(f'  WARN image fetch {url[-40:]}: {type(e).__name__}')
+        return None
+
+
+def news_row(lead, image_url):
     """Project one API lead onto our columns, or None if it cannot satisfy the
     client's model.
 
@@ -38,9 +81,12 @@ def news_row(lead):
     """
     if any(lead.get(k) is None for k in REQUIRED):
         return None
+    if not image_url:
+        return None
     row = {k: lead[k] for k in REQUIRED}
     for k in OPTIONAL:
         row[k] = lead.get(k)
+    row['image'] = image_url          # self-hosted, not api.army.mil
     return row
 
 
@@ -59,7 +105,16 @@ def main():
         sys.exit(f'army.mil returned {r.status_code} - refusing to touch the '
                  f'cached news rather than replace it with nothing')
     leads = r.json()
-    rows = [row for row in (news_row(x) for x in leads) if row]
+    if not a.apply:
+        rows = [row for row in (news_row(x, storage_url(f'{x.get("id")}.jpg'))
+                                for x in leads) if row]
+    else:
+        rows = []
+        for lead in leads:
+            img = upload_image(lead.get('id'), lead.get('image') or '')
+            row = news_row(lead, img)
+            if row:
+                rows.append(row)
     skipped = len(leads) - len(rows)
     print(f'fetched {len(leads)} leads, {len(rows)} usable'
           + (f', {skipped} skipped for missing fields' if skipped else ''))
