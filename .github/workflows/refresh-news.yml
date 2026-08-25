@@ -1,0 +1,75 @@
+name: Refresh cached news
+
+# api.army.mil sits behind Akamai, which returns 403 to any request carrying a
+# browser User-Agent and separately rejects Cloud Run's egress range. So the
+# wasm client cannot call it and neither can our /proxy. This job fetches it
+# from a GitHub runner and caches the result in Supabase, which the client
+# already reads.
+#
+# It lives in this repo rather than likeich/Reggie because this one is public,
+# and public repos get unlimited Actions minutes. The Reggie release workflow
+# is careful not to delete .github/ or tools/ when it republishes the site.
+on:
+  schedule:
+    - cron: '0 8 * * *'      # 08:00 UTC = 03:00 EST (04:00 EDT - cron is UTC only)
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Fetch and report, but do not write'
+        type: boolean
+        default: false
+
+concurrency:
+  group: refresh-news
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: tools
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - run: pip install requests
+
+      # The whole approach rests on this runner being able to reach army.mil at
+      # all - Cloud Run cannot. Fail loudly here rather than silently caching
+      # nothing.
+      - name: Verify army.mil is reachable from this runner
+        run: |
+          code=$(curl -s -o /tmp/leads.json -w '%{http_code}' --max-time 90 \
+            -H 'accept: application/json' https://api.army.mil/api/v1/leads)
+          echo "HTTP $code, $(wc -c < /tmp/leads.json) bytes"
+          test "$code" = "200" || {
+            echo "::error::army.mil returned $code from this runner - the cached-news approach needs rethinking"
+            exit 1; }
+
+      - name: Refresh the cache
+        env:
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            python sync_news.py
+          else
+            python sync_news.py --apply
+          fi
+
+      - name: Confirm the client can read it
+        run: |
+          n=$(curl -s --max-time 60 -H "apikey: ${{ vars.SUPABASE_ANON_KEY }}" \
+                -H "Authorization: Bearer ${{ vars.SUPABASE_ANON_KEY }}" \
+                "https://ziftzxigjayekmvvopkf.supabase.co/rest/v1/news?select=id" \
+              | grep -o '"id"' | wc -l)
+          echo "stories readable by anon: $n"
+          test "$n" -gt 0
