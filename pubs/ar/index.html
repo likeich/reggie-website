@@ -10,11 +10,11 @@
     <base href="/">
     <meta name="description" content="All 482 AR publications (Army Regulations), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.">
     <title>AR — Army Regulations</title>
-    <link rel="canonical" href="https://reggie.bot/pubs/ar">
+    <link rel="canonical" href="https://reggie.bot/pubs/ar/">
     <meta name="keywords" content="Army regulations, AR 670-1, Army publications, armypubs, DA PAM, ATP, field manual, Army doctrine, military regulations search">
 
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://reggie.bot/pubs/ar">
+    <meta property="og:url" content="https://reggie.bot/pubs/ar/">
     <meta property="og:site_name" content="Reggie.Bot">
     <meta property="og:title" content="AR — Army Regulations">
     <meta property="og:description" content="All 482 AR publications (Army Regulations), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.">
@@ -96,36 +96,48 @@
             inset: 0;
             z-index: 10;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 1.25rem;
             background: #141414;
-            font-family: Arial, Helvetica, sans-serif;
-            color: #AFAFAF;
             transition: opacity .35s ease;
+
+            /* The ring sits immediately outside the logo, touching it, so the
+               two sizes are derived from one another rather than set
+               independently. */
+            --boot-logo: clamp(160px, 42vmin, 300px);
+            --boot-ring-width: 7px;
         }
 
         #boot.done { opacity: 0; pointer-events: none; }
 
-        #boot img {
-            width: 72px;
-            height: 72px;
+        /* Square by construction: the ring is a border on a circle, and a
+           circle drawn on a non-square box is an ellipse. */
+        #boot-mark {
+            position: relative;
+            width: calc(var(--boot-logo) + 2 * var(--boot-ring-width));
+            height: calc(var(--boot-logo) + 2 * var(--boot-ring-width));
+        }
+
+        #boot-mark img {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: var(--boot-logo);
+            height: var(--boot-logo);
+            margin: calc(var(--boot-logo) / -2) 0 0 calc(var(--boot-logo) / -2);
             border-radius: 50%;
         }
 
-        #boot-spinner {
-            width: 34px;
-            height: 34px;
-            border: 3px solid #2D2D2D;
+        /* One arc travelling around the logo. The track is drawn in the same
+           near-black the app uses for a raised surface, so only the gold arc
+           reads as motion. */
+        #boot-ring {
+            position: absolute;
+            inset: 0;
+            border: var(--boot-ring-width) solid #2D2D2D;
             border-top-color: #FFCB05;
             border-radius: 50%;
-            animation: boot-spin .9s linear infinite;
-        }
-
-        #boot-label {
-            font-size: .95rem;
-            letter-spacing: .04em;
+            animation: boot-spin 1.1s linear infinite;
         }
 
         @keyframes boot-spin { to { transform: rotate(360deg); } }
@@ -133,7 +145,7 @@
         /* Respect a reduced-motion preference: keep the indicator, drop the
            spin. */
         @media (prefers-reduced-motion: reduce) {
-            #boot-spinner { animation: none; border-top-color: #FFCB05; }
+            #boot-ring { animation: none; }
         }
     </style>
     <!-- Google tag (gtag.js) -->
@@ -297,10 +309,14 @@
         <!-- The loading indicator lives inside the container so that Compose
              removes it along with everything else when it mounts, and so that
              nothing is ever layered over the canvas. -->
-        <div id="boot" role="status" aria-live="polite">
-            <img src="/icon_round.png" alt="" width="72" height="72">
-            <div id="boot-spinner"></div>
-            <div id="boot-label">Loading Reggie.Bot&hellip;</div>
+        <!-- No visible text: the mark and the ring around it say "loading"
+             on their own. aria-label keeps that legible to a screen reader
+             without putting a caption back on the screen. -->
+        <div id="boot" role="status" aria-live="polite" aria-label="Loading Reggie.Bot">
+            <div id="boot-mark">
+                <div id="boot-ring"></div>
+                <img src="/icon_round.png" alt="">
+            </div>
         </div>
         <!-- Not wrapped in <noscript>: crawlers that execute JS ignore it, and
              this needs to be real markup in the initial response. Compose
@@ -311,488 +327,488 @@
             <p>All 482 AR publications (Army Regulations), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.</p>
             <h2>482 publications</h2>
             <ul>
-                <li><a href="/pub/ar-1-1">AR 1-1</a> — Planning, Programming, Budgeting, And Execution — 05/23/2016</li>
-                <li><a href="/pub/ar-1-10">AR 1-10</a> — Fundraising Within The Department Of The Army — 12/22/2025</li>
-                <li><a href="/pub/ar-1-100">AR 1-100</a> — The Army Gift Program — 05/21/2025</li>
-                <li><a href="/pub/ar-1-19">AR 1-19</a> — Secretary Of The Army Delegations Of Authority — 03/27/2024</li>
-                <li><a href="/pub/ar-1-20">AR 1-20</a> — Legislative Liaison — 08/25/2021</li>
-                <li><a href="/pub/ar-1-201">AR 1-201</a> — Army Inspection Policy — 11/01/2023</li>
-                <li><a href="/pub/ar-1-202">AR 1-202</a> — Army Congressional Fellowship Program — 04/07/2017</li>
-                <li><a href="/pub/ar-1-33">AR 1-33</a> — The Army Memorial Program — 07/30/2025</li>
-                <li><a href="/pub/ar-1-50">AR 1-50</a> — Army Conference Policy — 11/25/2024</li>
-                <li><a href="/pub/ar-1-9">AR 1-9</a> — White House Liaison And Communications — 05/28/2014</li>
-                <li><a href="/pub/ar-10-16">AR 10-16</a> — U.s. Army Nuclear And Countering Weapons Of Mass Destruction Agency — 08/29/2019</li>
-                <li><a href="/pub/ar-10-47">AR 10-47</a> — U.s. Army Command And Control Support Agency — 10/26/2010</li>
-                <li><a href="/pub/ar-10-82">AR 10-82</a> — Army National Guard Information Technology — 06/18/2018</li>
-                <li><a href="/pub/ar-10-87">AR 10-87</a> — Army Commands, Army Service Component Commands, And Direct Reporting Units — 12/11/2017</li>
-                <li><a href="/pub/ar-10-89">AR 10-89</a> — U.s. Army Civilian Personnel Evaluation And Analysis Office — 09/08/2022</li>
-                <li><a href="/pub/ar-11-18">AR 11-18</a> — The Cost And Economic Analysis Program — 08/29/2019</li>
-                <li><a href="/pub/ar-11-2">AR 11-2</a> — Risk Management And Internal Control Program — 07/16/2024</li>
-                <li><a href="/pub/ar-11-31">AR 11-31</a> — Army Security Cooperation Policy — 03/21/2013</li>
-                <li><a href="/pub/ar-11-33">AR 11-33</a> — Army Lessons Learned Program — 07/28/2022</li>
-                <li><a href="/pub/ar-11-34">AR 11-34</a> — The Army Respiratory Protection Program — 07/25/2013</li>
-                <li><a href="/pub/ar-11-35">AR 11-35</a> — Occupational And Environmental Health Risk Management — 05/11/2016</li>
-                <li><a href="/pub/ar-11-41">AR 11-41</a> — The Counter-improvised Explosive Device Program — 01/22/2024</li>
-                <li><a href="/pub/ar-11-42">AR 11-42</a> — Army Corrosion Prevention And Control Program — 05/04/2026</li>
-                <li><a href="/pub/ar-11-6">AR 11-6</a> — Army Foreign Language Program — 05/09/2024</li>
-                <li><a href="/pub/ar-11-7">AR 11-7</a> — Internal Review Program — 05/21/2025</li>
-                <li><a href="/pub/ar-115-10">AR 115-10</a> — Weather Support For The U.s. Army {afi 15-157 (ip)} — 09/02/2021</li>
-                <li><a href="/pub/ar-115-13">AR 115-13</a> — Installation Geospatial Information And Services — 07/15/2024</li>
-                <li><a href="/pub/ar-12-1">AR 12-1</a> — Security Assistance, Training, And Export Policy — 02/29/2024</li>
-                <li><a href="/pub/ar-12-15">AR 12-15</a> — Joint Security Cooperation Education And Training {secnavinst 4950.4b; Afi 16-105} — 01/03/2011</li>
-                <li><a href="/pub/ar-12-7">AR 12-7</a> — Security Assistance Teams — 06/23/2009</li>
-                <li><a href="/pub/ar-135-100">AR 135-100</a> — Appointment Of Commissioned And Warrant Officers Of The Army — 09/01/1994</li>
-                <li><a href="/pub/ar-135-101">AR 135-101</a> — Appointment Of Reserve Commissioned Officers For Assignment To Army Medical Department Branches (reprinted W/basic Incl C1-4) — 02/15/1984</li>
-                <li><a href="/pub/ar-135-133">AR 135-133</a> — Ready Reserve Screening, Qualification Records System, And Change Of Address Reporting — 05/02/2025</li>
-                <li><a href="/pub/ar-135-155">AR 135-155</a> — Promotion Of Commissioned Officers And Warrant Officers — 02/12/2025</li>
-                <li><a href="/pub/ar-135-156">AR 135-156</a> — Reserve Component General Officer Personnel Management — 06/01/2026</li>
-                <li><a href="/pub/ar-135-175">AR 135-175</a> — Separation Of Officers — 05/29/2025</li>
-                <li><a href="/pub/ar-135-178">AR 135-178</a> — Enlisted Administrative Separations — 06/06/2025</li>
-                <li><a href="/pub/ar-135-18">AR 135-18</a> — The Active Guard Reserve Program — 08/04/2025</li>
-                <li><a href="/pub/ar-135-180">AR 135-180</a> — Retirement For Regular And Non-regular Service — 02/09/2024</li>
-                <li><a href="/pub/ar-135-200">AR 135-200</a> — Active Duty For Missions, Projects, And Training For Reserve Component Soldiers — 08/18/2025</li>
-                <li><a href="/pub/ar-135-210">AR 135-210</a> — Order To Active Duty As Individuals For Other Than A Presidential Reserve Call-up, Partial Or Full Mobilization — 12/17/2025</li>
-                <li><a href="/pub/ar-135-32">AR 135-32</a> — Retention In An Active Status After Qualification For Retired Pay — 03/26/2025</li>
-                <li><a href="/pub/ar-135-381">AR 135-381</a> — Incapacitation Of Reserve Component Soldiers — 01/03/2021</li>
-                <li><a href="/pub/ar-135-5">AR 135-5</a> — Army Reserve Forces Policy Committee — 01/16/2026</li>
-                <li><a href="/pub/ar-135-9">AR 135-9</a> — Participation In Joint Service Reserve Component Facility Boards — 10/30/2006</li>
-                <li><a href="/pub/ar-135-91">AR 135-91</a> — Service Obligations, Methods Of Fulfillment, Participation Requirements, And Enforcement Procedures — 05/15/2026</li>
-                <li><a href="/pub/ar-140-1">AR 140-1</a> — Mission, Organization, And Training — 01/20/2004</li>
-                <li><a href="/pub/ar-140-10">AR 140-10</a> — Assignments, Attachments, Details, And Transfers — 05/15/2026</li>
-                <li><a href="/pub/ar-140-111">AR 140-111</a> — U.s. Army Reserve Retention Program — 05/13/2026</li>
-                <li><a href="/pub/ar-140-145">AR 140-145</a> — Individual Mobilization Augmentation Program — 03/21/2022</li>
-                <li><a href="/pub/ar-140-185">AR 140-185</a> — Training And Retirement Point Credits And Unit Level Strength Accounting Records — 07/26/2024</li>
-                <li><a href="/pub/ar-140-483">AR 140-483</a> — Army Reserve Land And Facilities Management — 01/24/2020</li>
-                <li><a href="/pub/ar-140-50">AR 140-50</a> — Officer Candidate School, Army Reserve — 10/15/1999</li>
-                <li><a href="/pub/ar-145-1">AR 145-1</a> — Senior Reserve Officers' Training Corps Program: Organization, Administration, And Training — 05/29/2025</li>
-                <li><a href="/pub/ar-145-2">AR 145-2</a> — Junior Reserve Officers' Training Corps Program: Organization, Administration, Operation, And Support — 04/28/2023</li>
-                <li><a href="/pub/ar-15-1">AR 15-1</a> — Department Of The Army Federal Advisory Committee And Intergovernmental And Intragovernmental Management Program — 05/01/2026</li>
-                <li><a href="/pub/ar-15-130">AR 15-130</a> — Army Clemency And Parole Board — 03/24/2022</li>
-                <li><a href="/pub/ar-15-180">AR 15-180</a> — Army Discharge Review Board — 07/21/2021</li>
-                <li><a href="/pub/ar-15-185">AR 15-185</a> — Army Board For Correction Of Military Records — 03/31/2006</li>
-                <li><a href="/pub/ar-15-34">AR 15-34</a> — Department Of The Army Individual Service Review Board — 05/16/2025</li>
-                <li><a href="/pub/ar-15-41">AR 15-41</a> — Chemical, Biological, Radiological, And Nuclear Survivability Committee — 07/26/2024</li>
-                <li><a href="/pub/ar-15-6">AR 15-6</a> — Procedures For Preliminary Inquiries, Administrative Investigations, And Boards Of Officers — 06/22/2025</li>
-                <li><a href="/pub/ar-15-80">AR 15-80</a> — Army Grade Determination Review Board And Grade Determinations — 02/12/2020</li>
-                <li><a href="/pub/ar-150-1">AR 150-1</a> — Organization, Administration, And Operation — 05/26/2026</li>
-                <li><a href="/pub/ar-165-1">AR 165-1</a> — Army Chaplain Corps Activities — 02/05/2024</li>
-                <li><a href="/pub/ar-190-11">AR 190-11</a> — Physical Security Of Arms, Ammunition, And Explosives — 01/17/2019</li>
-                <li><a href="/pub/ar-190-12">AR 190-12</a> — Military Working Dog Program — 10/23/2019</li>
-                <li><a href="/pub/ar-190-13">AR 190-13</a> — The Army Physical Security Program — 04/15/2026</li>
-                <li><a href="/pub/ar-190-14">AR 190-14</a> — Arming And The Use Of Force — 03/01/2024</li>
-                <li><a href="/pub/ar-190-17">AR 190-17</a> — Biological Select Agents And Toxins Security Program — 03/05/2019</li>
-                <li><a href="/pub/ar-190-24">AR 190-24</a> — Armed Forces Disciplinary Control Boards And Off-installation Liaison And Operations {opnavinst 1620.2a; Afi 31-213; Mco 1620.2d; Comdtinst 1620.1e} — 07/27/2006</li>
-                <li><a href="/pub/ar-190-30">AR 190-30</a> — Military Police Investigations — 11/01/2005</li>
-                <li><a href="/pub/ar-190-32">AR 190-32</a> — Army Crime Prevention Program — 04/15/2026</li>
-                <li><a href="/pub/ar-190-45">AR 190-45</a> — Law Enforcement Reporting — 09/27/2016</li>
-                <li><a href="/pub/ar-190-47">AR 190-47</a> — The Army Corrections System — 03/17/2023</li>
-                <li><a href="/pub/ar-190-48">AR 190-48</a> — Protection Of Federal Witnesses On Army Installations — 04/01/2026</li>
-                <li><a href="/pub/ar-190-5">AR 190-5</a> — Motor Vehicle Traffic Supervision {opnav 11200.5d; Afi 31-218(i); Mco 5110.1d; Dlar 5720.1} — 05/22/2006</li>
-                <li><a href="/pub/ar-190-51">AR 190-51</a> — Security Of Unclassified Army Resources (sensitive And Nonsensitive) — 06/27/2019</li>
-                <li><a href="/pub/ar-190-53">AR 190-53</a> — Interception Of Wire And Oral Communications For Law Enforcement Purposes — 07/16/2018</li>
-                <li><a href="/pub/ar-190-54">AR 190-54</a> — Security Of Nuclear Reactors And Special Nuclear Materials — 06/19/2006</li>
-                <li><a href="/pub/ar-190-55">AR 190-55</a> — U.s. Army Corrections System: Procedures For Military Executions — 10/30/2023</li>
-                <li><a href="/pub/ar-190-56">AR 190-56</a> — The Army Civilian Police And Security Guard Program — 11/16/2023</li>
-                <li><a href="/pub/ar-190-58">AR 190-58</a> — Designation And Protection Of High Risk Personnel — 02/25/2018</li>
-                <li><a href="/pub/ar-190-59">AR 190-59</a> — Chemical Agent Security Program — 04/10/2012</li>
-                <li><a href="/pub/ar-190-6">AR 190-6</a> — Obtaining Information From Financial Institutions — 02/09/2006</li>
-                <li><a href="/pub/ar-190-8">AR 190-8</a> — Enemy Prisoners Of War, Retained Personnel, Civilian Internees And Other Detainees {opnavinst 3461.6; Afji 31-304; Mco 3461.1} — 10/01/1997</li>
-                <li><a href="/pub/ar-190-9">AR 190-9</a> — Absentee Deserter Apprehension Program And Surrender Of Military Personnel To Civilian Law Enforcement Agencies — 09/28/2015</li>
-                <li><a href="/pub/ar-195-2">AR 195-2</a> — Criminal Investigation Activities — 07/21/2020</li>
-                <li><a href="/pub/ar-195-3">AR 195-3</a> — The Criminal Investigation Command Special Agent Program — 01/19/2017</li>
-                <li><a href="/pub/ar-195-4">AR 195-4</a> — Use Of Contingency Limitation .0015 Funds For Criminal Investigative Activities — 03/30/2020</li>
-                <li><a href="/pub/ar-195-5">AR 195-5</a> — Evidence Procedures — 08/25/2019</li>
-                <li><a href="/pub/ar-195-6">AR 195-6</a> — Department Of The Army Polygraph Activities — 04/21/2016</li>
-                <li><a href="/pub/ar-20-1">AR 20-1</a> — Inspector General Activities And Procedures — 03/23/2020</li>
-                <li><a href="/pub/ar-200-1">AR 200-1</a> — Environmental Protection And Enhancement — 04/15/2026</li>
-                <li><a href="/pub/ar-210-130">AR 210-130</a> — Laundry And Dry Cleaning Operations — 02/22/2005</li>
-                <li><a href="/pub/ar-210-14">AR 210-14</a> — Installation Status Report Program — 06/11/2019</li>
-                <li><a href="/pub/ar-210-20">AR 210-20</a> — Real Property Master Planning For Army Installations — 05/16/2005</li>
-                <li><a href="/pub/ar-210-22">AR 210-22</a> — Support For Non-federal Entities Authorized To Operate On Department Of The Army Installations — 05/12/2022</li>
-                <li><a href="/pub/ar-210-25">AR 210-25</a> — Vending Facility Program For The Blind On Federal Property — 06/17/2021</li>
-                <li><a href="/pub/ar-210-27">AR 210-27</a> — Basic Policies And Principles For Carrying Out An Economic Adjustment Program — 04/01/2025</li>
-                <li><a href="/pub/ar-210-35">AR 210-35</a> — Civilian Inmate Labor Program And Civilian Inmate Prison Camps On Army Installations — 04/09/2024</li>
-                <li><a href="/pub/ar-210-7">AR 210-7</a> — Personal Commercial Solicitation On Army Installations — 05/11/2021</li>
-                <li><a href="/pub/ar-215-1">AR 215-1</a> — Military Morale, Welfare, And Recreation Programs And Nonappropriated Fund Instrumentalities — 09/24/2010</li>
-                <li><a href="/pub/ar-215-3">AR 215-3</a> — Nonappropriated Funds Instrumentalities Personnel Policy — 05/07/2024</li>
-                <li><a href="/pub/ar-215-4">AR 215-4</a> — Nonappropriated Fund Contracting — 08/05/2026</li>
-                <li><a href="/pub/ar-215-7">AR 215-7</a> — Civilian Nonappropriated Funds And Morale, Welfare, And Recreation Activities — 08/30/2019</li>
-                <li><a href="/pub/ar-215-8">AR 215-8</a> — Army And Air Force Exchange Service Operations {dafi 34-110(i)} — 07/14/2023</li>
-                <li><a href="/pub/ar-220-1">AR 220-1</a> — Army Unit Status Reporting And Force Registration-consolidated Policies — 08/16/2022</li>
-                <li><a href="/pub/ar-220-45">AR 220-45</a> — Duty Rosters — 04/09/2024</li>
-                <li><a href="/pub/ar-220-5">AR 220-5</a> — Designation, Classification, And Change In Status Of Units — 02/14/2024</li>
-                <li><a href="/pub/ar-220-90">AR 220-90</a> — Army Bands — 11/09/2016</li>
-                <li><a href="/pub/ar-25-1">AR 25-1</a> — Army Information Technology — 07/15/2019</li>
-                <li><a href="/pub/ar-25-12">AR 25-12</a> — Communications Security Equipment Maintenance And Maintenance Training — 12/23/2019</li>
-                <li><a href="/pub/ar-25-13">AR 25-13</a> — Army Telecommunications And Unified Capabilities — 05/11/2017</li>
-                <li><a href="/pub/ar-25-2">AR 25-2</a> — Army Cybersecurity — 04/04/2019</li>
-                <li><a href="/pub/ar-25-22">AR 25-22</a> — The Army Privacy And Civil Liberties Program — 09/30/2022</li>
-                <li><a href="/pub/ar-25-30">AR 25-30</a> — Army Publishing Program — 06/14/2021</li>
-                <li><a href="/pub/ar-25-35">AR 25-35</a> — Joint Technical Coordinating Group For Munitions Effectiveness (jtcg/me) Publications {afji 10-411; Navmatinst 5600.23; Mco 5600.43b} — 07/01/1996</li>
-                <li><a href="/pub/ar-25-36">AR 25-36</a> — Instructions For The Interservicing Of Technical Manuals And Related Technology Program {afi 20-118; Ar 25-36; Opnavinst 4160.1a; Mco 5215.16b; Dlar 4151.9} — 03/22/2024</li>
-                <li><a href="/pub/ar-25-38">AR 25-38</a> — Army Printing And Distribution Program — 06/14/2021</li>
-                <li><a href="/pub/ar-25-400-2">AR 25-400-2</a> — Army Records Management Program — 10/18/2022</li>
-                <li><a href="/pub/ar-25-50">AR 25-50</a> — Preparing And Managing Correspondence — 10/10/2020</li>
-                <li><a href="/pub/ar-25-51">AR 25-51</a> — Official Mail And Distribution Management — 01/30/2023</li>
-                <li><a href="/pub/ar-25-55">AR 25-55</a> — The Department Of The Army Freedom Of Information Act Program — 10/19/2020</li>
-                <li><a href="/pub/ar-25-58">AR 25-58</a> — Publishing In The Federal Register — 08/07/2015</li>
-                <li><a href="/pub/ar-25-59">AR 25-59</a> — Office Symbols — 02/15/2024</li>
-                <li><a href="/pub/ar-25-6">AR 25-6</a> — Military Auxiliary Radio System And Amateur Radio Program — 06/15/2026</li>
-                <li><a href="/pub/ar-25-98">AR 25-98</a> — Information Management Control Requirements Program — 02/08/2019</li>
-                <li><a href="/pub/ar-25-99">AR 25-99</a> — Biometrics Program And Dod Biometric Data Management — 07/21/2026</li>
-                <li><a href="/pub/ar-27-1">AR 27-1</a> — Judge Advocate Legal Services — 01/24/2017</li>
-                <li><a href="/pub/ar-27-10">AR 27-10</a> — Military Justice — 01/08/2025</li>
-                <li><a href="/pub/ar-27-20">AR 27-20</a> — Claims — 02/08/2008</li>
-                <li><a href="/pub/ar-27-26">AR 27-26</a> — Rules Of Professional Conduct For Lawyers — 03/26/2025</li>
-                <li><a href="/pub/ar-27-3">AR 27-3</a> — The Army Legal Assistance Program — 05/01/2024</li>
-                <li><a href="/pub/ar-27-40">AR 27-40</a> — Litigation — 09/19/1994</li>
-                <li><a href="/pub/ar-27-50">AR 27-50</a> — Status Of Forces Policies, Procedures, And Information {secnavinst 5820.4g} — 12/15/1989</li>
-                <li><a href="/pub/ar-27-52">AR 27-52</a> — Consular Protection Of Foreign Nationals Subject To The Uniform Code Of Military Justice {secnavinst 5820.6a; Dafi 51-707} — 07/24/2026</li>
-                <li><a href="/pub/ar-27-53">AR 27-53</a> — Legal Review Of Weapons And Weapon Systems — 09/23/2019</li>
-                <li><a href="/pub/ar-27-55">AR 27-55</a> — Notarial Services — 01/24/2020</li>
-                <li><a href="/pub/ar-27-60">AR 27-60</a> — Intellectual Property — 06/01/1993</li>
-                <li><a href="/pub/ar-27-70">AR 27-70</a> — Department Of Defense Foreign Tax Relief Program — 08/03/2022</li>
-                <li><a href="/pub/ar-290-5">AR 290-5</a> — Army Cemeteries — 10/21/2020</li>
-                <li><a href="/pub/ar-30-22">AR 30-22</a> — Army Food Program — 07/17/2019</li>
-                <li><a href="/pub/ar-34-1">AR 34-1</a> — Interoperability — 04/09/2020</li>
-                <li><a href="/pub/ar-350-1">AR 350-1</a> — Army Training And Leader Development — 06/01/2025</li>
-                <li><a href="/pub/ar-350-10">AR 350-10</a> — Management Of Army Individual Training Requirements And Resources — 11/20/2023</li>
-                <li><a href="/pub/ar-350-100">AR 350-100</a> — Officer Active Duty Service Obligations — 07/21/2023</li>
-                <li><a href="/pub/ar-350-19">AR 350-19</a> — The Army Sustainable Range Program — 08/30/2005</li>
-                <li><a href="/pub/ar-350-2">AR 350-2</a> — Operational Environment And Opposing Force Program — 03/12/2024</li>
-                <li><a href="/pub/ar-350-20">AR 350-20</a> — Management Of Defense Foreign Language Training {opnavinst 1550.13; Afi 35–4004; Mco 1550.4e} — 03/12/2018</li>
-                <li><a href="/pub/ar-350-28">AR 350-28</a> — Army Exercises — 12/09/1997</li>
-                <li><a href="/pub/ar-350-32">AR 350-32</a> — The Army Foundry Intelligence Training Program — 08/26/2024</li>
-                <li><a href="/pub/ar-350-38">AR 350-38</a> — Policies And Management For Training Aids, Devices, Simulators, And Simulations — 02/02/2018</li>
-                <li><a href="/pub/ar-350-50">AR 350-50</a> — Combat Training Center Program — 05/02/2018</li>
-                <li><a href="/pub/ar-350-51">AR 350-51</a> — United States Army Officer Candidate School — 05/15/2026</li>
-                <li><a href="/pub/ar-350-52">AR 350-52</a> — Army Training Support System — 01/17/2014</li>
-                <li><a href="/pub/ar-350-53">AR 350-53</a> — Comprehensive Soldier And Family Fitness — 10/04/2024</li>
-                <li><a href="/pub/ar-350-66">AR 350-66</a> — Small Arms Competitive Marksmanship Program — 09/23/2019</li>
-                <li><a href="/pub/ar-350-9">AR 350-9</a> — Overseas Deployment Training — 11/08/2004</li>
-                <li><a href="/pub/ar-351-3">AR 351-3</a> — Professional Education And Training Programs Of The Army Medical Department — 10/15/2007</li>
-                <li><a href="/pub/ar-351-9">AR 351-9</a> — Inter-service Training {opnavinst 1500.27h; Dafi 36-2657; Mco 1580.7f; Comdtinst 1580.1a} — 01/22/2024</li>
-                <li><a href="/pub/ar-36-2">AR 36-2</a> — Audit Services In The Department Of The Army — 08/14/2023</li>
-                <li><a href="/pub/ar-360-1">AR 360-1</a> — The Army Public Affairs Program — 04/15/2026</li>
-                <li><a href="/pub/ar-37-47">AR 37-47</a> — Official Representation Funds Of The Secretary Of The Army — 11/17/2023</li>
-                <li><a href="/pub/ar-37-64">AR 37-64</a> — Finance And Accounting For Sensitive Mission Funding (c) — 02/15/2023</li>
-                <li><a href="/pub/ar-370-2">AR 370-2</a> — The Army Library Program — 02/05/2024</li>
-                <li><a href="/pub/ar-380-10">AR 380-10</a> — Foreign Disclosure And Contacts With Foreign Representatives — 07/14/2015</li>
-                <li><a href="/pub/ar-380-13">AR 380-13</a> — Acquisition And Storage Of Information Concerning Nonaffiliated Persons And Organizations — 09/30/1974</li>
-                <li><a href="/pub/ar-380-27">AR 380-27</a> — Control Of Compromising Emanations — 07/22/2014</li>
-                <li><a href="/pub/ar-380-28">AR 380-28</a> — Army Sensitive Compartmented Information Security Program — 08/13/2018</li>
-                <li><a href="/pub/ar-380-381">AR 380-381</a> — Special Access Programs (saps) And Sensitive Activities — 04/21/2004</li>
-                <li><a href="/pub/ar-380-40">AR 380-40</a> — Safeguarding And Controlling Communications Security Material — 09/06/2022</li>
-                <li><a href="/pub/ar-380-49">AR 380-49</a> — Industrial Security Program — 03/20/2013</li>
-                <li><a href="/pub/ar-380-5">AR 380-5</a> — Army Information Security Program — 03/25/2022</li>
-                <li><a href="/pub/ar-380-53">AR 380-53</a> — Communications Security Monitoring — 12/23/2011</li>
-                <li><a href="/pub/ar-380-67">AR 380-67</a> — Personnel Security Program — 04/15/2026</li>
-                <li><a href="/pub/ar-381-10">AR 381-10</a> — The Conduct And Oversight Of U.s. Army Intelligence Activities — 01/27/2023</li>
-                <li><a href="/pub/ar-381-100">AR 381-100</a> — (u) The Army Human Intelligence (humint) Collection Program (s) — 08/27/2020</li>
-                <li><a href="/pub/ar-381-102">AR 381-102</a> — U.s. Army Cover Program (u) — 04/04/2022</li>
-                <li><a href="/pub/ar-381-11">AR 381-11</a> — Intelligence Support To Capability Development — 01/30/2019</li>
-                <li><a href="/pub/ar-381-12">AR 381-12</a> — Counterintelligence Awareness And Reporting — 06/13/2025</li>
-                <li><a href="/pub/ar-381-14">AR 381-14</a> — Technical Surveillance Countermeasures — 02/17/2015</li>
-                <li><a href="/pub/ar-381-141">AR 381-141</a> — Intelligence Contingency Funds (icf) (u) — 06/29/2020</li>
-                <li><a href="/pub/ar-381-143">AR 381-143</a> — Non-standard Materiel Policy And Intelligence Procedures (u) (only Available On Siprnet) — 04/28/2015</li>
-                <li><a href="/pub/ar-381-20">AR 381-20</a> — The Army Counterintelligence Program (u) — 06/09/2022</li>
-                <li><a href="/pub/ar-381-26">AR 381-26</a> — Army Foreign Materiel Program (u) — 01/30/2023</li>
-                <li><a href="/pub/ar-381-45">AR 381-45</a> — U.s. Army Intelligence And Security Records Repository — 04/19/2023</li>
-                <li><a href="/pub/ar-381-47">AR 381-47</a> — Offensive Counterintelligence Operations — 09/27/2022</li>
-                <li><a href="/pub/ar-385-10">AR 385-10</a> — The Army Safety And Occupational Health Program — 07/24/2023</li>
-                <li><a href="/pub/ar-385-63">AR 385-63</a> — Range Safety {mco 3570.1d} — 05/23/2025</li>
-                <li><a href="/pub/ar-40-1">AR 40-1</a> — Composition, Mission, And Functions Of The Army Medical Department — 05/24/2019</li>
-                <li><a href="/pub/ar-40-10">AR 40-10</a> — Health Hazard Assessment Program In Support Of The Army Acquisition Process — 07/27/2007</li>
-                <li><a href="/pub/ar-40-13">AR 40-13</a> — Radiological Advisory Medical Teams — 07/15/2019</li>
-                <li><a href="/pub/ar-40-21">AR 40-21</a> — Medical Aspects Of Army Aircraft Accident Investigation — 06/07/2019</li>
-                <li><a href="/pub/ar-40-25">AR 40-25</a> — Nutrition Standards And Education {opnavinst 10110.1; Mco 10110.49; Afi 44–141} — 01/03/2017</li>
-                <li><a href="/pub/ar-40-3">AR 40-3</a> — Medical, Dental, And Veterinary Care — 04/23/2013</li>
-                <li><a href="/pub/ar-40-33">AR 40-33</a> — The Care And Use Of Animals In Dod Research, Development, Test, And Evaluation (rdt&amp;e) Or Training Programs {dha-msr 6025.02; Ar 40-33; Secnavinst 3900.38d; Afm 40-401(i); Darpainst 18; Usuhsinst 3203} — 09/01/2022</li>
-                <li><a href="/pub/ar-40-35">AR 40-35</a> — Preventive Dentistry And Dental Readiness — 07/21/2016</li>
-                <li><a href="/pub/ar-40-400">AR 40-400</a> — Patient Administration — 07/08/2014</li>
-                <li><a href="/pub/ar-40-5">AR 40-5</a> — Army Public Health Program — 05/12/2020</li>
-                <li><a href="/pub/ar-40-501">AR 40-501</a> — Standards Of Medical Fitness — 06/27/2019</li>
-                <li><a href="/pub/ar-40-502">AR 40-502</a> — Medical Readiness — 06/27/2019</li>
-                <li><a href="/pub/ar-40-562">AR 40-562</a> — Immunizations And Chemoprophylaxis For The Prevention Of Infectious Diseases {bumedinst 6230.15b; Afi 48-110_ip; Cg Comdtinst M6230.4g} — 10/07/2013</li>
-                <li><a href="/pub/ar-40-58">AR 40-58</a> — Army Recovery Care Program — 05/12/2020</li>
-                <li><a href="/pub/ar-40-60">AR 40-60</a> — Army Medical Materiel Acquisition Policy — 05/06/2014</li>
-                <li><a href="/pub/ar-40-61">AR 40-61</a> — Medical Logistics Policies — 01/28/2005</li>
-                <li><a href="/pub/ar-40-63">AR 40-63</a> — Ophthalmic Services {secnavinst 6810.1; Afi 44   117} — 04/14/2015</li>
-                <li><a href="/pub/ar-40-656">AR 40-656</a> — Veterinary Surveillance Inspection Of Subsistence {navsupinst 4355.10a; Mco 10110.48} — 08/28/2006</li>
-                <li><a href="/pub/ar-40-657">AR 40-657</a> — Veterinary/medical Food Safety, Quality Assurance, And Laboratory Service {navsup 4355.4h; Mco P10110.31h} — 01/21/2005</li>
-                <li><a href="/pub/ar-40-66">AR 40-66</a> — Medical Record Administration And Healthcare Documentation — 06/17/2008</li>
-                <li><a href="/pub/ar-40-660">AR 40-660</a> — Dod Hazardous Food And Nonprescription Drug Recall System {dha-msr 6025.01; Dlar 6025.01; Navsupinst 10110.8d; Afi 48-161_ip; Mco 10110.38d} — 09/06/2018</li>
-                <li><a href="/pub/ar-40-68">AR 40-68</a> — Clinical Quality Management — 02/26/2004</li>
-                <li><a href="/pub/ar-40-7">AR 40-7</a> — Use Of U.s. Food And Drug Administration-regulated Investigational Products In Humans Including Schedule I Controlled Substances — 10/19/2009</li>
-                <li><a href="/pub/ar-40-8">AR 40-8</a> — Temporary Flying Restriction Due To Exogenous Factors Affecting Aircrew Efficiency — 02/02/2022</li>
-                <li><a href="/pub/ar-40-905">AR 40-905</a> — Veterinary Health Services {secnavinst 6401.1b; Afi 48-131} — 08/29/2006</li>
-                <li><a href="/pub/ar-405-10">AR 405-10</a> — Acquisition Of Real Property And Interests Therein (reprinted W/basic Incl C1-2) — 05/14/1970</li>
-                <li><a href="/pub/ar-405-16">AR 405-16</a> — Homeowners Assistance Program — 09/29/2016</li>
-                <li><a href="/pub/ar-405-45">AR 405-45</a> — Real Property Inventory Management — 11/01/2004</li>
-                <li><a href="/pub/ar-405-70">AR 405-70</a> — Utilization Of Real Property — 05/12/2006</li>
-                <li><a href="/pub/ar-405-80">AR 405-80</a> — Management Of Title And Granting Use Of Real Property — 04/22/2024</li>
-                <li><a href="/pub/ar-405-90">AR 405-90</a> — Disposal Of Real Property — 06/08/2020</li>
-                <li><a href="/pub/ar-415-16">AR 415-16</a> — Army Facilities Components System — 01/05/2018</li>
-                <li><a href="/pub/ar-415-28">AR 415-28</a> — Real Property Category Codes — 04/15/2014</li>
-                <li><a href="/pub/ar-415-32">AR 415-32</a> — Engineer Troop Unit Construction In Connection With Training Activities — 06/18/2018</li>
-                <li><a href="/pub/ar-420-1">AR 420-1</a> — Army Facilities Management — 04/15/2026</li>
-                <li><a href="/pub/ar-420-41">AR 420-41</a> — Acquisition And Sale Of Utilities Services — 03/03/2015</li>
-                <li><a href="/pub/ar-420-5">AR 420-5</a> — Army Fire And Emergency Services — 08/01/2024</li>
-                <li><a href="/pub/ar-5-1">AR 5-1</a> — Management Of Army Business Operations — 11/12/2015</li>
-                <li><a href="/pub/ar-5-10">AR 5-10</a> — Stationing — 04/02/2025</li>
-                <li><a href="/pub/ar-5-11">AR 5-11</a> — Management Of Army Modeling And Simulation — 05/16/2025</li>
-                <li><a href="/pub/ar-5-12">AR 5-12</a> — Army Use Of The Electromagnetic Spectrum — 02/08/2020</li>
-                <li><a href="/pub/ar-5-13">AR 5-13</a> — Army Munitions Requirements, Prioritization, And Authorizations Management Policy — 03/31/2021</li>
-                <li><a href="/pub/ar-5-18">AR 5-18</a> — Army Stationing And Installation Plan — 08/05/2022</li>
-                <li><a href="/pub/ar-5-21">AR 5-21</a> — Rand Arroyo Center — 06/29/2018</li>
-                <li><a href="/pub/ar-5-22">AR 5-22</a> — The Army Force Modernization Proponent System — 06/13/2023</li>
-                <li><a href="/pub/ar-5-25">AR 5-25</a> — Army Weather Functional Activities — 08/14/2023</li>
-                <li><a href="/pub/ar-5-9">AR 5-9</a> — Installation Agreements — 04/17/2018</li>
-                <li><a href="/pub/ar-50-5">AR 50-5</a> — Nuclear Surety — 06/15/2026</li>
-                <li><a href="/pub/ar-50-6">AR 50-6</a> — Chemical Surety — 10/13/2022</li>
-                <li><a href="/pub/ar-50-7">AR 50-7</a> — Army Reactor Program — 11/17/2016</li>
-                <li><a href="/pub/ar-500-3">AR 500-3</a> — U.s. Army Continuity Of Operations Program — 07/02/2021</li>
-                <li><a href="/pub/ar-500-5">AR 500-5</a> — Army Mobilization — 04/16/2015</li>
-                <li><a href="/pub/ar-525-13">AR 525-13</a> — Antiterrorism — 04/15/2026</li>
-                <li><a href="/pub/ar-525-17">AR 525-17</a> — (s) Special Mission Badges And Credentials (u) — 04/09/2019</li>
-                <li><a href="/pub/ar-525-2">AR 525-2</a> — The Army Protection Program — 06/09/2023</li>
-                <li><a href="/pub/ar-525-20">AR 525-20</a> — Information Operations — 09/29/2010</li>
-                <li><a href="/pub/ar-525-21">AR 525-21</a> — (c) Army Military Deception (mildec) Program (u) — 10/28/2013</li>
-                <li><a href="/pub/ar-525-24">AR 525-24</a> — U.s. Army Cyberspace And Electromagnetic Warfare Operations — 07/12/2023</li>
-                <li><a href="/pub/ar-525-26">AR 525-26</a> — Army Mission Assurance And The Mission Assurance Construct — 07/10/2025</li>
-                <li><a href="/pub/ar-525-27">AR 525-27</a> — Army Emergency Management Program — 03/29/2019</li>
-                <li><a href="/pub/ar-525-28">AR 525-28</a> — Personnel Recovery — 03/05/2010</li>
-                <li><a href="/pub/ar-525-29">AR 525-29</a> — Force Generation - Sustainable Readiness — 10/01/2019</li>
-                <li><a href="/pub/ar-525-30">AR 525-30</a> — Army Strategic And Operational Readiness — 04/09/2020</li>
-                <li><a href="/pub/ar-525-92">AR 525-92</a> — Army Arms Control Implementation And Compliance Policy — 09/27/2021</li>
-                <li><a href="/pub/ar-525-93">AR 525-93</a> — Army Deployment And Redeployment — 04/15/2026</li>
-                <li><a href="/pub/ar-525-94">AR 525-94</a> — Evacuation Of U.s. Citizens And Designated Aliens From Threatened Areas — 08/09/2024</li>
-                <li><a href="/pub/ar-525-95">AR 525-95</a> — Army Geospatial-intelligence And Geospatial Information And Services — 07/26/2022</li>
-                <li><a href="/pub/ar-530-1">AR 530-1</a> — Operations Security — 09/26/2014</li>
-                <li><a href="/pub/ar-55-46">AR 55-46</a> — Travel Overseas — 07/16/2024</li>
-                <li><a href="/pub/ar-55-48">AR 55-48</a> — Transportation Of Personal Property And Related Services — 03/19/2024</li>
-                <li><a href="/pub/ar-550-1">AR 550-1</a> — Processing Requests For Political Asylum And Temporary Refuge — 06/21/2004</li>
-                <li><a href="/pub/ar-550-51">AR 550-51</a> — International Agreements — 05/02/2008</li>
-                <li><a href="/pub/ar-550-52">AR 550-52</a> — Acquisition And Cross-servicing Agreements — 05/12/2025</li>
-                <li><a href="/pub/ar-56-3">AR 56-3</a> — Army Rail Operations — 08/09/2024</li>
-                <li><a href="/pub/ar-56-4">AR 56-4</a> — Distribution Of Materiel, Distribution Platform Management, And In-transit Visibility — 04/15/2026</li>
-                <li><a href="/pub/ar-56-9">AR 56-9</a> — Army Intratheater Watercraft Systems — 10/02/2020</li>
-                <li><a href="/pub/ar-570-4">AR 570-4</a> — Manpower Management — 05/01/2024</li>
-                <li><a href="/pub/ar-58-1">AR 58-1</a> — Management, Acquisition, And Use Of Motor Vehicles — 05/30/2025</li>
-                <li><a href="/pub/ar-59-3">AR 59-3</a> — Movement Of Cargo By Scheduled Military Air Transportation — 03/23/2017</li>
-                <li><a href="/pub/ar-59-4">AR 59-4</a> — Joint Airdrop Inspection Records, Malfunction Or Incident Investigations, And Activity Reporting {opnavinst 4630.24e; Afman 13-210 Volume 1; Mco 13480.1e Volume 1} — 08/09/2024</li>
-                <li><a href="/pub/ar-59-9">AR 59-9</a> — Special Assignment Airlift Mission Requirements — 07/12/2018</li>
-                <li><a href="/pub/ar-600-100">AR 600-100</a> — Army Profession And Leadership Policy — 03/27/2025</li>
-                <li><a href="/pub/ar-600-105">AR 600-105</a> — Aviation Service Of Rated Army Officers — 06/05/2020</li>
-                <li><a href="/pub/ar-600-106">AR 600-106</a> — Flying Status For Nonrated Army Aviation Personnel — 02/02/2022</li>
-                <li><a href="/pub/ar-600-110">AR 600-110</a> — Identification, Surveillance, And Administration Of Personnel Infected With Human Immunodeficiency Virus — 04/22/2014</li>
-                <li><a href="/pub/ar-600-20">AR 600-20</a> — Army Command Policy — 04/15/2026</li>
-                <li><a href="/pub/ar-600-25">AR 600-25</a> — Salutes, Honors, And Courtesy — 05/01/2026</li>
-                <li><a href="/pub/ar-600-291">AR 600-291</a> — Foreign Government Employment — 06/07/2024</li>
-                <li><a href="/pub/ar-600-3">AR 600-3</a> — The Army Personnel Development System — 02/07/2025</li>
-                <li><a href="/pub/ar-600-32">AR 600-32</a> — Conduct Between Soldiers Of Different Grades — 09/16/2024</li>
-                <li><a href="/pub/ar-600-37">AR 600-37</a> — Unfavorable Information — 10/02/2020</li>
-                <li><a href="/pub/ar-600-38">AR 600-38</a> — The Meal Entitlement Management System — 11/01/2023</li>
-                <li><a href="/pub/ar-600-4">AR 600-4</a> — Remission Or Cancellation Of Indebtedness — 10/29/2024</li>
-                <li><a href="/pub/ar-600-43">AR 600-43</a> — Conscientious Objection — 02/22/2023</li>
-                <li><a href="/pub/ar-600-52">AR 600-52</a> — Sexual Harassment/assault Response And Prevention Program — 02/11/2025</li>
-                <li><a href="/pub/ar-600-55">AR 600-55</a> — The Army Driver And Operator Standardization Program (selection, Training, Testing, And Licensing) — 04/25/2025</li>
-                <li><a href="/pub/ar-600-62">AR 600-62</a> — U.s. Army Personnel Control Facility Procedures For Administering Assigned And Attached Personnel — 03/18/2024</li>
-                <li><a href="/pub/ar-600-63">AR 600-63</a> — Army Health Promotion — 04/15/2026</li>
-                <li><a href="/pub/ar-600-7">AR 600-7</a> — Unlawful Discrimination On The Basis Of Disability In Programs And Activities Receiving Federal Financial Assistance From Or Conducted By The Department Of The Army — 02/06/2025</li>
-                <li><a href="/pub/ar-600-77">AR 600-77</a> — Administrative Management Of Wounded, Ill, Or Injured Soldiers — 03/05/2019</li>
-                <li><a href="/pub/ar-600-78">AR 600-78</a> — Army Suitability, Fitness, And Credentialing Program — 03/08/2024</li>
-                <li><a href="/pub/ar-600-8">AR 600-8</a> — Military Human Resources Management — 09/26/2025</li>
-                <li><a href="/pub/ar-600-8-10">AR 600-8-10</a> — Leaves And Passes — 06/03/2020</li>
-                <li><a href="/pub/ar-600-8-101">AR 600-8-101</a> — Personnel Readiness Processing — 03/06/2018</li>
-                <li><a href="/pub/ar-600-8-104">AR 600-8-104</a> — Army Military Human Resource Records Management — 06/29/2023</li>
-                <li><a href="/pub/ar-600-8-105">AR 600-8-105</a> — Military Orders - This Edition Remains In Effect Until 6 September 2026 — 12/20/2022</li>
-                <li><a href="/pub/ar-600-8-105">AR 600-8-105</a> — Military Orders — 08/06/2026</li>
-                <li><a href="/pub/ar-600-8-11">AR 600-8-11</a> — Reassignment — 05/01/2007</li>
-                <li><a href="/pub/ar-600-8-111">AR 600-8-111</a> — Army Mobilization, Manning, And Wartime Replacement Operations — 02/22/2024</li>
-                <li><a href="/pub/ar-600-8-14">AR 600-8-14</a> — Identification Cards For Members Of The Uniformed Services, Their Family Members, And Other Eligible Personnel — 10/21/2020</li>
-                <li><a href="/pub/ar-600-8-19">AR 600-8-19</a> — Enlisted Promotions And Demotions — 03/06/2026</li>
-                <li><a href="/pub/ar-600-8-2">AR 600-8-2</a> — Suspension Of Favorable Personnel Actions (flag) — 04/05/2021</li>
-                <li><a href="/pub/ar-600-8-22">AR 600-8-22</a> — Military Awards — 05/11/2026</li>
-                <li><a href="/pub/ar-600-8-24">AR 600-8-24</a> — Officer Transfers And Discharges — 05/05/2026</li>
-                <li><a href="/pub/ar-600-8-29">AR 600-8-29</a> — Officer Promotions — 09/09/2020</li>
-                <li><a href="/pub/ar-600-8-3">AR 600-8-3</a> — Postal Operations — 01/16/2026</li>
-                <li><a href="/pub/ar-600-8-4">AR 600-8-4</a> — Line Of Duty Policy, Procedures, And Investigations — 11/12/2020</li>
-                <li><a href="/pub/ar-600-8-6">AR 600-8-6</a> — Personnel Accountability — 05/12/2026</li>
-                <li><a href="/pub/ar-600-8-7">AR 600-8-7</a> — Retirement Services Program — 09/20/2022</li>
-                <li><a href="/pub/ar-600-81">AR 600-81</a> — Transition Assistance Program — 03/25/2026</li>
-                <li><a href="/pub/ar-600-85">AR 600-85</a> — The Army Substance Abuse Program — 10/04/2024</li>
-                <li><a href="/pub/ar-600-86">AR 600-86</a> — Army Disaster Personnel Accountability And Assessment Program — 09/16/2024</li>
-                <li><a href="/pub/ar-600-88">AR 600-88</a> — Sea Duty — 09/23/2021</li>
-                <li><a href="/pub/ar-600-89">AR 600-89</a> — General Douglas Macarthur Leadership Award Program — 12/14/2022</li>
-                <li><a href="/pub/ar-600-9">AR 600-9</a> — The Army Body Composition Program — 07/16/2019</li>
-                <li><a href="/pub/ar-600-91">AR 600-91</a> — Army Career Intermission Program — 05/25/2023</li>
-                <li><a href="/pub/ar-600-92">AR 600-92</a> — Army Suicide Prevention Program — 10/04/2024</li>
-                <li><a href="/pub/ar-601-1">AR 601-1</a> — Assignment Of Personnel To Army Recruiting Activities — 02/13/2026</li>
-                <li><a href="/pub/ar-601-10">AR 601-10</a> — Management And Recall To Active Duty Of Retired Soldiers Of The Army In Support Of Mobilization And Peacetime Operations — 06/07/2019</li>
-                <li><a href="/pub/ar-601-100">AR 601-100</a> — Appointment Of Commissioned And Warrant Officers In The Regular Army — 11/21/2006</li>
-                <li><a href="/pub/ar-601-141">AR 601-141</a> — U.s. Army Health Professions Scholarship, Financial Assistance, And Active Duty Health Professions Loan Repayment Programs — 09/19/2006</li>
-                <li><a href="/pub/ar-601-142">AR 601-142</a> — Army Medical Department Professional Filler System — 10/22/2015</li>
-                <li><a href="/pub/ar-601-2">AR 601-2</a> — Army Recruiting Support Programs — 04/13/2020</li>
-                <li><a href="/pub/ar-601-20">AR 601-20</a> — The Interservice Physician Assistant Training Program — 08/14/2009</li>
-                <li><a href="/pub/ar-601-208">AR 601-208</a> — The Army Marketing Program — 11/10/2021</li>
-                <li><a href="/pub/ar-601-210">AR 601-210</a> — Regular Army And Reserve Components Enlistment Program — 03/20/2026</li>
-                <li><a href="/pub/ar-601-25">AR 601-25</a> — Delay In Reporting For And Exemption From Active Duty, Initial Active Duty For Training, And Reserve Forces Duty — 10/18/2023</li>
-                <li><a href="/pub/ar-601-280">AR 601-280</a> — Army Retention Program — 04/14/2023</li>
-                <li><a href="/pub/ar-601-50">AR 601-50</a> — Appointment Of Temporary Officers In The Army Of The United States Upon Mobilization (reprinted W/basic Incl C1-2) — 12/04/1987</li>
-                <li><a href="/pub/ar-602-2">AR 602-2</a> — Human Systems Integration In The System Acquisition Process — 06/29/2022</li>
-                <li><a href="/pub/ar-608-1">AR 608-1</a> — Soldier And Family Readiness — 05/26/2026</li>
-                <li><a href="/pub/ar-608-10">AR 608-10</a> — Child, Youth, And School Services — 05/11/2026</li>
-                <li><a href="/pub/ar-608-18">AR 608-18</a> — The Army Family Advocacy Program — 10/30/2007</li>
-                <li><a href="/pub/ar-608-20">AR 608-20</a> — Army Voting Assistance Program — 04/15/2026</li>
-                <li><a href="/pub/ar-608-75">AR 608-75</a> — Exceptional Family Member Program — 01/27/2017</li>
-                <li><a href="/pub/ar-608-99">AR 608-99</a> — Family Support, Child Custody, And Parentage — 11/13/2020</li>
-                <li><a href="/pub/ar-611-1">AR 611-1</a> — Military Occupational Classification Structure Development And Implementation — 12/20/2022</li>
-                <li><a href="/pub/ar-611-105">AR 611-105</a> — Selection, Training, And Suitability For Explosive Ordnance Disposal — 05/30/2024</li>
-                <li><a href="/pub/ar-611-110">AR 611-110</a> — Selection Of Army Aviation Officers And Warrant Officers — 08/09/2023</li>
-                <li><a href="/pub/ar-611-5">AR 611-5</a> — Personnel And Classification Testing — 04/25/2022</li>
-                <li><a href="/pub/ar-611-60">AR 611-60</a> — Assignment Of Army Personnel To The Defense Attache Service — 02/12/2020</li>
-                <li><a href="/pub/ar-611-75">AR 611-75</a> — Management Of Army Divers — 10/11/2024</li>
-                <li><a href="/pub/ar-612-201">AR 612-201</a> — Initial Entry/prior Service Trainee Support — 03/11/2024</li>
-                <li><a href="/pub/ar-614-10">AR 614-10</a> — Army Military Personnel Exchange Program With Military Services Of Other Nations — 07/14/2011</li>
-                <li><a href="/pub/ar-614-100">AR 614-100</a> — Officer Assignment Policies And Procedures — 05/08/2024</li>
-                <li><a href="/pub/ar-614-115">AR 614-115</a> — Military Intelligence Excepted Career Program (great Skill) — 04/30/2010</li>
-                <li><a href="/pub/ar-614-120">AR 614-120</a> — Inter-service Transfer Of Commissioned Officers — 01/21/2022</li>
-                <li><a href="/pub/ar-614-200">AR 614-200</a> — Enlisted Assignments And Utilization Management — 06/27/2025</li>
-                <li><a href="/pub/ar-614-30">AR 614-30</a> — Overseas Service — 03/26/2025</li>
-                <li><a href="/pub/ar-616-110">AR 616-110</a> — Selection, Training, Utilization And Career Guidance For Army Medical Corps Officers As Flight Surgeons — 04/25/2018</li>
-                <li><a href="/pub/ar-621-1">AR 621-1</a> — Advanced Education Programs And Requirements For Military Personnel — 05/08/2024</li>
-                <li><a href="/pub/ar-621-202">AR 621-202</a> — Army Educational Incentives And Entitlements — 03/26/2025</li>
-                <li><a href="/pub/ar-621-5">AR 621-5</a> — Army Continuing Education System — 03/19/2026</li>
-                <li><a href="/pub/ar-621-7">AR 621-7</a> — The Army Fellowship And Scholarship Program — 03/12/2019</li>
-                <li><a href="/pub/ar-621-8">AR 621-8</a> — Management Of Defense English Language Training {af I36-4003; Mco1550.25a;opnavinst1550.12b} — 03/18/2025</li>
-                <li><a href="/pub/ar-623-3">AR 623-3</a> — Evaluation Reporting System — 02/14/2025</li>
-                <li><a href="/pub/ar-630-10">AR 630-10</a> — Absence Without Leave, Desertion, And Administration Of Personnel Involved In Civilian Court Proceedings — 01/13/2006</li>
-                <li><a href="/pub/ar-633-30">AR 633-30</a> — Military Sentences To Confinement {afr 125-30} — 12/02/2015</li>
-                <li><a href="/pub/ar-635-200">AR 635-200</a> — Active Duty Enlisted Administrative Separations — 06/30/2025</li>
-                <li><a href="/pub/ar-635-40">AR 635-40</a> — Disability Evaluation For Retention, Retirement, Or Separation — 01/19/2017</li>
-                <li><a href="/pub/ar-635-5-1">AR 635-5-1</a> — Separation Program Designator Codes — 03/02/2022</li>
-                <li><a href="/pub/ar-635-8">AR 635-8</a> — Separation Processing And Documents — 09/17/2019</li>
-                <li><a href="/pub/ar-637-1">AR 637-1</a> — Army Compensation And Entitlements Policy — 07/26/2021</li>
-                <li><a href="/pub/ar-637-2">AR 637-2</a> — Separation Pay (nondisability) And Levels Of Payment — 08/18/2022</li>
-                <li><a href="/pub/ar-638-2">AR 638-2</a> — Army Mortuary Affairs Program — 03/03/2023</li>
-                <li><a href="/pub/ar-638-34">AR 638-34</a> — Army Fatal Incident Family Brief Program — 04/26/2023</li>
-                <li><a href="/pub/ar-638-8">AR 638-8</a> — Army Casualty Program — 05/15/2026</li>
-                <li><a href="/pub/ar-640-30">AR 640-30</a> — Official Army Photographs — 12/06/2019</li>
-                <li><a href="/pub/ar-670-1">AR 670-1</a> — Wear And Appearance Of Army Uniforms And Insignia — 01/26/2021</li>
-                <li><a href="/pub/ar-670-10">AR 670-10</a> — Furnishing Uniforms, Or Paying Uniform Allowances, To Civilian Employees — 07/09/2021</li>
-                <li><a href="/pub/ar-672-11">AR 672-11</a> — Brigadier General Jeremiah P. Holland Award — 02/20/2013</li>
-                <li><a href="/pub/ar-672-16">AR 672-16</a> — Zachary And Elizabeth Fisher Distinguished Civilian Humanitarian Award {secnavinst 5061.16a; Afman 36-2806} — 03/26/2025</li>
-                <li><a href="/pub/ar-672-20">AR 672-20</a> — Incentive Awards — 11/06/2024</li>
-                <li><a href="/pub/ar-672-8">AR 672-8</a> — Manufacture, Sale, Wear, And Quality Control Of Heraldic Items — 12/30/2025</li>
-                <li><a href="/pub/ar-690-11">AR 690-11</a> — Department Of The Army Expeditionary Civilians — 12/30/2025</li>
-                <li><a href="/pub/ar-690-12">AR 690-12</a> — Civilian Personnel Equal Employment Opportunity Programs — 02/06/2025</li>
-                <li><a href="/pub/ar-690-200">AR 690-200</a> — General Personnel Provisions — 06/06/2025</li>
-                <li><a href="/pub/ar-690-300">AR 690-300</a> — Employment — 06/05/2025</li>
-                <li><a href="/pub/ar-690-500">AR 690-500</a> — Pay And Allowances Administration — 06/30/2022</li>
-                <li><a href="/pub/ar-690-600">AR 690-600</a> — Equal Employment Opportunity Discrimination Complaints — 02/06/2025</li>
-                <li><a href="/pub/ar-690-610">AR 690-610</a> — Hours Of Duty, Alternative Work Schedules, And Holidays — 08/18/2021</li>
-                <li><a href="/pub/ar-690-630">AR 690-630</a> — Absence And Leave — 08/18/2023</li>
-                <li><a href="/pub/ar-690-752">AR 690-752</a> — Disciplinary And Adverse Actions — 02/10/2022</li>
-                <li><a href="/pub/ar-690-950">AR 690-950</a> — Career Program Management — 04/18/2025</li>
-                <li><a href="/pub/ar-690-950-4">AR 690-950-4</a> — Military Intelligence Civilian Excepted Career Program — 01/21/2022</li>
-                <li><a href="/pub/ar-70-1">AR 70-1</a> — Army Operation Of The Adaptive Acquisition Framework — 11/28/2023</li>
-                <li><a href="/pub/ar-70-12">AR 70-12</a> — Fuels And Lubricants — 05/06/2022</li>
-                <li><a href="/pub/ar-70-13">AR 70-13</a> — Management And Oversight Of Service Acquisitions — 07/30/2010</li>
-                <li><a href="/pub/ar-70-25">AR 70-25</a> — Use Of Volunteers As Subjects Of Research (reprinted W/basic Incl C1-2) — 01/25/1990</li>
-                <li><a href="/pub/ar-70-31">AR 70-31</a> — Standards For Technical Reporting — 01/18/2024</li>
-                <li><a href="/pub/ar-70-38">AR 70-38</a> — Research, Development, Test And Evaluation Of Materiel For Worldwide Use — 06/26/2020</li>
-                <li><a href="/pub/ar-70-41">AR 70-41</a> — Armaments Cooperation — 06/17/2019</li>
-                <li><a href="/pub/ar-70-43">AR 70-43</a> — Space Test Program (stp) Management {afi 10–1202(i)/ar 70–43/opnavinst 3913.1a} — 11/15/2010</li>
-                <li><a href="/pub/ar-70-47">AR 70-47</a> — Engineering For Transportability Program — 03/27/2024</li>
-                <li><a href="/pub/ar-70-50">AR 70-50</a> — Designating And Naming Defense Military Aerospace Vehicles {afi 16-401; Navairinst 13100.16} — 11/03/2020</li>
-                <li><a href="/pub/ar-70-57">AR 70-57</a> — Army Technology Transfer — 03/02/2022</li>
-                <li><a href="/pub/ar-70-62">AR 70-62</a> — Airworthiness Of Aircraft Systems — 05/11/2016</li>
-                <li><a href="/pub/ar-70-75">AR 70-75</a> — Survivability Of Army Personnel And Materiel — 04/29/2019</li>
-                <li><a href="/pub/ar-70-76">AR 70-76</a> — Joint Electronics Type Designation Automated System {secnavinst 2830.1a; Afi 60-105} — 09/03/2024</li>
-                <li><a href="/pub/ar-70-77">AR 70-77</a> — Technology And Program Protection — 04/30/2025</li>
-                <li><a href="/pub/ar-70-78">AR 70-78</a> — Army Small Business Programs — 01/14/2025</li>
-                <li><a href="/pub/ar-70-79">AR 70-79</a> — Army Small Business Innovation Research And Small Business Technology Transfer Programs — 03/26/2025</li>
-                <li><a href="/pub/ar-700-100">AR 700-100</a> — Munitions Support For Joint Operations {mco 8012.1} — 05/20/2024</li>
-                <li><a href="/pub/ar-700-127">AR 700-127</a> — Integrated Product Support — 02/20/2024</li>
-                <li><a href="/pub/ar-700-13">AR 700-13</a> — Worldwide Department Of Defense Military Munitions (ammunition) Logistics/surveillance/explosives Safety Review And Technical Assistance Program — 12/15/2020</li>
-                <li><a href="/pub/ar-700-131">AR 700-131</a> — Loan, Lease, And Donation Of Army Materiel — 08/23/2004</li>
-                <li><a href="/pub/ar-700-132">AR 700-132</a> — Joint Oil Analysis Program {opnavinst 4731.2a; Afi 21-31} — 03/01/2024</li>
-                <li><a href="/pub/ar-700-136">AR 700-136</a> — Tactical Land-based Water Resources Management — 07/16/2024</li>
-                <li><a href="/pub/ar-700-137">AR 700-137</a> — Logistics Civil Augmentation Program — 11/22/2024</li>
-                <li><a href="/pub/ar-700-138">AR 700-138</a> — Army Logistics Readiness And Sustainability — 04/23/2018</li>
-                <li><a href="/pub/ar-700-139">AR 700-139</a> — Army Warranty Program — 04/30/2025</li>
-                <li><a href="/pub/ar-700-141">AR 700-141</a> — Hazardous Materials Information Resource System — 09/30/2015</li>
-                <li><a href="/pub/ar-700-143">AR 700-143</a> — Packaging Of Hazardous Material {dlar 4145.41; Navsupinst 4030.55d; Afi 24-210_ip; Mco 4030.40c} — 03/17/2023</li>
-                <li><a href="/pub/ar-700-144">AR 700-144</a> — Demilitarization And Trade Security Controls — 12/15/2022</li>
-                <li><a href="/pub/ar-700-145">AR 700-145</a> — Item Unique Identification — 05/29/2026</li>
-                <li><a href="/pub/ar-700-146">AR 700-146</a> — Individual Chemical Equipment Management Program — 04/14/2023</li>
-                <li><a href="/pub/ar-700-147">AR 700-147</a> — Contingency Basing — 02/24/2019</li>
-                <li><a href="/pub/ar-700-15">AR 700-15</a> — Packaging Of Materiel {opnavinst 4030.2; Afman 24 - 206; Mco 4030.33f; Dlar 4145.7/dcma - 1101} — 07/28/2020</li>
-                <li><a href="/pub/ar-700-18">AR 700-18</a> — Provisioning Of U.s. Army Equipment — 08/29/2020</li>
-                <li><a href="/pub/ar-700-20">AR 700-20</a> — Ammunition Peculiar Equipment — 12/06/2022</li>
-                <li><a href="/pub/ar-700-28">AR 700-28</a> — Ammunition Management — 10/09/2020</li>
-                <li><a href="/pub/ar-700-37">AR 700-37</a> — Packaging Of Army Materiel — 04/11/2025</li>
-                <li><a href="/pub/ar-700-4">AR 700-4</a> — Logistics Assistance Program — 04/28/2023</li>
-                <li><a href="/pub/ar-700-48">AR 700-48</a> — Management Of Radiologically Contaminated Equipment Outside The United States — 08/12/2020</li>
-                <li><a href="/pub/ar-700-68">AR 700-68</a> — Storage And Handling Of Liquefied And Gaseous Compressed Gasses And Their Full And Empty Cylinders {dlar (js) 4145.25/ar 700-68/navsupinst 4440.128/mco 10330.2d} — 07/17/2018</li>
-                <li><a href="/pub/ar-700-8">AR 700-8</a> — Logistics Planning Factors And Data Management — 07/21/2021</li>
-                <li><a href="/pub/ar-700-81">AR 700-81</a> — Dod Military Working Dog (mwd) Program {afi 31-126/ar 700-81/opnavinst 5585.3b/mco 5585.6} — 01/17/2019</li>
-                <li><a href="/pub/ar-700-82">AR 700-82</a> — Joint Regulation Governing The Use And Application Of Uniform Source, Maintenance, And Recoverability Codes {secnavinst 4410.23a; Afman 21-106} — 08/29/2020</li>
-                <li><a href="/pub/ar-700-84">AR 700-84</a> — Issue And Sale Of Personal Clothing — 03/26/2025</li>
-                <li><a href="/pub/ar-700-90">AR 700-90</a> — Army Industrial Base Process — 05/16/2025</li>
-                <li><a href="/pub/ar-702-11">AR 702-11</a> — Army Quality Program — 12/12/2023</li>
-                <li><a href="/pub/ar-702-12">AR 702-12</a> — Quality Assurance Specialist (ammunition Surveillance) Program — 07/02/2021</li>
-                <li><a href="/pub/ar-702-16">AR 702-16</a> — Chemical Biological Defense Materiel Reliability Program — 01/23/2023</li>
-                <li><a href="/pub/ar-702-18">AR 702-18</a> — Department Of Defense (dod) Shelf Life Materiel Quality Control Storage Standards {dlar (jp) 4155.37; Navsupinst 4410.56b; Afman 23-232(ip); Mco 4450.13b} — 07/28/2015</li>
-                <li><a href="/pub/ar-702-19">AR 702-19</a> — Reliability, Availability, And Maintainability — 03/25/2024</li>
-                <li><a href="/pub/ar-702-20">AR 702-20</a> — Counterfeit Risk Management Product Assurance — 01/09/2023</li>
-                <li><a href="/pub/ar-702-6">AR 702-6</a> — Ammunition Stockpile Reliability Program — 12/02/2016</li>
-                <li><a href="/pub/ar-702-7">AR 702-7</a> — Product Quality Deficiency Report Program (inter-service Product Deficiency Report) {dlar 4145.24; Secnavinst 4855.5; Afi 21-115; Dcma Inst 305} — 08/01/2022</li>
-                <li><a href="/pub/ar-702-7-1">AR 702-7-1</a> — Reporting Of Product Quality Deficiencies Within The U.s. Army — 04/13/2020</li>
-                <li><a href="/pub/ar-703-2">AR 703-2</a> — Petroleum Products Supply And Management — 12/03/2024</li>
-                <li><a href="/pub/ar-708-1">AR 708-1</a> — Logistics Management Data And Cataloging Policy For Army Operating Materials, Supplies, And Equipment — 02/07/2024</li>
-                <li><a href="/pub/ar-71-32">AR 71-32</a> — Force Development And Documentation Consolidated Policies — 03/20/2019</li>
-                <li><a href="/pub/ar-71-9">AR 71-9</a> — Warfighting Capabilities Determination — 06/29/2021</li>
-                <li><a href="/pub/ar-710-1">AR 710-1</a> — Centralized Inventory Management Of The Army Supply System — 11/28/2016</li>
-                <li><a href="/pub/ar-710-2">AR 710-2</a> — Secondary Item Policy And Retail Level Management — 07/01/2024</li>
-                <li><a href="/pub/ar-710-3">AR 710-3</a> — Inventory Management Asset And Transaction Reporting System — 09/02/2021</li>
-                <li><a href="/pub/ar-710-4">AR 710-4</a> — Property Accountability — 04/15/2026</li>
-                <li><a href="/pub/ar-711-6">AR 711-6</a> — Army Participation In The Defense Logistics Agency Weapon System Support Program — 09/26/2022</li>
-                <li><a href="/pub/ar-715-30">AR 715-30</a> — Secure Environment Contracting — 09/23/2019</li>
-                <li><a href="/pub/ar-715-9">AR 715-9</a> — Operational Contract Support Planning And Management — 09/18/2024</li>
-                <li><a href="/pub/ar-725-1">AR 725-1</a> — Special Authorization And Procedures For Issues, Sales, And Loans — 10/17/2003</li>
-                <li><a href="/pub/ar-725-50">AR 725-50</a> — Requisition, Receipt, And Issue System — 11/15/1995</li>
-                <li><a href="/pub/ar-73-1">AR 73-1</a> — Test And Evaluation Policy — 06/08/2018</li>
-                <li><a href="/pub/ar-735-17">AR 735-17</a> — Accounting For Library Materials — 06/16/2021</li>
-                <li><a href="/pub/ar-735-5">AR 735-5</a> — Relief Of Responsibility And Accountability — 04/30/2026</li>
-                <li><a href="/pub/ar-740-1">AR 740-1</a> — Storage And Supply Activity Operations — 02/09/2024</li>
-                <li><a href="/pub/ar-740-26">AR 740-26</a> — Physical Inventory Control — 03/23/2017</li>
-                <li><a href="/pub/ar-740-3">AR 740-3</a> — Stock Readiness {dlar (jsr) 4145.04/ar 740–3/afman 23-125/navsupinst 4400.100b/mco 4450.15b} — 10/21/2020</li>
-                <li><a href="/pub/ar-75-1">AR 75-1</a> — Malfunctions Involving Ammunition And Explosives — 07/17/2023</li>
-                <li><a href="/pub/ar-75-14">AR 75-14</a> — Inter-service Responsibilities For Explosive Ordnance Disposal {opnavinst 8027.7; Afi 32–3002–o; Mco 8027.1e} — 03/17/2020</li>
-                <li><a href="/pub/ar-75-15">AR 75-15</a> — Explosive Ordnance Disposal — 10/31/2024</li>
-                <li><a href="/pub/ar-750-1">AR 750-1</a> — Army Materiel Maintenance Policy — 04/29/2026</li>
-                <li><a href="/pub/ar-750-10">AR 750-10</a> — Army Modification Program — 04/29/2026</li>
-                <li><a href="/pub/ar-750-32">AR 750-32</a> — Airdrop, Parachute Recovery, And Aircraft Personnel Escape Systems — 07/15/2024</li>
-                <li><a href="/pub/ar-750-43">AR 750-43</a> — Army Test, Measurement, And Diagnostic Equipment — 07/15/2024</li>
-                <li><a href="/pub/ar-750-6">AR 750-6</a> — Army Equipment Safety And Maintenance Notification System — 01/12/2018</li>
-                <li><a href="/pub/ar-770-2">AR 770-2</a> — Materiel Fielding — 07/08/2026</li>
-                <li><a href="/pub/ar-770-3">AR 770-3</a> — Type Classification And Materiel Release — 05/14/2026</li>
-                <li><a href="/pub/ar-840-1">AR 840-1</a> — Department Of The Army Seal, Emblem, And Branch Of Service Plaques — 07/18/2022</li>
-                <li><a href="/pub/ar-840-10">AR 840-10</a> — Flags, Guidons, And Streamers — 08/19/2025</li>
-                <li><a href="/pub/ar-840-2">AR 840-2</a> — Heraldic Services — 09/28/2023</li>
-                <li><a href="/pub/ar-870-20">AR 870-20</a> — Army Museum Enterprise And Army Artifact Collection — 01/14/2026</li>
-                <li><a href="/pub/ar-870-21">AR 870-21</a> — The U.s. Army Regimental System — 12/11/2023</li>
-                <li><a href="/pub/ar-870-5">AR 870-5</a> — Military History: Responsibilities, Policies, And Procedures — 07/08/2024</li>
-                <li><a href="/pub/ar-900-1">AR 900-1</a> — Department Of The Army Space Policy — 04/21/2017</li>
-                <li><a href="/pub/ar-930-4">AR 930-4</a> — Army Emergency Relief — 04/15/2026</li>
-                <li><a href="/pub/ar-95-1">AR 95-1</a> — Flight Regulations — 03/22/2018</li>
-                <li><a href="/pub/ar-95-10">AR 95-10</a> — Department Of Defense Notice To Airmen System {afi 11-208; Opnavinst 3721.20d} — 02/13/2018</li>
-                <li><a href="/pub/ar-95-11">AR 95-11</a> — Military Flight Plan And Flight Movement Data Communications {afman 11-213, Navair 00-80t-114} — 06/14/2018</li>
-                <li><a href="/pub/ar-95-2">AR 95-2</a> — Air Traffic Control, Airfield/heliport, And Airspace Operations — 03/31/2016</li>
-                <li><a href="/pub/ar-95-20">AR 95-20</a> — Contractor`s Flight And Ground Operations {dcma Inst 8210-1d; Afi 10-220; Navairinst 3710.1h; Comdtinst M13020.3b} — 02/06/2023</li>
-                <li><a href="/pub/ar-95-30">AR 95-30</a> — Participation In A Military Or Civilian Aircraft Accident Safety Investigation {opnavist 3750.16c, Comdtinst 5100.28, Afi 91-206} Https://www.secnav.navy.mil/doni/directives/  The Navy Is The Lead Proponent For This Regulation. — 07/08/2004</li>
+                <li><a href="/pub/ar-1-1/">AR 1-1</a> — Planning, Programming, Budgeting, And Execution — 05/23/2016</li>
+                <li><a href="/pub/ar-1-10/">AR 1-10</a> — Fundraising Within The Department Of The Army — 12/22/2025</li>
+                <li><a href="/pub/ar-1-100/">AR 1-100</a> — The Army Gift Program — 05/21/2025</li>
+                <li><a href="/pub/ar-1-19/">AR 1-19</a> — Secretary Of The Army Delegations Of Authority — 03/27/2024</li>
+                <li><a href="/pub/ar-1-20/">AR 1-20</a> — Legislative Liaison — 08/25/2021</li>
+                <li><a href="/pub/ar-1-201/">AR 1-201</a> — Army Inspection Policy — 11/01/2023</li>
+                <li><a href="/pub/ar-1-202/">AR 1-202</a> — Army Congressional Fellowship Program — 04/07/2017</li>
+                <li><a href="/pub/ar-1-33/">AR 1-33</a> — The Army Memorial Program — 07/30/2025</li>
+                <li><a href="/pub/ar-1-50/">AR 1-50</a> — Army Conference Policy — 11/25/2024</li>
+                <li><a href="/pub/ar-1-9/">AR 1-9</a> — White House Liaison And Communications — 05/28/2014</li>
+                <li><a href="/pub/ar-10-16/">AR 10-16</a> — U.s. Army Nuclear And Countering Weapons Of Mass Destruction Agency — 08/29/2019</li>
+                <li><a href="/pub/ar-10-47/">AR 10-47</a> — U.s. Army Command And Control Support Agency — 10/26/2010</li>
+                <li><a href="/pub/ar-10-82/">AR 10-82</a> — Army National Guard Information Technology — 06/18/2018</li>
+                <li><a href="/pub/ar-10-87/">AR 10-87</a> — Army Commands, Army Service Component Commands, And Direct Reporting Units — 12/11/2017</li>
+                <li><a href="/pub/ar-10-89/">AR 10-89</a> — U.s. Army Civilian Personnel Evaluation And Analysis Office — 09/08/2022</li>
+                <li><a href="/pub/ar-11-18/">AR 11-18</a> — The Cost And Economic Analysis Program — 08/29/2019</li>
+                <li><a href="/pub/ar-11-2/">AR 11-2</a> — Risk Management And Internal Control Program — 07/16/2024</li>
+                <li><a href="/pub/ar-11-31/">AR 11-31</a> — Army Security Cooperation Policy — 03/21/2013</li>
+                <li><a href="/pub/ar-11-33/">AR 11-33</a> — Army Lessons Learned Program — 07/28/2022</li>
+                <li><a href="/pub/ar-11-34/">AR 11-34</a> — The Army Respiratory Protection Program — 07/25/2013</li>
+                <li><a href="/pub/ar-11-35/">AR 11-35</a> — Occupational And Environmental Health Risk Management — 05/11/2016</li>
+                <li><a href="/pub/ar-11-41/">AR 11-41</a> — The Counter-improvised Explosive Device Program — 01/22/2024</li>
+                <li><a href="/pub/ar-11-42/">AR 11-42</a> — Army Corrosion Prevention And Control Program — 05/04/2026</li>
+                <li><a href="/pub/ar-11-6/">AR 11-6</a> — Army Foreign Language Program — 05/09/2024</li>
+                <li><a href="/pub/ar-11-7/">AR 11-7</a> — Internal Review Program — 05/21/2025</li>
+                <li><a href="/pub/ar-115-10/">AR 115-10</a> — Weather Support For The U.s. Army {afi 15-157 (ip)} — 09/02/2021</li>
+                <li><a href="/pub/ar-115-13/">AR 115-13</a> — Installation Geospatial Information And Services — 07/15/2024</li>
+                <li><a href="/pub/ar-12-1/">AR 12-1</a> — Security Assistance, Training, And Export Policy — 02/29/2024</li>
+                <li><a href="/pub/ar-12-15/">AR 12-15</a> — Joint Security Cooperation Education And Training {secnavinst 4950.4b; Afi 16-105} — 01/03/2011</li>
+                <li><a href="/pub/ar-12-7/">AR 12-7</a> — Security Assistance Teams — 06/23/2009</li>
+                <li><a href="/pub/ar-135-100/">AR 135-100</a> — Appointment Of Commissioned And Warrant Officers Of The Army — 09/01/1994</li>
+                <li><a href="/pub/ar-135-101/">AR 135-101</a> — Appointment Of Reserve Commissioned Officers For Assignment To Army Medical Department Branches (reprinted W/basic Incl C1-4) — 02/15/1984</li>
+                <li><a href="/pub/ar-135-133/">AR 135-133</a> — Ready Reserve Screening, Qualification Records System, And Change Of Address Reporting — 05/02/2025</li>
+                <li><a href="/pub/ar-135-155/">AR 135-155</a> — Promotion Of Commissioned Officers And Warrant Officers — 02/12/2025</li>
+                <li><a href="/pub/ar-135-156/">AR 135-156</a> — Reserve Component General Officer Personnel Management — 06/01/2026</li>
+                <li><a href="/pub/ar-135-175/">AR 135-175</a> — Separation Of Officers — 05/29/2025</li>
+                <li><a href="/pub/ar-135-178/">AR 135-178</a> — Enlisted Administrative Separations — 06/06/2025</li>
+                <li><a href="/pub/ar-135-18/">AR 135-18</a> — The Active Guard Reserve Program — 08/04/2025</li>
+                <li><a href="/pub/ar-135-180/">AR 135-180</a> — Retirement For Regular And Non-regular Service — 02/09/2024</li>
+                <li><a href="/pub/ar-135-200/">AR 135-200</a> — Active Duty For Missions, Projects, And Training For Reserve Component Soldiers — 08/18/2025</li>
+                <li><a href="/pub/ar-135-210/">AR 135-210</a> — Order To Active Duty As Individuals For Other Than A Presidential Reserve Call-up, Partial Or Full Mobilization — 12/17/2025</li>
+                <li><a href="/pub/ar-135-32/">AR 135-32</a> — Retention In An Active Status After Qualification For Retired Pay — 03/26/2025</li>
+                <li><a href="/pub/ar-135-381/">AR 135-381</a> — Incapacitation Of Reserve Component Soldiers — 01/03/2021</li>
+                <li><a href="/pub/ar-135-5/">AR 135-5</a> — Army Reserve Forces Policy Committee — 01/16/2026</li>
+                <li><a href="/pub/ar-135-9/">AR 135-9</a> — Participation In Joint Service Reserve Component Facility Boards — 10/30/2006</li>
+                <li><a href="/pub/ar-135-91/">AR 135-91</a> — Service Obligations, Methods Of Fulfillment, Participation Requirements, And Enforcement Procedures — 05/15/2026</li>
+                <li><a href="/pub/ar-140-1/">AR 140-1</a> — Mission, Organization, And Training — 01/20/2004</li>
+                <li><a href="/pub/ar-140-10/">AR 140-10</a> — Assignments, Attachments, Details, And Transfers — 05/15/2026</li>
+                <li><a href="/pub/ar-140-111/">AR 140-111</a> — U.s. Army Reserve Retention Program — 05/13/2026</li>
+                <li><a href="/pub/ar-140-145/">AR 140-145</a> — Individual Mobilization Augmentation Program — 03/21/2022</li>
+                <li><a href="/pub/ar-140-185/">AR 140-185</a> — Training And Retirement Point Credits And Unit Level Strength Accounting Records — 07/26/2024</li>
+                <li><a href="/pub/ar-140-483/">AR 140-483</a> — Army Reserve Land And Facilities Management — 01/24/2020</li>
+                <li><a href="/pub/ar-140-50/">AR 140-50</a> — Officer Candidate School, Army Reserve — 10/15/1999</li>
+                <li><a href="/pub/ar-145-1/">AR 145-1</a> — Senior Reserve Officers' Training Corps Program: Organization, Administration, And Training — 05/29/2025</li>
+                <li><a href="/pub/ar-145-2/">AR 145-2</a> — Junior Reserve Officers' Training Corps Program: Organization, Administration, Operation, And Support — 04/28/2023</li>
+                <li><a href="/pub/ar-15-1/">AR 15-1</a> — Department Of The Army Federal Advisory Committee And Intergovernmental And Intragovernmental Management Program — 05/01/2026</li>
+                <li><a href="/pub/ar-15-130/">AR 15-130</a> — Army Clemency And Parole Board — 03/24/2022</li>
+                <li><a href="/pub/ar-15-180/">AR 15-180</a> — Army Discharge Review Board — 07/21/2021</li>
+                <li><a href="/pub/ar-15-185/">AR 15-185</a> — Army Board For Correction Of Military Records — 03/31/2006</li>
+                <li><a href="/pub/ar-15-34/">AR 15-34</a> — Department Of The Army Individual Service Review Board — 05/16/2025</li>
+                <li><a href="/pub/ar-15-41/">AR 15-41</a> — Chemical, Biological, Radiological, And Nuclear Survivability Committee — 07/26/2024</li>
+                <li><a href="/pub/ar-15-6/">AR 15-6</a> — Procedures For Preliminary Inquiries, Administrative Investigations, And Boards Of Officers — 06/22/2025</li>
+                <li><a href="/pub/ar-15-80/">AR 15-80</a> — Army Grade Determination Review Board And Grade Determinations — 02/12/2020</li>
+                <li><a href="/pub/ar-150-1/">AR 150-1</a> — Organization, Administration, And Operation — 05/26/2026</li>
+                <li><a href="/pub/ar-165-1/">AR 165-1</a> — Army Chaplain Corps Activities — 02/05/2024</li>
+                <li><a href="/pub/ar-190-11/">AR 190-11</a> — Physical Security Of Arms, Ammunition, And Explosives — 01/17/2019</li>
+                <li><a href="/pub/ar-190-12/">AR 190-12</a> — Military Working Dog Program — 10/23/2019</li>
+                <li><a href="/pub/ar-190-13/">AR 190-13</a> — The Army Physical Security Program — 04/15/2026</li>
+                <li><a href="/pub/ar-190-14/">AR 190-14</a> — Arming And The Use Of Force — 03/01/2024</li>
+                <li><a href="/pub/ar-190-17/">AR 190-17</a> — Biological Select Agents And Toxins Security Program — 03/05/2019</li>
+                <li><a href="/pub/ar-190-24/">AR 190-24</a> — Armed Forces Disciplinary Control Boards And Off-installation Liaison And Operations {opnavinst 1620.2a; Afi 31-213; Mco 1620.2d; Comdtinst 1620.1e} — 07/27/2006</li>
+                <li><a href="/pub/ar-190-30/">AR 190-30</a> — Military Police Investigations — 11/01/2005</li>
+                <li><a href="/pub/ar-190-32/">AR 190-32</a> — Army Crime Prevention Program — 04/15/2026</li>
+                <li><a href="/pub/ar-190-45/">AR 190-45</a> — Law Enforcement Reporting — 09/27/2016</li>
+                <li><a href="/pub/ar-190-47/">AR 190-47</a> — The Army Corrections System — 03/17/2023</li>
+                <li><a href="/pub/ar-190-48/">AR 190-48</a> — Protection Of Federal Witnesses On Army Installations — 04/01/2026</li>
+                <li><a href="/pub/ar-190-5/">AR 190-5</a> — Motor Vehicle Traffic Supervision {opnav 11200.5d; Afi 31-218(i); Mco 5110.1d; Dlar 5720.1} — 05/22/2006</li>
+                <li><a href="/pub/ar-190-51/">AR 190-51</a> — Security Of Unclassified Army Resources (sensitive And Nonsensitive) — 06/27/2019</li>
+                <li><a href="/pub/ar-190-53/">AR 190-53</a> — Interception Of Wire And Oral Communications For Law Enforcement Purposes — 07/16/2018</li>
+                <li><a href="/pub/ar-190-54/">AR 190-54</a> — Security Of Nuclear Reactors And Special Nuclear Materials — 06/19/2006</li>
+                <li><a href="/pub/ar-190-55/">AR 190-55</a> — U.s. Army Corrections System: Procedures For Military Executions — 10/30/2023</li>
+                <li><a href="/pub/ar-190-56/">AR 190-56</a> — The Army Civilian Police And Security Guard Program — 11/16/2023</li>
+                <li><a href="/pub/ar-190-58/">AR 190-58</a> — Designation And Protection Of High Risk Personnel — 02/25/2018</li>
+                <li><a href="/pub/ar-190-59/">AR 190-59</a> — Chemical Agent Security Program — 04/10/2012</li>
+                <li><a href="/pub/ar-190-6/">AR 190-6</a> — Obtaining Information From Financial Institutions — 02/09/2006</li>
+                <li><a href="/pub/ar-190-8/">AR 190-8</a> — Enemy Prisoners Of War, Retained Personnel, Civilian Internees And Other Detainees {opnavinst 3461.6; Afji 31-304; Mco 3461.1} — 10/01/1997</li>
+                <li><a href="/pub/ar-190-9/">AR 190-9</a> — Absentee Deserter Apprehension Program And Surrender Of Military Personnel To Civilian Law Enforcement Agencies — 09/28/2015</li>
+                <li><a href="/pub/ar-195-2/">AR 195-2</a> — Criminal Investigation Activities — 07/21/2020</li>
+                <li><a href="/pub/ar-195-3/">AR 195-3</a> — The Criminal Investigation Command Special Agent Program — 01/19/2017</li>
+                <li><a href="/pub/ar-195-4/">AR 195-4</a> — Use Of Contingency Limitation .0015 Funds For Criminal Investigative Activities — 03/30/2020</li>
+                <li><a href="/pub/ar-195-5/">AR 195-5</a> — Evidence Procedures — 08/25/2019</li>
+                <li><a href="/pub/ar-195-6/">AR 195-6</a> — Department Of The Army Polygraph Activities — 04/21/2016</li>
+                <li><a href="/pub/ar-20-1/">AR 20-1</a> — Inspector General Activities And Procedures — 03/23/2020</li>
+                <li><a href="/pub/ar-200-1/">AR 200-1</a> — Environmental Protection And Enhancement — 04/15/2026</li>
+                <li><a href="/pub/ar-210-130/">AR 210-130</a> — Laundry And Dry Cleaning Operations — 02/22/2005</li>
+                <li><a href="/pub/ar-210-14/">AR 210-14</a> — Installation Status Report Program — 06/11/2019</li>
+                <li><a href="/pub/ar-210-20/">AR 210-20</a> — Real Property Master Planning For Army Installations — 05/16/2005</li>
+                <li><a href="/pub/ar-210-22/">AR 210-22</a> — Support For Non-federal Entities Authorized To Operate On Department Of The Army Installations — 05/12/2022</li>
+                <li><a href="/pub/ar-210-25/">AR 210-25</a> — Vending Facility Program For The Blind On Federal Property — 06/17/2021</li>
+                <li><a href="/pub/ar-210-27/">AR 210-27</a> — Basic Policies And Principles For Carrying Out An Economic Adjustment Program — 04/01/2025</li>
+                <li><a href="/pub/ar-210-35/">AR 210-35</a> — Civilian Inmate Labor Program And Civilian Inmate Prison Camps On Army Installations — 04/09/2024</li>
+                <li><a href="/pub/ar-210-7/">AR 210-7</a> — Personal Commercial Solicitation On Army Installations — 05/11/2021</li>
+                <li><a href="/pub/ar-215-1/">AR 215-1</a> — Military Morale, Welfare, And Recreation Programs And Nonappropriated Fund Instrumentalities — 09/24/2010</li>
+                <li><a href="/pub/ar-215-3/">AR 215-3</a> — Nonappropriated Funds Instrumentalities Personnel Policy — 05/07/2024</li>
+                <li><a href="/pub/ar-215-4/">AR 215-4</a> — Nonappropriated Fund Contracting — 08/05/2026</li>
+                <li><a href="/pub/ar-215-7/">AR 215-7</a> — Civilian Nonappropriated Funds And Morale, Welfare, And Recreation Activities — 08/30/2019</li>
+                <li><a href="/pub/ar-215-8/">AR 215-8</a> — Army And Air Force Exchange Service Operations {dafi 34-110(i)} — 07/14/2023</li>
+                <li><a href="/pub/ar-220-1/">AR 220-1</a> — Army Unit Status Reporting And Force Registration-consolidated Policies — 08/16/2022</li>
+                <li><a href="/pub/ar-220-45/">AR 220-45</a> — Duty Rosters — 04/09/2024</li>
+                <li><a href="/pub/ar-220-5/">AR 220-5</a> — Designation, Classification, And Change In Status Of Units — 02/14/2024</li>
+                <li><a href="/pub/ar-220-90/">AR 220-90</a> — Army Bands — 11/09/2016</li>
+                <li><a href="/pub/ar-25-1/">AR 25-1</a> — Army Information Technology — 07/15/2019</li>
+                <li><a href="/pub/ar-25-12/">AR 25-12</a> — Communications Security Equipment Maintenance And Maintenance Training — 12/23/2019</li>
+                <li><a href="/pub/ar-25-13/">AR 25-13</a> — Army Telecommunications And Unified Capabilities — 05/11/2017</li>
+                <li><a href="/pub/ar-25-2/">AR 25-2</a> — Army Cybersecurity — 04/04/2019</li>
+                <li><a href="/pub/ar-25-22/">AR 25-22</a> — The Army Privacy And Civil Liberties Program — 09/30/2022</li>
+                <li><a href="/pub/ar-25-30/">AR 25-30</a> — Army Publishing Program — 06/14/2021</li>
+                <li><a href="/pub/ar-25-35/">AR 25-35</a> — Joint Technical Coordinating Group For Munitions Effectiveness (jtcg/me) Publications {afji 10-411; Navmatinst 5600.23; Mco 5600.43b} — 07/01/1996</li>
+                <li><a href="/pub/ar-25-36/">AR 25-36</a> — Instructions For The Interservicing Of Technical Manuals And Related Technology Program {afi 20-118; Ar 25-36; Opnavinst 4160.1a; Mco 5215.16b; Dlar 4151.9} — 03/22/2024</li>
+                <li><a href="/pub/ar-25-38/">AR 25-38</a> — Army Printing And Distribution Program — 06/14/2021</li>
+                <li><a href="/pub/ar-25-400-2/">AR 25-400-2</a> — Army Records Management Program — 10/18/2022</li>
+                <li><a href="/pub/ar-25-50/">AR 25-50</a> — Preparing And Managing Correspondence — 10/10/2020</li>
+                <li><a href="/pub/ar-25-51/">AR 25-51</a> — Official Mail And Distribution Management — 01/30/2023</li>
+                <li><a href="/pub/ar-25-55/">AR 25-55</a> — The Department Of The Army Freedom Of Information Act Program — 10/19/2020</li>
+                <li><a href="/pub/ar-25-58/">AR 25-58</a> — Publishing In The Federal Register — 08/07/2015</li>
+                <li><a href="/pub/ar-25-59/">AR 25-59</a> — Office Symbols — 02/15/2024</li>
+                <li><a href="/pub/ar-25-6/">AR 25-6</a> — Military Auxiliary Radio System And Amateur Radio Program — 06/15/2026</li>
+                <li><a href="/pub/ar-25-98/">AR 25-98</a> — Information Management Control Requirements Program — 02/08/2019</li>
+                <li><a href="/pub/ar-25-99/">AR 25-99</a> — Biometrics Program And Dod Biometric Data Management — 07/21/2026</li>
+                <li><a href="/pub/ar-27-1/">AR 27-1</a> — Judge Advocate Legal Services — 01/24/2017</li>
+                <li><a href="/pub/ar-27-10/">AR 27-10</a> — Military Justice — 01/08/2025</li>
+                <li><a href="/pub/ar-27-20/">AR 27-20</a> — Claims — 02/08/2008</li>
+                <li><a href="/pub/ar-27-26/">AR 27-26</a> — Rules Of Professional Conduct For Lawyers — 03/26/2025</li>
+                <li><a href="/pub/ar-27-3/">AR 27-3</a> — The Army Legal Assistance Program — 05/01/2024</li>
+                <li><a href="/pub/ar-27-40/">AR 27-40</a> — Litigation — 09/19/1994</li>
+                <li><a href="/pub/ar-27-50/">AR 27-50</a> — Status Of Forces Policies, Procedures, And Information {secnavinst 5820.4g} — 12/15/1989</li>
+                <li><a href="/pub/ar-27-52/">AR 27-52</a> — Consular Protection Of Foreign Nationals Subject To The Uniform Code Of Military Justice {secnavinst 5820.6a; Dafi 51-707} — 07/24/2026</li>
+                <li><a href="/pub/ar-27-53/">AR 27-53</a> — Legal Review Of Weapons And Weapon Systems — 09/23/2019</li>
+                <li><a href="/pub/ar-27-55/">AR 27-55</a> — Notarial Services — 01/24/2020</li>
+                <li><a href="/pub/ar-27-60/">AR 27-60</a> — Intellectual Property — 06/01/1993</li>
+                <li><a href="/pub/ar-27-70/">AR 27-70</a> — Department Of Defense Foreign Tax Relief Program — 08/03/2022</li>
+                <li><a href="/pub/ar-290-5/">AR 290-5</a> — Army Cemeteries — 10/21/2020</li>
+                <li><a href="/pub/ar-30-22/">AR 30-22</a> — Army Food Program — 07/17/2019</li>
+                <li><a href="/pub/ar-34-1/">AR 34-1</a> — Interoperability — 04/09/2020</li>
+                <li><a href="/pub/ar-350-1/">AR 350-1</a> — Army Training And Leader Development — 06/01/2025</li>
+                <li><a href="/pub/ar-350-10/">AR 350-10</a> — Management Of Army Individual Training Requirements And Resources — 11/20/2023</li>
+                <li><a href="/pub/ar-350-100/">AR 350-100</a> — Officer Active Duty Service Obligations — 07/21/2023</li>
+                <li><a href="/pub/ar-350-19/">AR 350-19</a> — The Army Sustainable Range Program — 08/30/2005</li>
+                <li><a href="/pub/ar-350-2/">AR 350-2</a> — Operational Environment And Opposing Force Program — 03/12/2024</li>
+                <li><a href="/pub/ar-350-20/">AR 350-20</a> — Management Of Defense Foreign Language Training {opnavinst 1550.13; Afi 35–4004; Mco 1550.4e} — 03/12/2018</li>
+                <li><a href="/pub/ar-350-28/">AR 350-28</a> — Army Exercises — 12/09/1997</li>
+                <li><a href="/pub/ar-350-32/">AR 350-32</a> — The Army Foundry Intelligence Training Program — 08/26/2024</li>
+                <li><a href="/pub/ar-350-38/">AR 350-38</a> — Policies And Management For Training Aids, Devices, Simulators, And Simulations — 02/02/2018</li>
+                <li><a href="/pub/ar-350-50/">AR 350-50</a> — Combat Training Center Program — 05/02/2018</li>
+                <li><a href="/pub/ar-350-51/">AR 350-51</a> — United States Army Officer Candidate School — 05/15/2026</li>
+                <li><a href="/pub/ar-350-52/">AR 350-52</a> — Army Training Support System — 01/17/2014</li>
+                <li><a href="/pub/ar-350-53/">AR 350-53</a> — Comprehensive Soldier And Family Fitness — 10/04/2024</li>
+                <li><a href="/pub/ar-350-66/">AR 350-66</a> — Small Arms Competitive Marksmanship Program — 09/23/2019</li>
+                <li><a href="/pub/ar-350-9/">AR 350-9</a> — Overseas Deployment Training — 11/08/2004</li>
+                <li><a href="/pub/ar-351-3/">AR 351-3</a> — Professional Education And Training Programs Of The Army Medical Department — 10/15/2007</li>
+                <li><a href="/pub/ar-351-9/">AR 351-9</a> — Inter-service Training {opnavinst 1500.27h; Dafi 36-2657; Mco 1580.7f; Comdtinst 1580.1a} — 01/22/2024</li>
+                <li><a href="/pub/ar-36-2/">AR 36-2</a> — Audit Services In The Department Of The Army — 08/14/2023</li>
+                <li><a href="/pub/ar-360-1/">AR 360-1</a> — The Army Public Affairs Program — 04/15/2026</li>
+                <li><a href="/pub/ar-37-47/">AR 37-47</a> — Official Representation Funds Of The Secretary Of The Army — 11/17/2023</li>
+                <li><a href="/pub/ar-37-64/">AR 37-64</a> — Finance And Accounting For Sensitive Mission Funding (c) — 02/15/2023</li>
+                <li><a href="/pub/ar-370-2/">AR 370-2</a> — The Army Library Program — 02/05/2024</li>
+                <li><a href="/pub/ar-380-10/">AR 380-10</a> — Foreign Disclosure And Contacts With Foreign Representatives — 07/14/2015</li>
+                <li><a href="/pub/ar-380-13/">AR 380-13</a> — Acquisition And Storage Of Information Concerning Nonaffiliated Persons And Organizations — 09/30/1974</li>
+                <li><a href="/pub/ar-380-27/">AR 380-27</a> — Control Of Compromising Emanations — 07/22/2014</li>
+                <li><a href="/pub/ar-380-28/">AR 380-28</a> — Army Sensitive Compartmented Information Security Program — 08/13/2018</li>
+                <li><a href="/pub/ar-380-381/">AR 380-381</a> — Special Access Programs (saps) And Sensitive Activities — 04/21/2004</li>
+                <li><a href="/pub/ar-380-40/">AR 380-40</a> — Safeguarding And Controlling Communications Security Material — 09/06/2022</li>
+                <li><a href="/pub/ar-380-49/">AR 380-49</a> — Industrial Security Program — 03/20/2013</li>
+                <li><a href="/pub/ar-380-5/">AR 380-5</a> — Army Information Security Program — 03/25/2022</li>
+                <li><a href="/pub/ar-380-53/">AR 380-53</a> — Communications Security Monitoring — 12/23/2011</li>
+                <li><a href="/pub/ar-380-67/">AR 380-67</a> — Personnel Security Program — 04/15/2026</li>
+                <li><a href="/pub/ar-381-10/">AR 381-10</a> — The Conduct And Oversight Of U.s. Army Intelligence Activities — 01/27/2023</li>
+                <li><a href="/pub/ar-381-100/">AR 381-100</a> — (u) The Army Human Intelligence (humint) Collection Program (s) — 08/27/2020</li>
+                <li><a href="/pub/ar-381-102/">AR 381-102</a> — U.s. Army Cover Program (u) — 04/04/2022</li>
+                <li><a href="/pub/ar-381-11/">AR 381-11</a> — Intelligence Support To Capability Development — 01/30/2019</li>
+                <li><a href="/pub/ar-381-12/">AR 381-12</a> — Counterintelligence Awareness And Reporting — 06/13/2025</li>
+                <li><a href="/pub/ar-381-14/">AR 381-14</a> — Technical Surveillance Countermeasures — 02/17/2015</li>
+                <li><a href="/pub/ar-381-141/">AR 381-141</a> — Intelligence Contingency Funds (icf) (u) — 06/29/2020</li>
+                <li><a href="/pub/ar-381-143/">AR 381-143</a> — Non-standard Materiel Policy And Intelligence Procedures (u) (only Available On Siprnet) — 04/28/2015</li>
+                <li><a href="/pub/ar-381-20/">AR 381-20</a> — The Army Counterintelligence Program (u) — 06/09/2022</li>
+                <li><a href="/pub/ar-381-26/">AR 381-26</a> — Army Foreign Materiel Program (u) — 01/30/2023</li>
+                <li><a href="/pub/ar-381-45/">AR 381-45</a> — U.s. Army Intelligence And Security Records Repository — 04/19/2023</li>
+                <li><a href="/pub/ar-381-47/">AR 381-47</a> — Offensive Counterintelligence Operations — 09/27/2022</li>
+                <li><a href="/pub/ar-385-10/">AR 385-10</a> — The Army Safety And Occupational Health Program — 07/24/2023</li>
+                <li><a href="/pub/ar-385-63/">AR 385-63</a> — Range Safety {mco 3570.1d} — 05/23/2025</li>
+                <li><a href="/pub/ar-40-1/">AR 40-1</a> — Composition, Mission, And Functions Of The Army Medical Department — 05/24/2019</li>
+                <li><a href="/pub/ar-40-10/">AR 40-10</a> — Health Hazard Assessment Program In Support Of The Army Acquisition Process — 07/27/2007</li>
+                <li><a href="/pub/ar-40-13/">AR 40-13</a> — Radiological Advisory Medical Teams — 07/15/2019</li>
+                <li><a href="/pub/ar-40-21/">AR 40-21</a> — Medical Aspects Of Army Aircraft Accident Investigation — 06/07/2019</li>
+                <li><a href="/pub/ar-40-25/">AR 40-25</a> — Nutrition Standards And Education {opnavinst 10110.1; Mco 10110.49; Afi 44–141} — 01/03/2017</li>
+                <li><a href="/pub/ar-40-3/">AR 40-3</a> — Medical, Dental, And Veterinary Care — 04/23/2013</li>
+                <li><a href="/pub/ar-40-33/">AR 40-33</a> — The Care And Use Of Animals In Dod Research, Development, Test, And Evaluation (rdt&amp;e) Or Training Programs {dha-msr 6025.02; Ar 40-33; Secnavinst 3900.38d; Afm 40-401(i); Darpainst 18; Usuhsinst 3203} — 09/01/2022</li>
+                <li><a href="/pub/ar-40-35/">AR 40-35</a> — Preventive Dentistry And Dental Readiness — 07/21/2016</li>
+                <li><a href="/pub/ar-40-400/">AR 40-400</a> — Patient Administration — 07/08/2014</li>
+                <li><a href="/pub/ar-40-5/">AR 40-5</a> — Army Public Health Program — 05/12/2020</li>
+                <li><a href="/pub/ar-40-501/">AR 40-501</a> — Standards Of Medical Fitness — 06/27/2019</li>
+                <li><a href="/pub/ar-40-502/">AR 40-502</a> — Medical Readiness — 06/27/2019</li>
+                <li><a href="/pub/ar-40-562/">AR 40-562</a> — Immunizations And Chemoprophylaxis For The Prevention Of Infectious Diseases {bumedinst 6230.15b; Afi 48-110_ip; Cg Comdtinst M6230.4g} — 10/07/2013</li>
+                <li><a href="/pub/ar-40-58/">AR 40-58</a> — Army Recovery Care Program — 05/12/2020</li>
+                <li><a href="/pub/ar-40-60/">AR 40-60</a> — Army Medical Materiel Acquisition Policy — 05/06/2014</li>
+                <li><a href="/pub/ar-40-61/">AR 40-61</a> — Medical Logistics Policies — 01/28/2005</li>
+                <li><a href="/pub/ar-40-63/">AR 40-63</a> — Ophthalmic Services {secnavinst 6810.1; Afi 44   117} — 04/14/2015</li>
+                <li><a href="/pub/ar-40-656/">AR 40-656</a> — Veterinary Surveillance Inspection Of Subsistence {navsupinst 4355.10a; Mco 10110.48} — 08/28/2006</li>
+                <li><a href="/pub/ar-40-657/">AR 40-657</a> — Veterinary/medical Food Safety, Quality Assurance, And Laboratory Service {navsup 4355.4h; Mco P10110.31h} — 01/21/2005</li>
+                <li><a href="/pub/ar-40-66/">AR 40-66</a> — Medical Record Administration And Healthcare Documentation — 06/17/2008</li>
+                <li><a href="/pub/ar-40-660/">AR 40-660</a> — Dod Hazardous Food And Nonprescription Drug Recall System {dha-msr 6025.01; Dlar 6025.01; Navsupinst 10110.8d; Afi 48-161_ip; Mco 10110.38d} — 09/06/2018</li>
+                <li><a href="/pub/ar-40-68/">AR 40-68</a> — Clinical Quality Management — 02/26/2004</li>
+                <li><a href="/pub/ar-40-7/">AR 40-7</a> — Use Of U.s. Food And Drug Administration-regulated Investigational Products In Humans Including Schedule I Controlled Substances — 10/19/2009</li>
+                <li><a href="/pub/ar-40-8/">AR 40-8</a> — Temporary Flying Restriction Due To Exogenous Factors Affecting Aircrew Efficiency — 02/02/2022</li>
+                <li><a href="/pub/ar-40-905/">AR 40-905</a> — Veterinary Health Services {secnavinst 6401.1b; Afi 48-131} — 08/29/2006</li>
+                <li><a href="/pub/ar-405-10/">AR 405-10</a> — Acquisition Of Real Property And Interests Therein (reprinted W/basic Incl C1-2) — 05/14/1970</li>
+                <li><a href="/pub/ar-405-16/">AR 405-16</a> — Homeowners Assistance Program — 09/29/2016</li>
+                <li><a href="/pub/ar-405-45/">AR 405-45</a> — Real Property Inventory Management — 11/01/2004</li>
+                <li><a href="/pub/ar-405-70/">AR 405-70</a> — Utilization Of Real Property — 05/12/2006</li>
+                <li><a href="/pub/ar-405-80/">AR 405-80</a> — Management Of Title And Granting Use Of Real Property — 04/22/2024</li>
+                <li><a href="/pub/ar-405-90/">AR 405-90</a> — Disposal Of Real Property — 06/08/2020</li>
+                <li><a href="/pub/ar-415-16/">AR 415-16</a> — Army Facilities Components System — 01/05/2018</li>
+                <li><a href="/pub/ar-415-28/">AR 415-28</a> — Real Property Category Codes — 04/15/2014</li>
+                <li><a href="/pub/ar-415-32/">AR 415-32</a> — Engineer Troop Unit Construction In Connection With Training Activities — 06/18/2018</li>
+                <li><a href="/pub/ar-420-1/">AR 420-1</a> — Army Facilities Management — 04/15/2026</li>
+                <li><a href="/pub/ar-420-41/">AR 420-41</a> — Acquisition And Sale Of Utilities Services — 03/03/2015</li>
+                <li><a href="/pub/ar-420-5/">AR 420-5</a> — Army Fire And Emergency Services — 08/01/2024</li>
+                <li><a href="/pub/ar-5-1/">AR 5-1</a> — Management Of Army Business Operations — 11/12/2015</li>
+                <li><a href="/pub/ar-5-10/">AR 5-10</a> — Stationing — 04/02/2025</li>
+                <li><a href="/pub/ar-5-11/">AR 5-11</a> — Management Of Army Modeling And Simulation — 05/16/2025</li>
+                <li><a href="/pub/ar-5-12/">AR 5-12</a> — Army Use Of The Electromagnetic Spectrum — 02/08/2020</li>
+                <li><a href="/pub/ar-5-13/">AR 5-13</a> — Army Munitions Requirements, Prioritization, And Authorizations Management Policy — 03/31/2021</li>
+                <li><a href="/pub/ar-5-18/">AR 5-18</a> — Army Stationing And Installation Plan — 08/05/2022</li>
+                <li><a href="/pub/ar-5-21/">AR 5-21</a> — Rand Arroyo Center — 06/29/2018</li>
+                <li><a href="/pub/ar-5-22/">AR 5-22</a> — The Army Force Modernization Proponent System — 06/13/2023</li>
+                <li><a href="/pub/ar-5-25/">AR 5-25</a> — Army Weather Functional Activities — 08/14/2023</li>
+                <li><a href="/pub/ar-5-9/">AR 5-9</a> — Installation Agreements — 04/17/2018</li>
+                <li><a href="/pub/ar-50-5/">AR 50-5</a> — Nuclear Surety — 06/15/2026</li>
+                <li><a href="/pub/ar-50-6/">AR 50-6</a> — Chemical Surety — 10/13/2022</li>
+                <li><a href="/pub/ar-50-7/">AR 50-7</a> — Army Reactor Program — 11/17/2016</li>
+                <li><a href="/pub/ar-500-3/">AR 500-3</a> — U.s. Army Continuity Of Operations Program — 07/02/2021</li>
+                <li><a href="/pub/ar-500-5/">AR 500-5</a> — Army Mobilization — 04/16/2015</li>
+                <li><a href="/pub/ar-525-13/">AR 525-13</a> — Antiterrorism — 04/15/2026</li>
+                <li><a href="/pub/ar-525-17/">AR 525-17</a> — (s) Special Mission Badges And Credentials (u) — 04/09/2019</li>
+                <li><a href="/pub/ar-525-2/">AR 525-2</a> — The Army Protection Program — 06/09/2023</li>
+                <li><a href="/pub/ar-525-20/">AR 525-20</a> — Information Operations — 09/29/2010</li>
+                <li><a href="/pub/ar-525-21/">AR 525-21</a> — (c) Army Military Deception (mildec) Program (u) — 10/28/2013</li>
+                <li><a href="/pub/ar-525-24/">AR 525-24</a> — U.s. Army Cyberspace And Electromagnetic Warfare Operations — 07/12/2023</li>
+                <li><a href="/pub/ar-525-26/">AR 525-26</a> — Army Mission Assurance And The Mission Assurance Construct — 07/10/2025</li>
+                <li><a href="/pub/ar-525-27/">AR 525-27</a> — Army Emergency Management Program — 03/29/2019</li>
+                <li><a href="/pub/ar-525-28/">AR 525-28</a> — Personnel Recovery — 03/05/2010</li>
+                <li><a href="/pub/ar-525-29/">AR 525-29</a> — Force Generation - Sustainable Readiness — 10/01/2019</li>
+                <li><a href="/pub/ar-525-30/">AR 525-30</a> — Army Strategic And Operational Readiness — 04/09/2020</li>
+                <li><a href="/pub/ar-525-92/">AR 525-92</a> — Army Arms Control Implementation And Compliance Policy — 09/27/2021</li>
+                <li><a href="/pub/ar-525-93/">AR 525-93</a> — Army Deployment And Redeployment — 04/15/2026</li>
+                <li><a href="/pub/ar-525-94/">AR 525-94</a> — Evacuation Of U.s. Citizens And Designated Aliens From Threatened Areas — 08/09/2024</li>
+                <li><a href="/pub/ar-525-95/">AR 525-95</a> — Army Geospatial-intelligence And Geospatial Information And Services — 07/26/2022</li>
+                <li><a href="/pub/ar-530-1/">AR 530-1</a> — Operations Security — 09/26/2014</li>
+                <li><a href="/pub/ar-55-46/">AR 55-46</a> — Travel Overseas — 07/16/2024</li>
+                <li><a href="/pub/ar-55-48/">AR 55-48</a> — Transportation Of Personal Property And Related Services — 03/19/2024</li>
+                <li><a href="/pub/ar-550-1/">AR 550-1</a> — Processing Requests For Political Asylum And Temporary Refuge — 06/21/2004</li>
+                <li><a href="/pub/ar-550-51/">AR 550-51</a> — International Agreements — 05/02/2008</li>
+                <li><a href="/pub/ar-550-52/">AR 550-52</a> — Acquisition And Cross-servicing Agreements — 05/12/2025</li>
+                <li><a href="/pub/ar-56-3/">AR 56-3</a> — Army Rail Operations — 08/09/2024</li>
+                <li><a href="/pub/ar-56-4/">AR 56-4</a> — Distribution Of Materiel, Distribution Platform Management, And In-transit Visibility — 04/15/2026</li>
+                <li><a href="/pub/ar-56-9/">AR 56-9</a> — Army Intratheater Watercraft Systems — 10/02/2020</li>
+                <li><a href="/pub/ar-570-4/">AR 570-4</a> — Manpower Management — 05/01/2024</li>
+                <li><a href="/pub/ar-58-1/">AR 58-1</a> — Management, Acquisition, And Use Of Motor Vehicles — 05/30/2025</li>
+                <li><a href="/pub/ar-59-3/">AR 59-3</a> — Movement Of Cargo By Scheduled Military Air Transportation — 03/23/2017</li>
+                <li><a href="/pub/ar-59-4/">AR 59-4</a> — Joint Airdrop Inspection Records, Malfunction Or Incident Investigations, And Activity Reporting {opnavinst 4630.24e; Afman 13-210 Volume 1; Mco 13480.1e Volume 1} — 08/09/2024</li>
+                <li><a href="/pub/ar-59-9/">AR 59-9</a> — Special Assignment Airlift Mission Requirements — 07/12/2018</li>
+                <li><a href="/pub/ar-600-100/">AR 600-100</a> — Army Profession And Leadership Policy — 03/27/2025</li>
+                <li><a href="/pub/ar-600-105/">AR 600-105</a> — Aviation Service Of Rated Army Officers — 06/05/2020</li>
+                <li><a href="/pub/ar-600-106/">AR 600-106</a> — Flying Status For Nonrated Army Aviation Personnel — 02/02/2022</li>
+                <li><a href="/pub/ar-600-110/">AR 600-110</a> — Identification, Surveillance, And Administration Of Personnel Infected With Human Immunodeficiency Virus — 04/22/2014</li>
+                <li><a href="/pub/ar-600-20/">AR 600-20</a> — Army Command Policy — 04/15/2026</li>
+                <li><a href="/pub/ar-600-25/">AR 600-25</a> — Salutes, Honors, And Courtesy — 05/01/2026</li>
+                <li><a href="/pub/ar-600-291/">AR 600-291</a> — Foreign Government Employment — 06/07/2024</li>
+                <li><a href="/pub/ar-600-3/">AR 600-3</a> — The Army Personnel Development System — 02/07/2025</li>
+                <li><a href="/pub/ar-600-32/">AR 600-32</a> — Conduct Between Soldiers Of Different Grades — 09/16/2024</li>
+                <li><a href="/pub/ar-600-37/">AR 600-37</a> — Unfavorable Information — 10/02/2020</li>
+                <li><a href="/pub/ar-600-38/">AR 600-38</a> — The Meal Entitlement Management System — 11/01/2023</li>
+                <li><a href="/pub/ar-600-4/">AR 600-4</a> — Remission Or Cancellation Of Indebtedness — 10/29/2024</li>
+                <li><a href="/pub/ar-600-43/">AR 600-43</a> — Conscientious Objection — 02/22/2023</li>
+                <li><a href="/pub/ar-600-52/">AR 600-52</a> — Sexual Harassment/assault Response And Prevention Program — 02/11/2025</li>
+                <li><a href="/pub/ar-600-55/">AR 600-55</a> — The Army Driver And Operator Standardization Program (selection, Training, Testing, And Licensing) — 04/25/2025</li>
+                <li><a href="/pub/ar-600-62/">AR 600-62</a> — U.s. Army Personnel Control Facility Procedures For Administering Assigned And Attached Personnel — 03/18/2024</li>
+                <li><a href="/pub/ar-600-63/">AR 600-63</a> — Army Health Promotion — 04/15/2026</li>
+                <li><a href="/pub/ar-600-7/">AR 600-7</a> — Unlawful Discrimination On The Basis Of Disability In Programs And Activities Receiving Federal Financial Assistance From Or Conducted By The Department Of The Army — 02/06/2025</li>
+                <li><a href="/pub/ar-600-77/">AR 600-77</a> — Administrative Management Of Wounded, Ill, Or Injured Soldiers — 03/05/2019</li>
+                <li><a href="/pub/ar-600-78/">AR 600-78</a> — Army Suitability, Fitness, And Credentialing Program — 03/08/2024</li>
+                <li><a href="/pub/ar-600-8/">AR 600-8</a> — Military Human Resources Management — 09/26/2025</li>
+                <li><a href="/pub/ar-600-8-10/">AR 600-8-10</a> — Leaves And Passes — 06/03/2020</li>
+                <li><a href="/pub/ar-600-8-101/">AR 600-8-101</a> — Personnel Readiness Processing — 03/06/2018</li>
+                <li><a href="/pub/ar-600-8-104/">AR 600-8-104</a> — Army Military Human Resource Records Management — 06/29/2023</li>
+                <li><a href="/pub/ar-600-8-105/">AR 600-8-105</a> — Military Orders - This Edition Remains In Effect Until 6 September 2026 — 12/20/2022</li>
+                <li><a href="/pub/ar-600-8-105/">AR 600-8-105</a> — Military Orders — 08/06/2026</li>
+                <li><a href="/pub/ar-600-8-11/">AR 600-8-11</a> — Reassignment — 05/01/2007</li>
+                <li><a href="/pub/ar-600-8-111/">AR 600-8-111</a> — Army Mobilization, Manning, And Wartime Replacement Operations — 02/22/2024</li>
+                <li><a href="/pub/ar-600-8-14/">AR 600-8-14</a> — Identification Cards For Members Of The Uniformed Services, Their Family Members, And Other Eligible Personnel — 10/21/2020</li>
+                <li><a href="/pub/ar-600-8-19/">AR 600-8-19</a> — Enlisted Promotions And Demotions — 03/06/2026</li>
+                <li><a href="/pub/ar-600-8-2/">AR 600-8-2</a> — Suspension Of Favorable Personnel Actions (flag) — 04/05/2021</li>
+                <li><a href="/pub/ar-600-8-22/">AR 600-8-22</a> — Military Awards — 05/11/2026</li>
+                <li><a href="/pub/ar-600-8-24/">AR 600-8-24</a> — Officer Transfers And Discharges — 05/05/2026</li>
+                <li><a href="/pub/ar-600-8-29/">AR 600-8-29</a> — Officer Promotions — 09/09/2020</li>
+                <li><a href="/pub/ar-600-8-3/">AR 600-8-3</a> — Postal Operations — 01/16/2026</li>
+                <li><a href="/pub/ar-600-8-4/">AR 600-8-4</a> — Line Of Duty Policy, Procedures, And Investigations — 11/12/2020</li>
+                <li><a href="/pub/ar-600-8-6/">AR 600-8-6</a> — Personnel Accountability — 05/12/2026</li>
+                <li><a href="/pub/ar-600-8-7/">AR 600-8-7</a> — Retirement Services Program — 09/20/2022</li>
+                <li><a href="/pub/ar-600-81/">AR 600-81</a> — Transition Assistance Program — 03/25/2026</li>
+                <li><a href="/pub/ar-600-85/">AR 600-85</a> — The Army Substance Abuse Program — 10/04/2024</li>
+                <li><a href="/pub/ar-600-86/">AR 600-86</a> — Army Disaster Personnel Accountability And Assessment Program — 09/16/2024</li>
+                <li><a href="/pub/ar-600-88/">AR 600-88</a> — Sea Duty — 09/23/2021</li>
+                <li><a href="/pub/ar-600-89/">AR 600-89</a> — General Douglas Macarthur Leadership Award Program — 12/14/2022</li>
+                <li><a href="/pub/ar-600-9/">AR 600-9</a> — The Army Body Composition Program — 07/16/2019</li>
+                <li><a href="/pub/ar-600-91/">AR 600-91</a> — Army Career Intermission Program — 05/25/2023</li>
+                <li><a href="/pub/ar-600-92/">AR 600-92</a> — Army Suicide Prevention Program — 10/04/2024</li>
+                <li><a href="/pub/ar-601-1/">AR 601-1</a> — Assignment Of Personnel To Army Recruiting Activities — 02/13/2026</li>
+                <li><a href="/pub/ar-601-10/">AR 601-10</a> — Management And Recall To Active Duty Of Retired Soldiers Of The Army In Support Of Mobilization And Peacetime Operations — 06/07/2019</li>
+                <li><a href="/pub/ar-601-100/">AR 601-100</a> — Appointment Of Commissioned And Warrant Officers In The Regular Army — 11/21/2006</li>
+                <li><a href="/pub/ar-601-141/">AR 601-141</a> — U.s. Army Health Professions Scholarship, Financial Assistance, And Active Duty Health Professions Loan Repayment Programs — 09/19/2006</li>
+                <li><a href="/pub/ar-601-142/">AR 601-142</a> — Army Medical Department Professional Filler System — 10/22/2015</li>
+                <li><a href="/pub/ar-601-2/">AR 601-2</a> — Army Recruiting Support Programs — 04/13/2020</li>
+                <li><a href="/pub/ar-601-20/">AR 601-20</a> — The Interservice Physician Assistant Training Program — 08/14/2009</li>
+                <li><a href="/pub/ar-601-208/">AR 601-208</a> — The Army Marketing Program — 11/10/2021</li>
+                <li><a href="/pub/ar-601-210/">AR 601-210</a> — Regular Army And Reserve Components Enlistment Program — 03/20/2026</li>
+                <li><a href="/pub/ar-601-25/">AR 601-25</a> — Delay In Reporting For And Exemption From Active Duty, Initial Active Duty For Training, And Reserve Forces Duty — 10/18/2023</li>
+                <li><a href="/pub/ar-601-280/">AR 601-280</a> — Army Retention Program — 04/14/2023</li>
+                <li><a href="/pub/ar-601-50/">AR 601-50</a> — Appointment Of Temporary Officers In The Army Of The United States Upon Mobilization (reprinted W/basic Incl C1-2) — 12/04/1987</li>
+                <li><a href="/pub/ar-602-2/">AR 602-2</a> — Human Systems Integration In The System Acquisition Process — 06/29/2022</li>
+                <li><a href="/pub/ar-608-1/">AR 608-1</a> — Soldier And Family Readiness — 05/26/2026</li>
+                <li><a href="/pub/ar-608-10/">AR 608-10</a> — Child, Youth, And School Services — 05/11/2026</li>
+                <li><a href="/pub/ar-608-18/">AR 608-18</a> — The Army Family Advocacy Program — 10/30/2007</li>
+                <li><a href="/pub/ar-608-20/">AR 608-20</a> — Army Voting Assistance Program — 04/15/2026</li>
+                <li><a href="/pub/ar-608-75/">AR 608-75</a> — Exceptional Family Member Program — 01/27/2017</li>
+                <li><a href="/pub/ar-608-99/">AR 608-99</a> — Family Support, Child Custody, And Parentage — 11/13/2020</li>
+                <li><a href="/pub/ar-611-1/">AR 611-1</a> — Military Occupational Classification Structure Development And Implementation — 12/20/2022</li>
+                <li><a href="/pub/ar-611-105/">AR 611-105</a> — Selection, Training, And Suitability For Explosive Ordnance Disposal — 05/30/2024</li>
+                <li><a href="/pub/ar-611-110/">AR 611-110</a> — Selection Of Army Aviation Officers And Warrant Officers — 08/09/2023</li>
+                <li><a href="/pub/ar-611-5/">AR 611-5</a> — Personnel And Classification Testing — 04/25/2022</li>
+                <li><a href="/pub/ar-611-60/">AR 611-60</a> — Assignment Of Army Personnel To The Defense Attache Service — 02/12/2020</li>
+                <li><a href="/pub/ar-611-75/">AR 611-75</a> — Management Of Army Divers — 10/11/2024</li>
+                <li><a href="/pub/ar-612-201/">AR 612-201</a> — Initial Entry/prior Service Trainee Support — 03/11/2024</li>
+                <li><a href="/pub/ar-614-10/">AR 614-10</a> — Army Military Personnel Exchange Program With Military Services Of Other Nations — 07/14/2011</li>
+                <li><a href="/pub/ar-614-100/">AR 614-100</a> — Officer Assignment Policies And Procedures — 05/08/2024</li>
+                <li><a href="/pub/ar-614-115/">AR 614-115</a> — Military Intelligence Excepted Career Program (great Skill) — 04/30/2010</li>
+                <li><a href="/pub/ar-614-120/">AR 614-120</a> — Inter-service Transfer Of Commissioned Officers — 01/21/2022</li>
+                <li><a href="/pub/ar-614-200/">AR 614-200</a> — Enlisted Assignments And Utilization Management — 06/27/2025</li>
+                <li><a href="/pub/ar-614-30/">AR 614-30</a> — Overseas Service — 03/26/2025</li>
+                <li><a href="/pub/ar-616-110/">AR 616-110</a> — Selection, Training, Utilization And Career Guidance For Army Medical Corps Officers As Flight Surgeons — 04/25/2018</li>
+                <li><a href="/pub/ar-621-1/">AR 621-1</a> — Advanced Education Programs And Requirements For Military Personnel — 05/08/2024</li>
+                <li><a href="/pub/ar-621-202/">AR 621-202</a> — Army Educational Incentives And Entitlements — 03/26/2025</li>
+                <li><a href="/pub/ar-621-5/">AR 621-5</a> — Army Continuing Education System — 03/19/2026</li>
+                <li><a href="/pub/ar-621-7/">AR 621-7</a> — The Army Fellowship And Scholarship Program — 03/12/2019</li>
+                <li><a href="/pub/ar-621-8/">AR 621-8</a> — Management Of Defense English Language Training {af I36-4003; Mco1550.25a;opnavinst1550.12b} — 03/18/2025</li>
+                <li><a href="/pub/ar-623-3/">AR 623-3</a> — Evaluation Reporting System — 02/14/2025</li>
+                <li><a href="/pub/ar-630-10/">AR 630-10</a> — Absence Without Leave, Desertion, And Administration Of Personnel Involved In Civilian Court Proceedings — 01/13/2006</li>
+                <li><a href="/pub/ar-633-30/">AR 633-30</a> — Military Sentences To Confinement {afr 125-30} — 12/02/2015</li>
+                <li><a href="/pub/ar-635-200/">AR 635-200</a> — Active Duty Enlisted Administrative Separations — 06/30/2025</li>
+                <li><a href="/pub/ar-635-40/">AR 635-40</a> — Disability Evaluation For Retention, Retirement, Or Separation — 01/19/2017</li>
+                <li><a href="/pub/ar-635-5-1/">AR 635-5-1</a> — Separation Program Designator Codes — 03/02/2022</li>
+                <li><a href="/pub/ar-635-8/">AR 635-8</a> — Separation Processing And Documents — 09/17/2019</li>
+                <li><a href="/pub/ar-637-1/">AR 637-1</a> — Army Compensation And Entitlements Policy — 07/26/2021</li>
+                <li><a href="/pub/ar-637-2/">AR 637-2</a> — Separation Pay (nondisability) And Levels Of Payment — 08/18/2022</li>
+                <li><a href="/pub/ar-638-2/">AR 638-2</a> — Army Mortuary Affairs Program — 03/03/2023</li>
+                <li><a href="/pub/ar-638-34/">AR 638-34</a> — Army Fatal Incident Family Brief Program — 04/26/2023</li>
+                <li><a href="/pub/ar-638-8/">AR 638-8</a> — Army Casualty Program — 05/15/2026</li>
+                <li><a href="/pub/ar-640-30/">AR 640-30</a> — Official Army Photographs — 12/06/2019</li>
+                <li><a href="/pub/ar-670-1/">AR 670-1</a> — Wear And Appearance Of Army Uniforms And Insignia — 01/26/2021</li>
+                <li><a href="/pub/ar-670-10/">AR 670-10</a> — Furnishing Uniforms, Or Paying Uniform Allowances, To Civilian Employees — 07/09/2021</li>
+                <li><a href="/pub/ar-672-11/">AR 672-11</a> — Brigadier General Jeremiah P. Holland Award — 02/20/2013</li>
+                <li><a href="/pub/ar-672-16/">AR 672-16</a> — Zachary And Elizabeth Fisher Distinguished Civilian Humanitarian Award {secnavinst 5061.16a; Afman 36-2806} — 03/26/2025</li>
+                <li><a href="/pub/ar-672-20/">AR 672-20</a> — Incentive Awards — 11/06/2024</li>
+                <li><a href="/pub/ar-672-8/">AR 672-8</a> — Manufacture, Sale, Wear, And Quality Control Of Heraldic Items — 12/30/2025</li>
+                <li><a href="/pub/ar-690-11/">AR 690-11</a> — Department Of The Army Expeditionary Civilians — 12/30/2025</li>
+                <li><a href="/pub/ar-690-12/">AR 690-12</a> — Civilian Personnel Equal Employment Opportunity Programs — 02/06/2025</li>
+                <li><a href="/pub/ar-690-200/">AR 690-200</a> — General Personnel Provisions — 06/06/2025</li>
+                <li><a href="/pub/ar-690-300/">AR 690-300</a> — Employment — 06/05/2025</li>
+                <li><a href="/pub/ar-690-500/">AR 690-500</a> — Pay And Allowances Administration — 06/30/2022</li>
+                <li><a href="/pub/ar-690-600/">AR 690-600</a> — Equal Employment Opportunity Discrimination Complaints — 02/06/2025</li>
+                <li><a href="/pub/ar-690-610/">AR 690-610</a> — Hours Of Duty, Alternative Work Schedules, And Holidays — 08/18/2021</li>
+                <li><a href="/pub/ar-690-630/">AR 690-630</a> — Absence And Leave — 08/18/2023</li>
+                <li><a href="/pub/ar-690-752/">AR 690-752</a> — Disciplinary And Adverse Actions — 02/10/2022</li>
+                <li><a href="/pub/ar-690-950/">AR 690-950</a> — Career Program Management — 04/18/2025</li>
+                <li><a href="/pub/ar-690-950-4/">AR 690-950-4</a> — Military Intelligence Civilian Excepted Career Program — 01/21/2022</li>
+                <li><a href="/pub/ar-70-1/">AR 70-1</a> — Army Operation Of The Adaptive Acquisition Framework — 11/28/2023</li>
+                <li><a href="/pub/ar-70-12/">AR 70-12</a> — Fuels And Lubricants — 05/06/2022</li>
+                <li><a href="/pub/ar-70-13/">AR 70-13</a> — Management And Oversight Of Service Acquisitions — 07/30/2010</li>
+                <li><a href="/pub/ar-70-25/">AR 70-25</a> — Use Of Volunteers As Subjects Of Research (reprinted W/basic Incl C1-2) — 01/25/1990</li>
+                <li><a href="/pub/ar-70-31/">AR 70-31</a> — Standards For Technical Reporting — 01/18/2024</li>
+                <li><a href="/pub/ar-70-38/">AR 70-38</a> — Research, Development, Test And Evaluation Of Materiel For Worldwide Use — 06/26/2020</li>
+                <li><a href="/pub/ar-70-41/">AR 70-41</a> — Armaments Cooperation — 06/17/2019</li>
+                <li><a href="/pub/ar-70-43/">AR 70-43</a> — Space Test Program (stp) Management {afi 10–1202(i)/ar 70–43/opnavinst 3913.1a} — 11/15/2010</li>
+                <li><a href="/pub/ar-70-47/">AR 70-47</a> — Engineering For Transportability Program — 03/27/2024</li>
+                <li><a href="/pub/ar-70-50/">AR 70-50</a> — Designating And Naming Defense Military Aerospace Vehicles {afi 16-401; Navairinst 13100.16} — 11/03/2020</li>
+                <li><a href="/pub/ar-70-57/">AR 70-57</a> — Army Technology Transfer — 03/02/2022</li>
+                <li><a href="/pub/ar-70-62/">AR 70-62</a> — Airworthiness Of Aircraft Systems — 05/11/2016</li>
+                <li><a href="/pub/ar-70-75/">AR 70-75</a> — Survivability Of Army Personnel And Materiel — 04/29/2019</li>
+                <li><a href="/pub/ar-70-76/">AR 70-76</a> — Joint Electronics Type Designation Automated System {secnavinst 2830.1a; Afi 60-105} — 09/03/2024</li>
+                <li><a href="/pub/ar-70-77/">AR 70-77</a> — Technology And Program Protection — 04/30/2025</li>
+                <li><a href="/pub/ar-70-78/">AR 70-78</a> — Army Small Business Programs — 01/14/2025</li>
+                <li><a href="/pub/ar-70-79/">AR 70-79</a> — Army Small Business Innovation Research And Small Business Technology Transfer Programs — 03/26/2025</li>
+                <li><a href="/pub/ar-700-100/">AR 700-100</a> — Munitions Support For Joint Operations {mco 8012.1} — 05/20/2024</li>
+                <li><a href="/pub/ar-700-127/">AR 700-127</a> — Integrated Product Support — 02/20/2024</li>
+                <li><a href="/pub/ar-700-13/">AR 700-13</a> — Worldwide Department Of Defense Military Munitions (ammunition) Logistics/surveillance/explosives Safety Review And Technical Assistance Program — 12/15/2020</li>
+                <li><a href="/pub/ar-700-131/">AR 700-131</a> — Loan, Lease, And Donation Of Army Materiel — 08/23/2004</li>
+                <li><a href="/pub/ar-700-132/">AR 700-132</a> — Joint Oil Analysis Program {opnavinst 4731.2a; Afi 21-31} — 03/01/2024</li>
+                <li><a href="/pub/ar-700-136/">AR 700-136</a> — Tactical Land-based Water Resources Management — 07/16/2024</li>
+                <li><a href="/pub/ar-700-137/">AR 700-137</a> — Logistics Civil Augmentation Program — 11/22/2024</li>
+                <li><a href="/pub/ar-700-138/">AR 700-138</a> — Army Logistics Readiness And Sustainability — 04/23/2018</li>
+                <li><a href="/pub/ar-700-139/">AR 700-139</a> — Army Warranty Program — 04/30/2025</li>
+                <li><a href="/pub/ar-700-141/">AR 700-141</a> — Hazardous Materials Information Resource System — 09/30/2015</li>
+                <li><a href="/pub/ar-700-143/">AR 700-143</a> — Packaging Of Hazardous Material {dlar 4145.41; Navsupinst 4030.55d; Afi 24-210_ip; Mco 4030.40c} — 03/17/2023</li>
+                <li><a href="/pub/ar-700-144/">AR 700-144</a> — Demilitarization And Trade Security Controls — 12/15/2022</li>
+                <li><a href="/pub/ar-700-145/">AR 700-145</a> — Item Unique Identification — 05/29/2026</li>
+                <li><a href="/pub/ar-700-146/">AR 700-146</a> — Individual Chemical Equipment Management Program — 04/14/2023</li>
+                <li><a href="/pub/ar-700-147/">AR 700-147</a> — Contingency Basing — 02/24/2019</li>
+                <li><a href="/pub/ar-700-15/">AR 700-15</a> — Packaging Of Materiel {opnavinst 4030.2; Afman 24 - 206; Mco 4030.33f; Dlar 4145.7/dcma - 1101} — 07/28/2020</li>
+                <li><a href="/pub/ar-700-18/">AR 700-18</a> — Provisioning Of U.s. Army Equipment — 08/29/2020</li>
+                <li><a href="/pub/ar-700-20/">AR 700-20</a> — Ammunition Peculiar Equipment — 12/06/2022</li>
+                <li><a href="/pub/ar-700-28/">AR 700-28</a> — Ammunition Management — 10/09/2020</li>
+                <li><a href="/pub/ar-700-37/">AR 700-37</a> — Packaging Of Army Materiel — 04/11/2025</li>
+                <li><a href="/pub/ar-700-4/">AR 700-4</a> — Logistics Assistance Program — 04/28/2023</li>
+                <li><a href="/pub/ar-700-48/">AR 700-48</a> — Management Of Radiologically Contaminated Equipment Outside The United States — 08/12/2020</li>
+                <li><a href="/pub/ar-700-68/">AR 700-68</a> — Storage And Handling Of Liquefied And Gaseous Compressed Gasses And Their Full And Empty Cylinders {dlar (js) 4145.25/ar 700-68/navsupinst 4440.128/mco 10330.2d} — 07/17/2018</li>
+                <li><a href="/pub/ar-700-8/">AR 700-8</a> — Logistics Planning Factors And Data Management — 07/21/2021</li>
+                <li><a href="/pub/ar-700-81/">AR 700-81</a> — Dod Military Working Dog (mwd) Program {afi 31-126/ar 700-81/opnavinst 5585.3b/mco 5585.6} — 01/17/2019</li>
+                <li><a href="/pub/ar-700-82/">AR 700-82</a> — Joint Regulation Governing The Use And Application Of Uniform Source, Maintenance, And Recoverability Codes {secnavinst 4410.23a; Afman 21-106} — 08/29/2020</li>
+                <li><a href="/pub/ar-700-84/">AR 700-84</a> — Issue And Sale Of Personal Clothing — 03/26/2025</li>
+                <li><a href="/pub/ar-700-90/">AR 700-90</a> — Army Industrial Base Process — 05/16/2025</li>
+                <li><a href="/pub/ar-702-11/">AR 702-11</a> — Army Quality Program — 12/12/2023</li>
+                <li><a href="/pub/ar-702-12/">AR 702-12</a> — Quality Assurance Specialist (ammunition Surveillance) Program — 07/02/2021</li>
+                <li><a href="/pub/ar-702-16/">AR 702-16</a> — Chemical Biological Defense Materiel Reliability Program — 01/23/2023</li>
+                <li><a href="/pub/ar-702-18/">AR 702-18</a> — Department Of Defense (dod) Shelf Life Materiel Quality Control Storage Standards {dlar (jp) 4155.37; Navsupinst 4410.56b; Afman 23-232(ip); Mco 4450.13b} — 07/28/2015</li>
+                <li><a href="/pub/ar-702-19/">AR 702-19</a> — Reliability, Availability, And Maintainability — 03/25/2024</li>
+                <li><a href="/pub/ar-702-20/">AR 702-20</a> — Counterfeit Risk Management Product Assurance — 01/09/2023</li>
+                <li><a href="/pub/ar-702-6/">AR 702-6</a> — Ammunition Stockpile Reliability Program — 12/02/2016</li>
+                <li><a href="/pub/ar-702-7/">AR 702-7</a> — Product Quality Deficiency Report Program (inter-service Product Deficiency Report) {dlar 4145.24; Secnavinst 4855.5; Afi 21-115; Dcma Inst 305} — 08/01/2022</li>
+                <li><a href="/pub/ar-702-7-1/">AR 702-7-1</a> — Reporting Of Product Quality Deficiencies Within The U.s. Army — 04/13/2020</li>
+                <li><a href="/pub/ar-703-2/">AR 703-2</a> — Petroleum Products Supply And Management — 12/03/2024</li>
+                <li><a href="/pub/ar-708-1/">AR 708-1</a> — Logistics Management Data And Cataloging Policy For Army Operating Materials, Supplies, And Equipment — 02/07/2024</li>
+                <li><a href="/pub/ar-71-32/">AR 71-32</a> — Force Development And Documentation Consolidated Policies — 03/20/2019</li>
+                <li><a href="/pub/ar-71-9/">AR 71-9</a> — Warfighting Capabilities Determination — 06/29/2021</li>
+                <li><a href="/pub/ar-710-1/">AR 710-1</a> — Centralized Inventory Management Of The Army Supply System — 11/28/2016</li>
+                <li><a href="/pub/ar-710-2/">AR 710-2</a> — Secondary Item Policy And Retail Level Management — 07/01/2024</li>
+                <li><a href="/pub/ar-710-3/">AR 710-3</a> — Inventory Management Asset And Transaction Reporting System — 09/02/2021</li>
+                <li><a href="/pub/ar-710-4/">AR 710-4</a> — Property Accountability — 04/15/2026</li>
+                <li><a href="/pub/ar-711-6/">AR 711-6</a> — Army Participation In The Defense Logistics Agency Weapon System Support Program — 09/26/2022</li>
+                <li><a href="/pub/ar-715-30/">AR 715-30</a> — Secure Environment Contracting — 09/23/2019</li>
+                <li><a href="/pub/ar-715-9/">AR 715-9</a> — Operational Contract Support Planning And Management — 09/18/2024</li>
+                <li><a href="/pub/ar-725-1/">AR 725-1</a> — Special Authorization And Procedures For Issues, Sales, And Loans — 10/17/2003</li>
+                <li><a href="/pub/ar-725-50/">AR 725-50</a> — Requisition, Receipt, And Issue System — 11/15/1995</li>
+                <li><a href="/pub/ar-73-1/">AR 73-1</a> — Test And Evaluation Policy — 06/08/2018</li>
+                <li><a href="/pub/ar-735-17/">AR 735-17</a> — Accounting For Library Materials — 06/16/2021</li>
+                <li><a href="/pub/ar-735-5/">AR 735-5</a> — Relief Of Responsibility And Accountability — 04/30/2026</li>
+                <li><a href="/pub/ar-740-1/">AR 740-1</a> — Storage And Supply Activity Operations — 02/09/2024</li>
+                <li><a href="/pub/ar-740-26/">AR 740-26</a> — Physical Inventory Control — 03/23/2017</li>
+                <li><a href="/pub/ar-740-3/">AR 740-3</a> — Stock Readiness {dlar (jsr) 4145.04/ar 740–3/afman 23-125/navsupinst 4400.100b/mco 4450.15b} — 10/21/2020</li>
+                <li><a href="/pub/ar-75-1/">AR 75-1</a> — Malfunctions Involving Ammunition And Explosives — 07/17/2023</li>
+                <li><a href="/pub/ar-75-14/">AR 75-14</a> — Inter-service Responsibilities For Explosive Ordnance Disposal {opnavinst 8027.7; Afi 32–3002–o; Mco 8027.1e} — 03/17/2020</li>
+                <li><a href="/pub/ar-75-15/">AR 75-15</a> — Explosive Ordnance Disposal — 10/31/2024</li>
+                <li><a href="/pub/ar-750-1/">AR 750-1</a> — Army Materiel Maintenance Policy — 04/29/2026</li>
+                <li><a href="/pub/ar-750-10/">AR 750-10</a> — Army Modification Program — 04/29/2026</li>
+                <li><a href="/pub/ar-750-32/">AR 750-32</a> — Airdrop, Parachute Recovery, And Aircraft Personnel Escape Systems — 07/15/2024</li>
+                <li><a href="/pub/ar-750-43/">AR 750-43</a> — Army Test, Measurement, And Diagnostic Equipment — 07/15/2024</li>
+                <li><a href="/pub/ar-750-6/">AR 750-6</a> — Army Equipment Safety And Maintenance Notification System — 01/12/2018</li>
+                <li><a href="/pub/ar-770-2/">AR 770-2</a> — Materiel Fielding — 07/08/2026</li>
+                <li><a href="/pub/ar-770-3/">AR 770-3</a> — Type Classification And Materiel Release — 05/14/2026</li>
+                <li><a href="/pub/ar-840-1/">AR 840-1</a> — Department Of The Army Seal, Emblem, And Branch Of Service Plaques — 07/18/2022</li>
+                <li><a href="/pub/ar-840-10/">AR 840-10</a> — Flags, Guidons, And Streamers — 08/19/2025</li>
+                <li><a href="/pub/ar-840-2/">AR 840-2</a> — Heraldic Services — 09/28/2023</li>
+                <li><a href="/pub/ar-870-20/">AR 870-20</a> — Army Museum Enterprise And Army Artifact Collection — 01/14/2026</li>
+                <li><a href="/pub/ar-870-21/">AR 870-21</a> — The U.s. Army Regimental System — 12/11/2023</li>
+                <li><a href="/pub/ar-870-5/">AR 870-5</a> — Military History: Responsibilities, Policies, And Procedures — 07/08/2024</li>
+                <li><a href="/pub/ar-900-1/">AR 900-1</a> — Department Of The Army Space Policy — 04/21/2017</li>
+                <li><a href="/pub/ar-930-4/">AR 930-4</a> — Army Emergency Relief — 04/15/2026</li>
+                <li><a href="/pub/ar-95-1/">AR 95-1</a> — Flight Regulations — 03/22/2018</li>
+                <li><a href="/pub/ar-95-10/">AR 95-10</a> — Department Of Defense Notice To Airmen System {afi 11-208; Opnavinst 3721.20d} — 02/13/2018</li>
+                <li><a href="/pub/ar-95-11/">AR 95-11</a> — Military Flight Plan And Flight Movement Data Communications {afman 11-213, Navair 00-80t-114} — 06/14/2018</li>
+                <li><a href="/pub/ar-95-2/">AR 95-2</a> — Air Traffic Control, Airfield/heliport, And Airspace Operations — 03/31/2016</li>
+                <li><a href="/pub/ar-95-20/">AR 95-20</a> — Contractor`s Flight And Ground Operations {dcma Inst 8210-1d; Afi 10-220; Navairinst 3710.1h; Comdtinst M13020.3b} — 02/06/2023</li>
+                <li><a href="/pub/ar-95-30/">AR 95-30</a> — Participation In A Military Or Civilian Aircraft Accident Safety Investigation {opnavist 3750.16c, Comdtinst 5100.28, Afi 91-206} Https://www.secnav.navy.mil/doni/directives/  The Navy Is The Lead Proponent For This Regulation. — 07/08/2004</li>
             </ul>
             <p><a href="/">Ask Reggie.Bot about AR publications</a></p>
         </div>

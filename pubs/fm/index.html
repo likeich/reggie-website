@@ -10,11 +10,11 @@
     <base href="/">
     <meta name="description" content="All 56 FM publications (Field Manuals), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.">
     <title>FM — Field Manuals</title>
-    <link rel="canonical" href="https://reggie.bot/pubs/fm">
+    <link rel="canonical" href="https://reggie.bot/pubs/fm/">
     <meta name="keywords" content="Army regulations, AR 670-1, Army publications, armypubs, DA PAM, ATP, field manual, Army doctrine, military regulations search">
 
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://reggie.bot/pubs/fm">
+    <meta property="og:url" content="https://reggie.bot/pubs/fm/">
     <meta property="og:site_name" content="Reggie.Bot">
     <meta property="og:title" content="FM — Field Manuals">
     <meta property="og:description" content="All 56 FM publications (Field Manuals), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.">
@@ -96,36 +96,48 @@
             inset: 0;
             z-index: 10;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 1.25rem;
             background: #141414;
-            font-family: Arial, Helvetica, sans-serif;
-            color: #AFAFAF;
             transition: opacity .35s ease;
+
+            /* The ring sits immediately outside the logo, touching it, so the
+               two sizes are derived from one another rather than set
+               independently. */
+            --boot-logo: clamp(160px, 42vmin, 300px);
+            --boot-ring-width: 7px;
         }
 
         #boot.done { opacity: 0; pointer-events: none; }
 
-        #boot img {
-            width: 72px;
-            height: 72px;
+        /* Square by construction: the ring is a border on a circle, and a
+           circle drawn on a non-square box is an ellipse. */
+        #boot-mark {
+            position: relative;
+            width: calc(var(--boot-logo) + 2 * var(--boot-ring-width));
+            height: calc(var(--boot-logo) + 2 * var(--boot-ring-width));
+        }
+
+        #boot-mark img {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: var(--boot-logo);
+            height: var(--boot-logo);
+            margin: calc(var(--boot-logo) / -2) 0 0 calc(var(--boot-logo) / -2);
             border-radius: 50%;
         }
 
-        #boot-spinner {
-            width: 34px;
-            height: 34px;
-            border: 3px solid #2D2D2D;
+        /* One arc travelling around the logo. The track is drawn in the same
+           near-black the app uses for a raised surface, so only the gold arc
+           reads as motion. */
+        #boot-ring {
+            position: absolute;
+            inset: 0;
+            border: var(--boot-ring-width) solid #2D2D2D;
             border-top-color: #FFCB05;
             border-radius: 50%;
-            animation: boot-spin .9s linear infinite;
-        }
-
-        #boot-label {
-            font-size: .95rem;
-            letter-spacing: .04em;
+            animation: boot-spin 1.1s linear infinite;
         }
 
         @keyframes boot-spin { to { transform: rotate(360deg); } }
@@ -133,7 +145,7 @@
         /* Respect a reduced-motion preference: keep the indicator, drop the
            spin. */
         @media (prefers-reduced-motion: reduce) {
-            #boot-spinner { animation: none; border-top-color: #FFCB05; }
+            #boot-ring { animation: none; }
         }
     </style>
     <!-- Google tag (gtag.js) -->
@@ -297,10 +309,14 @@
         <!-- The loading indicator lives inside the container so that Compose
              removes it along with everything else when it mounts, and so that
              nothing is ever layered over the canvas. -->
-        <div id="boot" role="status" aria-live="polite">
-            <img src="/icon_round.png" alt="" width="72" height="72">
-            <div id="boot-spinner"></div>
-            <div id="boot-label">Loading Reggie.Bot&hellip;</div>
+        <!-- No visible text: the mark and the ring around it say "loading"
+             on their own. aria-label keeps that legible to a screen reader
+             without putting a caption back on the screen. -->
+        <div id="boot" role="status" aria-live="polite" aria-label="Loading Reggie.Bot">
+            <div id="boot-mark">
+                <div id="boot-ring"></div>
+                <img src="/icon_round.png" alt="">
+            </div>
         </div>
         <!-- Not wrapped in <noscript>: crawlers that execute JS ignore it, and
              this needs to be real markup in the initial response. Compose
@@ -311,62 +327,62 @@
             <p>All 56 FM publications (Field Manuals), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.</p>
             <h2>56 publications</h2>
             <ul>
-                <li><a href="/pub/fm-1">FM 1</a> — The Army: A Primer To Our Profession Of Arms — 05/01/2025</li>
-                <li><a href="/pub/fm-1-02.1">FM 1-02.1</a> — Operational Terms — 05/30/2026</li>
-                <li><a href="/pub/fm-1-02.2">FM 1-02.2</a> — Military Symbols (this Item Is Published W/ Basic Incl C1) — 01/23/2025</li>
-                <li><a href="/pub/fm-101-51-3-cd">FM 101-51-3-CD</a> — Joint Technical Coordinating Group For Munitions Effectiveness Test And Data Reduction Procedures For Munitions {usaf 61a1-3-7; Fmfm 5-2l;na 00-130asr-2-1} (this Item Is Included On Em 0260) — 08/04/2009</li>
-                <li><a href="/pub/fm-2-0">FM 2-0</a> — Intelligence — 10/01/2023</li>
-                <li><a href="/pub/fm-2-22.3">FM 2-22.3</a> — Human Intelligence Collector Operations (effective On 25 April 2025, See Footnote For More Details) — 09/06/2006</li>
-                <li><a href="/pub/fm-3-0">FM 3-0</a> — Operations — 03/21/2025</li>
-                <li><a href="/pub/fm-3-01">FM 3-01</a> — U.s. Army Air And Missile Defense Operations — 08/26/2025</li>
-                <li><a href="/pub/fm-3-01.13">FM 3-01.13</a> — (u) Air Defense Artillery Operational Planning Data (s/nf) — 05/01/2019</li>
-                <li><a href="/pub/fm-3-01.44">FM 3-01.44</a> — Short-range Air Defense Operations — 07/21/2022</li>
-                <li><a href="/pub/fm-3-04">FM 3-04</a> — Army Aviation — 03/27/2025</li>
-                <li><a href="/pub/fm-3-05">FM 3-05</a> — Army Special Operations — 06/24/2025</li>
-                <li><a href="/pub/fm-3-07">FM 3-07</a> — Stability — 06/02/2014</li>
-                <li><a href="/pub/fm-3-08">FM 3-08</a> — Casualty Evacuation Support To Operations — 05/30/2026</li>
-                <li><a href="/pub/fm-3-09">FM 3-09</a> — Fire Support And Field Artillery Operations — 08/12/2024</li>
-                <li><a href="/pub/fm-3-11">FM 3-11</a> — Chemical, Biological, Radiological, And Nuclear Operations — 04/10/2025</li>
-                <li><a href="/pub/fm-3-12">FM 3-12</a> — Cyberspace And Electromagnetic Warfare Operations — 09/17/2025</li>
-                <li><a href="/pub/fm-3-13">FM 3-13</a> — Information Operations — 12/06/2016</li>
-                <li><a href="/pub/fm-3-13.4">FM 3-13.4</a> — Army Support To Military Deception — 02/26/2019</li>
-                <li><a href="/pub/fm-3-14">FM 3-14</a> — Army Space Operations — 02/25/2026</li>
-                <li><a href="/pub/fm-3-16">FM 3-16</a> — The Army In Multinational Operations — 07/15/2024</li>
-                <li><a href="/pub/fm-3-18">FM 3-18</a> — Special Forces — 08/07/2026</li>
-                <li><a href="/pub/fm-3-22">FM 3-22</a> — Army Support To Security Cooperation (this Item Is Published W/ Basic Incl C1) — 07/01/2023</li>
-                <li><a href="/pub/fm-3-24">FM 3-24</a> — Insurgencies And Countering Insurgencies {mcwp 3-33.5} (this Item Is Published W/ Basic Incl C2) — 05/13/2014</li>
-                <li><a href="/pub/fm-3-27">FM 3-27</a> — Army Global Missile Defense Operations — 08/11/2023</li>
-                <li><a href="/pub/fm-3-34">FM 3-34</a> — Engineer Operations — 12/15/2025</li>
-                <li><a href="/pub/fm-3-39">FM 3-39</a> — Military Police Operations — 04/21/2025</li>
-                <li><a href="/pub/fm-3-50">FM 3-50</a> — Army Personnel Recovery — 09/02/2014</li>
-                <li><a href="/pub/fm-3-52">FM 3-52</a> — Airspace — 08/11/2026</li>
-                <li><a href="/pub/fm-3-55">FM 3-55</a> — Information Collection — 05/03/2013</li>
-                <li><a href="/pub/fm-3-57">FM 3-57</a> — Civil Affairs Operations — 07/28/2021</li>
-                <li><a href="/pub/fm-3-60">FM 3-60</a> — Army Targeting — 08/11/2023</li>
-                <li><a href="/pub/fm-3-61">FM 3-61</a> — Communication Strategy And Public Affairs Operations (this Item Is Published W/ Basic Incl C1) — 02/25/2022</li>
-                <li><a href="/pub/fm-3-63">FM 3-63</a> — Detainee Operations — 03/10/2026</li>
-                <li><a href="/pub/fm-3-81">FM 3-81</a> — Maneuver Enhancement Brigade — 11/09/2021</li>
-                <li><a href="/pub/fm-3-83">FM 3-83</a> — Religious Affairs — 04/11/2025</li>
-                <li><a href="/pub/fm-3-84">FM 3-84</a> — Legal Support To Operations — 09/01/2023</li>
-                <li><a href="/pub/fm-3-90">FM 3-90</a> — Tactics — 05/01/2023</li>
-                <li><a href="/pub/fm-3-94">FM 3-94</a> — Armies, Corps, And Division Operations — 07/23/2021</li>
-                <li><a href="/pub/fm-3-96">FM 3-96</a> — Brigade Combat Team — 01/19/2021</li>
-                <li><a href="/pub/fm-3-98">FM 3-98</a> — Reconnaissance And Security Operations — 01/10/2023</li>
-                <li><a href="/pub/fm-3-99">FM 3-99</a> — Airborne And Air Assault Operations (this Item Is Published W/ Basic Incl C1) — 03/06/2015</li>
-                <li><a href="/pub/fm-4-0">FM 4-0</a> — Sustainment Operations — 03/20/2026</li>
-                <li><a href="/pub/fm-4-02">FM 4-02</a> — Army Health System (this Item Is Published W/ Basic Incl C2) — 11/17/2020</li>
-                <li><a href="/pub/fm-4-1">FM 4-1</a> — Human Resources Support — 09/15/2025</li>
-                <li><a href="/pub/fm-4-80">FM 4-80</a> — Financial Management Operations — 04/21/2025</li>
-                <li><a href="/pub/fm-5-0">FM 5-0</a> — Planning And Orders Production — 11/04/2024</li>
-                <li><a href="/pub/fm-6-0">FM 6-0</a> — Commander And Staff Organization And Operations — 05/16/2022</li>
-                <li><a href="/pub/fm-6-02">FM 6-02</a> — Signal Support To Operations — 09/13/2019</li>
-                <li><a href="/pub/fm-6-05">FM 6-05</a> — Multi-service Tactics, Techniques, And Procedures For Conventional Forces And Special Operations Forces Integration, Interoperability, And Interdependence (mcrp 3-30.4, Nttp 3-05.19, Afttp 3-2.73, Ussocom Pub 3-33) — 01/25/2022</li>
-                <li><a href="/pub/fm-6-22">FM 6-22</a> — Developing Leaders (this Item Is Published W/ Basic Incl C2) — 11/01/2022</li>
-                <li><a href="/pub/fm-6-27">FM 6-27</a> — The Commander's Handbook On The Law Of Land Warfare (mctp 11-10c) (this Item Is Published W/ Basic Incl C2) — 08/07/2019</li>
-                <li><a href="/pub/fm-6-99">FM 6-99</a> — U.s. Army Report And Message Formats — 05/17/2021</li>
-                <li><a href="/pub/fm-7-0">FM 7-0</a> — Training — 06/14/2021</li>
-                <li><a href="/pub/fm-7-100.1">FM 7-100.1</a> — Opposing Force Operations — 12/27/2004</li>
-                <li><a href="/pub/fm-7-22">FM 7-22</a> — Holistic Health And Fitness (this Item Is Published W/ Basic Incl C2) — 10/01/2020</li>
+                <li><a href="/pub/fm-1/">FM 1</a> — The Army: A Primer To Our Profession Of Arms — 05/01/2025</li>
+                <li><a href="/pub/fm-1-02.1/">FM 1-02.1</a> — Operational Terms — 05/30/2026</li>
+                <li><a href="/pub/fm-1-02.2/">FM 1-02.2</a> — Military Symbols (this Item Is Published W/ Basic Incl C1) — 01/23/2025</li>
+                <li><a href="/pub/fm-101-51-3-cd/">FM 101-51-3-CD</a> — Joint Technical Coordinating Group For Munitions Effectiveness Test And Data Reduction Procedures For Munitions {usaf 61a1-3-7; Fmfm 5-2l;na 00-130asr-2-1} (this Item Is Included On Em 0260) — 08/04/2009</li>
+                <li><a href="/pub/fm-2-0/">FM 2-0</a> — Intelligence — 10/01/2023</li>
+                <li><a href="/pub/fm-2-22.3/">FM 2-22.3</a> — Human Intelligence Collector Operations (effective On 25 April 2025, See Footnote For More Details) — 09/06/2006</li>
+                <li><a href="/pub/fm-3-0/">FM 3-0</a> — Operations — 03/21/2025</li>
+                <li><a href="/pub/fm-3-01/">FM 3-01</a> — U.s. Army Air And Missile Defense Operations — 08/26/2025</li>
+                <li><a href="/pub/fm-3-01.13/">FM 3-01.13</a> — (u) Air Defense Artillery Operational Planning Data (s/nf) — 05/01/2019</li>
+                <li><a href="/pub/fm-3-01.44/">FM 3-01.44</a> — Short-range Air Defense Operations — 07/21/2022</li>
+                <li><a href="/pub/fm-3-04/">FM 3-04</a> — Army Aviation — 03/27/2025</li>
+                <li><a href="/pub/fm-3-05/">FM 3-05</a> — Army Special Operations — 06/24/2025</li>
+                <li><a href="/pub/fm-3-07/">FM 3-07</a> — Stability — 06/02/2014</li>
+                <li><a href="/pub/fm-3-08/">FM 3-08</a> — Casualty Evacuation Support To Operations — 05/30/2026</li>
+                <li><a href="/pub/fm-3-09/">FM 3-09</a> — Fire Support And Field Artillery Operations — 08/12/2024</li>
+                <li><a href="/pub/fm-3-11/">FM 3-11</a> — Chemical, Biological, Radiological, And Nuclear Operations — 04/10/2025</li>
+                <li><a href="/pub/fm-3-12/">FM 3-12</a> — Cyberspace And Electromagnetic Warfare Operations — 09/17/2025</li>
+                <li><a href="/pub/fm-3-13/">FM 3-13</a> — Information Operations — 12/06/2016</li>
+                <li><a href="/pub/fm-3-13.4/">FM 3-13.4</a> — Army Support To Military Deception — 02/26/2019</li>
+                <li><a href="/pub/fm-3-14/">FM 3-14</a> — Army Space Operations — 02/25/2026</li>
+                <li><a href="/pub/fm-3-16/">FM 3-16</a> — The Army In Multinational Operations — 07/15/2024</li>
+                <li><a href="/pub/fm-3-18/">FM 3-18</a> — Special Forces — 08/07/2026</li>
+                <li><a href="/pub/fm-3-22/">FM 3-22</a> — Army Support To Security Cooperation (this Item Is Published W/ Basic Incl C1) — 07/01/2023</li>
+                <li><a href="/pub/fm-3-24/">FM 3-24</a> — Insurgencies And Countering Insurgencies {mcwp 3-33.5} (this Item Is Published W/ Basic Incl C2) — 05/13/2014</li>
+                <li><a href="/pub/fm-3-27/">FM 3-27</a> — Army Global Missile Defense Operations — 08/11/2023</li>
+                <li><a href="/pub/fm-3-34/">FM 3-34</a> — Engineer Operations — 12/15/2025</li>
+                <li><a href="/pub/fm-3-39/">FM 3-39</a> — Military Police Operations — 04/21/2025</li>
+                <li><a href="/pub/fm-3-50/">FM 3-50</a> — Army Personnel Recovery — 09/02/2014</li>
+                <li><a href="/pub/fm-3-52/">FM 3-52</a> — Airspace — 08/11/2026</li>
+                <li><a href="/pub/fm-3-55/">FM 3-55</a> — Information Collection — 05/03/2013</li>
+                <li><a href="/pub/fm-3-57/">FM 3-57</a> — Civil Affairs Operations — 07/28/2021</li>
+                <li><a href="/pub/fm-3-60/">FM 3-60</a> — Army Targeting — 08/11/2023</li>
+                <li><a href="/pub/fm-3-61/">FM 3-61</a> — Communication Strategy And Public Affairs Operations (this Item Is Published W/ Basic Incl C1) — 02/25/2022</li>
+                <li><a href="/pub/fm-3-63/">FM 3-63</a> — Detainee Operations — 03/10/2026</li>
+                <li><a href="/pub/fm-3-81/">FM 3-81</a> — Maneuver Enhancement Brigade — 11/09/2021</li>
+                <li><a href="/pub/fm-3-83/">FM 3-83</a> — Religious Affairs — 04/11/2025</li>
+                <li><a href="/pub/fm-3-84/">FM 3-84</a> — Legal Support To Operations — 09/01/2023</li>
+                <li><a href="/pub/fm-3-90/">FM 3-90</a> — Tactics — 05/01/2023</li>
+                <li><a href="/pub/fm-3-94/">FM 3-94</a> — Armies, Corps, And Division Operations — 07/23/2021</li>
+                <li><a href="/pub/fm-3-96/">FM 3-96</a> — Brigade Combat Team — 01/19/2021</li>
+                <li><a href="/pub/fm-3-98/">FM 3-98</a> — Reconnaissance And Security Operations — 01/10/2023</li>
+                <li><a href="/pub/fm-3-99/">FM 3-99</a> — Airborne And Air Assault Operations (this Item Is Published W/ Basic Incl C1) — 03/06/2015</li>
+                <li><a href="/pub/fm-4-0/">FM 4-0</a> — Sustainment Operations — 03/20/2026</li>
+                <li><a href="/pub/fm-4-02/">FM 4-02</a> — Army Health System (this Item Is Published W/ Basic Incl C2) — 11/17/2020</li>
+                <li><a href="/pub/fm-4-1/">FM 4-1</a> — Human Resources Support — 09/15/2025</li>
+                <li><a href="/pub/fm-4-80/">FM 4-80</a> — Financial Management Operations — 04/21/2025</li>
+                <li><a href="/pub/fm-5-0/">FM 5-0</a> — Planning And Orders Production — 11/04/2024</li>
+                <li><a href="/pub/fm-6-0/">FM 6-0</a> — Commander And Staff Organization And Operations — 05/16/2022</li>
+                <li><a href="/pub/fm-6-02/">FM 6-02</a> — Signal Support To Operations — 09/13/2019</li>
+                <li><a href="/pub/fm-6-05/">FM 6-05</a> — Multi-service Tactics, Techniques, And Procedures For Conventional Forces And Special Operations Forces Integration, Interoperability, And Interdependence (mcrp 3-30.4, Nttp 3-05.19, Afttp 3-2.73, Ussocom Pub 3-33) — 01/25/2022</li>
+                <li><a href="/pub/fm-6-22/">FM 6-22</a> — Developing Leaders (this Item Is Published W/ Basic Incl C2) — 11/01/2022</li>
+                <li><a href="/pub/fm-6-27/">FM 6-27</a> — The Commander's Handbook On The Law Of Land Warfare (mctp 11-10c) (this Item Is Published W/ Basic Incl C2) — 08/07/2019</li>
+                <li><a href="/pub/fm-6-99/">FM 6-99</a> — U.s. Army Report And Message Formats — 05/17/2021</li>
+                <li><a href="/pub/fm-7-0/">FM 7-0</a> — Training — 06/14/2021</li>
+                <li><a href="/pub/fm-7-100.1/">FM 7-100.1</a> — Opposing Force Operations — 12/27/2004</li>
+                <li><a href="/pub/fm-7-22/">FM 7-22</a> — Holistic Health And Fitness (this Item Is Published W/ Basic Incl C2) — 10/01/2020</li>
             </ul>
             <p><a href="/">Ask Reggie.Bot about FM publications</a></p>
         </div>

@@ -10,11 +10,11 @@
     <base href="/">
     <meta name="description" content="All 300 ATP publications (Army Techniques Publications), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.">
     <title>ATP — Army Techniques Publications</title>
-    <link rel="canonical" href="https://reggie.bot/pubs/atp">
+    <link rel="canonical" href="https://reggie.bot/pubs/atp/">
     <meta name="keywords" content="Army regulations, AR 670-1, Army publications, armypubs, DA PAM, ATP, field manual, Army doctrine, military regulations search">
 
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://reggie.bot/pubs/atp">
+    <meta property="og:url" content="https://reggie.bot/pubs/atp/">
     <meta property="og:site_name" content="Reggie.Bot">
     <meta property="og:title" content="ATP — Army Techniques Publications">
     <meta property="og:description" content="All 300 ATP publications (Army Techniques Publications), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.">
@@ -96,36 +96,48 @@
             inset: 0;
             z-index: 10;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 1.25rem;
             background: #141414;
-            font-family: Arial, Helvetica, sans-serif;
-            color: #AFAFAF;
             transition: opacity .35s ease;
+
+            /* The ring sits immediately outside the logo, touching it, so the
+               two sizes are derived from one another rather than set
+               independently. */
+            --boot-logo: clamp(160px, 42vmin, 300px);
+            --boot-ring-width: 7px;
         }
 
         #boot.done { opacity: 0; pointer-events: none; }
 
-        #boot img {
-            width: 72px;
-            height: 72px;
+        /* Square by construction: the ring is a border on a circle, and a
+           circle drawn on a non-square box is an ellipse. */
+        #boot-mark {
+            position: relative;
+            width: calc(var(--boot-logo) + 2 * var(--boot-ring-width));
+            height: calc(var(--boot-logo) + 2 * var(--boot-ring-width));
+        }
+
+        #boot-mark img {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: var(--boot-logo);
+            height: var(--boot-logo);
+            margin: calc(var(--boot-logo) / -2) 0 0 calc(var(--boot-logo) / -2);
             border-radius: 50%;
         }
 
-        #boot-spinner {
-            width: 34px;
-            height: 34px;
-            border: 3px solid #2D2D2D;
+        /* One arc travelling around the logo. The track is drawn in the same
+           near-black the app uses for a raised surface, so only the gold arc
+           reads as motion. */
+        #boot-ring {
+            position: absolute;
+            inset: 0;
+            border: var(--boot-ring-width) solid #2D2D2D;
             border-top-color: #FFCB05;
             border-radius: 50%;
-            animation: boot-spin .9s linear infinite;
-        }
-
-        #boot-label {
-            font-size: .95rem;
-            letter-spacing: .04em;
+            animation: boot-spin 1.1s linear infinite;
         }
 
         @keyframes boot-spin { to { transform: rotate(360deg); } }
@@ -133,7 +145,7 @@
         /* Respect a reduced-motion preference: keep the indicator, drop the
            spin. */
         @media (prefers-reduced-motion: reduce) {
-            #boot-spinner { animation: none; border-top-color: #FFCB05; }
+            #boot-ring { animation: none; }
         }
     </style>
     <!-- Google tag (gtag.js) -->
@@ -297,10 +309,14 @@
         <!-- The loading indicator lives inside the container so that Compose
              removes it along with everything else when it mounts, and so that
              nothing is ever layered over the canvas. -->
-        <div id="boot" role="status" aria-live="polite">
-            <img src="/icon_round.png" alt="" width="72" height="72">
-            <div id="boot-spinner"></div>
-            <div id="boot-label">Loading Reggie.Bot&hellip;</div>
+        <!-- No visible text: the mark and the ring around it say "loading"
+             on their own. aria-label keeps that legible to a screen reader
+             without putting a caption back on the screen. -->
+        <div id="boot" role="status" aria-live="polite" aria-label="Loading Reggie.Bot">
+            <div id="boot-mark">
+                <div id="boot-ring"></div>
+                <img src="/icon_round.png" alt="">
+            </div>
         </div>
         <!-- Not wrapped in <noscript>: crawlers that execute JS ignore it, and
              this needs to be real markup in the initial response. Compose
@@ -311,306 +327,306 @@
             <p>All 300 ATP publications (Army Techniques Publications), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.</p>
             <h2>300 publications</h2>
             <ul>
-                <li><a href="/pub/atp-1-0.1">ATP 1-0.1</a> — Techniques For Human Resources Support To Operations — 11/16/2023</li>
-                <li><a href="/pub/atp-1-02.1">ATP 1-02.1</a> — Multi-service Tactics, Techniques, And Procedures For Multi-service Brevity Codes {mcrp 3-30b.1 | Nttp 6-02.1 |  Afttp 3-2.5 | Sttp 3-9002} — 04/25/2025</li>
-                <li><a href="/pub/atp-1-05.01">ATP 1-05.01</a> — Religious Support And The Operations Process — 07/31/2018</li>
-                <li><a href="/pub/atp-1-05.02">ATP 1-05.02</a> — Religious Support To Funerals And Memorial Events — 11/27/2018</li>
-                <li><a href="/pub/atp-1-05.03">ATP 1-05.03</a> — Religious Support And External Advisement — 01/31/2019</li>
-                <li><a href="/pub/atp-1-05.04">ATP 1-05.04</a> — Religious Support And Internal Advisement (this Item Is Published W/ Basic Incl C1) — 03/23/2017</li>
-                <li><a href="/pub/atp-1-05.05">ATP 1-05.05</a> — Religious Support And Casualty Care — 08/28/2019</li>
-                <li><a href="/pub/atp-1-06.1">ATP 1-06.1</a> — Field Ordering Officer (foo) And Pay Agent (pa) Operations — 05/10/2013</li>
-                <li><a href="/pub/atp-1-06.2">ATP 1-06.2</a> — Commanders' Emergency Response Program — 05/22/2017</li>
-                <li><a href="/pub/atp-1-06.3">ATP 1-06.3</a> — Banking Operations — 01/23/2015</li>
-                <li><a href="/pub/atp-1-06.4">ATP 1-06.4</a> — Internal Controls — 05/12/2016</li>
-                <li><a href="/pub/atp-1-19">ATP 1-19</a> — Army Bands — 07/28/2021</li>
-                <li><a href="/pub/atp-1-20">ATP 1-20</a> — Military History Operations  (this Item Is Published W/ Basic Incl C1) — 06/09/2014</li>
-                <li><a href="/pub/atp-2-01">ATP 2-01</a> — Collection Management (this Item Is Published W/ Basic Incl C1) — 08/17/2021</li>
-                <li><a href="/pub/atp-2-01.3">ATP 2-01.3</a> — Intelligence Preparation Of The Operational Environment (this Item Is Published W/ Basic Incl C3) — 03/01/2019</li>
-                <li><a href="/pub/atp-2-01.4">ATP 2-01.4</a> — Intelligence Support To Army Targeting — 03/04/2026</li>
-                <li><a href="/pub/atp-2-19.1-1">ATP 2-19.1-1</a> — (u) Echelons Above Corps Intelligence Organizations (this Item Is Published W/ Basic Incl C1) — 03/01/2022</li>
-                <li><a href="/pub/atp-2-19.1-2">ATP 2-19.1-2</a> — (u) Echelons Above Corps Intelligence Organizations Volume Ii: United States Army Intelligence And Security Command (s//nf) — 09/29/2025</li>
-                <li><a href="/pub/atp-2-19.3">ATP 2-19.3</a> — Corps And Division Intelligence Techniques — 03/08/2023</li>
-                <li><a href="/pub/atp-2-19.4">ATP 2-19.4</a> — Brigade Combat Team Intelligence Techniques — 06/25/2021</li>
-                <li><a href="/pub/atp-2-22.1-1">ATP 2-22.1-1</a> — (u) Human Intelligence Techniques, Volume I (this Item Is Published W/ Basic Incl C1) — 05/16/2025</li>
-                <li><a href="/pub/atp-2-22.2-1">ATP 2-22.2-1</a> — Counterintelligence Volume I: Investigations, Analysis And Production, And Technical Services And Support Activities (u) — 12/11/2015</li>
-                <li><a href="/pub/atp-2-22.2-2">ATP 2-22.2-2</a> — (u) Counter Intelligence Volume Ii: Operations And Collection Activities (s//nf)  (this Item Is Published W/ Basic Incl C1) — 12/22/2016</li>
-                <li><a href="/pub/atp-2-22.31">ATP 2-22.31</a> — (u) Human Intelligence Military Source Operations Techniques (s//nf) (this Item Is Published W/ Basic Incl C2) — 04/17/2015</li>
-                <li><a href="/pub/atp-2-22.33">ATP 2-22.33</a> — (u) 2x Operations And Source Validation Techniques (s//nf) (this Item Is Published W/ Basic Incl C1) — 09/09/2016</li>
-                <li><a href="/pub/atp-2-22.34">ATP 2-22.34</a> — (u) Joint Interrogation And Debriefing Center Operations — 10/28/2020</li>
-                <li><a href="/pub/atp-2-22.4">ATP 2-22.4</a> — Technical Intelligence — 10/29/2021</li>
-                <li><a href="/pub/atp-2-22.6">ATP 2-22.6</a> — (u) Signals Intelligence (this Item Is Published W/ Basic Incl C2) — 01/09/2024</li>
-                <li><a href="/pub/atp-2-22.7">ATP 2-22.7</a> — Geospatial Intelligence — 06/09/2025</li>
-                <li><a href="/pub/atp-2-22.8">ATP 2-22.8</a> — (u) Measurement And Signature Intelligence (s//nf) — 05/30/2014</li>
-                <li><a href="/pub/atp-2-22.85">ATP 2-22.85</a> — Multi-service Tactics, Techniques, And Procedures For Tactical Employment Of Biometrics In Support Of Operations {mcrp 10-10f.1 | Nttp 3-07.16 | Afttp 3-2.85} (this Item Is Published W/ Basic Incl C1) — 04/30/2020</li>
-                <li><a href="/pub/atp-2-22.9-1">ATP 2-22.9-1</a> — (u) Publicly Available Information Research And Open-source Intelligence {mcrp 2-10a.3} (this Item Is Published W/ Basic Incl C1) — 10/19/2023</li>
-                <li><a href="/pub/atp-2-22.9-2">ATP 2-22.9-2</a> — (u) Open-source Intelligence Volume Ii (s) — 08/15/2019</li>
-                <li><a href="/pub/atp-2-33.4">ATP 2-33.4</a> — Intelligence Analysis (this Item Is Published W/ Basic Incl C1) — 01/10/2020</li>
-                <li><a href="/pub/atp-2-91.7">ATP 2-91.7</a> — Intelligence Support To Defense Support Of Civil  Authorities — 06/29/2015</li>
-                <li><a href="/pub/atp-2-91.9">ATP 2-91.9</a> — (u) Intelligence Operations In A Cyberspace Electromagnetic Activities Environment (ts) (this Item Is Published W/ Basic Incl C1) — 08/03/2017</li>
-                <li><a href="/pub/atp-3-01.15">ATP 3-01.15</a> — Multi-service Tactics, Techniques, And Procedures For Air And Missile Defense (mctp 10-10b, Nttp 3-01.8,  Afttp 3-2.31) — 04/07/2023</li>
-                <li><a href="/pub/atp-3-01.16">ATP 3-01.16</a> — Air And Missle Defense Intelligence Preparation Of The Battlefield (amd Ipb) — 03/31/2016</li>
-                <li><a href="/pub/atp-3-01.18">ATP 3-01.18</a> — Stinger Team Techniques — 08/23/2017</li>
-                <li><a href="/pub/atp-3-01.4">ATP 3-01.4</a> — Multi-service Tactics Techniques And Procedures For Joint Suppression Of Enemy Air Defense (j-sead) (mcrp 3-31.3; Nttp 3-01.42; Afttp 3-2.28) — 06/09/2022</li>
-                <li><a href="/pub/atp-3-01.48">ATP 3-01.48</a> — Sentinel Techniques — 03/04/2016</li>
-                <li><a href="/pub/atp-3-01.50">ATP 3-01.50</a> — Air Defense And Airspace Management (adam) Cell Operation — 04/05/2013</li>
-                <li><a href="/pub/atp-3-01.60">ATP 3-01.60</a> — Counter-rocket, Artillery, And Mortar Operations — 05/10/2013</li>
-                <li><a href="/pub/atp-3-01.64">ATP 3-01.64</a> — Avenger Battalion And Battery Techniques — 03/10/2016</li>
-                <li><a href="/pub/atp-3-01.7">ATP 3-01.7</a> — Air Defense Artillery Brigade Techniques — 03/16/2016</li>
-                <li><a href="/pub/atp-3-01.8">ATP 3-01.8</a> — Techniques For Combined Arms For Air Defense — 07/29/2016</li>
-                <li><a href="/pub/atp-3-01.81">ATP 3-01.81</a> — Counter-unmanned Aircraft System (c-uas) Operations — 05/23/2025</li>
-                <li><a href="/pub/atp-3-01.85">ATP 3-01.85</a> — Patriot Battalion Techniques — 01/31/2019</li>
-                <li><a href="/pub/atp-3-01.87">ATP 3-01.87</a> — Patriot Battery Techniques — 08/22/2018</li>
-                <li><a href="/pub/atp-3-01.91">ATP 3-01.91</a> — Terminal High Altitude Defense (thaad) Techniques — 08/26/2013</li>
-                <li><a href="/pub/atp-3-01.94">ATP 3-01.94</a> — Army Air And Missile Defense Command Operations — 04/20/2016</li>
-                <li><a href="/pub/atp-3-04.1">ATP 3-04.1</a> — Aviation Tactical Employment — 05/07/2020</li>
-                <li><a href="/pub/atp-3-04.119">ATP 3-04.119</a> — Aviation Security And Support Battalion Operations — 01/25/2022</li>
-                <li><a href="/pub/atp-3-04.13">ATP 3-04.13</a> — Helicopter And Small Aircraft Battle Damage Assessment, Repair, And Recovery — 11/09/2021</li>
-                <li><a href="/pub/atp-3-04.16">ATP 3-04.16</a> — Airfield Operations — 09/21/2023</li>
-                <li><a href="/pub/atp-3-04.17">ATP 3-04.17</a> — Techniques For Forward Arming And Refueling Points (this Item Is Published W/ Basic Incl C1) — 06/04/2018</li>
-                <li><a href="/pub/atp-3-04.18">ATP 3-04.18</a> — Multi-service Tactics, Techniques, And Procedures For Air Operations In Maritime Surface Warfare (mcrp 3-20.2, Nttp 3-20.8, Afttp 3-2.74) — 03/29/2024</li>
-                <li><a href="/pub/atp-3-04.19">ATP 3-04.19</a> — Multi-service Tactics, Techniques, And Procedures For Shipboard Helicopter And Tiltrotor Aircraft Operations — 03/01/2019</li>
-                <li><a href="/pub/atp-3-04.20">ATP 3-04.20</a> — Army Fixed-wing Operations — 06/03/2021</li>
-                <li><a href="/pub/atp-3-04.23">ATP 3-04.23</a> — Army Aviation Platoons — 05/17/2021</li>
-                <li><a href="/pub/atp-3-04.5">ATP 3-04.5</a> — Fundamentals Of Aviation Combat Survivability — 05/30/2026</li>
-                <li><a href="/pub/atp-3-04.6">ATP 3-04.6</a> — Air Traffic Services Operations  (this Item Is Published W/ Basic Incl C1) — 01/12/2022</li>
-                <li><a href="/pub/atp-3-04.7">ATP 3-04.7</a> — Army Aviation Maintenance — 10/20/2020</li>
-                <li><a href="/pub/atp-3-05.1">ATP 3-05.1</a> — Unconventional Warfare At The Combined Joint Special Operations Task Force Level (published With Basic Including Change 1.) — 04/09/2021</li>
-                <li><a href="/pub/atp-3-05.11">ATP 3-05.11</a> — Special Operations Chemical, Biological, Radiological, And Nuclear Operations — 04/30/2014</li>
-                <li><a href="/pub/atp-3-05.2">ATP 3-05.2</a> — Foreign Internal Defense — 08/19/2015</li>
-                <li><a href="/pub/atp-3-05.20">ATP 3-05.20</a> — Special Operations Intelligence — 05/03/2013</li>
-                <li><a href="/pub/atp-3-05.40">ATP 3-05.40</a> — Special Operations Sustainment — 05/03/2013</li>
-                <li><a href="/pub/atp-3-05.60">ATP 3-05.60</a> — Special Operations Communications System — 11/30/2015</li>
-                <li><a href="/pub/atp-3-05.68">ATP 3-05.68</a> — Special Operations Noncombatant Evacuation Operations — 09/30/2014</li>
-                <li><a href="/pub/atp-3-05.71">ATP 3-05.71</a> — (u) Army Special Operations Forces Resistance And Escape (c//rel To Usa, Fvey) (this Item Is Published W/ Basic Incl C2) — 11/15/2021</li>
-                <li><a href="/pub/atp-3-06">ATP 3-06</a> — Urban Operations {mctp 12-10b} (this Item Is Published W/ Basic Incl C1) — 07/21/2022</li>
-                <li><a href="/pub/atp-3-06.1">ATP 3-06.1</a> — Multi-service Tactics, Techniques, And Procedures For Aviation Urban Operations (mcrp 3-20.4, Nttp 3-01.04, Afttp 3-2.29) — 02/22/2022</li>
-                <li><a href="/pub/atp-3-06.11">ATP 3-06.11</a> — Brigade Combat Team Urban Operations — 09/27/2024</li>
-                <li><a href="/pub/atp-3-07.10">ATP 3-07.10</a> — Multi-service Tactics, Techniques, And Procedures For Advising Foreign Security Forces (mcrp 3-03d.1, Nttp 3-07.5, Afttp 3-2.76) — 06/15/2023</li>
-                <li><a href="/pub/atp-3-07.31">ATP 3-07.31</a> — Multi-service Tactics, Techniques, And Procedures For Peace Operations {mctp 3-03b | Afttp 3-2.40} (this Item Is Published W/ Basic Incl C1) — 05/02/2019</li>
-                <li><a href="/pub/atp-3-07.5">ATP 3-07.5</a> — Stability Techniques — 08/31/2012</li>
-                <li><a href="/pub/atp-3-07.6">ATP 3-07.6</a> — Protection Of Civilians (this Item Is Published W/ Basic Incl C1) — 10/29/2015</li>
-                <li><a href="/pub/atp-3-09.02">ATP 3-09.02</a> — Field Artillery Survey — 02/16/2016</li>
-                <li><a href="/pub/atp-3-09.12">ATP 3-09.12</a> — Field Artillery Counterfire And Weapons Locating Radar Operations — 10/26/2021</li>
-                <li><a href="/pub/atp-3-09.13">ATP 3-09.13</a> — The Battlefield Coordination Detachment — 07/24/2015</li>
-                <li><a href="/pub/atp-3-09.23">ATP 3-09.23</a> — Field Artillery Battalion Operations — 02/25/2026</li>
-                <li><a href="/pub/atp-3-09.24">ATP 3-09.24</a> — The Field Artillery Brigade — 03/30/2022</li>
-                <li><a href="/pub/atp-3-09.30">ATP 3-09.30</a> — Observed Fires — 09/28/2017</li>
-                <li><a href="/pub/atp-3-09.32">ATP 3-09.32</a> — Multi-service Tactics, Techniques, And Procedures For Joint Application Of Firepower (mcrp 3-31.6, Nttp 3-09.2, Afttp 3-2.6) — 11/29/2023</li>
-                <li><a href="/pub/atp-3-09.34">ATP 3-09.34</a> — Multi-service Tactics, Techniques, And Procedures For Kill Box Planning And Employment (mcrp 3-31.4, Nttp 3-09.2.1, Afttp 3-2.59) — 10/07/2022</li>
-                <li><a href="/pub/atp-3-09.42">ATP 3-09.42</a> — Fire Support For The Brigade Combat Team — 03/01/2016</li>
-                <li><a href="/pub/atp-3-09.50">ATP 3-09.50</a> — The Field Artillery Cannon Battery — 05/04/2016</li>
-                <li><a href="/pub/atp-3-09.60">ATP 3-09.60</a> — Techniques For Multiple Launch Rocket System (mlrs) And High Mobility Artillery Rocket System (himars) Operations — 07/29/2020</li>
-                <li><a href="/pub/atp-3-09.70">ATP 3-09.70</a> — Paladin Operations — 09/25/2015</li>
-                <li><a href="/pub/atp-3-09.90">ATP 3-09.90</a> — Division Artillery Operations And Fire Support For The Division — 10/12/2017</li>
-                <li><a href="/pub/atp-3-11.32">ATP 3-11.32</a> — Multi-service Tactics, Techniques, And Procedures For Chemical, Biological, Radiological, And Nuclear Protection {mcrp 10-10e.11 | Nttp 3-11.27 | Afttp 3-2.46} (this Item Is Published W/ Basic Incl C1) — 01/24/2024</li>
-                <li><a href="/pub/atp-3-11.33">ATP 3-11.33</a> — Multi-service Tactics, Techniques, And Procedures For Chemical, Biological, Radiological, And Nuclear Contamination Mitigation (mcrp 10-10e.12, Nttp 3-11.26, Afttp 3-2.60) — 01/24/2024</li>
-                <li><a href="/pub/atp-3-11.36">ATP 3-11.36</a> — Multi-service Tactics, Techniques, And Procedures For Chemical, Biological, Radiological, And Nuclear Planning {mcrp 10-10e.1 | Nttp 3-11.34 | Afttp 3-2.70} — 04/14/2025</li>
-                <li><a href="/pub/atp-3-11.37">ATP 3-11.37</a> — Multi-service Tactics, Techniques, And Procedures For Chemical, Biological, Radiological, And Nuclear Reconnaissance And Surveillance {mcrp 10-10e.7 | Nttp 3-11.29 | Afttp 3-22.44} (this Item Is Published W/ Basic Incl C1) — 03/31/2021</li>
-                <li><a href="/pub/atp-3-11.42">ATP 3-11.42</a> — Multi-service Tactics, Techniques, And Procedures For Domestic Chemical, Biological, Radiological, And Nuclear Response (mcrp 10-10e.10, Nttp 3-11.38, Afttp 3-2.84) (this Item Is Published W/ Basic Incl C1) — 12/22/2021</li>
-                <li><a href="/pub/atp-3-11.46">ATP 3-11.46</a> — Weapons Of Mass Destruction--civil Support Team Operations (afttp 3-2.81) (this Item Is Published W/ Basic Incl C1&amp;c2) — 05/20/2014</li>
-                <li><a href="/pub/atp-3-11.47">ATP 3-11.47</a> — Chemical, Biological, Radiological, Nuclear, And High-yield Explosives Enhanced Response Force Package (cerfp)/homeland Response Force (hrf) Operations (afttp 3-2.79) — 04/26/2013</li>
-                <li><a href="/pub/atp-3-11.50">ATP 3-11.50</a> — Battlefield Obscuration (this Item Is Published W/ Basic Incl C1) — 05/15/2014</li>
-                <li><a href="/pub/atp-3-11.74">ATP 3-11.74</a> — Chemical, Biological, Radiological, And Nuclear Platoons — 04/15/2021</li>
-                <li><a href="/pub/atp-3-12.3">ATP 3-12.3</a> — Electromagnetic Warfare Techniques — 01/30/2023</li>
-                <li><a href="/pub/atp-3-12.4">ATP 3-12.4</a> — Electromagnetic Warfare Platoon — 01/09/2023</li>
-                <li><a href="/pub/atp-3-13.1">ATP 3-13.1</a> — The Conduct Of Information Operations (this Item Is Published W/ Basic Incl C1) — 10/04/2018</li>
-                <li><a href="/pub/atp-3-13.3">ATP 3-13.3</a> — Army Operations Security For Division And Below — 07/16/2019</li>
-                <li><a href="/pub/atp-3-13.4">ATP 3-13.4</a> — (u) Army Deception Activities Tactics, Techniques, And Procedures (s) — 04/19/2024</li>
-                <li><a href="/pub/atp-3-13.5">ATP 3-13.5</a> — Soldier And Leader Engagement — 12/21/2021</li>
-                <li><a href="/pub/atp-3-14.1">ATP 3-14.1</a> — (u) Army Space Control Operations (s//nf) — 12/18/2025</li>
-                <li><a href="/pub/atp-3-14.3">ATP 3-14.3</a> — Techniques For Army Space Forces — 02/15/2018</li>
-                <li><a href="/pub/atp-3-16.02">ATP 3-16.02</a> — Write For Release — 09/26/2023</li>
-                <li><a href="/pub/atp-3-17.2">ATP 3-17.2</a> — Multi-service Tactics, Techniques, And Procedures For Airfield Opening {mcrp 3-20b.1; Nttp 3-02.18; Afttp 3-2.68} — 03/01/2024</li>
-                <li><a href="/pub/atp-3-18.1">ATP 3-18.1</a> — Special Forces Unconventional Warfare — 06/20/2025</li>
-                <li><a href="/pub/atp-3-18.10">ATP 3-18.10</a> — Special Forces Air Operations  (this Item Is Published W/ Basic Incl C1) — 06/03/2021</li>
-                <li><a href="/pub/atp-3-18.11">ATP 3-18.11</a> — Special Forces Military Free-fall Operations — 04/30/2025</li>
-                <li><a href="/pub/atp-3-18.12">ATP 3-18.12</a> — Special Forces Waterborne Operations — 12/16/2022</li>
-                <li><a href="/pub/atp-3-18.13">ATP 3-18.13</a> — Special Forces Use Of Pack Animals — 03/28/2024</li>
-                <li><a href="/pub/atp-3-18.14">ATP 3-18.14</a> — Special Forces Ground Mobility Operations Tactics, Techniques, And Procedures — 07/15/2022</li>
-                <li><a href="/pub/atp-3-18.16">ATP 3-18.16</a> — (u) Preparation Of The Environment (s//nf) (this Pub Is Published With C1 Included.) — 02/27/2018</li>
-                <li><a href="/pub/atp-3-18.20">ATP 3-18.20</a> — (u) Advanced Special Operations Techniques (s//nf) — 10/26/2021</li>
-                <li><a href="/pub/atp-3-18.3">ATP 3-18.3</a> — (u) Special Forces Direct Action Operations (c) — 08/09/2021</li>
-                <li><a href="/pub/atp-3-18.4">ATP 3-18.4</a> — Special Forces Special Reconnaissance — 10/05/2021</li>
-                <li><a href="/pub/atp-3-18.72">ATP 3-18.72</a> — (u) Special Forces Personnel Recovery (s//nf) — 06/18/2024</li>
-                <li><a href="/pub/atp-3-20.15">ATP 3-20.15</a> — Tank Platoon — 07/10/2025</li>
-                <li><a href="/pub/atp-3-20.96">ATP 3-20.96</a> — Cavalry Squadron — 05/12/2016</li>
-                <li><a href="/pub/atp-3-20.97">ATP 3-20.97</a> — Cavalry Troop — 09/12/2024</li>
-                <li><a href="/pub/atp-3-20.98">ATP 3-20.98</a> — Scout Platoon (this Item Is Published W/ Basic Incl C1) — 12/04/2019</li>
-                <li><a href="/pub/atp-3-21.10">ATP 3-21.10</a> — Infantry Rifle Company — 06/01/2026</li>
-                <li><a href="/pub/atp-3-21.11">ATP 3-21.11</a> — Stryker Brigade Combat Team Infantry Rifle Company — 11/25/2020</li>
-                <li><a href="/pub/atp-3-21.18">ATP 3-21.18</a> — Foot Marches — 07/24/2025</li>
-                <li><a href="/pub/atp-3-21.20">ATP 3-21.20</a> — Infantry Battalion — 12/28/2017</li>
-                <li><a href="/pub/atp-3-21.21">ATP 3-21.21</a> — Sbct Infantry Battalion — 03/22/2016</li>
-                <li><a href="/pub/atp-3-21.50">ATP 3-21.50</a> — Infantry Small-unit Mountain And Cold Weather Operations — 07/29/2025</li>
-                <li><a href="/pub/atp-3-21.51">ATP 3-21.51</a> — Subterranean Operations — 11/01/2019</li>
-                <li><a href="/pub/atp-3-21.71">ATP 3-21.71</a> — Mechanized Infantry Platoon And Squad — 10/15/2024</li>
-                <li><a href="/pub/atp-3-21.8">ATP 3-21.8</a> — Infantry Rifle Platoon And Squad (this Item Is Published W/ Basic Incl C1) — 01/11/2024</li>
-                <li><a href="/pub/atp-3-21.9">ATP 3-21.9</a> — Stryker Infantry Rifle Platoon And Squad — 06/24/2025</li>
-                <li><a href="/pub/atp-3-21.90">ATP 3-21.90</a> — Tactical Employment Of Mortars — 10/09/2019</li>
-                <li><a href="/pub/atp-3-21.91">ATP 3-21.91</a> — Stryker Brigade Combat Team Weapons Troop — 05/11/2017</li>
-                <li><a href="/pub/atp-3-22.40">ATP 3-22.40</a> — Multi-service Tactics, Techniques, And Procedures For The Employment Of Nonlethal Weapons {mctp 10-10a | Nttp 3-26.6 | Afttp 3-2.45 | Cgttp 3-93.2} — 04/07/2025</li>
-                <li><a href="/pub/atp-3-24.2">ATP 3-24.2</a> — Techniques In Counterinsurgency — 07/31/2025</li>
-                <li><a href="/pub/atp-3-27.3">ATP 3-27.3</a> — Ground-based Midcourse Defense Operations — 09/04/2025</li>
-                <li><a href="/pub/atp-3-27.5">ATP 3-27.5</a> — An/tpy-2 Forward Based Mode System Operations — 02/11/2022</li>
-                <li><a href="/pub/atp-3-28.1">ATP 3-28.1</a> — Multi-service Tactics, Techniques, And Procedures For Defense Support Of Civil Authorities (dsca) (mcrp 3-30.6, Nttp 3-57.2, Afttp 3-2.67, Cgttp 3-57.1) — 02/11/2021</li>
-                <li><a href="/pub/atp-3-34.10">ATP 3-34.10</a> — Engineer Platoons — 02/02/2021</li>
-                <li><a href="/pub/atp-3-34.20">ATP 3-34.20</a> — Countering Explosive Hazards {mcrp 10-10.1c} (this Item Is Published W/ Basic Incl C1) — 01/21/2016</li>
-                <li><a href="/pub/atp-3-34.22">ATP 3-34.22</a> — Engineer Operations--brigade Combat Team And Below — 04/14/2021</li>
-                <li><a href="/pub/atp-3-34.40">ATP 3-34.40</a> — General Engineering (mctp 3-40d(mcwp 3-17.7)) — 04/14/2023</li>
-                <li><a href="/pub/atp-3-34.45">ATP 3-34.45</a> — Electric Power Generation And Distribution  {mcrp 3-40d.17} — 02/05/2024</li>
-                <li><a href="/pub/atp-3-34.5">ATP 3-34.5</a> — Environmental Considerations (mcrp 3-40b.2) (this Item Is Published W/ Basic Incl C2) — 08/10/2015</li>
-                <li><a href="/pub/atp-3-34.80">ATP 3-34.80</a> — Geospatial Engineering — 03/26/2024</li>
-                <li><a href="/pub/atp-3-34.81">ATP 3-34.81</a> — Engineer Reconnaissance (mcwp 3-17.4) (this Item Is Published W/ Basic Incl C1) — 03/01/2016</li>
-                <li><a href="/pub/atp-3-34.84">ATP 3-34.84</a> — Multi-service Tactics, Techniques, And Procedures For Military Diving Operations (mcrp 3-10.2, Nttp 3-07.7, Afttp 3-2.75, Cgttp 3-95.17) — 06/16/2023</li>
-                <li><a href="/pub/atp-3-35">ATP 3-35</a> — Army Deployment And Redeployment — 03/09/2023</li>
-                <li><a href="/pub/atp-3-35.1">ATP 3-35.1</a> — Army Pre-positioned Operations (this Item Is Published W/ Basic Incl C1) — 04/21/2022</li>
-                <li><a href="/pub/atp-3-37.10">ATP 3-37.10</a> — Base Camps (mcrp 3-40d.13) — 01/27/2017</li>
-                <li><a href="/pub/atp-3-37.11">ATP 3-37.11</a> — Chemical, Biological, Radiological, Nuclear And Explosives Command (cbrne Command) — 08/28/2018</li>
-                <li><a href="/pub/atp-3-37.15">ATP 3-37.15</a> — Foreign Security Force Threats (this Item Is Published W/ Basic Incl C1) — 01/30/2020</li>
-                <li><a href="/pub/atp-3-37.2">ATP 3-37.2</a> — Antiterrorism — 07/19/2021</li>
-                <li><a href="/pub/atp-3-37.34">ATP 3-37.34</a> — Survivability Operations (mctp 3-34c) — 04/16/2018</li>
-                <li><a href="/pub/atp-3-39.10">ATP 3-39.10</a> — Police Operations — 07/24/2026</li>
-                <li><a href="/pub/atp-3-39.11">ATP 3-39.11</a> — Military Police Special Reaction Teams (this Item Is Published W/ Basic Incl C1) — 12/15/2022</li>
-                <li><a href="/pub/atp-3-39.12-1">ATP 3-39.12-1</a> — Law Enforcement Investigations, Volume I (this Item Is Published W/ Basic Incl C1) — 04/12/2024</li>
-                <li><a href="/pub/atp-3-39.12-2">ATP 3-39.12-2</a> — Law Enforcement Investigations, Volume Ii: Surveillance And Undercover Operations {dist By Proponent} (this Item Is Published W/ Basic Incl C1) — 04/12/2024</li>
-                <li><a href="/pub/atp-3-39.20">ATP 3-39.20</a> — Police Intelligence Operations — 05/13/2019</li>
-                <li><a href="/pub/atp-3-39.21">ATP 3-39.21</a> — Multi-service Tactics, Techniques, And Procedures For Expeditionary Forensics {mcrp 10-10f.5 | Nttp 3-07.8 | Afttp 3-2.7 | Cgttp 3-93.10} — 04/30/2026</li>
-                <li><a href="/pub/atp-3-39.30">ATP 3-39.30</a> — Security And Mobility Support — 03/25/2026</li>
-                <li><a href="/pub/atp-3-39.32">ATP 3-39.32</a> — Physical Security (this Item Is Published W/ Basic Incl C1) — 03/08/2022</li>
-                <li><a href="/pub/atp-3-39.33">ATP 3-39.33</a> — Crowd Control — 06/23/2022</li>
-                <li><a href="/pub/atp-3-39.34">ATP 3-39.34</a> — Military Working Dogs — 05/19/2022</li>
-                <li><a href="/pub/atp-3-39.35">ATP 3-39.35</a> — Protective Services (this Item Is Published W/ Basic Incl C1) — 05/31/2013</li>
-                <li><a href="/pub/atp-3-39.4">ATP 3-39.4</a> — Military Police Platoons (this Item Is Published W/ Basic Incl C1) — 04/09/2021</li>
-                <li><a href="/pub/atp-3-50.10">ATP 3-50.10</a> — Multi-service Tactics, Techniques, And Procedures For Personnel Recovery Mcrp 3-05.3, Nttp 3-57.6, Afttp 3-2.90) — 10/20/2022</li>
-                <li><a href="/pub/atp-3-50.20">ATP 3-50.20</a> — Survival, Evasion, Resistance, And Escape (sere) Planning And Preparation — 11/29/2017</li>
-                <li><a href="/pub/atp-3-50.21">ATP 3-50.21</a> — Survival — 09/18/2018</li>
-                <li><a href="/pub/atp-3-50.22">ATP 3-50.22</a> — Evasion — 11/28/2017</li>
-                <li><a href="/pub/atp-3-50.3">ATP 3-50.3</a> — Multi-service Tactics, Techniques, And Procedures For Survival, Evasion, And Recovery (mcrp 3-05.1, Nttp 3-50.3, Afttp 3-2.26) — 07/05/2023</li>
-                <li><a href="/pub/atp-3-52.1">ATP 3-52.1</a> — Multi-service Tactics, Techniques, And Procedures For Airspace Control (mcrp 3-20f.4, Nttp 3-56.4, Afttp 3-2.78) — 06/21/2023</li>
-                <li><a href="/pub/atp-3-52.2">ATP 3-52.2</a> — Multi-service Tactics, Techniques, And Procedures For The Theater Air-ground System (mcrp 3-20.1, Nttp 3-56.2, Afttp 3-2.17) — 08/22/2024</li>
-                <li><a href="/pub/atp-3-52.4">ATP 3-52.4</a> — Acc Multi-service Tactics, Techniques, And Procedures For Air Control Communication {mcrp 3-20f.10 | Nttp 6-02.9 | Afttp 3-2.8} — 10/09/2024</li>
-                <li><a href="/pub/atp-3-53">ATP 3-53</a> — The Psychological Operations Branch And Unit Activities — 04/20/2026</li>
-                <li><a href="/pub/atp-3-53.4">ATP 3-53.4</a> — Civil Authority Information Support — 07/12/2022</li>
-                <li><a href="/pub/atp-3-53.5">ATP 3-53.5</a> — (u) Psychological Operations Forces And Military Deception (s//nf) — 04/25/2025</li>
-                <li><a href="/pub/atp-3-55.3">ATP 3-55.3</a> — Multi-service Tactics, Techniques, And Procedures For Intelligence, Surveillance, And Reconnaissance Optimization {mcrp 2-10a.8 | Nttp 2-01.3 | Afttp 3-2.88 | Sttp 2-9001} — 10/03/2024</li>
-                <li><a href="/pub/atp-3-55.4">ATP 3-55.4</a> — Techniques For Information Collection During Operations Among Populations (this Item Is Published W/ Basic Incl C1) — 04/05/2016</li>
-                <li><a href="/pub/atp-3-55.6">ATP 3-55.6</a> — Multi-service Tactics, Techniques, And Procedures For Air-to-surface Radar System Employment (mcrp 2-10a.4, Nttp 3-55.13, Afttp 3-2.2) — 09/22/2023</li>
-                <li><a href="/pub/atp-3-57.10">ATP 3-57.10</a> — Civil Affairs Support To Populace And Resources Control (this Item Is Published W/ Basic Incl C1) — 08/06/2013</li>
-                <li><a href="/pub/atp-3-57.20">ATP 3-57.20</a> — Multi-service Techniques For Civil Affairs Support To Foreign Humanitarian Assistance {mcrp 3-33.1c} — 02/15/2013</li>
-                <li><a href="/pub/atp-3-57.30">ATP 3-57.30</a> — Civil Network Development And Engagement (this Item Is Published W/ Basic Incl C1) — 02/06/2023</li>
-                <li><a href="/pub/atp-3-57.40">ATP 3-57.40</a> — Military Government Operations In Support Of Transitional Governance — 06/05/2025</li>
-                <li><a href="/pub/atp-3-57.50">ATP 3-57.50</a> — Civil Knowledge Integration — 10/16/2024</li>
-                <li><a href="/pub/atp-3-57.60">ATP 3-57.60</a> — Civil Affairs Planning (this Item Is Published W/ Basic Incl C1) — 05/07/2024</li>
-                <li><a href="/pub/atp-3-57.70">ATP 3-57.70</a> — Civil-military Operations Center — 05/05/2014</li>
-                <li><a href="/pub/atp-3-57.80">ATP 3-57.80</a> — Army Special Operations Forces Civil Affairs — 11/01/2024</li>
-                <li><a href="/pub/atp-3-60.1">ATP 3-60.1</a> — Multi-service Tactics, Techniques, And Procedures For Dynamic Targeting {mcrp 3-31.5 | Nttp 3-60.1 | Afttp 3-2.3 | Sttp 3-9001} — 03/28/2025</li>
-                <li><a href="/pub/atp-3-60.2">ATP 3-60.2</a> — Multi-service Tactics, Techniques, And Procedures For Strike Coordination And Reconnaissance {mcrp 3-20d.1 | Nttp 3-03.4.3 | Afttp 3-2.72 | Sttp 3-9004} — 03/10/2026</li>
-                <li><a href="/pub/atp-3-72">ATP 3-72</a> — Operations In A Nuclear Environment (mcrp 10-10e.9, Nttp 3-72.1, Afttp 3-2.65) — 03/07/2022</li>
-                <li><a href="/pub/atp-3-75">ATP 3-75</a> — Ranger Operations — 06/26/2015</li>
-                <li><a href="/pub/atp-3-76">ATP 3-76</a> — Special Operations Aviation — 04/20/2026</li>
-                <li><a href="/pub/atp-3-90.1">ATP 3-90.1</a> — Armor And Mechanized Infantry Company Team (this Item Is Published W/ Basic Incl C1) — 10/24/2023</li>
-                <li><a href="/pub/atp-3-90.15">ATP 3-90.15</a> — Site Exploitation (this Item Is Published W/ Basic Incl C1) — 07/28/2015</li>
-                <li><a href="/pub/atp-3-90.20">ATP 3-90.20</a> — Regional Support Group — 09/13/2024</li>
-                <li><a href="/pub/atp-3-90.4">ATP 3-90.4</a> — (cui) Combined Arms Mobility {mctp 3-34a (mcwp 3-17.8)} — 06/10/2022</li>
-                <li><a href="/pub/atp-3-90.40">ATP 3-90.40</a> — Multi-service Tactics, Techniques, And Procedures For Combined Arms Countering Weapons Of Mass Destruction {mctp 10-10h | Afttp 3-2.71} (this Item Is Published W/ Basic Incl C1) — 05/18/2023</li>
-                <li><a href="/pub/atp-3-90.5">ATP 3-90.5</a> — Combined Arms Battalion — 07/15/2021</li>
-                <li><a href="/pub/atp-3-90.51">ATP 3-90.51</a> — Tactical Employment Of Small Unmanned Aircraft Systems — 06/01/2026</li>
-                <li><a href="/pub/atp-3-90.8">ATP 3-90.8</a> — Combined Arms Countermobility (mctp 3-34b) (this Item Is Published W/ Basic Incl C1) — 11/30/2021</li>
-                <li><a href="/pub/atp-3-90.96">ATP 3-90.96</a> — Arctic And Extreme Cold Weather Operations (this Item Is Published W/ Basic Incl C2) — 02/24/2025</li>
-                <li><a href="/pub/atp-3-90.97">ATP 3-90.97</a> — Mountain Warfare And Cold Weather Operations — 04/29/2016</li>
-                <li><a href="/pub/atp-3-90.98">ATP 3-90.98</a> — Jungle Operations (mctp 12-10c) — 09/24/2020</li>
-                <li><a href="/pub/atp-3-90.99">ATP 3-90.99</a> — Desert Operations {mctp 12-10d} (this Item Is Published W/ Basic Incl C1) — 04/07/2021</li>
-                <li><a href="/pub/atp-3-91">ATP 3-91</a> — Division Operations — 10/17/2014</li>
-                <li><a href="/pub/atp-3-91.1">ATP 3-91.1</a> — The Joint Air Ground Integration Center (afttp 3-2.86) — 04/17/2019</li>
-                <li><a href="/pub/atp-3-92">ATP 3-92</a> — Corps Operations — 01/15/2026</li>
-                <li><a href="/pub/atp-3-93">ATP 3-93</a> — Theater Army Operations — 08/27/2021</li>
-                <li><a href="/pub/atp-3-94.1">ATP 3-94.1</a> — Theater Liaison Detachment — 03/21/2025</li>
-                <li><a href="/pub/atp-3-94.2">ATP 3-94.2</a> — Deep Operations — 09/01/2016</li>
-                <li><a href="/pub/atp-3-94.4">ATP 3-94.4</a> — Reconstitution Operations — 05/05/2021</li>
-                <li><a href="/pub/atp-3-96.1">ATP 3-96.1</a> — Security Force Assistance Brigade — 06/11/2025</li>
-                <li><a href="/pub/atp-4-0.6">ATP 4-0.6</a> — Sustainment Automation Support Management Office Operations — 01/17/2024</li>
-                <li><a href="/pub/atp-4-01.45">ATP 4-01.45</a> — Multi-service Tactics, Techniques, And Procedures For Tactical Convoy Operations (mcrp 3-40f.7, Nttp 4-01.6, Afttp 3-2.58) — 06/05/2026</li>
-                <li><a href="/pub/atp-4-02.1">ATP 4-02.1</a> — Army Medical Logistics — 10/29/2015</li>
-                <li><a href="/pub/atp-4-02.10">ATP 4-02.10</a> — Army Hospitalization (role 3) — 08/14/2025</li>
-                <li><a href="/pub/atp-4-02.11">ATP 4-02.11</a> — Army Techniques Publication For Casualty Response, Tactical Combat Casualty Care, And First Aid — 03/23/2026</li>
-                <li><a href="/pub/atp-4-02.13">ATP 4-02.13</a> — Casualty Evacuation — 06/30/2021</li>
-                <li><a href="/pub/atp-4-02.19">ATP 4-02.19</a> — Dental Services — 07/31/2026</li>
-                <li><a href="/pub/atp-4-02.2">ATP 4-02.2</a> — Medical Evacuation — 07/12/2019</li>
-                <li><a href="/pub/atp-4-02.25">ATP 4-02.25</a> — The Medical Detachment, Forward Resuscitative And Surgical (this Item Is Published W/ Basic Incl C1) — 12/07/2020</li>
-                <li><a href="/pub/atp-4-02.4">ATP 4-02.4</a> — Medical Platoon — 05/12/2021</li>
-                <li><a href="/pub/atp-4-02.42">ATP 4-02.42</a> — Army Health System Support To Stability And Defense Support Of Civil Authorities Tasks — 06/09/2014</li>
-                <li><a href="/pub/atp-4-02.43">ATP 4-02.43</a> — Army Health System Support To Army Special Operations Forces — 08/14/2023</li>
-                <li><a href="/pub/atp-4-02.46">ATP 4-02.46</a> — Army Health System Support To Detainee Operations (this Item Is Published W/ Basic Incl C1) — 08/24/2021</li>
-                <li><a href="/pub/atp-4-02.5">ATP 4-02.5</a> — Casualty Care (this Item Is Published W/ Basic Incl C1) — 05/10/2013</li>
-                <li><a href="/pub/atp-4-02.55">ATP 4-02.55</a> — Army Health System Support Planning — 03/30/2020</li>
-                <li><a href="/pub/atp-4-02.6">ATP 4-02.6</a> — The Medical Company (role 2) — 11/08/2022</li>
-                <li><a href="/pub/atp-4-02.7">ATP 4-02.7</a> — Multi-service Tactics, Techniques, And Procedures For Health Service Support In A Chemical, Biological, Radiological, And Nuclear Environment (mcrp 4-11.1f, Nttp 4-02.7, Afttp 3-42.3) — 03/15/2016</li>
-                <li><a href="/pub/atp-4-02.8">ATP 4-02.8</a> — Force Health Protection (this Item Is Published W/ Basic Incl C1) — 03/09/2016</li>
-                <li><a href="/pub/atp-4-02.82">ATP 4-02.82</a> — Occupational And Environmental Health Site Assessment (ntrp 4-02.9 , Afttp 3-2.82_ip) — 01/01/2023</li>
-                <li><a href="/pub/atp-4-02.83">ATP 4-02.83</a> — Multiservice Tactics, Techniques, And Procedures For Treatment Of Nuclear And Radiological Casualties (mcrp 4-11.1b, Ntrp 4-02.21, Afman 44-161(i)) — 05/05/2014</li>
-                <li><a href="/pub/atp-4-02.84">ATP 4-02.84</a> — Multi-service Tactics, Techniques, And Procedures For Treatment Of Biological Warfare Agent Casualties (mcrp 3-40a.3, Ntrp 4-02.23, Afman 44-156_ip) — 11/21/2019</li>
-                <li><a href="/pub/atp-4-02.85">ATP 4-02.85</a> — Multi-service Tactics, Techniques And Procedures For Treatment Of Chemical Warfare Agent Casulties And Conventional Military Chemical Injuries (mcrp 3-40a.1, *ntrp 4-02.22, *afttp(i) 3-2.69)  (this Item Is Published W/ Basic Incl C1) — 08/02/2016</li>
-                <li><a href="/pub/atp-4-10">ATP 4-10</a> — Multi-service Tactics, Techniques, And Procedures For Operational Contract Support {mcrp 4-11h | Nttp 4-09.1 | Afttp 3-2.41} (this Item Is Published W/ Basic Incl C1) — 12/02/2025</li>
-                <li><a href="/pub/atp-4-10.1">ATP 4-10.1</a> — Logistics Civil Augmentation Program Support To Operations — 11/28/2023</li>
-                <li><a href="/pub/atp-4-11">ATP 4-11</a> — Army Motor Transport Operations — 03/16/2026</li>
-                <li><a href="/pub/atp-4-12">ATP 4-12</a> — Army Container Operations — 02/12/2021</li>
-                <li><a href="/pub/atp-4-13">ATP 4-13</a> — Army Expeditionary Intermodal Operations — 06/21/2023</li>
-                <li><a href="/pub/atp-4-14">ATP 4-14</a> — Expeditionary Railway Center Operations — 06/22/2022</li>
-                <li><a href="/pub/atp-4-15">ATP 4-15</a> — Army Watercraft Operations (this Item Is Published W/ Basic Incl C1) — 04/03/2015</li>
-                <li><a href="/pub/atp-4-16">ATP 4-16</a> — Movement Control — 04/25/2022</li>
-                <li><a href="/pub/atp-4-25.12">ATP 4-25.12</a> — Unit Field Sanitation Teams  (this Item Is Published W/ Basic Incl C2) — 04/30/2014</li>
-                <li><a href="/pub/atp-4-31">ATP 4-31</a> — Ground Equipment Battle Damage Assessment, Repair, And Recovery — 04/01/2025</li>
-                <li><a href="/pub/atp-4-32">ATP 4-32</a> — Explosive Ordnance Disposal Operations — 04/21/2025</li>
-                <li><a href="/pub/atp-4-32.1">ATP 4-32.1</a> — Explosive Ordnance Disposal (eod) Group And Battalion Headquarters Operations (this Item Is Published W/ Basic Incl C1) — 01/24/2017</li>
-                <li><a href="/pub/atp-4-32.2">ATP 4-32.2</a> — Multi-service Tactics, Techniques, And Procedures For Explosive Ordnance (eo) {mcrp 10-10d.1, Nttp 3-02.4.1, Afttp 3-2.12} — 03/01/2024</li>
-                <li><a href="/pub/atp-4-32.3">ATP 4-32.3</a> — Explosive Ordnance Disposal (eod) Company, Platoon, And Team Operations (this Item Is Published W/ Basic Incl C1) — 02/01/2017</li>
-                <li><a href="/pub/atp-4-33">ATP 4-33</a> — Maintenance Operations — 01/09/2024</li>
-                <li><a href="/pub/atp-4-35">ATP 4-35</a> — Munitions Operations — 01/31/2023</li>
-                <li><a href="/pub/atp-4-35.1">ATP 4-35.1</a> — Ammunition And Explosives Handler Safety Techniques — 07/24/2026</li>
-                <li><a href="/pub/atp-4-41">ATP 4-41</a> — Army Field Feeding And Class I Operations — 12/31/2015</li>
-                <li><a href="/pub/atp-4-42">ATP 4-42</a> — Materiel Management, Supply, And Field Services Operations — 11/02/2020</li>
-                <li><a href="/pub/atp-4-42.2">ATP 4-42.2</a> — Supply Support Activity Operations — 09/18/2024</li>
-                <li><a href="/pub/atp-4-43">ATP 4-43</a> — Petroleum Supply Operations — 04/18/2022</li>
-                <li><a href="/pub/atp-4-44">ATP 4-44</a> — Water Support Operations — 07/08/2026</li>
-                <li><a href="/pub/atp-4-46">ATP 4-46</a> — Multi-service Tactics, Techniques, And Procedures For Mortuary Affairs In Theaters Of Operations (mcrp 3-40g.3/nttp 4-06/afttp 3-2.51) — 08/03/2022</li>
-                <li><a href="/pub/atp-4-48">ATP 4-48</a> — Aerial Delivery — 08/28/2023</li>
-                <li><a href="/pub/atp-4-70">ATP 4-70</a> — Assistant Secretary Of The Army For Acquisition, Logistics, And Technology Forward Support To Team Operations — 04/04/2025</li>
-                <li><a href="/pub/atp-4-71">ATP 4-71</a> — Contracting Support Brigade — 10/03/2024</li>
-                <li><a href="/pub/atp-4-90">ATP 4-90</a> — Brigade Support Battalion — 01/26/2026</li>
-                <li><a href="/pub/atp-4-90.5">ATP 4-90.5</a> — Logistics Platoon Leader — 11/02/2021</li>
-                <li><a href="/pub/atp-4-91">ATP 4-91</a> — Division Sustainment Operations (this Item Is Published W/ Basic Incl C1) — 11/08/2022</li>
-                <li><a href="/pub/atp-4-92">ATP 4-92</a> — Field Army And Corps Sustainment Operations — 03/14/2023</li>
-                <li><a href="/pub/atp-4-93">ATP 4-93</a> — Theater Sustainment Operations — 05/01/2023</li>
-                <li><a href="/pub/atp-4-93.1">ATP 4-93.1</a> — Combat Sustainment Support Battalion — 06/19/2017</li>
-                <li><a href="/pub/atp-4-98">ATP 4-98</a> — Army Sustainment Command Operations — 01/06/2025</li>
-                <li><a href="/pub/atp-5-0.1">ATP 5-0.1</a> — Army Design Methodology (this Item Is Published W/ Basic Incl C1) — 07/01/2015</li>
-                <li><a href="/pub/atp-5-0.2-1">ATP 5-0.2-1</a> — Staff Reference Guide Volume I, Unclassified Resources — 12/07/2020</li>
-                <li><a href="/pub/atp-5-0.2-2">ATP 5-0.2-2</a> — Staff Reference Guide Volume Ii: Appendix O Distribution D Resources — 12/07/2020</li>
-                <li><a href="/pub/atp-5-0.3">ATP 5-0.3</a> — Multi-service Tactics, Techniques, And Procedures For Operation Assessment (mcrp 5-10.1, Nttp 5-01.3, Afttp 3-2.87) — 02/07/2020</li>
-                <li><a href="/pub/atp-5-0.6">ATP 5-0.6</a> — Network Engagement — 06/19/2017</li>
-                <li><a href="/pub/atp-5-19">ATP 5-19</a> — Risk Management — 11/09/2021</li>
-                <li><a href="/pub/atp-6-0.5">ATP 6-0.5</a> — Command Post Organization And Operations — 03/01/2017</li>
-                <li><a href="/pub/atp-6-0.7">ATP 6-0.7</a> — Multi-service Tactics, Techniques, And Procedures For Data Orchestration — 06/01/2026</li>
-                <li><a href="/pub/atp-6-01.1">ATP 6-01.1</a> — Knowledge Management — 03/11/2024</li>
-                <li><a href="/pub/atp-6-02.12">ATP 6-02.12</a> — Department Of Defense Information Network-army Planning Techniques — 11/17/2021</li>
-                <li><a href="/pub/atp-6-02.2">ATP 6-02.2</a> — Signal Platoon — 07/10/2026</li>
-                <li><a href="/pub/atp-6-02.40">ATP 6-02.40</a> — Techniques For Visual Information Operations (this Item Is Published W/ Basic Incl C1) — 01/03/2019</li>
-                <li><a href="/pub/atp-6-02.45">ATP 6-02.45</a> — Techniques For Tactical Signal Support To Theater Operations — 11/07/2019</li>
-                <li><a href="/pub/atp-6-02.46">ATP 6-02.46</a> — Expeditionary Signal Companies — 05/07/2025</li>
-                <li><a href="/pub/atp-6-02.53">ATP 6-02.53</a> — Techniques For Tactical Radios And Retransmission — 07/31/2025</li>
-                <li><a href="/pub/atp-6-02.54">ATP 6-02.54</a> — Techniques For Satellite Communications — 11/05/2020</li>
-                <li><a href="/pub/atp-6-02.60">ATP 6-02.60</a> — Tactical Networking Techniques For Corps And Below — 08/09/2019</li>
-                <li><a href="/pub/atp-6-02.61">ATP 6-02.61</a> — Expeditionary Mission Partner Network Operations — 12/06/2023</li>
-                <li><a href="/pub/atp-6-02.62">ATP 6-02.62</a> — Expeditionary Mission Partner Network Techniques For Joining, Membership, And Exiting Instructions — 12/06/2023</li>
-                <li><a href="/pub/atp-6-02.70">ATP 6-02.70</a> — Techniques For Spectrum Management Operations — 09/16/2025</li>
-                <li><a href="/pub/atp-6-02.71">ATP 6-02.71</a> — Techniques For Department Of Defense Information Network Operations — 08/14/2025</li>
-                <li><a href="/pub/atp-6-02.72">ATP 6-02.72</a> — Multi-service Tactics, Techniques, And Procedures For Tactical Radios (mcrp 3-30b.3, Nttp 6-02.2, Afttp 3-2.18) — 07/10/2026</li>
-                <li><a href="/pub/atp-6-02.75">ATP 6-02.75</a> — Techniques For Communications Security — 05/18/2020</li>
-                <li><a href="/pub/atp-6-22.1">ATP 6-22.1</a> — Providing Feedback: Counseling–coaching–mentoring — 02/13/2024</li>
-                <li><a href="/pub/atp-7-100.1">ATP 7-100.1</a> — Russian Tactics (this Item Is Published W/ Basic Incl C1) — 02/29/2024</li>
-                <li><a href="/pub/atp-7-100.3">ATP 7-100.3</a> — Chinese Tactics (this Item Is Published W Basic Incl C1) — 08/09/2021</li>
-                <li><a href="/pub/atp-7-22.01">ATP 7-22.01</a> — Holistic Health And Fitness Testing — 03/12/2026</li>
-                <li><a href="/pub/atp-7-22.02">ATP 7-22.02</a> — Holistic Health And Fitness Drills And Exercises (this Item Is Published W/ Basic Incl C1) — 10/01/2020</li>
+                <li><a href="/pub/atp-1-0.1/">ATP 1-0.1</a> — Techniques For Human Resources Support To Operations — 11/16/2023</li>
+                <li><a href="/pub/atp-1-02.1/">ATP 1-02.1</a> — Multi-service Tactics, Techniques, And Procedures For Multi-service Brevity Codes {mcrp 3-30b.1 | Nttp 6-02.1 |  Afttp 3-2.5 | Sttp 3-9002} — 04/25/2025</li>
+                <li><a href="/pub/atp-1-05.01/">ATP 1-05.01</a> — Religious Support And The Operations Process — 07/31/2018</li>
+                <li><a href="/pub/atp-1-05.02/">ATP 1-05.02</a> — Religious Support To Funerals And Memorial Events — 11/27/2018</li>
+                <li><a href="/pub/atp-1-05.03/">ATP 1-05.03</a> — Religious Support And External Advisement — 01/31/2019</li>
+                <li><a href="/pub/atp-1-05.04/">ATP 1-05.04</a> — Religious Support And Internal Advisement (this Item Is Published W/ Basic Incl C1) — 03/23/2017</li>
+                <li><a href="/pub/atp-1-05.05/">ATP 1-05.05</a> — Religious Support And Casualty Care — 08/28/2019</li>
+                <li><a href="/pub/atp-1-06.1/">ATP 1-06.1</a> — Field Ordering Officer (foo) And Pay Agent (pa) Operations — 05/10/2013</li>
+                <li><a href="/pub/atp-1-06.2/">ATP 1-06.2</a> — Commanders' Emergency Response Program — 05/22/2017</li>
+                <li><a href="/pub/atp-1-06.3/">ATP 1-06.3</a> — Banking Operations — 01/23/2015</li>
+                <li><a href="/pub/atp-1-06.4/">ATP 1-06.4</a> — Internal Controls — 05/12/2016</li>
+                <li><a href="/pub/atp-1-19/">ATP 1-19</a> — Army Bands — 07/28/2021</li>
+                <li><a href="/pub/atp-1-20/">ATP 1-20</a> — Military History Operations  (this Item Is Published W/ Basic Incl C1) — 06/09/2014</li>
+                <li><a href="/pub/atp-2-01/">ATP 2-01</a> — Collection Management (this Item Is Published W/ Basic Incl C1) — 08/17/2021</li>
+                <li><a href="/pub/atp-2-01.3/">ATP 2-01.3</a> — Intelligence Preparation Of The Operational Environment (this Item Is Published W/ Basic Incl C3) — 03/01/2019</li>
+                <li><a href="/pub/atp-2-01.4/">ATP 2-01.4</a> — Intelligence Support To Army Targeting — 03/04/2026</li>
+                <li><a href="/pub/atp-2-19.1-1/">ATP 2-19.1-1</a> — (u) Echelons Above Corps Intelligence Organizations (this Item Is Published W/ Basic Incl C1) — 03/01/2022</li>
+                <li><a href="/pub/atp-2-19.1-2/">ATP 2-19.1-2</a> — (u) Echelons Above Corps Intelligence Organizations Volume Ii: United States Army Intelligence And Security Command (s//nf) — 09/29/2025</li>
+                <li><a href="/pub/atp-2-19.3/">ATP 2-19.3</a> — Corps And Division Intelligence Techniques — 03/08/2023</li>
+                <li><a href="/pub/atp-2-19.4/">ATP 2-19.4</a> — Brigade Combat Team Intelligence Techniques — 06/25/2021</li>
+                <li><a href="/pub/atp-2-22.1-1/">ATP 2-22.1-1</a> — (u) Human Intelligence Techniques, Volume I (this Item Is Published W/ Basic Incl C1) — 05/16/2025</li>
+                <li><a href="/pub/atp-2-22.2-1/">ATP 2-22.2-1</a> — Counterintelligence Volume I: Investigations, Analysis And Production, And Technical Services And Support Activities (u) — 12/11/2015</li>
+                <li><a href="/pub/atp-2-22.2-2/">ATP 2-22.2-2</a> — (u) Counter Intelligence Volume Ii: Operations And Collection Activities (s//nf)  (this Item Is Published W/ Basic Incl C1) — 12/22/2016</li>
+                <li><a href="/pub/atp-2-22.31/">ATP 2-22.31</a> — (u) Human Intelligence Military Source Operations Techniques (s//nf) (this Item Is Published W/ Basic Incl C2) — 04/17/2015</li>
+                <li><a href="/pub/atp-2-22.33/">ATP 2-22.33</a> — (u) 2x Operations And Source Validation Techniques (s//nf) (this Item Is Published W/ Basic Incl C1) — 09/09/2016</li>
+                <li><a href="/pub/atp-2-22.34/">ATP 2-22.34</a> — (u) Joint Interrogation And Debriefing Center Operations — 10/28/2020</li>
+                <li><a href="/pub/atp-2-22.4/">ATP 2-22.4</a> — Technical Intelligence — 10/29/2021</li>
+                <li><a href="/pub/atp-2-22.6/">ATP 2-22.6</a> — (u) Signals Intelligence (this Item Is Published W/ Basic Incl C2) — 01/09/2024</li>
+                <li><a href="/pub/atp-2-22.7/">ATP 2-22.7</a> — Geospatial Intelligence — 06/09/2025</li>
+                <li><a href="/pub/atp-2-22.8/">ATP 2-22.8</a> — (u) Measurement And Signature Intelligence (s//nf) — 05/30/2014</li>
+                <li><a href="/pub/atp-2-22.85/">ATP 2-22.85</a> — Multi-service Tactics, Techniques, And Procedures For Tactical Employment Of Biometrics In Support Of Operations {mcrp 10-10f.1 | Nttp 3-07.16 | Afttp 3-2.85} (this Item Is Published W/ Basic Incl C1) — 04/30/2020</li>
+                <li><a href="/pub/atp-2-22.9-1/">ATP 2-22.9-1</a> — (u) Publicly Available Information Research And Open-source Intelligence {mcrp 2-10a.3} (this Item Is Published W/ Basic Incl C1) — 10/19/2023</li>
+                <li><a href="/pub/atp-2-22.9-2/">ATP 2-22.9-2</a> — (u) Open-source Intelligence Volume Ii (s) — 08/15/2019</li>
+                <li><a href="/pub/atp-2-33.4/">ATP 2-33.4</a> — Intelligence Analysis (this Item Is Published W/ Basic Incl C1) — 01/10/2020</li>
+                <li><a href="/pub/atp-2-91.7/">ATP 2-91.7</a> — Intelligence Support To Defense Support Of Civil  Authorities — 06/29/2015</li>
+                <li><a href="/pub/atp-2-91.9/">ATP 2-91.9</a> — (u) Intelligence Operations In A Cyberspace Electromagnetic Activities Environment (ts) (this Item Is Published W/ Basic Incl C1) — 08/03/2017</li>
+                <li><a href="/pub/atp-3-01.15/">ATP 3-01.15</a> — Multi-service Tactics, Techniques, And Procedures For Air And Missile Defense (mctp 10-10b, Nttp 3-01.8,  Afttp 3-2.31) — 04/07/2023</li>
+                <li><a href="/pub/atp-3-01.16/">ATP 3-01.16</a> — Air And Missle Defense Intelligence Preparation Of The Battlefield (amd Ipb) — 03/31/2016</li>
+                <li><a href="/pub/atp-3-01.18/">ATP 3-01.18</a> — Stinger Team Techniques — 08/23/2017</li>
+                <li><a href="/pub/atp-3-01.4/">ATP 3-01.4</a> — Multi-service Tactics Techniques And Procedures For Joint Suppression Of Enemy Air Defense (j-sead) (mcrp 3-31.3; Nttp 3-01.42; Afttp 3-2.28) — 06/09/2022</li>
+                <li><a href="/pub/atp-3-01.48/">ATP 3-01.48</a> — Sentinel Techniques — 03/04/2016</li>
+                <li><a href="/pub/atp-3-01.50/">ATP 3-01.50</a> — Air Defense And Airspace Management (adam) Cell Operation — 04/05/2013</li>
+                <li><a href="/pub/atp-3-01.60/">ATP 3-01.60</a> — Counter-rocket, Artillery, And Mortar Operations — 05/10/2013</li>
+                <li><a href="/pub/atp-3-01.64/">ATP 3-01.64</a> — Avenger Battalion And Battery Techniques — 03/10/2016</li>
+                <li><a href="/pub/atp-3-01.7/">ATP 3-01.7</a> — Air Defense Artillery Brigade Techniques — 03/16/2016</li>
+                <li><a href="/pub/atp-3-01.8/">ATP 3-01.8</a> — Techniques For Combined Arms For Air Defense — 07/29/2016</li>
+                <li><a href="/pub/atp-3-01.81/">ATP 3-01.81</a> — Counter-unmanned Aircraft System (c-uas) Operations — 05/23/2025</li>
+                <li><a href="/pub/atp-3-01.85/">ATP 3-01.85</a> — Patriot Battalion Techniques — 01/31/2019</li>
+                <li><a href="/pub/atp-3-01.87/">ATP 3-01.87</a> — Patriot Battery Techniques — 08/22/2018</li>
+                <li><a href="/pub/atp-3-01.91/">ATP 3-01.91</a> — Terminal High Altitude Defense (thaad) Techniques — 08/26/2013</li>
+                <li><a href="/pub/atp-3-01.94/">ATP 3-01.94</a> — Army Air And Missile Defense Command Operations — 04/20/2016</li>
+                <li><a href="/pub/atp-3-04.1/">ATP 3-04.1</a> — Aviation Tactical Employment — 05/07/2020</li>
+                <li><a href="/pub/atp-3-04.119/">ATP 3-04.119</a> — Aviation Security And Support Battalion Operations — 01/25/2022</li>
+                <li><a href="/pub/atp-3-04.13/">ATP 3-04.13</a> — Helicopter And Small Aircraft Battle Damage Assessment, Repair, And Recovery — 11/09/2021</li>
+                <li><a href="/pub/atp-3-04.16/">ATP 3-04.16</a> — Airfield Operations — 09/21/2023</li>
+                <li><a href="/pub/atp-3-04.17/">ATP 3-04.17</a> — Techniques For Forward Arming And Refueling Points (this Item Is Published W/ Basic Incl C1) — 06/04/2018</li>
+                <li><a href="/pub/atp-3-04.18/">ATP 3-04.18</a> — Multi-service Tactics, Techniques, And Procedures For Air Operations In Maritime Surface Warfare (mcrp 3-20.2, Nttp 3-20.8, Afttp 3-2.74) — 03/29/2024</li>
+                <li><a href="/pub/atp-3-04.19/">ATP 3-04.19</a> — Multi-service Tactics, Techniques, And Procedures For Shipboard Helicopter And Tiltrotor Aircraft Operations — 03/01/2019</li>
+                <li><a href="/pub/atp-3-04.20/">ATP 3-04.20</a> — Army Fixed-wing Operations — 06/03/2021</li>
+                <li><a href="/pub/atp-3-04.23/">ATP 3-04.23</a> — Army Aviation Platoons — 05/17/2021</li>
+                <li><a href="/pub/atp-3-04.5/">ATP 3-04.5</a> — Fundamentals Of Aviation Combat Survivability — 05/30/2026</li>
+                <li><a href="/pub/atp-3-04.6/">ATP 3-04.6</a> — Air Traffic Services Operations  (this Item Is Published W/ Basic Incl C1) — 01/12/2022</li>
+                <li><a href="/pub/atp-3-04.7/">ATP 3-04.7</a> — Army Aviation Maintenance — 10/20/2020</li>
+                <li><a href="/pub/atp-3-05.1/">ATP 3-05.1</a> — Unconventional Warfare At The Combined Joint Special Operations Task Force Level (published With Basic Including Change 1.) — 04/09/2021</li>
+                <li><a href="/pub/atp-3-05.11/">ATP 3-05.11</a> — Special Operations Chemical, Biological, Radiological, And Nuclear Operations — 04/30/2014</li>
+                <li><a href="/pub/atp-3-05.2/">ATP 3-05.2</a> — Foreign Internal Defense — 08/19/2015</li>
+                <li><a href="/pub/atp-3-05.20/">ATP 3-05.20</a> — Special Operations Intelligence — 05/03/2013</li>
+                <li><a href="/pub/atp-3-05.40/">ATP 3-05.40</a> — Special Operations Sustainment — 05/03/2013</li>
+                <li><a href="/pub/atp-3-05.60/">ATP 3-05.60</a> — Special Operations Communications System — 11/30/2015</li>
+                <li><a href="/pub/atp-3-05.68/">ATP 3-05.68</a> — Special Operations Noncombatant Evacuation Operations — 09/30/2014</li>
+                <li><a href="/pub/atp-3-05.71/">ATP 3-05.71</a> — (u) Army Special Operations Forces Resistance And Escape (c//rel To Usa, Fvey) (this Item Is Published W/ Basic Incl C2) — 11/15/2021</li>
+                <li><a href="/pub/atp-3-06/">ATP 3-06</a> — Urban Operations {mctp 12-10b} (this Item Is Published W/ Basic Incl C1) — 07/21/2022</li>
+                <li><a href="/pub/atp-3-06.1/">ATP 3-06.1</a> — Multi-service Tactics, Techniques, And Procedures For Aviation Urban Operations (mcrp 3-20.4, Nttp 3-01.04, Afttp 3-2.29) — 02/22/2022</li>
+                <li><a href="/pub/atp-3-06.11/">ATP 3-06.11</a> — Brigade Combat Team Urban Operations — 09/27/2024</li>
+                <li><a href="/pub/atp-3-07.10/">ATP 3-07.10</a> — Multi-service Tactics, Techniques, And Procedures For Advising Foreign Security Forces (mcrp 3-03d.1, Nttp 3-07.5, Afttp 3-2.76) — 06/15/2023</li>
+                <li><a href="/pub/atp-3-07.31/">ATP 3-07.31</a> — Multi-service Tactics, Techniques, And Procedures For Peace Operations {mctp 3-03b | Afttp 3-2.40} (this Item Is Published W/ Basic Incl C1) — 05/02/2019</li>
+                <li><a href="/pub/atp-3-07.5/">ATP 3-07.5</a> — Stability Techniques — 08/31/2012</li>
+                <li><a href="/pub/atp-3-07.6/">ATP 3-07.6</a> — Protection Of Civilians (this Item Is Published W/ Basic Incl C1) — 10/29/2015</li>
+                <li><a href="/pub/atp-3-09.02/">ATP 3-09.02</a> — Field Artillery Survey — 02/16/2016</li>
+                <li><a href="/pub/atp-3-09.12/">ATP 3-09.12</a> — Field Artillery Counterfire And Weapons Locating Radar Operations — 10/26/2021</li>
+                <li><a href="/pub/atp-3-09.13/">ATP 3-09.13</a> — The Battlefield Coordination Detachment — 07/24/2015</li>
+                <li><a href="/pub/atp-3-09.23/">ATP 3-09.23</a> — Field Artillery Battalion Operations — 02/25/2026</li>
+                <li><a href="/pub/atp-3-09.24/">ATP 3-09.24</a> — The Field Artillery Brigade — 03/30/2022</li>
+                <li><a href="/pub/atp-3-09.30/">ATP 3-09.30</a> — Observed Fires — 09/28/2017</li>
+                <li><a href="/pub/atp-3-09.32/">ATP 3-09.32</a> — Multi-service Tactics, Techniques, And Procedures For Joint Application Of Firepower (mcrp 3-31.6, Nttp 3-09.2, Afttp 3-2.6) — 11/29/2023</li>
+                <li><a href="/pub/atp-3-09.34/">ATP 3-09.34</a> — Multi-service Tactics, Techniques, And Procedures For Kill Box Planning And Employment (mcrp 3-31.4, Nttp 3-09.2.1, Afttp 3-2.59) — 10/07/2022</li>
+                <li><a href="/pub/atp-3-09.42/">ATP 3-09.42</a> — Fire Support For The Brigade Combat Team — 03/01/2016</li>
+                <li><a href="/pub/atp-3-09.50/">ATP 3-09.50</a> — The Field Artillery Cannon Battery — 05/04/2016</li>
+                <li><a href="/pub/atp-3-09.60/">ATP 3-09.60</a> — Techniques For Multiple Launch Rocket System (mlrs) And High Mobility Artillery Rocket System (himars) Operations — 07/29/2020</li>
+                <li><a href="/pub/atp-3-09.70/">ATP 3-09.70</a> — Paladin Operations — 09/25/2015</li>
+                <li><a href="/pub/atp-3-09.90/">ATP 3-09.90</a> — Division Artillery Operations And Fire Support For The Division — 10/12/2017</li>
+                <li><a href="/pub/atp-3-11.32/">ATP 3-11.32</a> — Multi-service Tactics, Techniques, And Procedures For Chemical, Biological, Radiological, And Nuclear Protection {mcrp 10-10e.11 | Nttp 3-11.27 | Afttp 3-2.46} (this Item Is Published W/ Basic Incl C1) — 01/24/2024</li>
+                <li><a href="/pub/atp-3-11.33/">ATP 3-11.33</a> — Multi-service Tactics, Techniques, And Procedures For Chemical, Biological, Radiological, And Nuclear Contamination Mitigation (mcrp 10-10e.12, Nttp 3-11.26, Afttp 3-2.60) — 01/24/2024</li>
+                <li><a href="/pub/atp-3-11.36/">ATP 3-11.36</a> — Multi-service Tactics, Techniques, And Procedures For Chemical, Biological, Radiological, And Nuclear Planning {mcrp 10-10e.1 | Nttp 3-11.34 | Afttp 3-2.70} — 04/14/2025</li>
+                <li><a href="/pub/atp-3-11.37/">ATP 3-11.37</a> — Multi-service Tactics, Techniques, And Procedures For Chemical, Biological, Radiological, And Nuclear Reconnaissance And Surveillance {mcrp 10-10e.7 | Nttp 3-11.29 | Afttp 3-22.44} (this Item Is Published W/ Basic Incl C1) — 03/31/2021</li>
+                <li><a href="/pub/atp-3-11.42/">ATP 3-11.42</a> — Multi-service Tactics, Techniques, And Procedures For Domestic Chemical, Biological, Radiological, And Nuclear Response (mcrp 10-10e.10, Nttp 3-11.38, Afttp 3-2.84) (this Item Is Published W/ Basic Incl C1) — 12/22/2021</li>
+                <li><a href="/pub/atp-3-11.46/">ATP 3-11.46</a> — Weapons Of Mass Destruction--civil Support Team Operations (afttp 3-2.81) (this Item Is Published W/ Basic Incl C1&amp;c2) — 05/20/2014</li>
+                <li><a href="/pub/atp-3-11.47/">ATP 3-11.47</a> — Chemical, Biological, Radiological, Nuclear, And High-yield Explosives Enhanced Response Force Package (cerfp)/homeland Response Force (hrf) Operations (afttp 3-2.79) — 04/26/2013</li>
+                <li><a href="/pub/atp-3-11.50/">ATP 3-11.50</a> — Battlefield Obscuration (this Item Is Published W/ Basic Incl C1) — 05/15/2014</li>
+                <li><a href="/pub/atp-3-11.74/">ATP 3-11.74</a> — Chemical, Biological, Radiological, And Nuclear Platoons — 04/15/2021</li>
+                <li><a href="/pub/atp-3-12.3/">ATP 3-12.3</a> — Electromagnetic Warfare Techniques — 01/30/2023</li>
+                <li><a href="/pub/atp-3-12.4/">ATP 3-12.4</a> — Electromagnetic Warfare Platoon — 01/09/2023</li>
+                <li><a href="/pub/atp-3-13.1/">ATP 3-13.1</a> — The Conduct Of Information Operations (this Item Is Published W/ Basic Incl C1) — 10/04/2018</li>
+                <li><a href="/pub/atp-3-13.3/">ATP 3-13.3</a> — Army Operations Security For Division And Below — 07/16/2019</li>
+                <li><a href="/pub/atp-3-13.4/">ATP 3-13.4</a> — (u) Army Deception Activities Tactics, Techniques, And Procedures (s) — 04/19/2024</li>
+                <li><a href="/pub/atp-3-13.5/">ATP 3-13.5</a> — Soldier And Leader Engagement — 12/21/2021</li>
+                <li><a href="/pub/atp-3-14.1/">ATP 3-14.1</a> — (u) Army Space Control Operations (s//nf) — 12/18/2025</li>
+                <li><a href="/pub/atp-3-14.3/">ATP 3-14.3</a> — Techniques For Army Space Forces — 02/15/2018</li>
+                <li><a href="/pub/atp-3-16.02/">ATP 3-16.02</a> — Write For Release — 09/26/2023</li>
+                <li><a href="/pub/atp-3-17.2/">ATP 3-17.2</a> — Multi-service Tactics, Techniques, And Procedures For Airfield Opening {mcrp 3-20b.1; Nttp 3-02.18; Afttp 3-2.68} — 03/01/2024</li>
+                <li><a href="/pub/atp-3-18.1/">ATP 3-18.1</a> — Special Forces Unconventional Warfare — 06/20/2025</li>
+                <li><a href="/pub/atp-3-18.10/">ATP 3-18.10</a> — Special Forces Air Operations  (this Item Is Published W/ Basic Incl C1) — 06/03/2021</li>
+                <li><a href="/pub/atp-3-18.11/">ATP 3-18.11</a> — Special Forces Military Free-fall Operations — 04/30/2025</li>
+                <li><a href="/pub/atp-3-18.12/">ATP 3-18.12</a> — Special Forces Waterborne Operations — 12/16/2022</li>
+                <li><a href="/pub/atp-3-18.13/">ATP 3-18.13</a> — Special Forces Use Of Pack Animals — 03/28/2024</li>
+                <li><a href="/pub/atp-3-18.14/">ATP 3-18.14</a> — Special Forces Ground Mobility Operations Tactics, Techniques, And Procedures — 07/15/2022</li>
+                <li><a href="/pub/atp-3-18.16/">ATP 3-18.16</a> — (u) Preparation Of The Environment (s//nf) (this Pub Is Published With C1 Included.) — 02/27/2018</li>
+                <li><a href="/pub/atp-3-18.20/">ATP 3-18.20</a> — (u) Advanced Special Operations Techniques (s//nf) — 10/26/2021</li>
+                <li><a href="/pub/atp-3-18.3/">ATP 3-18.3</a> — (u) Special Forces Direct Action Operations (c) — 08/09/2021</li>
+                <li><a href="/pub/atp-3-18.4/">ATP 3-18.4</a> — Special Forces Special Reconnaissance — 10/05/2021</li>
+                <li><a href="/pub/atp-3-18.72/">ATP 3-18.72</a> — (u) Special Forces Personnel Recovery (s//nf) — 06/18/2024</li>
+                <li><a href="/pub/atp-3-20.15/">ATP 3-20.15</a> — Tank Platoon — 07/10/2025</li>
+                <li><a href="/pub/atp-3-20.96/">ATP 3-20.96</a> — Cavalry Squadron — 05/12/2016</li>
+                <li><a href="/pub/atp-3-20.97/">ATP 3-20.97</a> — Cavalry Troop — 09/12/2024</li>
+                <li><a href="/pub/atp-3-20.98/">ATP 3-20.98</a> — Scout Platoon (this Item Is Published W/ Basic Incl C1) — 12/04/2019</li>
+                <li><a href="/pub/atp-3-21.10/">ATP 3-21.10</a> — Infantry Rifle Company — 06/01/2026</li>
+                <li><a href="/pub/atp-3-21.11/">ATP 3-21.11</a> — Stryker Brigade Combat Team Infantry Rifle Company — 11/25/2020</li>
+                <li><a href="/pub/atp-3-21.18/">ATP 3-21.18</a> — Foot Marches — 07/24/2025</li>
+                <li><a href="/pub/atp-3-21.20/">ATP 3-21.20</a> — Infantry Battalion — 12/28/2017</li>
+                <li><a href="/pub/atp-3-21.21/">ATP 3-21.21</a> — Sbct Infantry Battalion — 03/22/2016</li>
+                <li><a href="/pub/atp-3-21.50/">ATP 3-21.50</a> — Infantry Small-unit Mountain And Cold Weather Operations — 07/29/2025</li>
+                <li><a href="/pub/atp-3-21.51/">ATP 3-21.51</a> — Subterranean Operations — 11/01/2019</li>
+                <li><a href="/pub/atp-3-21.71/">ATP 3-21.71</a> — Mechanized Infantry Platoon And Squad — 10/15/2024</li>
+                <li><a href="/pub/atp-3-21.8/">ATP 3-21.8</a> — Infantry Rifle Platoon And Squad (this Item Is Published W/ Basic Incl C1) — 01/11/2024</li>
+                <li><a href="/pub/atp-3-21.9/">ATP 3-21.9</a> — Stryker Infantry Rifle Platoon And Squad — 06/24/2025</li>
+                <li><a href="/pub/atp-3-21.90/">ATP 3-21.90</a> — Tactical Employment Of Mortars — 10/09/2019</li>
+                <li><a href="/pub/atp-3-21.91/">ATP 3-21.91</a> — Stryker Brigade Combat Team Weapons Troop — 05/11/2017</li>
+                <li><a href="/pub/atp-3-22.40/">ATP 3-22.40</a> — Multi-service Tactics, Techniques, And Procedures For The Employment Of Nonlethal Weapons {mctp 10-10a | Nttp 3-26.6 | Afttp 3-2.45 | Cgttp 3-93.2} — 04/07/2025</li>
+                <li><a href="/pub/atp-3-24.2/">ATP 3-24.2</a> — Techniques In Counterinsurgency — 07/31/2025</li>
+                <li><a href="/pub/atp-3-27.3/">ATP 3-27.3</a> — Ground-based Midcourse Defense Operations — 09/04/2025</li>
+                <li><a href="/pub/atp-3-27.5/">ATP 3-27.5</a> — An/tpy-2 Forward Based Mode System Operations — 02/11/2022</li>
+                <li><a href="/pub/atp-3-28.1/">ATP 3-28.1</a> — Multi-service Tactics, Techniques, And Procedures For Defense Support Of Civil Authorities (dsca) (mcrp 3-30.6, Nttp 3-57.2, Afttp 3-2.67, Cgttp 3-57.1) — 02/11/2021</li>
+                <li><a href="/pub/atp-3-34.10/">ATP 3-34.10</a> — Engineer Platoons — 02/02/2021</li>
+                <li><a href="/pub/atp-3-34.20/">ATP 3-34.20</a> — Countering Explosive Hazards {mcrp 10-10.1c} (this Item Is Published W/ Basic Incl C1) — 01/21/2016</li>
+                <li><a href="/pub/atp-3-34.22/">ATP 3-34.22</a> — Engineer Operations--brigade Combat Team And Below — 04/14/2021</li>
+                <li><a href="/pub/atp-3-34.40/">ATP 3-34.40</a> — General Engineering (mctp 3-40d(mcwp 3-17.7)) — 04/14/2023</li>
+                <li><a href="/pub/atp-3-34.45/">ATP 3-34.45</a> — Electric Power Generation And Distribution  {mcrp 3-40d.17} — 02/05/2024</li>
+                <li><a href="/pub/atp-3-34.5/">ATP 3-34.5</a> — Environmental Considerations (mcrp 3-40b.2) (this Item Is Published W/ Basic Incl C2) — 08/10/2015</li>
+                <li><a href="/pub/atp-3-34.80/">ATP 3-34.80</a> — Geospatial Engineering — 03/26/2024</li>
+                <li><a href="/pub/atp-3-34.81/">ATP 3-34.81</a> — Engineer Reconnaissance (mcwp 3-17.4) (this Item Is Published W/ Basic Incl C1) — 03/01/2016</li>
+                <li><a href="/pub/atp-3-34.84/">ATP 3-34.84</a> — Multi-service Tactics, Techniques, And Procedures For Military Diving Operations (mcrp 3-10.2, Nttp 3-07.7, Afttp 3-2.75, Cgttp 3-95.17) — 06/16/2023</li>
+                <li><a href="/pub/atp-3-35/">ATP 3-35</a> — Army Deployment And Redeployment — 03/09/2023</li>
+                <li><a href="/pub/atp-3-35.1/">ATP 3-35.1</a> — Army Pre-positioned Operations (this Item Is Published W/ Basic Incl C1) — 04/21/2022</li>
+                <li><a href="/pub/atp-3-37.10/">ATP 3-37.10</a> — Base Camps (mcrp 3-40d.13) — 01/27/2017</li>
+                <li><a href="/pub/atp-3-37.11/">ATP 3-37.11</a> — Chemical, Biological, Radiological, Nuclear And Explosives Command (cbrne Command) — 08/28/2018</li>
+                <li><a href="/pub/atp-3-37.15/">ATP 3-37.15</a> — Foreign Security Force Threats (this Item Is Published W/ Basic Incl C1) — 01/30/2020</li>
+                <li><a href="/pub/atp-3-37.2/">ATP 3-37.2</a> — Antiterrorism — 07/19/2021</li>
+                <li><a href="/pub/atp-3-37.34/">ATP 3-37.34</a> — Survivability Operations (mctp 3-34c) — 04/16/2018</li>
+                <li><a href="/pub/atp-3-39.10/">ATP 3-39.10</a> — Police Operations — 07/24/2026</li>
+                <li><a href="/pub/atp-3-39.11/">ATP 3-39.11</a> — Military Police Special Reaction Teams (this Item Is Published W/ Basic Incl C1) — 12/15/2022</li>
+                <li><a href="/pub/atp-3-39.12-1/">ATP 3-39.12-1</a> — Law Enforcement Investigations, Volume I (this Item Is Published W/ Basic Incl C1) — 04/12/2024</li>
+                <li><a href="/pub/atp-3-39.12-2/">ATP 3-39.12-2</a> — Law Enforcement Investigations, Volume Ii: Surveillance And Undercover Operations {dist By Proponent} (this Item Is Published W/ Basic Incl C1) — 04/12/2024</li>
+                <li><a href="/pub/atp-3-39.20/">ATP 3-39.20</a> — Police Intelligence Operations — 05/13/2019</li>
+                <li><a href="/pub/atp-3-39.21/">ATP 3-39.21</a> — Multi-service Tactics, Techniques, And Procedures For Expeditionary Forensics {mcrp 10-10f.5 | Nttp 3-07.8 | Afttp 3-2.7 | Cgttp 3-93.10} — 04/30/2026</li>
+                <li><a href="/pub/atp-3-39.30/">ATP 3-39.30</a> — Security And Mobility Support — 03/25/2026</li>
+                <li><a href="/pub/atp-3-39.32/">ATP 3-39.32</a> — Physical Security (this Item Is Published W/ Basic Incl C1) — 03/08/2022</li>
+                <li><a href="/pub/atp-3-39.33/">ATP 3-39.33</a> — Crowd Control — 06/23/2022</li>
+                <li><a href="/pub/atp-3-39.34/">ATP 3-39.34</a> — Military Working Dogs — 05/19/2022</li>
+                <li><a href="/pub/atp-3-39.35/">ATP 3-39.35</a> — Protective Services (this Item Is Published W/ Basic Incl C1) — 05/31/2013</li>
+                <li><a href="/pub/atp-3-39.4/">ATP 3-39.4</a> — Military Police Platoons (this Item Is Published W/ Basic Incl C1) — 04/09/2021</li>
+                <li><a href="/pub/atp-3-50.10/">ATP 3-50.10</a> — Multi-service Tactics, Techniques, And Procedures For Personnel Recovery Mcrp 3-05.3, Nttp 3-57.6, Afttp 3-2.90) — 10/20/2022</li>
+                <li><a href="/pub/atp-3-50.20/">ATP 3-50.20</a> — Survival, Evasion, Resistance, And Escape (sere) Planning And Preparation — 11/29/2017</li>
+                <li><a href="/pub/atp-3-50.21/">ATP 3-50.21</a> — Survival — 09/18/2018</li>
+                <li><a href="/pub/atp-3-50.22/">ATP 3-50.22</a> — Evasion — 11/28/2017</li>
+                <li><a href="/pub/atp-3-50.3/">ATP 3-50.3</a> — Multi-service Tactics, Techniques, And Procedures For Survival, Evasion, And Recovery (mcrp 3-05.1, Nttp 3-50.3, Afttp 3-2.26) — 07/05/2023</li>
+                <li><a href="/pub/atp-3-52.1/">ATP 3-52.1</a> — Multi-service Tactics, Techniques, And Procedures For Airspace Control (mcrp 3-20f.4, Nttp 3-56.4, Afttp 3-2.78) — 06/21/2023</li>
+                <li><a href="/pub/atp-3-52.2/">ATP 3-52.2</a> — Multi-service Tactics, Techniques, And Procedures For The Theater Air-ground System (mcrp 3-20.1, Nttp 3-56.2, Afttp 3-2.17) — 08/22/2024</li>
+                <li><a href="/pub/atp-3-52.4/">ATP 3-52.4</a> — Acc Multi-service Tactics, Techniques, And Procedures For Air Control Communication {mcrp 3-20f.10 | Nttp 6-02.9 | Afttp 3-2.8} — 10/09/2024</li>
+                <li><a href="/pub/atp-3-53/">ATP 3-53</a> — The Psychological Operations Branch And Unit Activities — 04/20/2026</li>
+                <li><a href="/pub/atp-3-53.4/">ATP 3-53.4</a> — Civil Authority Information Support — 07/12/2022</li>
+                <li><a href="/pub/atp-3-53.5/">ATP 3-53.5</a> — (u) Psychological Operations Forces And Military Deception (s//nf) — 04/25/2025</li>
+                <li><a href="/pub/atp-3-55.3/">ATP 3-55.3</a> — Multi-service Tactics, Techniques, And Procedures For Intelligence, Surveillance, And Reconnaissance Optimization {mcrp 2-10a.8 | Nttp 2-01.3 | Afttp 3-2.88 | Sttp 2-9001} — 10/03/2024</li>
+                <li><a href="/pub/atp-3-55.4/">ATP 3-55.4</a> — Techniques For Information Collection During Operations Among Populations (this Item Is Published W/ Basic Incl C1) — 04/05/2016</li>
+                <li><a href="/pub/atp-3-55.6/">ATP 3-55.6</a> — Multi-service Tactics, Techniques, And Procedures For Air-to-surface Radar System Employment (mcrp 2-10a.4, Nttp 3-55.13, Afttp 3-2.2) — 09/22/2023</li>
+                <li><a href="/pub/atp-3-57.10/">ATP 3-57.10</a> — Civil Affairs Support To Populace And Resources Control (this Item Is Published W/ Basic Incl C1) — 08/06/2013</li>
+                <li><a href="/pub/atp-3-57.20/">ATP 3-57.20</a> — Multi-service Techniques For Civil Affairs Support To Foreign Humanitarian Assistance {mcrp 3-33.1c} — 02/15/2013</li>
+                <li><a href="/pub/atp-3-57.30/">ATP 3-57.30</a> — Civil Network Development And Engagement (this Item Is Published W/ Basic Incl C1) — 02/06/2023</li>
+                <li><a href="/pub/atp-3-57.40/">ATP 3-57.40</a> — Military Government Operations In Support Of Transitional Governance — 06/05/2025</li>
+                <li><a href="/pub/atp-3-57.50/">ATP 3-57.50</a> — Civil Knowledge Integration — 10/16/2024</li>
+                <li><a href="/pub/atp-3-57.60/">ATP 3-57.60</a> — Civil Affairs Planning (this Item Is Published W/ Basic Incl C1) — 05/07/2024</li>
+                <li><a href="/pub/atp-3-57.70/">ATP 3-57.70</a> — Civil-military Operations Center — 05/05/2014</li>
+                <li><a href="/pub/atp-3-57.80/">ATP 3-57.80</a> — Army Special Operations Forces Civil Affairs — 11/01/2024</li>
+                <li><a href="/pub/atp-3-60.1/">ATP 3-60.1</a> — Multi-service Tactics, Techniques, And Procedures For Dynamic Targeting {mcrp 3-31.5 | Nttp 3-60.1 | Afttp 3-2.3 | Sttp 3-9001} — 03/28/2025</li>
+                <li><a href="/pub/atp-3-60.2/">ATP 3-60.2</a> — Multi-service Tactics, Techniques, And Procedures For Strike Coordination And Reconnaissance {mcrp 3-20d.1 | Nttp 3-03.4.3 | Afttp 3-2.72 | Sttp 3-9004} — 03/10/2026</li>
+                <li><a href="/pub/atp-3-72/">ATP 3-72</a> — Operations In A Nuclear Environment (mcrp 10-10e.9, Nttp 3-72.1, Afttp 3-2.65) — 03/07/2022</li>
+                <li><a href="/pub/atp-3-75/">ATP 3-75</a> — Ranger Operations — 06/26/2015</li>
+                <li><a href="/pub/atp-3-76/">ATP 3-76</a> — Special Operations Aviation — 04/20/2026</li>
+                <li><a href="/pub/atp-3-90.1/">ATP 3-90.1</a> — Armor And Mechanized Infantry Company Team (this Item Is Published W/ Basic Incl C1) — 10/24/2023</li>
+                <li><a href="/pub/atp-3-90.15/">ATP 3-90.15</a> — Site Exploitation (this Item Is Published W/ Basic Incl C1) — 07/28/2015</li>
+                <li><a href="/pub/atp-3-90.20/">ATP 3-90.20</a> — Regional Support Group — 09/13/2024</li>
+                <li><a href="/pub/atp-3-90.4/">ATP 3-90.4</a> — (cui) Combined Arms Mobility {mctp 3-34a (mcwp 3-17.8)} — 06/10/2022</li>
+                <li><a href="/pub/atp-3-90.40/">ATP 3-90.40</a> — Multi-service Tactics, Techniques, And Procedures For Combined Arms Countering Weapons Of Mass Destruction {mctp 10-10h | Afttp 3-2.71} (this Item Is Published W/ Basic Incl C1) — 05/18/2023</li>
+                <li><a href="/pub/atp-3-90.5/">ATP 3-90.5</a> — Combined Arms Battalion — 07/15/2021</li>
+                <li><a href="/pub/atp-3-90.51/">ATP 3-90.51</a> — Tactical Employment Of Small Unmanned Aircraft Systems — 06/01/2026</li>
+                <li><a href="/pub/atp-3-90.8/">ATP 3-90.8</a> — Combined Arms Countermobility (mctp 3-34b) (this Item Is Published W/ Basic Incl C1) — 11/30/2021</li>
+                <li><a href="/pub/atp-3-90.96/">ATP 3-90.96</a> — Arctic And Extreme Cold Weather Operations (this Item Is Published W/ Basic Incl C2) — 02/24/2025</li>
+                <li><a href="/pub/atp-3-90.97/">ATP 3-90.97</a> — Mountain Warfare And Cold Weather Operations — 04/29/2016</li>
+                <li><a href="/pub/atp-3-90.98/">ATP 3-90.98</a> — Jungle Operations (mctp 12-10c) — 09/24/2020</li>
+                <li><a href="/pub/atp-3-90.99/">ATP 3-90.99</a> — Desert Operations {mctp 12-10d} (this Item Is Published W/ Basic Incl C1) — 04/07/2021</li>
+                <li><a href="/pub/atp-3-91/">ATP 3-91</a> — Division Operations — 10/17/2014</li>
+                <li><a href="/pub/atp-3-91.1/">ATP 3-91.1</a> — The Joint Air Ground Integration Center (afttp 3-2.86) — 04/17/2019</li>
+                <li><a href="/pub/atp-3-92/">ATP 3-92</a> — Corps Operations — 01/15/2026</li>
+                <li><a href="/pub/atp-3-93/">ATP 3-93</a> — Theater Army Operations — 08/27/2021</li>
+                <li><a href="/pub/atp-3-94.1/">ATP 3-94.1</a> — Theater Liaison Detachment — 03/21/2025</li>
+                <li><a href="/pub/atp-3-94.2/">ATP 3-94.2</a> — Deep Operations — 09/01/2016</li>
+                <li><a href="/pub/atp-3-94.4/">ATP 3-94.4</a> — Reconstitution Operations — 05/05/2021</li>
+                <li><a href="/pub/atp-3-96.1/">ATP 3-96.1</a> — Security Force Assistance Brigade — 06/11/2025</li>
+                <li><a href="/pub/atp-4-0.6/">ATP 4-0.6</a> — Sustainment Automation Support Management Office Operations — 01/17/2024</li>
+                <li><a href="/pub/atp-4-01.45/">ATP 4-01.45</a> — Multi-service Tactics, Techniques, And Procedures For Tactical Convoy Operations (mcrp 3-40f.7, Nttp 4-01.6, Afttp 3-2.58) — 06/05/2026</li>
+                <li><a href="/pub/atp-4-02.1/">ATP 4-02.1</a> — Army Medical Logistics — 10/29/2015</li>
+                <li><a href="/pub/atp-4-02.10/">ATP 4-02.10</a> — Army Hospitalization (role 3) — 08/14/2025</li>
+                <li><a href="/pub/atp-4-02.11/">ATP 4-02.11</a> — Army Techniques Publication For Casualty Response, Tactical Combat Casualty Care, And First Aid — 03/23/2026</li>
+                <li><a href="/pub/atp-4-02.13/">ATP 4-02.13</a> — Casualty Evacuation — 06/30/2021</li>
+                <li><a href="/pub/atp-4-02.19/">ATP 4-02.19</a> — Dental Services — 07/31/2026</li>
+                <li><a href="/pub/atp-4-02.2/">ATP 4-02.2</a> — Medical Evacuation — 07/12/2019</li>
+                <li><a href="/pub/atp-4-02.25/">ATP 4-02.25</a> — The Medical Detachment, Forward Resuscitative And Surgical (this Item Is Published W/ Basic Incl C1) — 12/07/2020</li>
+                <li><a href="/pub/atp-4-02.4/">ATP 4-02.4</a> — Medical Platoon — 05/12/2021</li>
+                <li><a href="/pub/atp-4-02.42/">ATP 4-02.42</a> — Army Health System Support To Stability And Defense Support Of Civil Authorities Tasks — 06/09/2014</li>
+                <li><a href="/pub/atp-4-02.43/">ATP 4-02.43</a> — Army Health System Support To Army Special Operations Forces — 08/14/2023</li>
+                <li><a href="/pub/atp-4-02.46/">ATP 4-02.46</a> — Army Health System Support To Detainee Operations (this Item Is Published W/ Basic Incl C1) — 08/24/2021</li>
+                <li><a href="/pub/atp-4-02.5/">ATP 4-02.5</a> — Casualty Care (this Item Is Published W/ Basic Incl C1) — 05/10/2013</li>
+                <li><a href="/pub/atp-4-02.55/">ATP 4-02.55</a> — Army Health System Support Planning — 03/30/2020</li>
+                <li><a href="/pub/atp-4-02.6/">ATP 4-02.6</a> — The Medical Company (role 2) — 11/08/2022</li>
+                <li><a href="/pub/atp-4-02.7/">ATP 4-02.7</a> — Multi-service Tactics, Techniques, And Procedures For Health Service Support In A Chemical, Biological, Radiological, And Nuclear Environment (mcrp 4-11.1f, Nttp 4-02.7, Afttp 3-42.3) — 03/15/2016</li>
+                <li><a href="/pub/atp-4-02.8/">ATP 4-02.8</a> — Force Health Protection (this Item Is Published W/ Basic Incl C1) — 03/09/2016</li>
+                <li><a href="/pub/atp-4-02.82/">ATP 4-02.82</a> — Occupational And Environmental Health Site Assessment (ntrp 4-02.9 , Afttp 3-2.82_ip) — 01/01/2023</li>
+                <li><a href="/pub/atp-4-02.83/">ATP 4-02.83</a> — Multiservice Tactics, Techniques, And Procedures For Treatment Of Nuclear And Radiological Casualties (mcrp 4-11.1b, Ntrp 4-02.21, Afman 44-161(i)) — 05/05/2014</li>
+                <li><a href="/pub/atp-4-02.84/">ATP 4-02.84</a> — Multi-service Tactics, Techniques, And Procedures For Treatment Of Biological Warfare Agent Casualties (mcrp 3-40a.3, Ntrp 4-02.23, Afman 44-156_ip) — 11/21/2019</li>
+                <li><a href="/pub/atp-4-02.85/">ATP 4-02.85</a> — Multi-service Tactics, Techniques And Procedures For Treatment Of Chemical Warfare Agent Casulties And Conventional Military Chemical Injuries (mcrp 3-40a.1, *ntrp 4-02.22, *afttp(i) 3-2.69)  (this Item Is Published W/ Basic Incl C1) — 08/02/2016</li>
+                <li><a href="/pub/atp-4-10/">ATP 4-10</a> — Multi-service Tactics, Techniques, And Procedures For Operational Contract Support {mcrp 4-11h | Nttp 4-09.1 | Afttp 3-2.41} (this Item Is Published W/ Basic Incl C1) — 12/02/2025</li>
+                <li><a href="/pub/atp-4-10.1/">ATP 4-10.1</a> — Logistics Civil Augmentation Program Support To Operations — 11/28/2023</li>
+                <li><a href="/pub/atp-4-11/">ATP 4-11</a> — Army Motor Transport Operations — 03/16/2026</li>
+                <li><a href="/pub/atp-4-12/">ATP 4-12</a> — Army Container Operations — 02/12/2021</li>
+                <li><a href="/pub/atp-4-13/">ATP 4-13</a> — Army Expeditionary Intermodal Operations — 06/21/2023</li>
+                <li><a href="/pub/atp-4-14/">ATP 4-14</a> — Expeditionary Railway Center Operations — 06/22/2022</li>
+                <li><a href="/pub/atp-4-15/">ATP 4-15</a> — Army Watercraft Operations (this Item Is Published W/ Basic Incl C1) — 04/03/2015</li>
+                <li><a href="/pub/atp-4-16/">ATP 4-16</a> — Movement Control — 04/25/2022</li>
+                <li><a href="/pub/atp-4-25.12/">ATP 4-25.12</a> — Unit Field Sanitation Teams  (this Item Is Published W/ Basic Incl C2) — 04/30/2014</li>
+                <li><a href="/pub/atp-4-31/">ATP 4-31</a> — Ground Equipment Battle Damage Assessment, Repair, And Recovery — 04/01/2025</li>
+                <li><a href="/pub/atp-4-32/">ATP 4-32</a> — Explosive Ordnance Disposal Operations — 04/21/2025</li>
+                <li><a href="/pub/atp-4-32.1/">ATP 4-32.1</a> — Explosive Ordnance Disposal (eod) Group And Battalion Headquarters Operations (this Item Is Published W/ Basic Incl C1) — 01/24/2017</li>
+                <li><a href="/pub/atp-4-32.2/">ATP 4-32.2</a> — Multi-service Tactics, Techniques, And Procedures For Explosive Ordnance (eo) {mcrp 10-10d.1, Nttp 3-02.4.1, Afttp 3-2.12} — 03/01/2024</li>
+                <li><a href="/pub/atp-4-32.3/">ATP 4-32.3</a> — Explosive Ordnance Disposal (eod) Company, Platoon, And Team Operations (this Item Is Published W/ Basic Incl C1) — 02/01/2017</li>
+                <li><a href="/pub/atp-4-33/">ATP 4-33</a> — Maintenance Operations — 01/09/2024</li>
+                <li><a href="/pub/atp-4-35/">ATP 4-35</a> — Munitions Operations — 01/31/2023</li>
+                <li><a href="/pub/atp-4-35.1/">ATP 4-35.1</a> — Ammunition And Explosives Handler Safety Techniques — 07/24/2026</li>
+                <li><a href="/pub/atp-4-41/">ATP 4-41</a> — Army Field Feeding And Class I Operations — 12/31/2015</li>
+                <li><a href="/pub/atp-4-42/">ATP 4-42</a> — Materiel Management, Supply, And Field Services Operations — 11/02/2020</li>
+                <li><a href="/pub/atp-4-42.2/">ATP 4-42.2</a> — Supply Support Activity Operations — 09/18/2024</li>
+                <li><a href="/pub/atp-4-43/">ATP 4-43</a> — Petroleum Supply Operations — 04/18/2022</li>
+                <li><a href="/pub/atp-4-44/">ATP 4-44</a> — Water Support Operations — 07/08/2026</li>
+                <li><a href="/pub/atp-4-46/">ATP 4-46</a> — Multi-service Tactics, Techniques, And Procedures For Mortuary Affairs In Theaters Of Operations (mcrp 3-40g.3/nttp 4-06/afttp 3-2.51) — 08/03/2022</li>
+                <li><a href="/pub/atp-4-48/">ATP 4-48</a> — Aerial Delivery — 08/28/2023</li>
+                <li><a href="/pub/atp-4-70/">ATP 4-70</a> — Assistant Secretary Of The Army For Acquisition, Logistics, And Technology Forward Support To Team Operations — 04/04/2025</li>
+                <li><a href="/pub/atp-4-71/">ATP 4-71</a> — Contracting Support Brigade — 10/03/2024</li>
+                <li><a href="/pub/atp-4-90/">ATP 4-90</a> — Brigade Support Battalion — 01/26/2026</li>
+                <li><a href="/pub/atp-4-90.5/">ATP 4-90.5</a> — Logistics Platoon Leader — 11/02/2021</li>
+                <li><a href="/pub/atp-4-91/">ATP 4-91</a> — Division Sustainment Operations (this Item Is Published W/ Basic Incl C1) — 11/08/2022</li>
+                <li><a href="/pub/atp-4-92/">ATP 4-92</a> — Field Army And Corps Sustainment Operations — 03/14/2023</li>
+                <li><a href="/pub/atp-4-93/">ATP 4-93</a> — Theater Sustainment Operations — 05/01/2023</li>
+                <li><a href="/pub/atp-4-93.1/">ATP 4-93.1</a> — Combat Sustainment Support Battalion — 06/19/2017</li>
+                <li><a href="/pub/atp-4-98/">ATP 4-98</a> — Army Sustainment Command Operations — 01/06/2025</li>
+                <li><a href="/pub/atp-5-0.1/">ATP 5-0.1</a> — Army Design Methodology (this Item Is Published W/ Basic Incl C1) — 07/01/2015</li>
+                <li><a href="/pub/atp-5-0.2-1/">ATP 5-0.2-1</a> — Staff Reference Guide Volume I, Unclassified Resources — 12/07/2020</li>
+                <li><a href="/pub/atp-5-0.2-2/">ATP 5-0.2-2</a> — Staff Reference Guide Volume Ii: Appendix O Distribution D Resources — 12/07/2020</li>
+                <li><a href="/pub/atp-5-0.3/">ATP 5-0.3</a> — Multi-service Tactics, Techniques, And Procedures For Operation Assessment (mcrp 5-10.1, Nttp 5-01.3, Afttp 3-2.87) — 02/07/2020</li>
+                <li><a href="/pub/atp-5-0.6/">ATP 5-0.6</a> — Network Engagement — 06/19/2017</li>
+                <li><a href="/pub/atp-5-19/">ATP 5-19</a> — Risk Management — 11/09/2021</li>
+                <li><a href="/pub/atp-6-0.5/">ATP 6-0.5</a> — Command Post Organization And Operations — 03/01/2017</li>
+                <li><a href="/pub/atp-6-0.7/">ATP 6-0.7</a> — Multi-service Tactics, Techniques, And Procedures For Data Orchestration — 06/01/2026</li>
+                <li><a href="/pub/atp-6-01.1/">ATP 6-01.1</a> — Knowledge Management — 03/11/2024</li>
+                <li><a href="/pub/atp-6-02.12/">ATP 6-02.12</a> — Department Of Defense Information Network-army Planning Techniques — 11/17/2021</li>
+                <li><a href="/pub/atp-6-02.2/">ATP 6-02.2</a> — Signal Platoon — 07/10/2026</li>
+                <li><a href="/pub/atp-6-02.40/">ATP 6-02.40</a> — Techniques For Visual Information Operations (this Item Is Published W/ Basic Incl C1) — 01/03/2019</li>
+                <li><a href="/pub/atp-6-02.45/">ATP 6-02.45</a> — Techniques For Tactical Signal Support To Theater Operations — 11/07/2019</li>
+                <li><a href="/pub/atp-6-02.46/">ATP 6-02.46</a> — Expeditionary Signal Companies — 05/07/2025</li>
+                <li><a href="/pub/atp-6-02.53/">ATP 6-02.53</a> — Techniques For Tactical Radios And Retransmission — 07/31/2025</li>
+                <li><a href="/pub/atp-6-02.54/">ATP 6-02.54</a> — Techniques For Satellite Communications — 11/05/2020</li>
+                <li><a href="/pub/atp-6-02.60/">ATP 6-02.60</a> — Tactical Networking Techniques For Corps And Below — 08/09/2019</li>
+                <li><a href="/pub/atp-6-02.61/">ATP 6-02.61</a> — Expeditionary Mission Partner Network Operations — 12/06/2023</li>
+                <li><a href="/pub/atp-6-02.62/">ATP 6-02.62</a> — Expeditionary Mission Partner Network Techniques For Joining, Membership, And Exiting Instructions — 12/06/2023</li>
+                <li><a href="/pub/atp-6-02.70/">ATP 6-02.70</a> — Techniques For Spectrum Management Operations — 09/16/2025</li>
+                <li><a href="/pub/atp-6-02.71/">ATP 6-02.71</a> — Techniques For Department Of Defense Information Network Operations — 08/14/2025</li>
+                <li><a href="/pub/atp-6-02.72/">ATP 6-02.72</a> — Multi-service Tactics, Techniques, And Procedures For Tactical Radios (mcrp 3-30b.3, Nttp 6-02.2, Afttp 3-2.18) — 07/10/2026</li>
+                <li><a href="/pub/atp-6-02.75/">ATP 6-02.75</a> — Techniques For Communications Security — 05/18/2020</li>
+                <li><a href="/pub/atp-6-22.1/">ATP 6-22.1</a> — Providing Feedback: Counseling–coaching–mentoring — 02/13/2024</li>
+                <li><a href="/pub/atp-7-100.1/">ATP 7-100.1</a> — Russian Tactics (this Item Is Published W/ Basic Incl C1) — 02/29/2024</li>
+                <li><a href="/pub/atp-7-100.3/">ATP 7-100.3</a> — Chinese Tactics (this Item Is Published W Basic Incl C1) — 08/09/2021</li>
+                <li><a href="/pub/atp-7-22.01/">ATP 7-22.01</a> — Holistic Health And Fitness Testing — 03/12/2026</li>
+                <li><a href="/pub/atp-7-22.02/">ATP 7-22.02</a> — Holistic Health And Fitness Drills And Exercises (this Item Is Published W/ Basic Incl C1) — 10/01/2020</li>
             </ul>
             <p><a href="/">Ask Reggie.Bot about ATP publications</a></p>
         </div>

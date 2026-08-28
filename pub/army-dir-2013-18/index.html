@@ -10,11 +10,11 @@
     <base href="/">
     <meta name="description" content="ARMY DIR 2013-18, Army Insider Threat Program. Dated 07/31/2013. Proponent G-3/5/7. Status ACTIVE. Read it or ask Reggie.Bot a question about it.">
     <title>ARMY DIR 2013-18 - Army Insider Threat Program</title>
-    <link rel="canonical" href="https://reggie.bot/pub/army-dir-2013-18">
+    <link rel="canonical" href="https://reggie.bot/pub/army-dir-2013-18/">
     <meta name="keywords" content="Army regulations, AR 670-1, Army publications, armypubs, DA PAM, ATP, field manual, Army doctrine, military regulations search">
 
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://reggie.bot/pub/army-dir-2013-18">
+    <meta property="og:url" content="https://reggie.bot/pub/army-dir-2013-18/">
     <meta property="og:site_name" content="Reggie.Bot">
     <meta property="og:title" content="ARMY DIR 2013-18 - Army Insider Threat Program">
     <meta property="og:description" content="ARMY DIR 2013-18, Army Insider Threat Program. Dated 07/31/2013. Proponent G-3/5/7. Status ACTIVE. Read it or ask Reggie.Bot a question about it.">
@@ -30,7 +30,7 @@
   "@type": "Report",
   "name": "ARMY DIR 2013-18 - Army Insider Threat Program",
   "alternateName": "ARMY DIR 2013-18",
-  "url": "https://reggie.bot/pub/army-dir-2013-18",
+  "url": "https://reggie.bot/pub/army-dir-2013-18/",
   "inLanguage": "en",
   "isAccessibleForFree": true,
   "datePublished": "07/31/2013",
@@ -101,36 +101,48 @@
             inset: 0;
             z-index: 10;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 1.25rem;
             background: #141414;
-            font-family: Arial, Helvetica, sans-serif;
-            color: #AFAFAF;
             transition: opacity .35s ease;
+
+            /* The ring sits immediately outside the logo, touching it, so the
+               two sizes are derived from one another rather than set
+               independently. */
+            --boot-logo: clamp(160px, 42vmin, 300px);
+            --boot-ring-width: 7px;
         }
 
         #boot.done { opacity: 0; pointer-events: none; }
 
-        #boot img {
-            width: 72px;
-            height: 72px;
+        /* Square by construction: the ring is a border on a circle, and a
+           circle drawn on a non-square box is an ellipse. */
+        #boot-mark {
+            position: relative;
+            width: calc(var(--boot-logo) + 2 * var(--boot-ring-width));
+            height: calc(var(--boot-logo) + 2 * var(--boot-ring-width));
+        }
+
+        #boot-mark img {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: var(--boot-logo);
+            height: var(--boot-logo);
+            margin: calc(var(--boot-logo) / -2) 0 0 calc(var(--boot-logo) / -2);
             border-radius: 50%;
         }
 
-        #boot-spinner {
-            width: 34px;
-            height: 34px;
-            border: 3px solid #2D2D2D;
+        /* One arc travelling around the logo. The track is drawn in the same
+           near-black the app uses for a raised surface, so only the gold arc
+           reads as motion. */
+        #boot-ring {
+            position: absolute;
+            inset: 0;
+            border: var(--boot-ring-width) solid #2D2D2D;
             border-top-color: #FFCB05;
             border-radius: 50%;
-            animation: boot-spin .9s linear infinite;
-        }
-
-        #boot-label {
-            font-size: .95rem;
-            letter-spacing: .04em;
+            animation: boot-spin 1.1s linear infinite;
         }
 
         @keyframes boot-spin { to { transform: rotate(360deg); } }
@@ -138,7 +150,7 @@
         /* Respect a reduced-motion preference: keep the indicator, drop the
            spin. */
         @media (prefers-reduced-motion: reduce) {
-            #boot-spinner { animation: none; border-top-color: #FFCB05; }
+            #boot-ring { animation: none; }
         }
     </style>
     <!-- Google tag (gtag.js) -->
@@ -302,10 +314,14 @@
         <!-- The loading indicator lives inside the container so that Compose
              removes it along with everything else when it mounts, and so that
              nothing is ever layered over the canvas. -->
-        <div id="boot" role="status" aria-live="polite">
-            <img src="/icon_round.png" alt="" width="72" height="72">
-            <div id="boot-spinner"></div>
-            <div id="boot-label">Loading Reggie.Bot&hellip;</div>
+        <!-- No visible text: the mark and the ring around it say "loading"
+             on their own. aria-label keeps that legible to a screen reader
+             without putting a caption back on the screen. -->
+        <div id="boot" role="status" aria-live="polite" aria-label="Loading Reggie.Bot">
+            <div id="boot-mark">
+                <div id="boot-ring"></div>
+                <img src="/icon_round.png" alt="">
+            </div>
         </div>
         <!-- Not wrapped in <noscript>: crawlers that execute JS ignore it, and
              this needs to be real markup in the initial response. Compose
@@ -325,7 +341,7 @@
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=103661">View ARMY DIR 2013-18 on armypubs.army.mil</a></p>
             <h2>Related publications</h2>
             <ul>
-                <li><a href="/pub/ar-381-12">AR 381-12</a></li>
+                <li><a href="/pub/ar-381-12/">AR 381-12</a></li>
             </ul>
             <p><a href="/">Ask Reggie.Bot a question about ARMY DIR 2013-18</a></p>
         </div>

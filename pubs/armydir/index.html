@@ -10,11 +10,11 @@
     <base href="/">
     <meta name="description" content="All 168 ARMYDIR publications (Army Directives), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.">
     <title>ARMYDIR — Army Directives</title>
-    <link rel="canonical" href="https://reggie.bot/pubs/armydir">
+    <link rel="canonical" href="https://reggie.bot/pubs/armydir/">
     <meta name="keywords" content="Army regulations, AR 670-1, Army publications, armypubs, DA PAM, ATP, field manual, Army doctrine, military regulations search">
 
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://reggie.bot/pubs/armydir">
+    <meta property="og:url" content="https://reggie.bot/pubs/armydir/">
     <meta property="og:site_name" content="Reggie.Bot">
     <meta property="og:title" content="ARMYDIR — Army Directives">
     <meta property="og:description" content="All 168 ARMYDIR publications (Army Directives), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.">
@@ -96,36 +96,48 @@
             inset: 0;
             z-index: 10;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 1.25rem;
             background: #141414;
-            font-family: Arial, Helvetica, sans-serif;
-            color: #AFAFAF;
             transition: opacity .35s ease;
+
+            /* The ring sits immediately outside the logo, touching it, so the
+               two sizes are derived from one another rather than set
+               independently. */
+            --boot-logo: clamp(160px, 42vmin, 300px);
+            --boot-ring-width: 7px;
         }
 
         #boot.done { opacity: 0; pointer-events: none; }
 
-        #boot img {
-            width: 72px;
-            height: 72px;
+        /* Square by construction: the ring is a border on a circle, and a
+           circle drawn on a non-square box is an ellipse. */
+        #boot-mark {
+            position: relative;
+            width: calc(var(--boot-logo) + 2 * var(--boot-ring-width));
+            height: calc(var(--boot-logo) + 2 * var(--boot-ring-width));
+        }
+
+        #boot-mark img {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: var(--boot-logo);
+            height: var(--boot-logo);
+            margin: calc(var(--boot-logo) / -2) 0 0 calc(var(--boot-logo) / -2);
             border-radius: 50%;
         }
 
-        #boot-spinner {
-            width: 34px;
-            height: 34px;
-            border: 3px solid #2D2D2D;
+        /* One arc travelling around the logo. The track is drawn in the same
+           near-black the app uses for a raised surface, so only the gold arc
+           reads as motion. */
+        #boot-ring {
+            position: absolute;
+            inset: 0;
+            border: var(--boot-ring-width) solid #2D2D2D;
             border-top-color: #FFCB05;
             border-radius: 50%;
-            animation: boot-spin .9s linear infinite;
-        }
-
-        #boot-label {
-            font-size: .95rem;
-            letter-spacing: .04em;
+            animation: boot-spin 1.1s linear infinite;
         }
 
         @keyframes boot-spin { to { transform: rotate(360deg); } }
@@ -133,7 +145,7 @@
         /* Respect a reduced-motion preference: keep the indicator, drop the
            spin. */
         @media (prefers-reduced-motion: reduce) {
-            #boot-spinner { animation: none; border-top-color: #FFCB05; }
+            #boot-ring { animation: none; }
         }
     </style>
     <!-- Google tag (gtag.js) -->
@@ -297,10 +309,14 @@
         <!-- The loading indicator lives inside the container so that Compose
              removes it along with everything else when it mounts, and so that
              nothing is ever layered over the canvas. -->
-        <div id="boot" role="status" aria-live="polite">
-            <img src="/icon_round.png" alt="" width="72" height="72">
-            <div id="boot-spinner"></div>
-            <div id="boot-label">Loading Reggie.Bot&hellip;</div>
+        <!-- No visible text: the mark and the ring around it say "loading"
+             on their own. aria-label keeps that legible to a screen reader
+             without putting a caption back on the screen. -->
+        <div id="boot" role="status" aria-live="polite" aria-label="Loading Reggie.Bot">
+            <div id="boot-mark">
+                <div id="boot-ring"></div>
+                <img src="/icon_round.png" alt="">
+            </div>
         </div>
         <!-- Not wrapped in <noscript>: crawlers that execute JS ignore it, and
              this needs to be real markup in the initial response. Compose
@@ -311,174 +327,174 @@
             <p>All 168 ARMYDIR publications (Army Directives), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.</p>
             <h2>168 publications</h2>
             <ul>
-                <li><a href="/pub/army-dir-2010-10">ARMY DIR 2010-10</a> — Enhancement Of The Promotion Review Board Process — 12/03/2010</li>
-                <li><a href="/pub/army-dir-2011-03">ARMY DIR 2011-03</a> — Change Of Operational Control For 1st Information Operations Command (land) And Direction For U.s. Army Cyber Command To Conduct The Information Operations Missions For The Army — 02/02/2011</li>
-                <li><a href="/pub/army-dir-2011-09">ARMY DIR 2011-09</a> — Employment Of Licensed Professional Counselors As Fully Functioning Army Substance Abuse Program Practitioners — 07/26/2011</li>
-                <li><a href="/pub/army-dir-2012-08">ARMY DIR 2012-08</a> — Army Total Force Policy — 09/04/2012</li>
-                <li><a href="/pub/army-dir-2012-10">ARMY DIR 2012-10</a> — The Army Special Programs Directorate — 05/14/2012</li>
-                <li><a href="/pub/army-dir-2012-19">ARMY DIR 2012-19</a> — Elimination Of The Oath Of Office Requirement When Transferring From The Active-duty List To The Reserve Active-status List — 07/16/2012</li>
-                <li><a href="/pub/army-dir-2013-01">ARMY DIR 2013-01</a> — Guidance On The Acquisition And Use Of Service Dogs By Soldiers — 01/28/2013</li>
-                <li><a href="/pub/army-dir-2013-03">ARMY DIR 2013-03</a> — Chemical Accident Or Incident Response And Assistance — 04/04/2013</li>
-                <li><a href="/pub/army-dir-2013-18">ARMY DIR 2013-18</a> — Army Insider Threat Program — 07/31/2013</li>
-                <li><a href="/pub/army-dir-2014-02">ARMY DIR 2014-02</a> — Net Zero Installations Policy — 01/28/2014</li>
-                <li><a href="/pub/army-dir-2014-05">ARMY DIR 2014-05</a> — Policy And Implementation Procedures For Common Access Card Credentialing And Installation Access For Uncleared Contractors — 03/07/2014</li>
-                <li><a href="/pub/army-dir-2014-08">ARMY DIR 2014-08</a> — Water Rights Policy For Army Installations In The United States — 05/12/2014</li>
-                <li><a href="/pub/army-dir-2014-10">ARMY DIR 2014-10</a> — Advanced Metering Of Utilities — 06/04/2014</li>
-                <li><a href="/pub/army-dir-2014-11">ARMY DIR 2014-11</a> — Enlisted To Medical Degree Preparatory Program — 05/14/2014</li>
-                <li><a href="/pub/army-dir-2014-21">ARMY DIR 2014-21</a> — Law Enforcement And Security Support At Arlington National Cemetery And The U.s. Soldiers` And Airmen`s Home National Cemetery — 07/21/2014</li>
-                <li><a href="/pub/army-dir-2014-22">ARMY DIR 2014-22</a> — Establishment Of The Office Of Energy Initiatives — 08/01/2014</li>
-                <li><a href="/pub/army-dir-2014-23">ARMY DIR 2014-23</a> — Conduct Of Screening And Background Checks For Individuals Who Have Regular Contact With Children In Army Programs — 09/10/2014</li>
-                <li><a href="/pub/army-dir-2014-25">ARMY DIR 2014-25</a> — Establishment Of A Public Web Site Sharing Information About Army Wanted Fugitives — 10/23/2014</li>
-                <li><a href="/pub/army-dir-2014-26">ARMY DIR 2014-26</a> — Reassignment Of Soldiers Requiring A Command-directed Behavioral Health Evaluation Or Follow-on Treatment — 10/22/2014</li>
-                <li><a href="/pub/army-dir-2014-28">ARMY DIR 2014-28</a> — Requests To Upgrade Discharge By Veterans Claiming Post Traumatic Stress Disorder — 11/03/2014</li>
-                <li><a href="/pub/army-dir-2015-05">ARMY DIR 2015-05</a> — Special Access Program Oversight Committee — 01/21/2015</li>
-                <li><a href="/pub/army-dir-2015-20">ARMY DIR 2015-20</a> — Tuberculosis (tb) Screening And Testing Procedures For Child, Youth And School (cys) Services Personnel — 04/21/2015</li>
-                <li><a href="/pub/army-dir-2015-22">ARMY DIR 2015-22</a> — Revision To List Of Special Command Sergeant  Major Positions — 05/01/2015</li>
-                <li><a href="/pub/army-dir-2015-29">ARMY DIR 2015-29</a> — Confidential Review Of Characterization Of Terms Of Discharge Of Members Of The Army Who Are Victims Of Sexual Offenses — 08/06/2015</li>
-                <li><a href="/pub/army-dir-2015-32">ARMY DIR 2015-32</a> — Changes To The Grade Determination System For Army Medical Department Officers — 08/13/2015</li>
-                <li><a href="/pub/army-dir-2015-33">ARMY DIR 2015-33</a> — Designation Of An Army Lead For Conventional Airborne Forces — 08/19/2015</li>
-                <li><a href="/pub/army-dir-2015-44">ARMY DIR 2015-44</a> — Updated Policy For Army Child, Youth, And School Services Programs — 12/14/2015</li>
-                <li><a href="/pub/army-dir-2016-22">ARMY DIR 2016-22</a> — Authority To Initiate Applications To Correct Military Records On Behalf Of A Group Of Soldiers Or Former Soldiers Who Were Similarly Harmed By The Same Error Or Injustice — 05/31/2016</li>
-                <li><a href="/pub/army-dir-2016-24">ARMY DIR 2016-24</a> — Department Of Defense Biological Select Agent And Toxins Biosafety Program — 07/25/2016</li>
-                <li><a href="/pub/army-dir-2016-28">ARMY DIR 2016-28</a> — Sharing U.s. Department Of Veterans Affairs Disability Rating For Members Of The Ready Reserve — 08/08/2016</li>
-                <li><a href="/pub/army-dir-2016-33">ARMY DIR 2016-33</a> — Special Board Review Of Approved Qualitative Management Program Board Recommendations — 10/24/2016</li>
-                <li><a href="/pub/army-dir-2016-37">ARMY DIR 2016-37</a> — U.s. Army Open-source Intelligence Activities — 11/22/2016</li>
-                <li><a href="/pub/army-dir-2016-38">ARMY DIR 2016-38</a> — Migration Of Army Systems And Applications To Approved Hosting Environments And Consolidation Of Data Centers — 12/09/2016</li>
-                <li><a href="/pub/army-dir-2017-15">ARMY DIR 2017-15</a> — Managing And Overseeing The Acquisition Of Services — 04/25/2017</li>
-                <li><a href="/pub/army-dir-2017-24">ARMY DIR 2017-24</a> — Cross-functional Team Pilot In Support Of Materiel Development — 10/06/2017</li>
-                <li><a href="/pub/army-dir-2017-32">ARMY DIR 2017-32</a> — Acquisition Reform Initiative #6: Streamlining The Contracting Process — 11/15/2017</li>
-                <li><a href="/pub/army-dir-2017-33">ARMY DIR 2017-33</a> — Enabling The Army Modernization Task Force — 11/07/2017</li>
-                <li><a href="/pub/army-dir-2017-34">ARMY DIR 2017-34</a> — Acquisition Reform Initiative #7: Improving Cost Estimation And Resourcing — 11/15/2017</li>
-                <li><a href="/pub/army-dir-2017-35">ARMY DIR 2017-35</a> — Acquisition Reform Initiative #8: Assessing Performance With Metrics — 11/15/2017</li>
-                <li><a href="/pub/army-dir-2018-02">ARMY DIR 2018-02</a> — Global Cultural Knowledge Network — 04/04/2018</li>
-                <li><a href="/pub/army-dir-2018-03">ARMY DIR 2018-03</a> — Space Control, Electronic Warfare Tte And Lfx's — 07/27/2018</li>
-                <li><a href="/pub/army-dir-2018-04">ARMY DIR 2018-04</a> — Terminating The Requirement For Tactical Vehicle Registration Numbers — 05/07/2018</li>
-                <li><a href="/pub/army-dir-2018-06">ARMY DIR 2018-06</a> — U.s. Army Privileged User/elevated Access To Army Joint Worldwide Intelligence Communications System Information Systems, Netowrks, And Data — 05/10/2018</li>
-                <li><a href="/pub/army-dir-2018-07">ARMY DIR 2018-07</a> — Prioritizing Efforts-readiness And Lethality — 04/13/2018</li>
-                <li><a href="/pub/army-dir-2018-07-1">ARMY DIR 2018-07-1</a> — Prioritizing Efforts-readiness And Lethality (update 1) — 04/16/2018</li>
-                <li><a href="/pub/army-dir-2018-07-11">ARMY DIR 2018-07-11</a> — Prioritizing Efforts-readiness And Lethality (update 11) — 06/26/2018</li>
-                <li><a href="/pub/army-dir-2018-07-12">ARMY DIR 2018-07-12</a> — Prioritizing Efforts-readiness And Lethality (update 12) — 08/20/2018</li>
-                <li><a href="/pub/army-dir-2018-07-14">ARMY DIR 2018-07-14</a> — Prioritizing Efforts-readiness And Lethality (update 14) — 10/22/2018</li>
-                <li><a href="/pub/army-dir-2018-07-17">ARMY DIR 2018-07-17</a> — Prioritizing Efforts-readiness And Lethality (update 17) — 11/28/2018</li>
-                <li><a href="/pub/army-dir-2018-07-18">ARMY DIR 2018-07-18</a> — Prioritizing Efforts-readiness And Lethality (update 18) — 01/04/2019</li>
-                <li><a href="/pub/army-dir-2018-07-2">ARMY DIR 2018-07-2</a> — Prioritizing Efforts-readiness And Lethality (update 2) — 04/18/2018</li>
-                <li><a href="/pub/army-dir-2018-07-3">ARMY DIR 2018-07-3</a> — Prioritizing Efforts-readiness And Lethality (update 3) — 04/23/2018</li>
-                <li><a href="/pub/army-dir-2018-07-4">ARMY DIR 2018-07-4</a> — Prioritizing Efforts-readiness And Lethality (update 4) — 04/26/2018</li>
-                <li><a href="/pub/army-dir-2018-07-5">ARMY DIR 2018-07-5</a> — Prioritizing Efforts-readiness And Lethality (update 5) — 05/09/2018</li>
-                <li><a href="/pub/army-dir-2018-07-7">ARMY DIR 2018-07-7</a> — Prioritizing Efforts-readiness And Lethality (update 7) — 05/25/2018</li>
-                <li><a href="/pub/army-dir-2018-07-9">ARMY DIR 2018-07-9</a> — Prioritizing Efforts-readiness And Lethality (update 9) — 06/12/2018</li>
-                <li><a href="/pub/army-dir-2018-10">ARMY DIR 2018-10</a> — Authorizing Use Of Da Form 1059-2 (senior Service And Command And General Staff College Academic Evaluation Report) For The U.s.army War College — 06/08/2018</li>
-                <li><a href="/pub/army-dir-2018-16">ARMY DIR 2018-16</a> — Suitability Criteria For Military Personnel In Specified Positions — 11/08/2018</li>
-                <li><a href="/pub/army-dir-2018-17">ARMY DIR 2018-17</a> — Army Accessions Way Ahead — 10/01/2018</li>
-                <li><a href="/pub/army-dir-2018-18">ARMY DIR 2018-18</a> — Army Artificial Intelligence Task Force In Support Of The Department Of Defense Joint Artificial Intelligence Center — 10/02/2018</li>
-                <li><a href="/pub/army-dir-2018-22">ARMY DIR 2018-22</a> — Retention Policy For Non-deployable Soldiers — 11/08/2018</li>
-                <li><a href="/pub/army-dir-2018-26">ARMY DIR 2018-26</a> — Enabling Modernization Through The Management Of Intellectual Property — 12/07/2018</li>
-                <li><a href="/pub/army-dir-2018-29">ARMY DIR 2018-29</a> — Non-federal Entity Competition With Appropriated And Nonappropriated Fund Activities On Army Installations — 12/17/2018</li>
-                <li><a href="/pub/army-dir-2019-02">ARMY DIR 2019-02</a> — Voluntary Inactive Duty Training — 01/22/2019</li>
-                <li><a href="/pub/army-dir-2019-07">ARMY DIR 2019-07</a> — Army Dental Readiness And Deployability — 02/25/2019</li>
-                <li><a href="/pub/army-dir-2019-10">ARMY DIR 2019-10</a> — Army Child, Youth And School Services Space-available Patrons — 02/05/2019</li>
-                <li><a href="/pub/army-dir-2019-11">ARMY DIR 2019-11</a> — Rebalance Of Army Child Care Fee Assistance — 02/28/2019</li>
-                <li><a href="/pub/army-dir-2019-13">ARMY DIR 2019-13</a> — Response To Major Juvenile Misconduct And Referral Of Civilian Criminal Offenses To Civilian Authorities — 03/21/2019</li>
-                <li><a href="/pub/army-dir-2019-14">ARMY DIR 2019-14</a> — Posthumous Graduation And Commission Of United States Military Academy Cadets — 03/20/2019</li>
-                <li><a href="/pub/army-dir-2019-17">ARMY DIR 2019-17</a> — Changes To The Soldier And Family Readiness Group Program — 04/01/2019</li>
-                <li><a href="/pub/army-dir-2019-21">ARMY DIR 2019-21</a> — Restrictions On Personnel Claim Payments — 05/29/2019</li>
-                <li><a href="/pub/army-dir-2019-23">ARMY DIR 2019-23</a> — Allocation Of Wireless Portable Electronic Devices — 08/01/2019</li>
-                <li><a href="/pub/army-dir-2019-24">ARMY DIR 2019-24</a> — Reporting Responsibilities For Commanders And Covered Professionals For Child Abuse And Neglect — 07/11/2019</li>
-                <li><a href="/pub/army-dir-2019-27">ARMY DIR 2019-27</a> — Direct Appointment Of Officers Up To The Grade Of Colonel (other Than Special Branches) — 09/12/2019</li>
-                <li><a href="/pub/army-dir-2019-28">ARMY DIR 2019-28</a> — Authority To Adjust Effective Date Of Promotion Of A Reserve Commissioned Officer In The Event Of Undue Delay In Federal Recognition Of Promotion — 09/19/2019</li>
-                <li><a href="/pub/army-dir-2019-33">ARMY DIR 2019-33</a> — Total Army Sponsorship Program — 10/21/2019</li>
-                <li><a href="/pub/army-dir-2020-03">ARMY DIR 2020-03</a> — Installation Energy And Water Resilience Policy — 03/31/2020</li>
-                <li><a href="/pub/army-dir-2020-07">ARMY DIR 2020-07</a> — Army National Guard Military Morale, Welfare, And Recreation Programs And Nonappropriated Fund Instrumentalities — 08/03/2020</li>
-                <li><a href="/pub/army-dir-2020-10">ARMY DIR 2020-10</a> — Use Of Imitative Substitute Building Materials In Historic Housing — 08/25/2020</li>
-                <li><a href="/pub/army-dir-2020-11">ARMY DIR 2020-11</a> — Roles And Responsibilities For Military Installation Operations — 10/01/2020</li>
-                <li><a href="/pub/army-dir-2020-12">ARMY DIR 2020-12</a> — Department Of Defense Enterprise Email Trusted Agents — 10/14/2020</li>
-                <li><a href="/pub/army-dir-2020-13">ARMY DIR 2020-13</a> — Disclosure Of Protected Health Information To Unit Command Officials — 10/26/2020</li>
-                <li><a href="/pub/army-dir-2020-18">ARMY DIR 2020-18</a> — Discontinuation Of The Formal Competition Process For Army Communities Of Excellence — 12/18/2020</li>
-                <li><a href="/pub/army-dir-2021-02">ARMY DIR 2021-02</a> — Access To Army Installations By Foreign Nationals And  Section 621-eligible Veterans And Caregivers — 01/13/2021</li>
-                <li><a href="/pub/army-dir-2021-03">ARMY DIR 2021-03</a> — Army Civilian Fitness And Health Promotion Program — 01/18/2021</li>
-                <li><a href="/pub/army-dir-2021-05">ARMY DIR 2021-05</a> — Integrated Disability Evaluation System — 03/16/2021</li>
-                <li><a href="/pub/army-dir-2021-08">ARMY DIR 2021-08</a> — Implementation And Sustainment Of Army Medical Department Individual Critical Task Lists — 03/19/2021</li>
-                <li><a href="/pub/army-dir-2021-10">ARMY DIR 2021-10</a> — Commander's Risk Reduction Toolkit — 04/15/2021</li>
-                <li><a href="/pub/army-dir-2021-18">ARMY DIR 2021-18</a> — Use Of People Analytics Data/data Omnibus — 05/18/2021</li>
-                <li><a href="/pub/army-dir-2021-19">ARMY DIR 2021-19</a> — Direct Appointment Of Senior Noncommissioned Officers To Chief Warrant Officer Two For Special Forces — 05/12/2021</li>
-                <li><a href="/pub/army-dir-2021-24">ARMY DIR 2021-24</a> — Protecting Army Modernization Science And Technology Efforts And Programs — 06/11/2021</li>
-                <li><a href="/pub/army-dir-2021-25">ARMY DIR 2021-25</a> — Protecting Sensitive Army Modernization Science And Technology Efforts And Programs — 06/11/2021</li>
-                <li><a href="/pub/army-dir-2021-26">ARMY DIR 2021-26</a> — Family Advocacy Program Incident Determination Committee And Clinical Case Staff Meeting — 07/12/2021</li>
-                <li><a href="/pub/army-dir-2021-27">ARMY DIR 2021-27</a> — Installation Response To Problematic Sexual Behavior In Children And Youth — 06/07/2021</li>
-                <li><a href="/pub/army-dir-2021-28">ARMY DIR 2021-28</a> — Retired Regular Army Warrant Officers Serving In The Ready Reserve — 07/01/2021</li>
-                <li><a href="/pub/army-dir-2021-31">ARMY DIR 2021-31</a> — Managing Active Date Of Rank For Aviation Branch Warrant Officers In The Regular Army — 09/10/2021</li>
-                <li><a href="/pub/army-dir-2021-32">ARMY DIR 2021-32</a> — Detainee Operations Update — 09/17/2021</li>
-                <li><a href="/pub/army-dir-2021-33">ARMY DIR 2021-33</a> — Approval And Appeal Authorities For Military Medical And Administrative Immunization Exemptions — 09/24/2021</li>
-                <li><a href="/pub/army-dir-2021-34">ARMY DIR 2021-34</a> — Director, U.s. Army Criminal Investigation Division Authorities And Responsibilities — 09/17/2021</li>
-                <li><a href="/pub/army-dir-2021-35">ARMY DIR 2021-35</a> — Roles And Responsibilities For Program Objective Memorandum Program Evaluation Groups — 11/05/2021</li>
-                <li><a href="/pub/army-dir-2022-01">ARMY DIR 2022-01</a> — Personal Commercial Solicitation On Army Installations To Support Financial Education — 02/11/2022</li>
-                <li><a href="/pub/army-dir-2022-03">ARMY DIR 2022-03</a> — Supplemental Training For Members Of Boards For Correction Of Military Records And Discharge Review Boards — 01/25/2022</li>
-                <li><a href="/pub/army-dir-2022-04">ARMY DIR 2022-04</a> — Sexual Assault Line Of Duty Determinations And Reporting — 02/07/2022</li>
-                <li><a href="/pub/army-dir-2022-07">ARMY DIR 2022-07</a> — Army Modernization Roles And Responsibilities — 05/03/2022</li>
-                <li><a href="/pub/army-dir-2022-08">ARMY DIR 2022-08</a> — U.s. Army Criminal Investigation Division Roles And Responsibilities — 07/20/2022</li>
-                <li><a href="/pub/army-dir-2022-09">ARMY DIR 2022-09</a> — Soldier Tattoos — 06/22/2022</li>
-                <li><a href="/pub/army-dir-2022-10">ARMY DIR 2022-10</a> — Safe-to-report For  Victims Of Sexual Assault — 07/06/2022</li>
-                <li><a href="/pub/army-dir-2022-11">ARMY DIR 2022-11</a> — Designation Of Deputy For Medical Systems — 09/16/2022</li>
-                <li><a href="/pub/army-dir-2022-13">ARMY DIR 2022-13</a> — Reforms To Counter Sexual Harassment/sexual Assault In The Army — 09/20/2022</li>
-                <li><a href="/pub/army-dir-2023-01">ARMY DIR 2023-01</a> — Army Recruiting Ribbon Program — 01/23/2023</li>
-                <li><a href="/pub/army-dir-2023-02">ARMY DIR 2023-02</a> — Direct Appointment And Commission Of Certain Warrant Officers — 02/06/2023</li>
-                <li><a href="/pub/army-dir-2023-03">ARMY DIR 2023-03</a> — Army Adverse Information Program — 02/22/2023</li>
-                <li><a href="/pub/army-dir-2023-04">ARMY DIR 2023-04</a> — Command Notification Of Pregnancy — 02/27/2023</li>
-                <li><a href="/pub/army-dir-2023-06">ARMY DIR 2023-06</a> — Army Basic Needs Allowance Program — 02/27/2023</li>
-                <li><a href="/pub/army-dir-2023-07">ARMY DIR 2023-07</a> — Arms, Ammunition, And Explosives Accountability — 03/24/2023</li>
-                <li><a href="/pub/army-dir-2023-09">ARMY DIR 2023-09</a> — Army Coaching Program — 06/02/2023</li>
-                <li><a href="/pub/army-dir-2023-10">ARMY DIR 2023-10</a> — Administrative Roles, Responsibilities, And Procedures For Patient Movement — 06/02/2023</li>
-                <li><a href="/pub/army-dir-2023-13">ARMY DIR 2023-13</a> — Processing Of Personal Effects By The Joint Personal Effects Depot — 07/07/2023</li>
-                <li><a href="/pub/army-dir-2023-17">ARMY DIR 2023-17</a> — Reserve Component Line Of Duty Requests And Behavioral Health Investigations — 12/14/2023</li>
-                <li><a href="/pub/army-dir-2024-01">ARMY DIR 2024-01</a> — Army Fitness Determinations And Deployability — 02/09/2024</li>
-                <li><a href="/pub/army-dir-2024-03">ARMY DIR 2024-03</a> — Army Digital Engineering — 05/21/2024</li>
-                <li><a href="/pub/army-dir-2024-04">ARMY DIR 2024-04</a> — Reimbursement Of Qualifying Spouse Relicensing Costs And Business Costs — 05/30/2024</li>
-                <li><a href="/pub/army-dir-2024-05">ARMY DIR 2024-05</a> — Aggregating And Reporting Soldier Race And Ethnicity Data — 06/10/2024</li>
-                <li><a href="/pub/army-dir-2024-06">ARMY DIR 2024-06</a> — Soldier Appeal Of The Formal Physical Evaluation Board Findings And Recommendations — 06/24/2024</li>
-                <li><a href="/pub/army-dir-2024-09">ARMY DIR 2024-09</a> — Army Safety And Occupational Health Management System — 08/07/2024</li>
-                <li><a href="/pub/army-dir-2024-13">ARMY DIR 2024-13</a> — Roles And Responsibilities For Establishing Army Equid Enterprise Program — 12/19/2024</li>
-                <li><a href="/pub/army-dir-2025-01">ARMY DIR 2025-01</a> — Rescission Of Diversity, Equity, Inclusion And Accessibility Policies And Programs — 01/24/2025</li>
-                <li><a href="/pub/army-dir-2025-02">ARMY DIR 2025-02</a> — Parenthood, Pregnancy, And Postpartum — 02/24/2025</li>
-                <li><a href="/pub/army-dir-2025-03">ARMY DIR 2025-03</a> — Reporting Prohibited Activities (rpa) — 02/21/2025</li>
-                <li><a href="/pub/army-dir-2025-04">ARMY DIR 2025-04</a> — Initial Entry Training For Reserve Component Soldiers — 03/25/2025</li>
-                <li><a href="/pub/army-dir-2025-05">ARMY DIR 2025-05</a> — Certificate Of Uniformed Service—dd Forms 214, 214-1, And 215 — 03/25/2025</li>
-                <li><a href="/pub/army-dir-2025-06">ARMY DIR 2025-06</a> — Army Fitness Test — 04/17/2025</li>
-                <li><a href="/pub/army-dir-2025-07">ARMY DIR 2025-07</a> — Standardization Of Investigation And Personnel Action Processes — 05/22/2025</li>
-                <li><a href="/pub/army-dir-2025-08">ARMY DIR 2025-08</a> — Home Of Record Designation Or Change Request — 05/21/2025</li>
-                <li><a href="/pub/army-dir-2025-09">ARMY DIR 2025-09</a> — Reserve Component Retirement Planning — 05/28/2025</li>
-                <li><a href="/pub/army-dir-2025-10">ARMY DIR 2025-10</a> — Army Civilian Harassment Prevention And Response Program — 06/18/2025</li>
-                <li><a href="/pub/army-dir-2025-11">ARMY DIR 2025-11</a> — Administrative Absence For Non-covered Assisted Reproductive Technology — 06/25/2025</li>
-                <li><a href="/pub/army-dir-2025-12">ARMY DIR 2025-12</a> — Disclosure Of Department Of The Army Controlled Unclassified Information To Foreign Governments — 06/25/2025</li>
-                <li><a href="/pub/army-dir-2025-13">ARMY DIR 2025-13</a> — Facial Hair Grooming Standards — 07/07/2025</li>
-                <li><a href="/pub/army-dir-2025-14">ARMY DIR 2025-14</a> — Advanced Manufactured Parts Certification Authority Assigned To Commanding General, United States Army Materiel Command — 07/22/2025</li>
-                <li><a href="/pub/army-dir-2025-15">ARMY DIR 2025-15</a> — Use Of Publicly Available Information For Intelligence Activities — 08/06/2025</li>
-                <li><a href="/pub/army-dir-2025-16">ARMY DIR 2025-16</a> — Canine Holistic Health And Fitness — 08/21/2025</li>
-                <li><a href="/pub/army-dir-2025-18">ARMY DIR 2025-18</a> — Appearance, Grooming, And Army Body Composition Program Standards — 09/12/2025</li>
-                <li><a href="/pub/army-dir-2025-19">ARMY DIR 2025-19</a> — Loan, Lease, And Donation Of Army Materiel — 10/24/2025</li>
-                <li><a href="/pub/army-dir-2025-20">ARMY DIR 2025-20</a> — Determination And Reporting Of Missing, Absent-unknown, Absent Without Leave, And Duty Status-whereabouts Unknown Soldiers — 10/28/2025</li>
-                <li><a href="/pub/army-dir-2025-21">ARMY DIR 2025-21</a> — Handling Protest, Extremist, And Criminal Gang Activities — 10/30/2025</li>
-                <li><a href="/pub/army-dir-2025-22">ARMY DIR 2025-22</a> — Army Recovery Care Program Reform — 11/12/2025</li>
-                <li><a href="/pub/army-dir-2025-23">ARMY DIR 2025-23</a> — Special Reaction Team Capability — 11/14/2025</li>
-                <li><a href="/pub/army-dir-2025-24">ARMY DIR 2025-24</a> — Expansion Of Army Assignments — 11/14/2025</li>
-                <li><a href="/pub/army-dir-2025-26">ARMY DIR 2025-26</a> — Supply Chain Risk Management For Weapon Systems — 12/12/2025</li>
-                <li><a href="/pub/army-dir-2025-c">ARMY DIR 2025-C</a> — Classified Title — 08/01/2025</li>
-                <li><a href="/pub/army-dir-2026-02">ARMY DIR 2026-02</a> — Elimination Of Department Of The Army Ad Hoc Review Boards — 01/08/2026</li>
-                <li><a href="/pub/army-dir-2026-03">ARMY DIR 2026-03</a> — Child, Youth, And School Services Immunization Requirements — 02/11/2026</li>
-                <li><a href="/pub/army-dir-2026-05">ARMY DIR 2026-05</a> — Inspector General Administrative Investigations Oversight And Reform — 03/16/2026</li>
-                <li><a href="/pub/army-dir-2026-07">ARMY DIR 2026-07</a> — Army Physical Fitness Standards — 04/17/2026</li>
-                <li><a href="/pub/army-dir-2026-08">ARMY DIR 2026-08</a> — Permanent Change To Timeline For Requesting Voluntary Retirement From Active Service — 04/17/2026</li>
-                <li><a href="/pub/army-dir-2026-09">ARMY DIR 2026-09</a> — Grooming Standards And Religious Accommodation — 05/19/2026</li>
-                <li><a href="/pub/army-dir-2026-10">ARMY DIR 2026-10</a> — Disability Evaluation System: Board Composition And Reserve Component Non-duty-related Procedures — 06/10/2026</li>
-                <li><a href="/pub/army-dir-2026-11">ARMY DIR 2026-11</a> — Officer Promotion Screening And Review, And Personnel Suitability Screening For Senior Noncommissioned Officer Positions — 06/10/2026</li>
-                <li><a href="/pub/army-dir-2026-12">ARMY DIR 2026-12</a> — Support To Military Health System Stabilization — 06/23/2026</li>
-                <li><a href="/pub/army-dir-2026-13">ARMY DIR 2026-13</a> — Army Body Composition Program And Standards — 07/01/2026</li>
-                <li><a href="/pub/army-dir-2026-14">ARMY DIR 2026-14</a> — Prohibition Of Kratom Use — 06/23/2026</li>
-                <li><a href="/pub/army-dir-2026-15">ARMY DIR 2026-15</a> — Line Of Duty Investigations And Determinations In Death Cases — 06/23/2026</li>
-                <li><a href="/pub/army-dir-2026-16">ARMY DIR 2026-16</a> — Chaplain Rank And Insignia — 06/23/2026</li>
-                <li><a href="/pub/army-dir-2026-17">ARMY DIR 2026-17</a> — Optimizing Digital Media — 06/30/2026</li>
-                <li><a href="/pub/army-dir-2026-18">ARMY DIR 2026-18</a> — Modern Civilian Workforce Management — 07/07/2026</li>
-                <li><a href="/pub/army-dir-2026-19">ARMY DIR 2026-19</a> — Enabling Modern Software Acquisition Practices — 07/22/2026</li>
-                <li><a href="/pub/army-dir-2026-20">ARMY DIR 2026-20</a> — Army Legal Services Realignment — 08/05/2026</li>
+                <li><a href="/pub/army-dir-2010-10/">ARMY DIR 2010-10</a> — Enhancement Of The Promotion Review Board Process — 12/03/2010</li>
+                <li><a href="/pub/army-dir-2011-03/">ARMY DIR 2011-03</a> — Change Of Operational Control For 1st Information Operations Command (land) And Direction For U.s. Army Cyber Command To Conduct The Information Operations Missions For The Army — 02/02/2011</li>
+                <li><a href="/pub/army-dir-2011-09/">ARMY DIR 2011-09</a> — Employment Of Licensed Professional Counselors As Fully Functioning Army Substance Abuse Program Practitioners — 07/26/2011</li>
+                <li><a href="/pub/army-dir-2012-08/">ARMY DIR 2012-08</a> — Army Total Force Policy — 09/04/2012</li>
+                <li><a href="/pub/army-dir-2012-10/">ARMY DIR 2012-10</a> — The Army Special Programs Directorate — 05/14/2012</li>
+                <li><a href="/pub/army-dir-2012-19/">ARMY DIR 2012-19</a> — Elimination Of The Oath Of Office Requirement When Transferring From The Active-duty List To The Reserve Active-status List — 07/16/2012</li>
+                <li><a href="/pub/army-dir-2013-01/">ARMY DIR 2013-01</a> — Guidance On The Acquisition And Use Of Service Dogs By Soldiers — 01/28/2013</li>
+                <li><a href="/pub/army-dir-2013-03/">ARMY DIR 2013-03</a> — Chemical Accident Or Incident Response And Assistance — 04/04/2013</li>
+                <li><a href="/pub/army-dir-2013-18/">ARMY DIR 2013-18</a> — Army Insider Threat Program — 07/31/2013</li>
+                <li><a href="/pub/army-dir-2014-02/">ARMY DIR 2014-02</a> — Net Zero Installations Policy — 01/28/2014</li>
+                <li><a href="/pub/army-dir-2014-05/">ARMY DIR 2014-05</a> — Policy And Implementation Procedures For Common Access Card Credentialing And Installation Access For Uncleared Contractors — 03/07/2014</li>
+                <li><a href="/pub/army-dir-2014-08/">ARMY DIR 2014-08</a> — Water Rights Policy For Army Installations In The United States — 05/12/2014</li>
+                <li><a href="/pub/army-dir-2014-10/">ARMY DIR 2014-10</a> — Advanced Metering Of Utilities — 06/04/2014</li>
+                <li><a href="/pub/army-dir-2014-11/">ARMY DIR 2014-11</a> — Enlisted To Medical Degree Preparatory Program — 05/14/2014</li>
+                <li><a href="/pub/army-dir-2014-21/">ARMY DIR 2014-21</a> — Law Enforcement And Security Support At Arlington National Cemetery And The U.s. Soldiers` And Airmen`s Home National Cemetery — 07/21/2014</li>
+                <li><a href="/pub/army-dir-2014-22/">ARMY DIR 2014-22</a> — Establishment Of The Office Of Energy Initiatives — 08/01/2014</li>
+                <li><a href="/pub/army-dir-2014-23/">ARMY DIR 2014-23</a> — Conduct Of Screening And Background Checks For Individuals Who Have Regular Contact With Children In Army Programs — 09/10/2014</li>
+                <li><a href="/pub/army-dir-2014-25/">ARMY DIR 2014-25</a> — Establishment Of A Public Web Site Sharing Information About Army Wanted Fugitives — 10/23/2014</li>
+                <li><a href="/pub/army-dir-2014-26/">ARMY DIR 2014-26</a> — Reassignment Of Soldiers Requiring A Command-directed Behavioral Health Evaluation Or Follow-on Treatment — 10/22/2014</li>
+                <li><a href="/pub/army-dir-2014-28/">ARMY DIR 2014-28</a> — Requests To Upgrade Discharge By Veterans Claiming Post Traumatic Stress Disorder — 11/03/2014</li>
+                <li><a href="/pub/army-dir-2015-05/">ARMY DIR 2015-05</a> — Special Access Program Oversight Committee — 01/21/2015</li>
+                <li><a href="/pub/army-dir-2015-20/">ARMY DIR 2015-20</a> — Tuberculosis (tb) Screening And Testing Procedures For Child, Youth And School (cys) Services Personnel — 04/21/2015</li>
+                <li><a href="/pub/army-dir-2015-22/">ARMY DIR 2015-22</a> — Revision To List Of Special Command Sergeant  Major Positions — 05/01/2015</li>
+                <li><a href="/pub/army-dir-2015-29/">ARMY DIR 2015-29</a> — Confidential Review Of Characterization Of Terms Of Discharge Of Members Of The Army Who Are Victims Of Sexual Offenses — 08/06/2015</li>
+                <li><a href="/pub/army-dir-2015-32/">ARMY DIR 2015-32</a> — Changes To The Grade Determination System For Army Medical Department Officers — 08/13/2015</li>
+                <li><a href="/pub/army-dir-2015-33/">ARMY DIR 2015-33</a> — Designation Of An Army Lead For Conventional Airborne Forces — 08/19/2015</li>
+                <li><a href="/pub/army-dir-2015-44/">ARMY DIR 2015-44</a> — Updated Policy For Army Child, Youth, And School Services Programs — 12/14/2015</li>
+                <li><a href="/pub/army-dir-2016-22/">ARMY DIR 2016-22</a> — Authority To Initiate Applications To Correct Military Records On Behalf Of A Group Of Soldiers Or Former Soldiers Who Were Similarly Harmed By The Same Error Or Injustice — 05/31/2016</li>
+                <li><a href="/pub/army-dir-2016-24/">ARMY DIR 2016-24</a> — Department Of Defense Biological Select Agent And Toxins Biosafety Program — 07/25/2016</li>
+                <li><a href="/pub/army-dir-2016-28/">ARMY DIR 2016-28</a> — Sharing U.s. Department Of Veterans Affairs Disability Rating For Members Of The Ready Reserve — 08/08/2016</li>
+                <li><a href="/pub/army-dir-2016-33/">ARMY DIR 2016-33</a> — Special Board Review Of Approved Qualitative Management Program Board Recommendations — 10/24/2016</li>
+                <li><a href="/pub/army-dir-2016-37/">ARMY DIR 2016-37</a> — U.s. Army Open-source Intelligence Activities — 11/22/2016</li>
+                <li><a href="/pub/army-dir-2016-38/">ARMY DIR 2016-38</a> — Migration Of Army Systems And Applications To Approved Hosting Environments And Consolidation Of Data Centers — 12/09/2016</li>
+                <li><a href="/pub/army-dir-2017-15/">ARMY DIR 2017-15</a> — Managing And Overseeing The Acquisition Of Services — 04/25/2017</li>
+                <li><a href="/pub/army-dir-2017-24/">ARMY DIR 2017-24</a> — Cross-functional Team Pilot In Support Of Materiel Development — 10/06/2017</li>
+                <li><a href="/pub/army-dir-2017-32/">ARMY DIR 2017-32</a> — Acquisition Reform Initiative #6: Streamlining The Contracting Process — 11/15/2017</li>
+                <li><a href="/pub/army-dir-2017-33/">ARMY DIR 2017-33</a> — Enabling The Army Modernization Task Force — 11/07/2017</li>
+                <li><a href="/pub/army-dir-2017-34/">ARMY DIR 2017-34</a> — Acquisition Reform Initiative #7: Improving Cost Estimation And Resourcing — 11/15/2017</li>
+                <li><a href="/pub/army-dir-2017-35/">ARMY DIR 2017-35</a> — Acquisition Reform Initiative #8: Assessing Performance With Metrics — 11/15/2017</li>
+                <li><a href="/pub/army-dir-2018-02/">ARMY DIR 2018-02</a> — Global Cultural Knowledge Network — 04/04/2018</li>
+                <li><a href="/pub/army-dir-2018-03/">ARMY DIR 2018-03</a> — Space Control, Electronic Warfare Tte And Lfx's — 07/27/2018</li>
+                <li><a href="/pub/army-dir-2018-04/">ARMY DIR 2018-04</a> — Terminating The Requirement For Tactical Vehicle Registration Numbers — 05/07/2018</li>
+                <li><a href="/pub/army-dir-2018-06/">ARMY DIR 2018-06</a> — U.s. Army Privileged User/elevated Access To Army Joint Worldwide Intelligence Communications System Information Systems, Netowrks, And Data — 05/10/2018</li>
+                <li><a href="/pub/army-dir-2018-07/">ARMY DIR 2018-07</a> — Prioritizing Efforts-readiness And Lethality — 04/13/2018</li>
+                <li><a href="/pub/army-dir-2018-07-1/">ARMY DIR 2018-07-1</a> — Prioritizing Efforts-readiness And Lethality (update 1) — 04/16/2018</li>
+                <li><a href="/pub/army-dir-2018-07-11/">ARMY DIR 2018-07-11</a> — Prioritizing Efforts-readiness And Lethality (update 11) — 06/26/2018</li>
+                <li><a href="/pub/army-dir-2018-07-12/">ARMY DIR 2018-07-12</a> — Prioritizing Efforts-readiness And Lethality (update 12) — 08/20/2018</li>
+                <li><a href="/pub/army-dir-2018-07-14/">ARMY DIR 2018-07-14</a> — Prioritizing Efforts-readiness And Lethality (update 14) — 10/22/2018</li>
+                <li><a href="/pub/army-dir-2018-07-17/">ARMY DIR 2018-07-17</a> — Prioritizing Efforts-readiness And Lethality (update 17) — 11/28/2018</li>
+                <li><a href="/pub/army-dir-2018-07-18/">ARMY DIR 2018-07-18</a> — Prioritizing Efforts-readiness And Lethality (update 18) — 01/04/2019</li>
+                <li><a href="/pub/army-dir-2018-07-2/">ARMY DIR 2018-07-2</a> — Prioritizing Efforts-readiness And Lethality (update 2) — 04/18/2018</li>
+                <li><a href="/pub/army-dir-2018-07-3/">ARMY DIR 2018-07-3</a> — Prioritizing Efforts-readiness And Lethality (update 3) — 04/23/2018</li>
+                <li><a href="/pub/army-dir-2018-07-4/">ARMY DIR 2018-07-4</a> — Prioritizing Efforts-readiness And Lethality (update 4) — 04/26/2018</li>
+                <li><a href="/pub/army-dir-2018-07-5/">ARMY DIR 2018-07-5</a> — Prioritizing Efforts-readiness And Lethality (update 5) — 05/09/2018</li>
+                <li><a href="/pub/army-dir-2018-07-7/">ARMY DIR 2018-07-7</a> — Prioritizing Efforts-readiness And Lethality (update 7) — 05/25/2018</li>
+                <li><a href="/pub/army-dir-2018-07-9/">ARMY DIR 2018-07-9</a> — Prioritizing Efforts-readiness And Lethality (update 9) — 06/12/2018</li>
+                <li><a href="/pub/army-dir-2018-10/">ARMY DIR 2018-10</a> — Authorizing Use Of Da Form 1059-2 (senior Service And Command And General Staff College Academic Evaluation Report) For The U.s.army War College — 06/08/2018</li>
+                <li><a href="/pub/army-dir-2018-16/">ARMY DIR 2018-16</a> — Suitability Criteria For Military Personnel In Specified Positions — 11/08/2018</li>
+                <li><a href="/pub/army-dir-2018-17/">ARMY DIR 2018-17</a> — Army Accessions Way Ahead — 10/01/2018</li>
+                <li><a href="/pub/army-dir-2018-18/">ARMY DIR 2018-18</a> — Army Artificial Intelligence Task Force In Support Of The Department Of Defense Joint Artificial Intelligence Center — 10/02/2018</li>
+                <li><a href="/pub/army-dir-2018-22/">ARMY DIR 2018-22</a> — Retention Policy For Non-deployable Soldiers — 11/08/2018</li>
+                <li><a href="/pub/army-dir-2018-26/">ARMY DIR 2018-26</a> — Enabling Modernization Through The Management Of Intellectual Property — 12/07/2018</li>
+                <li><a href="/pub/army-dir-2018-29/">ARMY DIR 2018-29</a> — Non-federal Entity Competition With Appropriated And Nonappropriated Fund Activities On Army Installations — 12/17/2018</li>
+                <li><a href="/pub/army-dir-2019-02/">ARMY DIR 2019-02</a> — Voluntary Inactive Duty Training — 01/22/2019</li>
+                <li><a href="/pub/army-dir-2019-07/">ARMY DIR 2019-07</a> — Army Dental Readiness And Deployability — 02/25/2019</li>
+                <li><a href="/pub/army-dir-2019-10/">ARMY DIR 2019-10</a> — Army Child, Youth And School Services Space-available Patrons — 02/05/2019</li>
+                <li><a href="/pub/army-dir-2019-11/">ARMY DIR 2019-11</a> — Rebalance Of Army Child Care Fee Assistance — 02/28/2019</li>
+                <li><a href="/pub/army-dir-2019-13/">ARMY DIR 2019-13</a> — Response To Major Juvenile Misconduct And Referral Of Civilian Criminal Offenses To Civilian Authorities — 03/21/2019</li>
+                <li><a href="/pub/army-dir-2019-14/">ARMY DIR 2019-14</a> — Posthumous Graduation And Commission Of United States Military Academy Cadets — 03/20/2019</li>
+                <li><a href="/pub/army-dir-2019-17/">ARMY DIR 2019-17</a> — Changes To The Soldier And Family Readiness Group Program — 04/01/2019</li>
+                <li><a href="/pub/army-dir-2019-21/">ARMY DIR 2019-21</a> — Restrictions On Personnel Claim Payments — 05/29/2019</li>
+                <li><a href="/pub/army-dir-2019-23/">ARMY DIR 2019-23</a> — Allocation Of Wireless Portable Electronic Devices — 08/01/2019</li>
+                <li><a href="/pub/army-dir-2019-24/">ARMY DIR 2019-24</a> — Reporting Responsibilities For Commanders And Covered Professionals For Child Abuse And Neglect — 07/11/2019</li>
+                <li><a href="/pub/army-dir-2019-27/">ARMY DIR 2019-27</a> — Direct Appointment Of Officers Up To The Grade Of Colonel (other Than Special Branches) — 09/12/2019</li>
+                <li><a href="/pub/army-dir-2019-28/">ARMY DIR 2019-28</a> — Authority To Adjust Effective Date Of Promotion Of A Reserve Commissioned Officer In The Event Of Undue Delay In Federal Recognition Of Promotion — 09/19/2019</li>
+                <li><a href="/pub/army-dir-2019-33/">ARMY DIR 2019-33</a> — Total Army Sponsorship Program — 10/21/2019</li>
+                <li><a href="/pub/army-dir-2020-03/">ARMY DIR 2020-03</a> — Installation Energy And Water Resilience Policy — 03/31/2020</li>
+                <li><a href="/pub/army-dir-2020-07/">ARMY DIR 2020-07</a> — Army National Guard Military Morale, Welfare, And Recreation Programs And Nonappropriated Fund Instrumentalities — 08/03/2020</li>
+                <li><a href="/pub/army-dir-2020-10/">ARMY DIR 2020-10</a> — Use Of Imitative Substitute Building Materials In Historic Housing — 08/25/2020</li>
+                <li><a href="/pub/army-dir-2020-11/">ARMY DIR 2020-11</a> — Roles And Responsibilities For Military Installation Operations — 10/01/2020</li>
+                <li><a href="/pub/army-dir-2020-12/">ARMY DIR 2020-12</a> — Department Of Defense Enterprise Email Trusted Agents — 10/14/2020</li>
+                <li><a href="/pub/army-dir-2020-13/">ARMY DIR 2020-13</a> — Disclosure Of Protected Health Information To Unit Command Officials — 10/26/2020</li>
+                <li><a href="/pub/army-dir-2020-18/">ARMY DIR 2020-18</a> — Discontinuation Of The Formal Competition Process For Army Communities Of Excellence — 12/18/2020</li>
+                <li><a href="/pub/army-dir-2021-02/">ARMY DIR 2021-02</a> — Access To Army Installations By Foreign Nationals And  Section 621-eligible Veterans And Caregivers — 01/13/2021</li>
+                <li><a href="/pub/army-dir-2021-03/">ARMY DIR 2021-03</a> — Army Civilian Fitness And Health Promotion Program — 01/18/2021</li>
+                <li><a href="/pub/army-dir-2021-05/">ARMY DIR 2021-05</a> — Integrated Disability Evaluation System — 03/16/2021</li>
+                <li><a href="/pub/army-dir-2021-08/">ARMY DIR 2021-08</a> — Implementation And Sustainment Of Army Medical Department Individual Critical Task Lists — 03/19/2021</li>
+                <li><a href="/pub/army-dir-2021-10/">ARMY DIR 2021-10</a> — Commander's Risk Reduction Toolkit — 04/15/2021</li>
+                <li><a href="/pub/army-dir-2021-18/">ARMY DIR 2021-18</a> — Use Of People Analytics Data/data Omnibus — 05/18/2021</li>
+                <li><a href="/pub/army-dir-2021-19/">ARMY DIR 2021-19</a> — Direct Appointment Of Senior Noncommissioned Officers To Chief Warrant Officer Two For Special Forces — 05/12/2021</li>
+                <li><a href="/pub/army-dir-2021-24/">ARMY DIR 2021-24</a> — Protecting Army Modernization Science And Technology Efforts And Programs — 06/11/2021</li>
+                <li><a href="/pub/army-dir-2021-25/">ARMY DIR 2021-25</a> — Protecting Sensitive Army Modernization Science And Technology Efforts And Programs — 06/11/2021</li>
+                <li><a href="/pub/army-dir-2021-26/">ARMY DIR 2021-26</a> — Family Advocacy Program Incident Determination Committee And Clinical Case Staff Meeting — 07/12/2021</li>
+                <li><a href="/pub/army-dir-2021-27/">ARMY DIR 2021-27</a> — Installation Response To Problematic Sexual Behavior In Children And Youth — 06/07/2021</li>
+                <li><a href="/pub/army-dir-2021-28/">ARMY DIR 2021-28</a> — Retired Regular Army Warrant Officers Serving In The Ready Reserve — 07/01/2021</li>
+                <li><a href="/pub/army-dir-2021-31/">ARMY DIR 2021-31</a> — Managing Active Date Of Rank For Aviation Branch Warrant Officers In The Regular Army — 09/10/2021</li>
+                <li><a href="/pub/army-dir-2021-32/">ARMY DIR 2021-32</a> — Detainee Operations Update — 09/17/2021</li>
+                <li><a href="/pub/army-dir-2021-33/">ARMY DIR 2021-33</a> — Approval And Appeal Authorities For Military Medical And Administrative Immunization Exemptions — 09/24/2021</li>
+                <li><a href="/pub/army-dir-2021-34/">ARMY DIR 2021-34</a> — Director, U.s. Army Criminal Investigation Division Authorities And Responsibilities — 09/17/2021</li>
+                <li><a href="/pub/army-dir-2021-35/">ARMY DIR 2021-35</a> — Roles And Responsibilities For Program Objective Memorandum Program Evaluation Groups — 11/05/2021</li>
+                <li><a href="/pub/army-dir-2022-01/">ARMY DIR 2022-01</a> — Personal Commercial Solicitation On Army Installations To Support Financial Education — 02/11/2022</li>
+                <li><a href="/pub/army-dir-2022-03/">ARMY DIR 2022-03</a> — Supplemental Training For Members Of Boards For Correction Of Military Records And Discharge Review Boards — 01/25/2022</li>
+                <li><a href="/pub/army-dir-2022-04/">ARMY DIR 2022-04</a> — Sexual Assault Line Of Duty Determinations And Reporting — 02/07/2022</li>
+                <li><a href="/pub/army-dir-2022-07/">ARMY DIR 2022-07</a> — Army Modernization Roles And Responsibilities — 05/03/2022</li>
+                <li><a href="/pub/army-dir-2022-08/">ARMY DIR 2022-08</a> — U.s. Army Criminal Investigation Division Roles And Responsibilities — 07/20/2022</li>
+                <li><a href="/pub/army-dir-2022-09/">ARMY DIR 2022-09</a> — Soldier Tattoos — 06/22/2022</li>
+                <li><a href="/pub/army-dir-2022-10/">ARMY DIR 2022-10</a> — Safe-to-report For  Victims Of Sexual Assault — 07/06/2022</li>
+                <li><a href="/pub/army-dir-2022-11/">ARMY DIR 2022-11</a> — Designation Of Deputy For Medical Systems — 09/16/2022</li>
+                <li><a href="/pub/army-dir-2022-13/">ARMY DIR 2022-13</a> — Reforms To Counter Sexual Harassment/sexual Assault In The Army — 09/20/2022</li>
+                <li><a href="/pub/army-dir-2023-01/">ARMY DIR 2023-01</a> — Army Recruiting Ribbon Program — 01/23/2023</li>
+                <li><a href="/pub/army-dir-2023-02/">ARMY DIR 2023-02</a> — Direct Appointment And Commission Of Certain Warrant Officers — 02/06/2023</li>
+                <li><a href="/pub/army-dir-2023-03/">ARMY DIR 2023-03</a> — Army Adverse Information Program — 02/22/2023</li>
+                <li><a href="/pub/army-dir-2023-04/">ARMY DIR 2023-04</a> — Command Notification Of Pregnancy — 02/27/2023</li>
+                <li><a href="/pub/army-dir-2023-06/">ARMY DIR 2023-06</a> — Army Basic Needs Allowance Program — 02/27/2023</li>
+                <li><a href="/pub/army-dir-2023-07/">ARMY DIR 2023-07</a> — Arms, Ammunition, And Explosives Accountability — 03/24/2023</li>
+                <li><a href="/pub/army-dir-2023-09/">ARMY DIR 2023-09</a> — Army Coaching Program — 06/02/2023</li>
+                <li><a href="/pub/army-dir-2023-10/">ARMY DIR 2023-10</a> — Administrative Roles, Responsibilities, And Procedures For Patient Movement — 06/02/2023</li>
+                <li><a href="/pub/army-dir-2023-13/">ARMY DIR 2023-13</a> — Processing Of Personal Effects By The Joint Personal Effects Depot — 07/07/2023</li>
+                <li><a href="/pub/army-dir-2023-17/">ARMY DIR 2023-17</a> — Reserve Component Line Of Duty Requests And Behavioral Health Investigations — 12/14/2023</li>
+                <li><a href="/pub/army-dir-2024-01/">ARMY DIR 2024-01</a> — Army Fitness Determinations And Deployability — 02/09/2024</li>
+                <li><a href="/pub/army-dir-2024-03/">ARMY DIR 2024-03</a> — Army Digital Engineering — 05/21/2024</li>
+                <li><a href="/pub/army-dir-2024-04/">ARMY DIR 2024-04</a> — Reimbursement Of Qualifying Spouse Relicensing Costs And Business Costs — 05/30/2024</li>
+                <li><a href="/pub/army-dir-2024-05/">ARMY DIR 2024-05</a> — Aggregating And Reporting Soldier Race And Ethnicity Data — 06/10/2024</li>
+                <li><a href="/pub/army-dir-2024-06/">ARMY DIR 2024-06</a> — Soldier Appeal Of The Formal Physical Evaluation Board Findings And Recommendations — 06/24/2024</li>
+                <li><a href="/pub/army-dir-2024-09/">ARMY DIR 2024-09</a> — Army Safety And Occupational Health Management System — 08/07/2024</li>
+                <li><a href="/pub/army-dir-2024-13/">ARMY DIR 2024-13</a> — Roles And Responsibilities For Establishing Army Equid Enterprise Program — 12/19/2024</li>
+                <li><a href="/pub/army-dir-2025-01/">ARMY DIR 2025-01</a> — Rescission Of Diversity, Equity, Inclusion And Accessibility Policies And Programs — 01/24/2025</li>
+                <li><a href="/pub/army-dir-2025-02/">ARMY DIR 2025-02</a> — Parenthood, Pregnancy, And Postpartum — 02/24/2025</li>
+                <li><a href="/pub/army-dir-2025-03/">ARMY DIR 2025-03</a> — Reporting Prohibited Activities (rpa) — 02/21/2025</li>
+                <li><a href="/pub/army-dir-2025-04/">ARMY DIR 2025-04</a> — Initial Entry Training For Reserve Component Soldiers — 03/25/2025</li>
+                <li><a href="/pub/army-dir-2025-05/">ARMY DIR 2025-05</a> — Certificate Of Uniformed Service—dd Forms 214, 214-1, And 215 — 03/25/2025</li>
+                <li><a href="/pub/army-dir-2025-06/">ARMY DIR 2025-06</a> — Army Fitness Test — 04/17/2025</li>
+                <li><a href="/pub/army-dir-2025-07/">ARMY DIR 2025-07</a> — Standardization Of Investigation And Personnel Action Processes — 05/22/2025</li>
+                <li><a href="/pub/army-dir-2025-08/">ARMY DIR 2025-08</a> — Home Of Record Designation Or Change Request — 05/21/2025</li>
+                <li><a href="/pub/army-dir-2025-09/">ARMY DIR 2025-09</a> — Reserve Component Retirement Planning — 05/28/2025</li>
+                <li><a href="/pub/army-dir-2025-10/">ARMY DIR 2025-10</a> — Army Civilian Harassment Prevention And Response Program — 06/18/2025</li>
+                <li><a href="/pub/army-dir-2025-11/">ARMY DIR 2025-11</a> — Administrative Absence For Non-covered Assisted Reproductive Technology — 06/25/2025</li>
+                <li><a href="/pub/army-dir-2025-12/">ARMY DIR 2025-12</a> — Disclosure Of Department Of The Army Controlled Unclassified Information To Foreign Governments — 06/25/2025</li>
+                <li><a href="/pub/army-dir-2025-13/">ARMY DIR 2025-13</a> — Facial Hair Grooming Standards — 07/07/2025</li>
+                <li><a href="/pub/army-dir-2025-14/">ARMY DIR 2025-14</a> — Advanced Manufactured Parts Certification Authority Assigned To Commanding General, United States Army Materiel Command — 07/22/2025</li>
+                <li><a href="/pub/army-dir-2025-15/">ARMY DIR 2025-15</a> — Use Of Publicly Available Information For Intelligence Activities — 08/06/2025</li>
+                <li><a href="/pub/army-dir-2025-16/">ARMY DIR 2025-16</a> — Canine Holistic Health And Fitness — 08/21/2025</li>
+                <li><a href="/pub/army-dir-2025-18/">ARMY DIR 2025-18</a> — Appearance, Grooming, And Army Body Composition Program Standards — 09/12/2025</li>
+                <li><a href="/pub/army-dir-2025-19/">ARMY DIR 2025-19</a> — Loan, Lease, And Donation Of Army Materiel — 10/24/2025</li>
+                <li><a href="/pub/army-dir-2025-20/">ARMY DIR 2025-20</a> — Determination And Reporting Of Missing, Absent-unknown, Absent Without Leave, And Duty Status-whereabouts Unknown Soldiers — 10/28/2025</li>
+                <li><a href="/pub/army-dir-2025-21/">ARMY DIR 2025-21</a> — Handling Protest, Extremist, And Criminal Gang Activities — 10/30/2025</li>
+                <li><a href="/pub/army-dir-2025-22/">ARMY DIR 2025-22</a> — Army Recovery Care Program Reform — 11/12/2025</li>
+                <li><a href="/pub/army-dir-2025-23/">ARMY DIR 2025-23</a> — Special Reaction Team Capability — 11/14/2025</li>
+                <li><a href="/pub/army-dir-2025-24/">ARMY DIR 2025-24</a> — Expansion Of Army Assignments — 11/14/2025</li>
+                <li><a href="/pub/army-dir-2025-26/">ARMY DIR 2025-26</a> — Supply Chain Risk Management For Weapon Systems — 12/12/2025</li>
+                <li><a href="/pub/army-dir-2025-c/">ARMY DIR 2025-C</a> — Classified Title — 08/01/2025</li>
+                <li><a href="/pub/army-dir-2026-02/">ARMY DIR 2026-02</a> — Elimination Of Department Of The Army Ad Hoc Review Boards — 01/08/2026</li>
+                <li><a href="/pub/army-dir-2026-03/">ARMY DIR 2026-03</a> — Child, Youth, And School Services Immunization Requirements — 02/11/2026</li>
+                <li><a href="/pub/army-dir-2026-05/">ARMY DIR 2026-05</a> — Inspector General Administrative Investigations Oversight And Reform — 03/16/2026</li>
+                <li><a href="/pub/army-dir-2026-07/">ARMY DIR 2026-07</a> — Army Physical Fitness Standards — 04/17/2026</li>
+                <li><a href="/pub/army-dir-2026-08/">ARMY DIR 2026-08</a> — Permanent Change To Timeline For Requesting Voluntary Retirement From Active Service — 04/17/2026</li>
+                <li><a href="/pub/army-dir-2026-09/">ARMY DIR 2026-09</a> — Grooming Standards And Religious Accommodation — 05/19/2026</li>
+                <li><a href="/pub/army-dir-2026-10/">ARMY DIR 2026-10</a> — Disability Evaluation System: Board Composition And Reserve Component Non-duty-related Procedures — 06/10/2026</li>
+                <li><a href="/pub/army-dir-2026-11/">ARMY DIR 2026-11</a> — Officer Promotion Screening And Review, And Personnel Suitability Screening For Senior Noncommissioned Officer Positions — 06/10/2026</li>
+                <li><a href="/pub/army-dir-2026-12/">ARMY DIR 2026-12</a> — Support To Military Health System Stabilization — 06/23/2026</li>
+                <li><a href="/pub/army-dir-2026-13/">ARMY DIR 2026-13</a> — Army Body Composition Program And Standards — 07/01/2026</li>
+                <li><a href="/pub/army-dir-2026-14/">ARMY DIR 2026-14</a> — Prohibition Of Kratom Use — 06/23/2026</li>
+                <li><a href="/pub/army-dir-2026-15/">ARMY DIR 2026-15</a> — Line Of Duty Investigations And Determinations In Death Cases — 06/23/2026</li>
+                <li><a href="/pub/army-dir-2026-16/">ARMY DIR 2026-16</a> — Chaplain Rank And Insignia — 06/23/2026</li>
+                <li><a href="/pub/army-dir-2026-17/">ARMY DIR 2026-17</a> — Optimizing Digital Media — 06/30/2026</li>
+                <li><a href="/pub/army-dir-2026-18/">ARMY DIR 2026-18</a> — Modern Civilian Workforce Management — 07/07/2026</li>
+                <li><a href="/pub/army-dir-2026-19/">ARMY DIR 2026-19</a> — Enabling Modern Software Acquisition Practices — 07/22/2026</li>
+                <li><a href="/pub/army-dir-2026-20/">ARMY DIR 2026-20</a> — Army Legal Services Realignment — 08/05/2026</li>
             </ul>
             <p><a href="/">Ask Reggie.Bot about ARMYDIR publications</a></p>
         </div>
