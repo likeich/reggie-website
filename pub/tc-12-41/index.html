@@ -85,26 +85,37 @@
         #root {
             width: 100%;
             height: 100%;
+            /* Anchors #boot, which is layered over the app rather than sitting
+               inside it. */
+            position: relative;
         }
 
         /* The SEO copy has to be real markup in the initial response, but a
            wall of unstyled text is not what a visitor should stare at for the
            seconds wasm takes to boot. #boot covers it with the app's own
            colours; both are removed the moment Compose paints. */
-        /* Absolute within #ComposeTarget, never fixed over the whole page: a
-           full-viewport overlay sits on top of the canvas, and Compose then
-           swallowed the first click anywhere in the app because the pointer
-           had never entered the canvas. Inside the container it is also torn
-           down by Compose itself on mount. */
+        /* Layered over the app, not inside it. It used to live inside
+           #ComposeTarget so that Compose would tear it down on mount -- which
+           it did, instantly and before any transition could run, so the
+           loading screen vanished in a hard cut. Out here its removal is ours
+           to time, and it can fade.
+
+           pointer-events: none is what makes that safe. An earlier overlay
+           swallowed the pointer, and Compose, never having seen the pointer
+           enter its canvas, ignored the first click anywhere in the app even
+           after the overlay was gone. Transparent to input from the first
+           frame, the canvas underneath gets every event as usual. Absolute
+           within #root, never fixed. */
         #boot {
             position: absolute;
             inset: 0;
             z-index: 10;
+            pointer-events: none;
             display: flex;
             align-items: center;
             justify-content: center;
             background: #141414;
-            transition: opacity .35s ease;
+            transition: opacity .45s ease;
 
             /* The ring sits immediately outside the logo, touching it, so the
                two sizes are derived from one another rather than set
@@ -113,7 +124,7 @@
             --boot-ring-width: 7px;
         }
 
-        #boot.done { opacity: 0; pointer-events: none; }
+        #boot.done { opacity: 0; }
 
         /* Square by construction: the ring is a border on a circle, and a
            circle drawn on a non-square box is an ellipse. */
@@ -151,6 +162,8 @@
            spin. */
         @media (prefers-reduced-motion: reduce) {
             #boot-ring { animation: none; }
+            /* Uncover the app at once rather than dissolving into it. */
+            #boot { transition: none; }
         }
     </style>
     <!-- Google tag (gtag.js) -->
@@ -239,18 +252,36 @@
                     var boot = document.getElementById('boot');
                     if (!boot || boot.classList.contains('done')) return;
                     boot.classList.add('done');
-                    setTimeout(function () { boot.remove(); }, 400);
+                    // transitionend removes it as soon as the fade finishes;
+                    // the timer is the backstop for a browser that never fires
+                    // one (a reduced-motion setting removes the transition
+                    // altogether), so the overlay can never be left behind.
+                    boot.addEventListener('transitionend', function () { boot.remove(); });
+                    setTimeout(function () { boot.remove(); }, 1000);
                 }
 
-                // Compose creates its own <canvas> inside the container when it
-                // mounts, so that is the signal that the app is really up. Two
-                // frames later it has painted, and the overlay can go without
-                // exposing a blank canvas.
+                // Compose renders to a canvas, and that canvas is the signal
+                // that the app is really up. It is not in the document though:
+                // Compose Multiplatform 1.11 puts it inside a shadow root, so
+                // document.querySelector('canvas') returns null forever and
+                // waiting on that meant waiting on something that never came.
+                function composeCanvas(root) {
+                    if (root.querySelector('canvas')) return true;
+                    var hosts = root.querySelectorAll('*');
+                    for (var i = 0; i < hosts.length; i++) {
+                        var shadow = hosts[i].shadowRoot;
+                        if (shadow && shadow.querySelector('canvas')) return true;
+                    }
+                    return false;
+                }
+
+                // Two frames after it mounts it has painted, so the overlay can
+                // dissolve into the app rather than off a blank canvas.
                 function dismissWhenComposePaints() {
                     var target = document.getElementById('ComposeTarget');
                     if (!target) return;
                     var observer = new MutationObserver(function () {
-                        if (!target.querySelector('canvas')) return;
+                        if (!composeCanvas(target)) return;
                         observer.disconnect();
                         requestAnimationFrame(function () {
                             requestAnimationFrame(dismissBootScreen);
@@ -306,23 +337,21 @@
      inside it. Leaving a <canvas> here gives an unsized 300x150 default that
      renders nothing, and a second canvas nested inside it. -->
 <div id="root">
+    <!-- No visible text: the mark and the ring around it say "loading" on
+         their own. aria-label keeps that legible to a screen reader without
+         putting a caption back on the screen. -->
+    <div id="boot" role="status" aria-live="polite" aria-label="Loading Reggie.Bot">
+        <div id="boot-mark">
+            <div id="boot-ring"></div>
+            <img src="/icon_round.png" alt="">
+        </div>
+    </div>
+
     <!-- Compose replaces the contents of #ComposeTarget on boot, so users never
          see this. Crawlers do: the app renders to a <canvas>, which search
          engines cannot read at all, leaving the site with no indexable text
          whatsoever. This is the only content Google gets today. -->
     <div id="ComposeTarget" aria-label="Interactive application area" tabindex="0">
-        <!-- The loading indicator lives inside the container so that Compose
-             removes it along with everything else when it mounts, and so that
-             nothing is ever layered over the canvas. -->
-        <!-- No visible text: the mark and the ring around it say "loading"
-             on their own. aria-label keeps that legible to a screen reader
-             without putting a caption back on the screen. -->
-        <div id="boot" role="status" aria-live="polite" aria-label="Loading Reggie.Bot">
-            <div id="boot-mark">
-                <div id="boot-ring"></div>
-                <img src="/icon_round.png" alt="">
-            </div>
-        </div>
         <!-- Not wrapped in <noscript>: crawlers that execute JS ignore it, and
              this needs to be real markup in the initial response. Compose
              clears the container when it mounts, so users see it only for the
