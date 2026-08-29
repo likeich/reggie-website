@@ -31,6 +31,31 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://reggie.bot/info/disclaimer/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://reggie.bot/info/help/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://reggie.bot/info/information-security/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://reggie.bot/info/privacy-policy/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://reggie.bot/info/licenses/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://reggie.bot/pubs/adp/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
