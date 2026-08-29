@@ -18,11 +18,20 @@
     <meta property="og:site_name" content="Reggie.Bot">
     <meta property="og:title" content="AR 700-144 - Demilitarization And Trade Security Controls">
     <meta property="og:description" content="AR 700-144 governs Army participation in the DoD Demilitarization and Trade Security Controls Program, including DEMIL coding.">
-    <meta property="og:image" content="https://reggie.bot/icon_round.png">
+    <!-- icon-512, not icon_round: that one is 192x192, and previews commonly
+         refuse an image below 200x200 outright -- which is why a shared answer
+         arrived with no picture at all rather than a small one. Dimensions are
+         declared so a preview can lay out its card without fetching the image
+         first. -->
+    <meta property="og:image" content="https://reggie.bot/icon-512.png">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:alt" content="Reggie.Bot">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="AR 700-144 - Demilitarization And Trade Security Controls">
     <meta name="twitter:description" content="AR 700-144 governs Army participation in the DoD Demilitarization and Trade Security Controls Program, including DEMIL coding.">
-    <meta name="twitter:image" content="https://reggie.bot/icon_round.png">
+    <meta name="twitter:image" content="https://reggie.bot/icon-512.png">
 
     <script type="application/ld+json">
 {
@@ -74,6 +83,20 @@
   ]
 }
     </script>
+    <!-- A disc that touches all four edges, cropped tight to the mark.
+         The old favicon was the app icon as drawn for the app: its circle sat
+         inset inside the square with transparent margin, and the head filled
+         only 63% of that circle. Google crops favicons to a circle of its own,
+         so what arrived was a small disc inside a ring of page background --
+         the white padding in a search result. Now the disc fills the square
+         exactly, so Google's crop lands on the artwork's own edge, and the
+         head fills more of it.
+         Still a circle rather than a square: a tab draws the icon as given,
+         with no crop, and a circle is what this app looks like.
+         PNGs first and sized -- Google wants a square multiple of 48px -- with
+         the .ico kept for anything that asks for one. -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
     <!-- Installable. theme-color paints the browser chrome and the splash
@@ -233,7 +256,12 @@
             const url = window.location.href; // Get the current page URL
             if (navigator.share) {
                 navigator.share({
-                    title: document.title,
+                    // Named explicitly rather than taken from document.title.
+                    // What is being shared is an answer, not the page it was
+                    // read on, and the sheet showed whichever page the app had
+                    // been served as -- "Army Links" on top of a regulation
+                    // answer, for anyone who arrived through that link.
+                    title: 'Reggie.Bot',
                     text: text,
                     url: url
                 }).then(() => {
