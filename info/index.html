@@ -59,15 +59,20 @@
          with no crop, and a circle is what this app looks like.
          PNGs first and sized -- Google wants a square multiple of 48px -- with
          the .ico kept for anything that asks for one. -->
-    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png">
+    <!-- Neutral, not the Army's. The boot script below repaints these for a
+         reader who has chosen a service, but only once it runs: before that,
+         and for every crawler, link preview and background tab that never
+         executes it, what stands is what the document declares. Shipping gold
+         here undid the neutral boot the script exists to provide. -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192-neutral.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96-neutral.png">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
     <!-- Installable. theme-color paints the browser chrome and the splash
          screen; without apple-touch-icon iOS renders a screenshot instead. -->
     <link rel="manifest" href="/manifest.webmanifest">
     <meta name="theme-color" content="#141414">
-    <link rel="apple-touch-icon" href="/icon-192.png">
+    <link rel="apple-touch-icon" href="/icon-192-neutral.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Reggie.Bot">
@@ -718,17 +723,20 @@
             <p>The Application collects the following when you use it:</p>
             <ul>
                 <li>  <strong>The questions you ask.</strong> The text of a question is sent to the Service Provider's server and on to OpenAI, which generates the answer. Questions are not stored by the Service Provider and are not sent to any analytics service. OpenAI's handling of them is governed by <a href="https://openai.com/terms">OpenAI's Terms of Service</a>.</li>
-                <li>  <strong>Usage information, on the website only.</strong> The pages you visit, when you visit them, and the links you follow out of the site. This is collected through Google Analytics.</li>
-                <li>  <strong>An approximate location, on the website only.</strong> Google Analytics derives an approximate location from your IP address. It is used to understand where the Application is used from, in aggregate.</li>
+                <li>  <strong>Usage information, on the website and in the app.</strong> The screens you open, the publications you view or download, the links you follow out, the service you have selected, and when each of these happens. On the website this is collected through Google Analytics; in the app it is collected through Firebase Analytics, which reports into the same Google Analytics property. The app is identified by a pseudonymous installation identifier that Firebase generates, along with your device model, operating system version and app version. <strong>No advertising identifier is collected</strong>, and none is used: the Application shows no advertising and personalises nothing.</li>
+                <li>  <strong>An approximate location.</strong> Google Analytics derives an approximate location from your IP address, on the website and in the app alike. It is used to understand where the Application is used from, in aggregate.</li>
+                <li>  <strong>Crash reports, in the app.</strong> If the app fails, a report is sent through Firebase Crashlytics containing the technical details of the failure — where in the code it happened, the type of error, and your device model, operating system version and app version. It is used to find and fix faults.</li>
                 <li>  <strong>Anything you send through the contact form.</strong> The subject, your message, and the contact details you choose to give — that field is optional, and the form works without it.</li>
             </ul>
             <p>The Application does not request, read or use your device's location. It holds no location permission on any platform, and the approximate location described above is inferred by Google from the network you connect over rather than measured by your device. It is not used to personalise content, to rank answers, or to provide any location-based feature.</p>
-            <p>The Android app contains no analytics at all. The usage and approximate-location collection described above applies to the website; the app sends nothing beyond the questions you ask and anything you submit through the contact form.</p>
+            <p>Until September 2026 the Android app collected nothing at all beyond the questions you asked, and this policy said so. That is no longer true, and the section above describes what it collects now. Usage information and crash reports were added so that faults in the app can be found without waiting for someone to report them, and so that it is possible to tell an app nobody uses from one that is failing silently.</p>
+            <p><strong>What is never sent to any analytics service is the text of your questions.</strong> Usage events record that a search happened, and which publications were opened, downloaded or linked to — never what you asked. Nothing you type into the search box is included in any analytics or crash report.</p>
             <p><strong>Third Party Access</strong></p>
             <p>The Application relies on these services, and only these:</p>
             <ul>
                 <li>  <strong>OpenAI</strong> receives the text of your questions in order to answer them.</li>
-                <li>  <strong>Google Analytics</strong> (website only) receives page views, outbound link clicks, and the IP address from which an approximate location is derived. See <a href="https://www.google.com/policies/privacy/partners/">Google's Privacy &amp; Terms page</a>.</li>
+                <li>  <strong>Google Analytics</strong> receives page and screen views, outbound link clicks, the publications viewed or downloaded, and the IP address from which an approximate location is derived. On the website this is the Google Analytics tag; in the app it is Firebase Analytics, reporting into the same property. See <a href="https://www.google.com/policies/privacy/partners/">Google's Privacy &amp; Terms page</a>.</li>
+                <li>  <strong>Firebase Crashlytics</strong> (app only) receives crash reports: the technical details of a failure, and the device model, operating system version and app version it happened on. See the <a href="https://firebase.google.com/support/privacy">Firebase Privacy and Security page</a>.</li>
                 <li>  <strong>Google Cloud Run</strong> hosts the service that answers questions, and records standard server logs. See the <a href="https://cloud.google.com/terms/cloud-privacy-notice">Google Cloud Privacy Notice</a>.</li>
                 <li>  <strong>Supabase</strong> serves the publication database, over a read-only key.</li>
                 <li>  <strong>GitHub Pages</strong> hosts the website itself.</li>
@@ -742,21 +750,21 @@
             </ul>
             <p><strong>Opt-Out Rights</strong></p>
             <p>On the website, you can stop analytics collection by installing <a href="https://tools.google.com/dlpage/gaoptout">Google's opt-out browser add-on</a>, or by blocking analytics cookies in your browser. The Application works normally either way.</p>
-            <p>In the app, you can stop all collection by uninstalling it, using the standard uninstall process on your device or through the marketplace you installed it from.</p>
+            <p>In the app there is currently no setting that turns usage collection or crash reporting off; the only way to stop it is to uninstall the app, using the standard uninstall process on your device or through the marketplace you installed it from.</p>
             <p>Asking no questions and sending no messages means nothing is transmitted for either.</p>
             <p><strong>Data Retention Policy</strong></p>
-            <p>Questions are not retained by the Service Provider. Contact form submissions are retained in the Service Provider's server logs. Website analytics are retained by Google under Google Analytics' own retention settings.</p>
+            <p>Questions are not retained by the Service Provider. Contact form submissions are retained in the Service Provider's server logs. Analytics from the website and the app are retained by Google under Google Analytics' own retention settings, and crash reports are retained by Google under Firebase Crashlytics' own retention settings.</p>
             <p>If you would like data you have provided through the contact form deleted, contact kyle@ark.place and the Service Provider will respond in a reasonable time.</p>
             <p><strong>Children</strong></p>
             <p>The Service Provider does not use the Application to knowingly solicit data from or market to children under the age of 13.</p>
             <p>The Service Provider does not knowingly collect personally identifiable information from children. The Service Provider encourages all children to never submit any personally identifiable information through the Application and/or Services. The Service Provider encourage parents and legal guardians to monitor their children's Internet usage and to help enforce this Policy by instructing their children never to provide personally identifiable information through the Application and/or Services without their permission. If you have reason to believe that a child has provided personally identifiable information to the Service Provider through the Application and/or Services, please contact the Service Provider (kyle@ark.place) so that they will be able to take the necessary actions. You must also be at least 16 years of age to consent to the processing of your personally identifiable information in your country (in some countries we may allow your parent or guardian to do so on your behalf).</p>
             <p><strong>Sensitive Information</strong></p>
-            <p>Do not include sensitive or confidential details in a question. Questions are sent to OpenAI to be answered, so they should be sanitized of specifics such as names, units, locations, times and anything else you would not put into a public search engine. The Application searches only publicly released Army publications and is not intended for handling confidential material.</p>
+            <p>Do not include sensitive or confidential details in a question. Questions are sent to OpenAI to be answered, so they should be sanitized of specifics such as names, units, locations, times and anything else you would not put into a public search engine. The Application searches only publicly released publications of the US Army, Marine Corps, Coast Guard, Space Force and Air Force, and is not intended for handling confidential material.</p>
             <p><strong>Security</strong></p>
             <p>The Service Provider is concerned about safeguarding the confidentiality of your information. All traffic uses HTTPS, and the Service Provider provides physical, electronic, and procedural safeguards to protect information the Service Provider processes and maintains.</p>
             <p><strong>Changes</strong></p>
             <p>This Privacy Policy may be updated from time to time for any reason. The Service Provider will notify you of any changes to the Privacy Policy by updating this page with the new Privacy Policy. You are advised to consult this Privacy Policy regularly for any changes, as continued use is deemed approval of all changes.</p>
-            <p>This privacy policy is effective as of 2026-08-29.</p>
+            <p>This privacy policy is effective as of 2026-09-02.</p>
             <p><strong>Your Consent</strong></p>
             <p>By using the Application, you are consenting to the processing of your information as set forth in this Privacy Policy now and as amended by us.</p>
             <p><strong>Contact Us</strong></p>

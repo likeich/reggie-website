@@ -100,15 +100,20 @@
          with no crop, and a circle is what this app looks like.
          PNGs first and sized -- Google wants a square multiple of 48px -- with
          the .ico kept for anything that asks for one. -->
-    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png">
+    <!-- Neutral, not the Army's. The boot script below repaints these for a
+         reader who has chosen a service, but only once it runs: before that,
+         and for every crawler, link preview and background tab that never
+         executes it, what stands is what the document declares. Shipping gold
+         here undid the neutral boot the script exists to provide. -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192-neutral.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96-neutral.png">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
     <!-- Installable. theme-color paints the browser chrome and the splash
          screen; without apple-touch-icon iOS renders a screenshot instead. -->
     <link rel="manifest" href="/manifest.webmanifest">
     <meta name="theme-color" content="#141414">
-    <link rel="apple-touch-icon" href="/icon-192.png">
+    <link rel="apple-touch-icon" href="/icon-192-neutral.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Reggie.Bot">

@@ -9,7 +9,7 @@
          composition and freezes the canvas. Must precede the first script. -->
     <base href="/">
     <meta name="description" content="All 168 ARMYDIR publications (Army Directives), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.">
-    <title>ARMYDIR — Army Directives</title>
+    <title>ARMYDIR - Army Directives</title>
     <link rel="canonical" href="https://reggie.bot/usa/pubs/armydir/">
     <!-- The shell is shared by every page, so this names no one service.
          It said "Army regulations, AR 670-1, ... armypubs" while the Army
@@ -21,7 +21,7 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://reggie.bot/usa/pubs/armydir/">
     <meta property="og:site_name" content="Reggie.Bot">
-    <meta property="og:title" content="ARMYDIR — Army Directives">
+    <meta property="og:title" content="ARMYDIR - Army Directives">
     <meta property="og:description" content="All 168 ARMYDIR publications (Army Directives), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.">
     <!-- icon-512, not icon_round: that one is 192x192, and previews commonly
          refuse an image below 200x200 outright -- which is why a shared answer
@@ -34,7 +34,7 @@
     <meta property="og:image:type" content="image/png">
     <meta property="og:image:alt" content="Reggie.Bot">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="ARMYDIR — Army Directives">
+    <meta name="twitter:title" content="ARMYDIR - Army Directives">
     <meta name="twitter:description" content="All 168 ARMYDIR publications (Army Directives), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.">
     <meta name="twitter:image" content="https://reggie.bot/icon-512.png">
 
@@ -42,7 +42,7 @@
 {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  "name": "ARMYDIR — Army Directives",
+  "name": "ARMYDIR - Army Directives",
   "description": "All 168 ARMYDIR publications (Army Directives), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.",
   "url": "https://reggie.bot/usa/pubs/armydir/"
 }
@@ -59,15 +59,20 @@
          with no crop, and a circle is what this app looks like.
          PNGs first and sized -- Google wants a square multiple of 48px -- with
          the .ico kept for anything that asks for one. -->
-    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png">
+    <!-- Neutral, not the Army's. The boot script below repaints these for a
+         reader who has chosen a service, but only once it runs: before that,
+         and for every crawler, link preview and background tab that never
+         executes it, what stands is what the document declares. Shipping gold
+         here undid the neutral boot the script exists to provide. -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192-neutral.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96-neutral.png">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
     <!-- Installable. theme-color paints the browser chrome and the splash
          screen; without apple-touch-icon iOS renders a screenshot instead. -->
     <link rel="manifest" href="/manifest.webmanifest">
     <meta name="theme-color" content="#141414">
-    <link rel="apple-touch-icon" href="/icon-192.png">
+    <link rel="apple-touch-icon" href="/icon-192-neutral.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Reggie.Bot">
@@ -659,7 +664,7 @@
              clears the container when it mounts, so users see it only for the
              instant before the app boots. -->
         <div id="seo-fallback">
-            <h1>ARMYDIR — Army Directives</h1>
+            <h1>ARMYDIR - Army Directives</h1>
             <p>All 168 ARMYDIR publications (Army Directives), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.</p>
             <h2>168 publications</h2>
             <ul>
