@@ -11,8 +11,13 @@ table the client already has access to.
     SUPABASE_SERVICE_KEY=... python sync_news.py --apply
 
 The scheduled job that runs this lives in likeich/reggie-website (tools/), not
-here: that repo is public and public repos get unlimited Actions minutes. Keep
-the two copies in step.
+here: that repo is public and public repos get unlimited Actions minutes.
+
+This file is the source. The release workflow copies it there on every publish,
+so the copy is a build output and must not be edited by hand -- which is what
+went wrong before: the two were kept in step by a note in this docstring, the
+note was not enough, and the copy sat 277 lines behind knowing nothing about
+DVIDS while four services' news went unsynced.
 """
 import argparse
 import os
@@ -263,6 +268,32 @@ def cached_count(branch, key):
         return None
 
 
+def stale_ids(rows, branch, key):
+    """The ids this run's prune would delete, or None if we cannot tell.
+
+    Read-only, so the dry run can report exactly what --apply would remove.
+    It could not before: `if not a.apply: return` sat above the prune
+    entirely, so the preview listed five upserts and never mentioned that the
+    same command would also delete -- which is the mistake CLAUDE.md records
+    against sync_vector_store.py, whose preview called every file new and hid
+    409 pending deletions.
+
+    None for any failure, and the caller then skips rather than guesses. Not
+    knowing what is there is not a licence to delete from it.
+    """
+    try:
+        r = requests.get(f'{SUPABASE_URL}/rest/v1/news',
+                         headers={'apikey': key, 'Authorization': f'Bearer {key}'},
+                         params={'select': 'id', 'branch': f'eq.{branch}'}, timeout=60)
+        if r.status_code >= 300:
+            return None
+        held = {str(row['id']) for row in r.json()}
+    except (requests.RequestException, ValueError, KeyError, TypeError):
+        return None
+    fetched = {str(row['id']) for row in rows}
+    return sorted(held - fetched)
+
+
 def prune_filter(rows, branch):
     """Which stories a sync may delete: this service's, minus what it just wrote.
 
@@ -298,13 +329,38 @@ def news_row(lead, image_url, branch='usa'):
     return row
 
 
-def main():
+def report_prune(rows, branch, key):
+    """Say what the prune would do, without doing any of it.
+
+    Called from the dry run, and it asks the same two questions the real run
+    asks in the same order, so the preview cannot say one thing and the apply
+    do another.
+    """
+    cached = cached_count(branch, key)
+    if cached is None:
+        print(f'  would skip the prune: could not count {branch} stories, '
+              'and an unknown cache is not one to delete from')
+        return
+    if not may_prune(len(rows), cached):
+        print(f'  would skip the prune: the feed returned {len(rows)} where '
+              f'{cached} are cached, which is a short fetch as readily as '
+              f'{cached - len(rows)} removals')
+        return
+    stale = stale_ids(rows, branch, key)
+    if stale is None:
+        print('  would skip the prune: could not read the cached ids')
+        return
+    print(f'  would prune {len(stale)} stale {branch} stories'
+          + (f': {stale[:8]}' if stale else ''))
+
+
+def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument('--apply', action='store_true')
     ap.add_argument('--branch', default='usa',
                     help="which service's news to sync: usa, or any of "
                          + ', '.join(sorted(DVIDS_FEEDS)))
-    a = ap.parse_args()
+    a = ap.parse_args(argv)
     # Accept the old spelling and write the new one, so an old invocation
     # cannot create a second, un-prunable set of rows.
     a.branch = canonical_branch(a.branch)
@@ -363,6 +419,7 @@ def main():
         print('Dry run. Re-run with --apply.')
         for row in rows[:5]:
             print(f'  would upsert {row["id"]}  {row["title"][:60]}')
+        report_prune(rows, a.branch, key)
         return 0
 
     h = {'apikey': key, 'Authorization': f'Bearer {key}',
