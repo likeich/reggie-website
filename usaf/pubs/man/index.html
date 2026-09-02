@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Compose resolves relative asset paths (./composeResources/...) against
+         the document URL. Without this, every deep link such as /pub/ar-670-1
+         asks for /pub/composeResources/... and 404s, which throws out of
+         composition and freezes the canvas. Must precede the first script. -->
+    <base href="/">
+    <meta name="description" content="All 774 MAN publications (Manuals), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.">
+    <title>MAN — Manuals</title>
+    <link rel="canonical" href="https://reggie.bot/usaf/pubs/man/">
+    <!-- The shell is shared by every page, so this names no one service.
+         It said "Army regulations, AR 670-1, ... armypubs" while the Army
+         owned the root, which put one service on the Coast Guard's pages
+         too. Search engines ignore this tag; it is corrected because it
+         was wrong, not because it ranks. -->
+    <meta name="keywords" content="military regulations, Army regulations, Marine Corps orders, Coast Guard instructions, Space Force publications, Air Force instructions, armypubs, MCPEL, e-Publishing, military publications search">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://reggie.bot/usaf/pubs/man/">
+    <meta property="og:site_name" content="Reggie.Bot">
+    <meta property="og:title" content="MAN — Manuals">
+    <meta property="og:description" content="All 774 MAN publications (Manuals), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.">
+    <!-- icon-512, not icon_round: that one is 192x192, and previews commonly
+         refuse an image below 200x200 outright -- which is why a shared answer
+         arrived with no picture at all rather than a small one. Dimensions are
+         declared so a preview can lay out its card without fetching the image
+         first. -->
+    <meta property="og:image" content="https://reggie.bot/icon-512.png">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:alt" content="Reggie.Bot">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="MAN — Manuals">
+    <meta name="twitter:description" content="All 774 MAN publications (Manuals), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.">
+    <meta name="twitter:image" content="https://reggie.bot/icon-512.png">
+
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "MAN — Manuals",
+  "description": "All 774 MAN publications (Manuals), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.",
+  "url": "https://reggie.bot/usaf/pubs/man/"
+}
+    </script>
+    <!-- A disc that touches all four edges, cropped tight to the mark.
+         The old favicon was the app icon as drawn for the app: its circle sat
+         inset inside the square with transparent margin, and the head filled
+         only 63% of that circle. Google crops favicons to a circle of its own,
+         so what arrived was a small disc inside a ring of page background --
+         the white padding in a search result. Now the disc fills the square
+         exactly, so Google's crop lands on the artwork's own edge, and the
+         head fills more of it.
+         Still a circle rather than a square: a tab draws the icon as given,
+         with no crop, and a circle is what this app looks like.
+         PNGs first and sized -- Google wants a square multiple of 48px -- with
+         the .ico kept for anything that asks for one. -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <!-- Installable. theme-color paints the browser chrome and the splash
+         screen; without apple-touch-icon iOS renders a screenshot instead. -->
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#141414">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Reggie.Bot">
+    <!-- The branch, decided before the first paint.
+
+         The app takes seconds to boot -- 15MB of wasm has to arrive and start
+         -- and until it does, this file is the whole of what a reader sees.
+         Both branch-coloured things on it, the spinner and the mark, used to
+         be the Army's outright, so anyone who had chosen another service
+         watched a gold screen resolve into their own colour on every single
+         load. On the 1,546 generated pages too: all of them are rendered from
+         this template.
+
+         So the two colours are read from the same localStorage key the app
+         writes ("branch", set by SettingsBranchStore) and applied as custom
+         properties on the root element, inline and synchronously, before the
+         stylesheet below is ever used to draw anything.
+
+         Kept deliberately dumb -- a literal table, no fetch, no dependency on
+         the wasm having loaded -- because anything that can fail here fails in
+         the one window where nothing else is running yet. An unreadable or
+         unrecognised value leaves the Army showing, which is what every
+         reader who has never chosen a service should see anyway.
+
+         model.seo.BootPaletteTest pins this table against Branch: plain HTML
+         is invisible to the compiler, so nothing else would notice the day a
+         service is added or a palette is retuned. -->
+    <script>
+        (function () {
+            // Valid JSON on purpose: model.seo.BootPaletteTest parses this
+            // table and checks every path in it against Branch and against
+            // the files on disk. Plain HTML is invisible to the compiler, and
+            // the exhaustive `when`s that stop Branch drifting elsewhere have
+            // no reach in here, so this is the only thing that will notice the
+            // day a service is added or a palette retuned.
+            var BRANDS = {
+                "usa": {
+                    "accent": "#FFCB05",
+                    "mark": "/icon_round.png",
+                    "manifest": "/manifest.webmanifest",
+                    "favicon192": "/favicon-192.png",
+                    "favicon96": "/favicon-96.png",
+                    "appIcon": "/icon-192.png"
+                },
+                "usmc": {
+                    "accent": "#E04B4B",
+                    "mark": "/icon_round_usmc.png",
+                    "manifest": "/manifest-usmc.webmanifest",
+                    "favicon192": "/favicon-192-usmc.png",
+                    "favicon96": "/favicon-96-usmc.png",
+                    "appIcon": "/icon-192-usmc.png"
+                },
+                "usaf": {
+                    "accent": "#7FB3F0",
+                    "mark": "/icon_round_usaf.png",
+                    "manifest": "/manifest-usaf.webmanifest",
+                    "favicon192": "/favicon-192-usaf.png",
+                    "favicon96": "/favicon-96-usaf.png",
+                    "appIcon": "/icon-192-usaf.png"
+                },
+                "ussf": {
+                    "accent": "#C8D2E0",
+                    "mark": "/icon_round_ussf.png",
+                    "manifest": "/manifest-ussf.webmanifest",
+                    "favicon192": "/favicon-192-ussf.png",
+                    "favicon96": "/favicon-96-ussf.png",
+                    "appIcon": "/icon-192-ussf.png"
+                },
+                "uscg": {
+                    "accent": "#F57C00",
+                    "mark": "/icon_round_uscg.png",
+                    "manifest": "/manifest-uscg.webmanifest",
+                    "favicon192": "/favicon-192-uscg.png",
+                    "favicon96": "/favicon-96-uscg.png",
+                    "appIcon": "/icon-192-uscg.png"
+                }
+            };
+
+            // Nobody's colours until somebody has chosen. The Army was the
+            // default here, so a reader who had never answered the picker
+            // watched the app load in gold behind a gold favicon -- the
+            // question still on screen and already answered underneath.
+            //
+            // Grey is ui.theme.NEUTRAL_PRIMARY, the same colour the app paints
+            // while the picker is open, so the handover from HTML to Compose
+            // is invisible instead of a flash of the wrong service.
+            var NEUTRAL = {
+                "accent": "#D4D4D4",
+                "mark": "/icon_round_neutral.png",
+                "manifest": "/manifest.webmanifest",
+                "favicon192": "/favicon-192-neutral.png",
+                "favicon96": "/favicon-96-neutral.png",
+                "appIcon": "/icon-192-neutral.png"
+            };
+
+            var slug = null;
+            // Saved before the services were renamed. Those strings sit in
+            // browsers and keep arriving; Branch.bySlug and the database's
+            // branch_canonical() map them the same way.
+            var LEGACY = {"army": "usa", "navy": "usn", "marine-corps": "usmc",
+                          "air-force": "usaf", "space-force": "ussf",
+                          "coast-guard": "uscg"};
+            // localStorage throws outright rather than returning null when a
+            // browser blocks storage, so the read is guarded and not just the
+            // value it returns.
+            // The address first. A shared link names the service, and that is
+            // a firmer answer than whatever this browser chose last time --
+            // reading only localStorage meant arriving cold at /usaf/news/
+            // painted Army gold until Compose started. Route.serviceOf is the
+            // same rule in Kotlin; an unprefixed path is nobody's here,
+            // because the picker has to be free to ask.
+            var first = (location.pathname.split("/")[1] || "").toLowerCase();
+            first = LEGACY[first] || first;
+            if (BRANDS[first]) slug = first;
+
+            // localStorage throws outright rather than returning null when a
+            // browser blocks storage, so the read is guarded and not just the
+            // value it returns.
+            if (slug === null) {
+                try {
+                    var stored = localStorage.getItem("branch");
+                    stored = LEGACY[stored] || stored;
+                    if (BRANDS[stored]) slug = stored;
+                } catch (e) { /* no reachable choice; stay neutral and ask */ }
+            }
+
+            var brand = slug === null ? NEUTRAL : BRANDS[slug];
+            var root = document.documentElement;
+            root.setAttribute("data-branch", slug === null ? "neutral" : slug);
+            root.style.setProperty("--brand", brand.accent);
+            root.style.setProperty("--brand-logo", "url(" + brand.mark + ")");
+
+            // The tab icon, and the app if it has been installed.
+            //
+            // These are rewritten rather than written, so this script has to
+            // sit below the links it edits -- which is why it is at the end of
+            // <head> rather than the top. Still ahead of the stylesheet and of
+            // every element it colours, which is what matters for the paint.
+            //
+            // The manifest is the one branch-coloured thing nothing above can
+            // reach: an installed app's splash screen is drawn by the
+            // operating system, from icons it fetched for itself, so the only
+            // lever we have is which URL the link names. One manifest per
+            // service is written into the distribution by GenerateSeoPages,
+            // derived from the Army's; all six share an id, so switching
+            // service re-skins the installed app rather than offering a
+            // second copy of it.
+            function repoint(selector, href) {
+                var link = document.querySelector(selector);
+                if (link) link.href = href;
+            }
+            repoint('link[rel="manifest"]', brand.manifest);
+            repoint('link[rel="icon"][sizes="192x192"]', brand.favicon192);
+            repoint('link[rel="icon"][sizes="96x96"]', brand.favicon96);
+            repoint('link[rel="apple-touch-icon"]', brand.appIcon);
+        })();
+    </script>
+    <style>
+        /* The flex centering that used to live here sized #root to its
+           content rather than stretching it, so the app rendered in a narrow
+           column once ComposeViewport replaced the fixed-size canvas. */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #0a0a0a;
+            color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+
+        #ComposeTarget {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        /* Readable if the app never boots, invisible the moment it does. */
+        #seo-fallback {
+            max-width: 46rem;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            font-family: Arial, sans-serif;
+            line-height: 1.5;
+        }
+
+        /* No flex centering here: it existed to centre the old fixed-size
+           canvas. As a flex item the Compose container sized to its content
+           (300px) instead of stretching, so the app rendered in a narrow
+           column. ComposeViewport fills whatever container it is given. */
+        #root {
+            width: 100%;
+            height: 100%;
+            /* Anchors #boot, which is layered over the app rather than sitting
+               inside it. */
+            position: relative;
+        }
+
+        /* The SEO copy has to be real markup in the initial response, but a
+           wall of unstyled text is not what a visitor should stare at for the
+           seconds wasm takes to boot. #boot covers it with the app's own
+           colours; both are removed the moment Compose paints. */
+        /* Layered over the app, not inside it. It used to live inside
+           #ComposeTarget so that Compose would tear it down on mount -- which
+           it did, instantly and before any transition could run, so the
+           loading screen vanished in a hard cut. Out here its removal is ours
+           to time, and it can fade.
+
+           pointer-events: none is what makes that safe. An earlier overlay
+           swallowed the pointer, and Compose, never having seen the pointer
+           enter its canvas, ignored the first click anywhere in the app even
+           after the overlay was gone. Transparent to input from the first
+           frame, the canvas underneath gets every event as usual. Absolute
+           within #root, never fixed. */
+        #boot {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #141414;
+            transition: opacity .45s ease;
+
+            /* The ring sits immediately outside the logo, touching it, so the
+               two sizes are derived from one another rather than set
+               independently. */
+            --boot-logo: clamp(160px, 42vmin, 300px);
+            --boot-ring-width: 7px;
+        }
+
+        #boot.done { opacity: 0; }
+
+        /* Square by construction: the ring is a border on a circle, and a
+           circle drawn on a non-square box is an ellipse. */
+        /* Only ever inserted when the app did not start. Centred over the
+           fallback text rather than replacing it, so the page still says what
+           the site is. */
+        #boot-failed {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            max-width: 22rem;
+            padding: 1.25rem 1.5rem;
+            border-radius: 12px;
+            background: #1c1c1c;
+            color: #f2f2f2;
+            font: 16px/1.5 system-ui, -apple-system, sans-serif;
+            text-align: center;
+        }
+
+        #boot-failed p { margin: 0 0 1rem; }
+
+        #boot-failed button {
+            font: inherit;
+            padding: 0.5rem 1.25rem;
+            border: 0;
+            border-radius: 8px;
+            background: var(--brand, #FFCB05);
+            color: #141414;
+            cursor: pointer;
+        }
+
+        #boot-mark {
+            position: relative;
+            width: calc(var(--boot-logo) + 2 * var(--boot-ring-width));
+            height: calc(var(--boot-logo) + 2 * var(--boot-ring-width));
+        }
+
+        /* A background image, not an <img>: the source has to be settled
+           before the first paint, and the script that settles it runs in
+           <head>, where there is no element yet to set a src on. A custom
+           property crosses that gap; a DOM write cannot. */
+        #boot-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: var(--boot-logo);
+            height: var(--boot-logo);
+            margin: calc(var(--boot-logo) / -2) 0 0 calc(var(--boot-logo) / -2);
+            border-radius: 50%;
+            background-image: var(--brand-logo, url(/icon_round.png));
+            background-size: cover;
+        }
+
+        /* One arc travelling around the logo. The track is drawn in the same
+           near-black the app uses for a raised surface, so only the coloured
+           arc reads as motion.
+
+           The fallbacks here and on the mark are what a reader sees if the
+           script above never ran at all -- scripting off, or a CSP that
+           refuses it. The Army's colours, which is what the app itself falls
+           back to. */
+        #boot-ring {
+            position: absolute;
+            inset: 0;
+            border: var(--boot-ring-width) solid #2D2D2D;
+            border-top-color: var(--brand, #FFCB05);
+            border-radius: 50%;
+            animation: boot-spin 1.1s linear infinite;
+        }
+
+        @keyframes boot-spin { to { transform: rotate(360deg); } }
+
+        /* Respect a reduced-motion preference: keep the indicator, drop the
+           spin. */
+        @media (prefers-reduced-motion: reduce) {
+            #boot-ring { animation: none; }
+            /* Uncover the app at once rather than dissolving into it. */
+            #boot { transition: none; }
+        }
+    </style>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CEQC3WB0MN"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-CEQC3WB0MN');
+    </script>
+    <script type="application/javascript">
+        // Function to create an object from a list of parameters and values
+        function createParamValueObject(params, values) {
+            var paramArray = params.split(',');
+            var valueArray = values.split(',');
+
+            if (paramArray.length !== valueArray.length) {
+                throw new Error('The number of parameters must match the number of values');
+            }
+
+            var result = {};
+            for (var i = 0; i < paramArray.length; i++) {
+                result[paramArray[i].trim()] = valueArray[i].trim();
+            }
+
+            return result;
+        }
+
+        // Read one archived publication and hand back its text.
+        //
+        // The corpus is stored gzipped -- 616MB of Air Force text is 169MB
+        // packed -- and the services after the Army keep no text column in
+        // Postgres, so a result card's supporting line is found here from the
+        // archive instead. DecompressionStream unpacks the body as it
+        // arrives, which is why this is a few lines of JS rather than an
+        // inflate implementation in Kotlin, and why the bytes never cross the
+        // wasm boundary.
+        //
+        // Resolves to null for anything at all -- a 404, an offline browser,
+        // a body that is not gzip. A missing snippet is a card with one less
+        // line on it; a thrown error is a search that looks broken.
+        function fetchArchivedText(url) {
+            return fetch(url)
+                .then(function (response) {
+                    if (!response.ok || !response.body) return null;
+                    return new Response(
+                        response.body.pipeThrough(new DecompressionStream('gzip'))
+                    ).text();
+                })
+                .catch(function () { return null; });
+        }
+
+        function shareContent(text) {
+            const url = window.location.href; // Get the current page URL
+            if (navigator.share) {
+                navigator.share({
+                    // Named explicitly rather than taken from document.title.
+                    // What is being shared is an answer, not the page it was
+                    // read on, and the sheet showed whichever page the app had
+                    // been served as -- "Army Links" on top of a regulation
+                    // answer, for anyone who arrived through that link.
+                    title: 'Reggie.Bot',
+                    text: text,
+                    url: url
+                }).then(() => {
+                    console.log('Successfully shared');
+                }).catch((error) => {
+                    console.error('Error sharing:', error);
+                });
+            } else {
+                console.error('Web Share API not supported in this browser');
+            }
+        }
+
+        // Waits for the helpers the app expects, but not forever.
+        //
+        // This polled every 100ms with no limit. Anything it waited on that
+        // never arrived -- a blocked third-party script, an extension that
+        // removed a global -- was a permanent, silent blank page: no error, no
+        // timeout, and the wasm never even requested. Loading the app late is
+        // recoverable; never loading it is not, so the deadline calls through
+        // anyway rather than giving up.
+        function waitForFunctions(functionNames, callback) {
+            var deadline = Date.now() + 5000;
+
+            function checkFunctions() {
+                for (let i = 0; i < functionNames.length; i++) {
+                    if (typeof window[functionNames[i]] !== "function") {
+                        if (Date.now() > deadline) {
+                            console.warn('proceeding without ' + functionNames[i]);
+                            break;
+                        }
+                        setTimeout(checkFunctions, 100);
+                        return;
+                    }
+                }
+                callback();
+            }
+
+            checkFunctions();
+        }
+
+        function detectUnsupportedBrowser() {
+            const userAgent = navigator.userAgent;
+
+            // Check if the browser is Safari and not Chrome or Firefox on iOS
+            const isSafari = /^((?!chrome|android|crios|fxios).)*safari/i.test(userAgent);
+
+            if (isSafari) {
+                // Extract the Safari version from the userAgent
+                const versionMatch = userAgent.match(/Version\/(\d+\.\d+)/);
+                if (versionMatch) {
+                    const safariVersion = parseFloat(versionMatch[1]);
+                    console.log(`Safari version detected: ${safariVersion}`);
+                    return safariVersion < 18.2;
+                }
+            }
+            console.log("Browser is not Safari or version not detected.");
+            return false;
+        }
+
+        if (detectUnsupportedBrowser()) {
+            window.location.href = "unsupported_browser.html";
+        } else {
+            window.onload = function() {
+                function dismissBootScreen() {
+                    var boot = document.getElementById('boot');
+                    if (!boot || boot.classList.contains('done')) return;
+                    boot.classList.add('done');
+                    // transitionend removes it as soon as the fade finishes;
+                    // the timer is the backstop for a browser that never fires
+                    // one (a reduced-motion setting removes the transition
+                    // altogether), so the overlay can never be left behind.
+                    boot.addEventListener('transitionend', function () { boot.remove(); });
+                    setTimeout(function () { boot.remove(); }, 1000);
+                }
+
+                // Compose renders to a canvas, and that canvas is the signal
+                // that the app is really up. It is not in the document though:
+                // Compose Multiplatform 1.11 puts it inside a shadow root, so
+                // document.querySelector('canvas') returns null forever and
+                // waiting on that meant waiting on something that never came.
+                function composeCanvas(root) {
+                    if (root.querySelector('canvas')) return true;
+                    var hosts = root.querySelectorAll('*');
+                    for (var i = 0; i < hosts.length; i++) {
+                        var shadow = hosts[i].shadowRoot;
+                        if (shadow && shadow.querySelector('canvas')) return true;
+                    }
+                    return false;
+                }
+
+                // Two frames after it mounts it has painted, so the overlay can
+                // dissolve into the app rather than off a blank canvas.
+                function dismissWhenComposePaints() {
+                    var target = document.getElementById('ComposeTarget');
+                    if (!target) return;
+                    var observer = new MutationObserver(function () {
+                        if (!composeCanvas(target)) return;
+                        observer.disconnect();
+                        requestAnimationFrame(function () {
+                            requestAnimationFrame(dismissBootScreen);
+                        });
+                    });
+                    observer.observe(target, { childList: true, subtree: true });
+
+                    // If wasm never boots, say so. This used to dismiss the
+                    // overlay and nothing else, so a failed boot and a slow one
+                    // looked the same -- and both looked like a broken site
+                    // with no way out but knowing to reload.
+                    setTimeout(function () {
+                        observer.disconnect();
+                        dismissBootScreen();
+                        if (!composeCanvas(target)) showBootFailed();
+                    }, 25000);
+                }
+
+                dismissWhenComposePaints();
+
+                // Registered after load, and deliberately after the wasm has
+                // been asked for: the app is ~15MB and the worker must not
+                // compete with it on a first visit. It pays off on the second.
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('/sw.js').catch(function (e) {
+                        // Not fatal - the app works without it.
+                        console.warn('service worker registration failed', e);
+                    });
+                }
+
+                // Shown only when the app really did not start. The fallback
+                // text underneath says what the site is; this says what
+                // happened and offers the one thing that fixes it.
+                function showBootFailed() {
+                    if (document.getElementById('boot-failed')) return;
+                    var box = document.createElement('div');
+                    box.id = 'boot-failed';
+                    box.setAttribute('role', 'alert');
+                    box.innerHTML =
+                        '<p>Reggie could not finish loading.</p>' +
+                        '<button type="button">Reload</button>';
+                    box.querySelector('button').addEventListener('click', function () {
+                        // Bypass both caches: the likeliest cause is a cached
+                        // copy that is no longer whole.
+                        if (window.caches && caches.keys) {
+                            caches.keys().then(function (names) {
+                                return Promise.all(names.map(function (n) { return caches.delete(n); }));
+                            }).catch(function () {}).then(function () { location.reload(); });
+                        } else {
+                            location.reload();
+                        }
+                    });
+                    document.getElementById('root').appendChild(box);
+                }
+
+                // A tab the browser reclaimed and then restored.
+                //
+                // Everything here runs inside window.onload, and a page
+                // restored from the back/forward cache never fires load again
+                // -- so if whatever was on screen is gone, nothing rebuilds
+                // it. Storage pressure can also empty the cache the app was
+                // served from, which is what leaves a blank white document
+                // rather than this app's own dark shell.
+                window.addEventListener('pageshow', function (event) {
+                    if (!event.persisted) return;
+                    var target = document.getElementById('ComposeTarget');
+                    if (target && composeCanvas(target)) return;
+                    location.reload();
+                });
+
+                function loadWasm() {
+                    var canvas = document.getElementById('ComposeTarget');
+                    canvas.focus();
+
+                    var script = document.createElement('script');
+                    // Absolute: this same file is served at /news, /pubs and
+                    // friends so deep links work, and a relative path would
+                    // look for /news/composeApp.js and never boot.
+                    script.src = "/composeApp.js";
+                    document.head.appendChild(script);
+                }
+
+                // List of functions to wait for
+                const functionsToWaitFor = ["createParamValueObject", "gtag", "shareContent"];
+
+                // Wait for all functions before loading Wasm
+                waitForFunctions(functionsToWaitFor, loadWasm);
+            };
+        }
+    </script>
+</head>
+<body>
+<!-- ComposeViewport (Compose Multiplatform 1.11, which replaced
+     CanvasBasedWindow) attaches to a CONTAINER and creates its own canvas
+     inside it. Leaving a <canvas> here gives an unsized 300x150 default that
+     renders nothing, and a second canvas nested inside it. -->
+<div id="root">
+    <!-- No visible text: the mark and the ring around it say "loading" on
+         their own. aria-label keeps that legible to a screen reader without
+         putting a caption back on the screen. -->
+    <div id="boot" role="status" aria-live="polite" aria-label="Loading Reggie.Bot">
+        <div id="boot-mark">
+            <div id="boot-ring"></div>
+            <div id="boot-logo"></div>
+        </div>
+    </div>
+
+    <!-- Compose replaces the contents of #ComposeTarget on boot, so users never
+         see this. Crawlers do: the app renders to a <canvas>, which search
+         engines cannot read at all, leaving the site with no indexable text
+         whatsoever. This is the only content Google gets today. -->
+    <div id="ComposeTarget" aria-label="Interactive application area" tabindex="0">
+        <!-- Not wrapped in <noscript>: crawlers that execute JS ignore it, and
+             this needs to be real markup in the initial response. Compose
+             clears the container when it mounts, so users see it only for the
+             instant before the app boots. -->
+        <div id="seo-fallback">
+            <h1>MAN — Manuals</h1>
+            <p>All 774 MAN publications (Manuals), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.</p>
+            <h2>774 publications</h2>
+            <ul>
+                <li><a href="/usaf/pub/16afman23-300/">16AFMAN23-300</a> — Materiel Management Processes — 2026-02-11</li>
+                <li><a href="/usaf/pub/301fwman13-212/">301FWMAN13-212</a> — Range Planning And Operations — 2026-05-14</li>
+                <li><a href="/usaf/pub/354fwman13-212/">354FWMAN13-212</a> — Joint Pacific Alaska Range Complex Planning And Operations — 2025-07-29</li>
+                <li><a href="/usaf/pub/448scmwman23-101/">448SCMWMAN23-101</a> — Centralized Flight To Commodity Flight Workload Transfer Process — 2023-11-28</li>
+                <li><a href="/usaf/pub/916arwman34-135/">916ARWMAN34-135</a> — Wing Lodging Procedures — 2023-01-10</li>
+                <li><a href="/usaf/pub/accman11-2bqm-167av1/">ACCMAN11-2BQM-167AV1</a> — Bqm-167a—aircrew Training — 2025-03-06</li>
+                <li><a href="/usaf/pub/accman11-2bqm-167av2/">ACCMAN11-2BQM-167AV2</a> — Bqm-167a—aircrew Evaluation Criteria — 2025-03-06</li>
+                <li><a href="/usaf/pub/accman11-2bqm-167av3/">ACCMAN11-2BQM-167AV3</a> — Bqm-167a—operations Procedures — 2025-03-06</li>
+                <li><a href="/usaf/pub/accman11-2cap-usafv1/">ACCMAN11-2CAP-USAFV1</a> — Cap-usaf Aircrew Training — 2023-05-26</li>
+                <li><a href="/usaf/pub/accman11-2cap-usafv2/">ACCMAN11-2CAP-USAFV2</a> — Cap-usaf Aircrew Evaluation Criteria — 2023-05-26</li>
+                <li><a href="/usaf/pub/accman11-2cap-usafv3/">ACCMAN11-2CAP-USAFV3</a> — Cap-usaf Aircrew Operations — 2023-05-26</li>
+                <li><a href="/usaf/pub/accman11-2e-9v1/">ACCMAN11-2E-9V1</a> — E-9—aircrew Training — 2025-02-26</li>
+                <li><a href="/usaf/pub/accman11-2e-9v2/">ACCMAN11-2E-9V2</a> — E-9—aircrew Evaluation Criteria — 2023-11-13</li>
+                <li><a href="/usaf/pub/accman11-2e-9v3/">ACCMAN11-2E-9V3</a> — E-9—operations Procedures — 2026-06-23</li>
+                <li><a href="/usaf/pub/accman11-2ea-37bv1/">ACCMAN11-2EA-37BV1</a> — Ea-37b Aircrew Training — 2026-03-25</li>
+                <li><a href="/usaf/pub/accman11-2ea-37bv2/">ACCMAN11-2EA-37BV2</a> — Ea-37b Aircrew Evaluation Criteria — 2026-03-25</li>
+                <li><a href="/usaf/pub/accman11-2ea-37bv3/">ACCMAN11-2EA-37BV3</a> — Ea-37b Operations Procedures — 2026-03-25</li>
+                <li><a href="/usaf/pub/accman11-2ec-130hv1/">ACCMAN11-2EC-130HV1</a> — Ec-130h Aircrew Training — 2025-03-19</li>
+                <li><a href="/usaf/pub/accman11-2ec-130hv2/">ACCMAN11-2EC-130HV2</a> — Ec-130h Aircrew Evaluation Criteria — 2026-03-24</li>
+                <li><a href="/usaf/pub/accman11-2ec-130hv3/">ACCMAN11-2EC-130HV3</a> — Ec-130h Operations Procedures — 2023-02-23</li>
+                <li><a href="/usaf/pub/accman11-2qf-16v1/">ACCMAN11-2QF-16V1</a> — Qf-16--aircrew Training — 2024-10-01</li>
+                <li><a href="/usaf/pub/accman11-2qf-16v2/">ACCMAN11-2QF-16V2</a> — Qf-16—aircrew Evaluation Criteria — 2023-10-13</li>
+                <li><a href="/usaf/pub/accman11-2qf-16v3/">ACCMAN11-2QF-16V3</a> — Qf-16--operations Procedures — 2024-03-27</li>
+                <li><a href="/usaf/pub/accman11-2rc-135v1/">ACCMAN11-2RC-135V1</a> — Rc/wc/tc-135—aircrew Training — 2025-01-29</li>
+                <li><a href="/usaf/pub/accman11-2rc-135v2/">ACCMAN11-2RC-135V2</a> — Rc/wc/tc-135—aircrew Evaluation Criteria — 2025-01-29</li>
+                <li><a href="/usaf/pub/accman11-2rc-135v3/">ACCMAN11-2RC-135V3</a> — Rc/tc/wc-135—operations Procedures — 2025-01-29</li>
+                <li><a href="/usaf/pub/accman11-2rq-4v1/">ACCMAN11-2RQ-4V1</a> — Rq-4—crew Training — 2026-04-02</li>
+                <li><a href="/usaf/pub/accman11-2rq-4v3/">ACCMAN11-2RQ-4V3</a> — Rq-4—operations Procedures — 2026-04-02</li>
+                <li><a href="/usaf/pub/accman14-401/">ACCMAN14-401</a> — Air Force Distributed Common Ground System (dcgs) Training, Certification, And Quality Management — 2020-04-06</li>
+                <li><a href="/usaf/pub/accman14-402/">ACCMAN14-402</a> — Unit-level Intelligence Mission And Responsibilities — 2020-03-25</li>
+                <li><a href="/usaf/pub/accman14-420/">ACCMAN14-420</a> — Tactics Analysis And Reporting Program (tarp) / Tactics And Adversary Studies Element (tase) Responsibilities — 2023-02-24</li>
+                <li><a href="/usaf/pub/accman14-421/">ACCMAN14-421</a> — Air Force National-tactical Integration (nti) — 2023-06-05</li>
+                <li><a href="/usaf/pub/accman14-422/">ACCMAN14-422</a> — Intelligence Data Governance — 2023-10-24</li>
+                <li><a href="/usaf/pub/accman17-2acdv1/">ACCMAN17-2ACDV1</a> — Air Force Cyberspace Defense (acd) - Cybercrew Training — 2023-03-30</li>
+                <li><a href="/usaf/pub/accman17-2acdv2/">ACCMAN17-2ACDV2</a> — Air Force Cyberspace Defense (acd) - Standardization/evaluation — 2023-03-30</li>
+                <li><a href="/usaf/pub/accman17-2acdv3/">ACCMAN17-2ACDV3</a> — Air Force Cyberspace Defense (acd) - Operations And Procedures — 2023-03-30</li>
+                <li><a href="/usaf/pub/accman17-2afincv1/">ACCMAN17-2AFINCV1</a> — Air Force Intranet Control (afinc) Cybercrew Training — 2021-03-18</li>
+                <li><a href="/usaf/pub/accman17-2afincv2/">ACCMAN17-2AFINCV2</a> — Air Force Intranet Control (afinc) Standardization/evaluation — 2021-03-18</li>
+                <li><a href="/usaf/pub/accman17-2afincv3/">ACCMAN17-2AFINCV3</a> — Air Force Intranet Control (afinc) Operations And Procedures — 2021-03-18</li>
+                <li><a href="/usaf/pub/accman17-2cdav1/">ACCMAN17-2CDAV1</a> — Cyberspace Defense Analysis (cda) - Cybercrew Training — 2021-05-11</li>
+                <li><a href="/usaf/pub/accman17-2cdav2/">ACCMAN17-2CDAV2</a> — Cyberspace Defense Analysis (cda) - Standardization And Evaluation (stan/eval) — 2021-05-11</li>
+                <li><a href="/usaf/pub/accman17-2cdav3/">ACCMAN17-2CDAV3</a> — Cyberspace Defense Analysis (cda) - Operations And Procedures — 2021-05-11</li>
+                <li><a href="/usaf/pub/accman17-2cscsv1/">ACCMAN17-2CSCSV1</a> — Cyberspace Security And Control System (cscs) - Cybercrew Training — 2021-05-14</li>
+                <li><a href="/usaf/pub/accman17-2cscsv2/">ACCMAN17-2CSCSV2</a> — Cyberspace Security And Control System (cscs) - Standardization/evaluation Program — 2021-05-14</li>
+                <li><a href="/usaf/pub/accman17-2cscsv3/">ACCMAN17-2CSCSV3</a> — Cyberspace Security And Control System (cscs) - Operations And Procedures — 2021-05-14</li>
+                <li><a href="/usaf/pub/accman17-2cvahv1/">ACCMAN17-2CVAHV1</a> — Cyber Vulnerability Assessment/hunter (cva/h) - Training — 2024-10-28</li>
+                <li><a href="/usaf/pub/accman17-2cvahv2/">ACCMAN17-2CVAHV2</a> — Cyber Vulnerability Assessment/hunter (cva/h) - Standardization/evaluation Program — 2026-05-28</li>
+                <li><a href="/usaf/pub/accman17-2cvahv3/">ACCMAN17-2CVAHV3</a> — Cyber Vulnerability Assessment/hunter (cva/h) - Operations And Procedures — 2024-10-28</li>
+                <li><a href="/usaf/pub/accman17-2tnov1/">ACCMAN17-2TNOV1</a> — Telephony Network Operations (tno) - Cybercrew Training — 2024-05-24</li>
+                <li><a href="/usaf/pub/accman17-2tnov2/">ACCMAN17-2TNOV2</a> — Telephony Network Operations (tno) – Standardization/evaluation Program — 2024-05-24</li>
+                <li><a href="/usaf/pub/accman17-2tnov3/">ACCMAN17-2TNOV3</a> — Telephony Network Operations (tno) – Operations And Procedures — 2024-05-24</li>
+                <li><a href="/usaf/pub/aetcman11-219/">AETCMAN11-219</a> — Initial Flight Training — 2023-04-13</li>
+                <li><a href="/usaf/pub/aetcman11-247/">AETCMAN11-247</a> — T-1a Flying Fundamentals — 2024-10-01</li>
+                <li><a href="/usaf/pub/aetcman11-248/">AETCMAN11-248</a> — T-6 Primary Flying — 2025-08-13</li>
+                <li><a href="/usaf/pub/aetcman11-251/">AETCMAN11-251</a> — T-38c Flying Fundamentals — 2024-09-10</li>
+                <li><a href="/usaf/pub/aetcman11-2aav1/">AETCMAN11-2AAV1</a> — Air Advisor Aircrew Training — 2023-12-18</li>
+                <li><a href="/usaf/pub/aetcman11-2aav2/">AETCMAN11-2AAV2</a> — Air Advisor Aircrew Evaluation Criteria — 2024-10-02</li>
+                <li><a href="/usaf/pub/aetcman11-2sailplanev1/">AETCMAN11-2SAILPLANEV1</a> — Sailplane Aircrew Training — 2025-03-04</li>
+                <li><a href="/usaf/pub/aetcman11-2sailplanev2/">AETCMAN11-2SAILPLANEV2</a> — Sailplane Aircrew Evaluation Criteria — 2025-03-20</li>
+                <li><a href="/usaf/pub/aetcman11-2t-1v1/">AETCMAN11-2T-1V1</a> — T-1a Aircrew Training — 2025-02-25</li>
+                <li><a href="/usaf/pub/aetcman11-2t-1v3/">AETCMAN11-2T-1V3</a> — T-1a Operations Procedures — 2026-01-15</li>
+                <li><a href="/usaf/pub/aetcman11-2t-41-51-53v1/">AETCMAN11-2T-41-51-53V1</a> — T-41, T-51, &amp; T-53 Aircrew Training — 2023-08-04</li>
+                <li><a href="/usaf/pub/aetcman11-2t-41-51-53v2/">AETCMAN11-2T-41-51-53V2</a> — T-41, T-51, &amp; T-53 Evaluation Criteria — 2023-06-15</li>
+                <li><a href="/usaf/pub/aetcman11-2t-41-51-53v3/">AETCMAN11-2T-41-51-53V3</a> — T-41, T-51, &amp; T-53 Operations Procedures — 2023-08-04</li>
+                <li><a href="/usaf/pub/aetcman11-2t-6v1/">AETCMAN11-2T-6V1</a> — T-6a Aircrew Training — 2025-01-31</li>
+                <li><a href="/usaf/pub/aetcman11-2t-6v2/">AETCMAN11-2T-6V2</a> — T-6a Aircrew Evaluation Criteria — 2026-02-09</li>
+                <li><a href="/usaf/pub/aetcman11-2t-6v3/">AETCMAN11-2T-6V3</a> — T-6a Operations Procedures — 2026-08-05</li>
+                <li><a href="/usaf/pub/aetcman11-2t-7v1/">AETCMAN11-2T-7V1</a> — T-7 Aircrew Training — 2026-02-17</li>
+                <li><a href="/usaf/pub/aetcman11-2t-7v2/">AETCMAN11-2T-7V2</a> — T-7 Aircrew Evaluation Criteria — 2026-02-17</li>
+                <li><a href="/usaf/pub/aetcman11-2t-7v3/">AETCMAN11-2T-7V3</a> — T-7 Operations Procedures — 2026-02-17</li>
+                <li><a href="/usaf/pub/aetcman90-7001/">AETCMAN90-7001</a> — Aetc Student And Learning Data Standards — 2025-12-29</li>
+                <li><a href="/usaf/pub/afgscman13-5202v1/">AFGSCMAN13-5202V1</a> — Airborne Launch Control System (alcs) Crew Training And Certification — 2026-08-06</li>
+                <li><a href="/usaf/pub/afjman23-209/">AFJMAN23-209</a> — Storage And Handling Of Hazardous Materials — 2020-03-04</li>
+                <li><a href="/usaf/pub/afjman34-606/">AFJMAN34-606</a> — Armed Forces Recipe Service — 2025-11-19</li>
+                <li><a href="/usaf/pub/afman10-1004/">AFMAN10-1004</a> — Conducting Air Force Open Houses — 2018-08-23</li>
+                <li><a href="/usaf/pub/afman10-206_accsup/">AFMAN10-206_ACCSUP</a> — Operational Reporting (oprep) — 2022-10-06</li>
+                <li><a href="/usaf/pub/afman10-206_aetcsup/">AFMAN10-206_AETCSUP</a> — Operational Reporting — 2021-05-11</li>
+                <li><a href="/usaf/pub/afman10-206_afgscsup/">AFMAN10-206_AFGSCSUP</a> — Operational Reporting (oprep) — 2019-05-13</li>
+                <li><a href="/usaf/pub/afman10-206_afmcsup/">AFMAN10-206_AFMCSUP</a> — Operational Reporting — 2024-10-23</li>
+                <li><a href="/usaf/pub/afman10-206_afsocsup/">AFMAN10-206_AFSOCSUP</a> — Operational Reporting (oprep) — 2026-05-28</li>
+                <li><a href="/usaf/pub/afman10-206_amcsup/">AFMAN10-206_AMCSUP</a> — Operational Reporting — 2025-08-25</li>
+                <li><a href="/usaf/pub/afman10-206_angsup/">AFMAN10-206_ANGSUP</a> — Operational Reporting (oprep) — 2024-12-05</li>
+                <li><a href="/usaf/pub/afman10-206_pacafsup/">AFMAN10-206_PACAFSUP</a> — Operational Reporting (oprep) — 2026-05-20</li>
+                <li><a href="/usaf/pub/afman10-206_usafe-afafricasup/">AFMAN10-206_USAFE-AFAFRICASUP</a> — Operational Reporting (oprep) — 2023-09-07</li>
+                <li><a href="/usaf/pub/afman10-207/">AFMAN10-207</a> — Command Posts — 2018-04-11</li>
+                <li><a href="/usaf/pub/afman10-207_accsup/">AFMAN10-207_ACCSUP</a> — Command Posts — 2024-11-26</li>
+                <li><a href="/usaf/pub/afman10-207_aetcsup/">AFMAN10-207_AETCSUP</a> — Command Posts — 2023-05-31</li>
+                <li><a href="/usaf/pub/afman10-207_afdwsup/">AFMAN10-207_AFDWSUP</a> — Command Posts — 2023-04-04</li>
+                <li><a href="/usaf/pub/afman10-207_afgscsup_afgscgm2026-01/">AFMAN10-207_AFGSCSUP_AFGSCGM2026-01</a> — Command Post — 2026-04-06</li>
+                <li><a href="/usaf/pub/afman10-207_afmcsup/">AFMAN10-207_AFMCSUP</a> — Command Posts — 2019-08-01</li>
+                <li><a href="/usaf/pub/afman10-207_afrcsup/">AFMAN10-207_AFRCSUP</a> — Command Posts — 2022-04-21</li>
+                <li><a href="/usaf/pub/afman10-207_afsocsup_afsocgm2026-01/">AFMAN10-207_AFSOCSUP_AFSOCGM2026-01</a> — Command Posts — 2026-03-03</li>
+                <li><a href="/usaf/pub/afman10-207_amcsup/">AFMAN10-207_AMCSUP</a> — Command Posts — 2019-02-19</li>
+                <li><a href="/usaf/pub/afman10-207_angsup/">AFMAN10-207_ANGSUP</a> — Command Posts — 2024-12-04</li>
+                <li><a href="/usaf/pub/afman10-207_usafe-afafricasup/">AFMAN10-207_USAFE-AFAFRICASUP</a> — Command Posts — 2023-12-19</li>
+                <li><a href="/usaf/pub/afman10-2909/">AFMAN10-2909</a> — Aeromedical Evacuation (ae) Equipment Standards — 2024-06-28</li>
+                <li><a href="/usaf/pub/afman10-3500v1/">AFMAN10-3500V1</a> — Air Force Special Warfare Training Program — 2025-06-03</li>
+                <li><a href="/usaf/pub/afman10-3500v2/">AFMAN10-3500V2</a> — Air Force Special Warfare Standardization And Evaluation — 2025-06-03</li>
+                <li><a href="/usaf/pub/afman10-3505v1/">AFMAN10-3505V1</a> — Joint Terminal Attack Controller (jtac) Training Program — 2023-11-07</li>
+                <li><a href="/usaf/pub/afman10-3505v2/">AFMAN10-3505V2</a> — Joint Terminal Attack Controller Standardization And Evaluation Program — 2023-11-07</li>
+                <li><a href="/usaf/pub/afman10-3505v2_57wgsup/">AFMAN10-3505V2_57WGSUP</a> — Joint Terminal Attack Controller (jtac) Standardization/evaluation Program — 2025-09-30</li>
+                <li><a href="/usaf/pub/afman10-3507/">AFMAN10-3507</a> — Afspecwar Mountain Operations Program — 2023-05-09</li>
+                <li><a href="/usaf/pub/afman10-3509/">AFMAN10-3509</a> — Air Force Special Warfare Medical Operations — 2026-08-17</li>
+                <li><a href="/usaf/pub/afman10-3511/">AFMAN10-3511</a> — Pararescue And Combat Rescue Officer Operations — 2020-12-02</li>
+                <li><a href="/usaf/pub/afman10-3531v1/">AFMAN10-3531V1</a> — Tactical Air Control Party (tacp) Weapon System (ws) Command And Control (c2), Intelligence, And Special Warfare Mission Support Training Programs — 2025-07-18</li>
+                <li><a href="/usaf/pub/afman11-101/">AFMAN11-101</a> — Management Reports On The Flying Hour Program — 2020-12-23</li>
+                <li><a href="/usaf/pub/afman11-101_afgscsup/">AFMAN11-101_AFGSCSUP</a> — Management Reports On The Flying Hour Program — 2026-01-13</li>
+                <li><a href="/usaf/pub/afman11-202v1/">AFMAN11-202V1</a> — Aircrew Training — 2025-08-08</li>
+                <li><a href="/usaf/pub/afman11-202v1_aetcsup/">AFMAN11-202V1_AETCSUP</a> — Aircrew Training — 2026-08-17</li>
+                <li><a href="/usaf/pub/afman11-202v1_afdwsup/">AFMAN11-202V1_AFDWSUP</a> — Aircrew Training — 2021-04-27</li>
+                <li><a href="/usaf/pub/afman11-202v1_afmcsup/">AFMAN11-202V1_AFMCSUP</a> — Aircrew Training — 2024-02-12</li>
+                <li><a href="/usaf/pub/afman11-202v1_afsocsup/">AFMAN11-202V1_AFSOCSUP</a> — Aircrew Training — 2022-07-18</li>
+                <li><a href="/usaf/pub/afman11-202v1_usafe-afafricasup/">AFMAN11-202V1_USAFE-AFAFRICASUP</a> — Aircrew Training — 2024-01-25</li>
+                <li><a href="/usaf/pub/afman11-202v2/">AFMAN11-202V2</a> — Aircrew Standardization And Evaluation Program — 2026-07-28</li>
+                <li><a href="/usaf/pub/afman11-202v2_301fwsup/">AFMAN11-202V2_301FWSUP</a> — Aircrew Standardization And Evaluation Program — 2026-05-18</li>
+                <li><a href="/usaf/pub/afman11-202v2_314awsup/">AFMAN11-202V2_314AWSUP</a> — Aircrew Standardization And Evaluation Program — 2023-07-20</li>
+                <li><a href="/usaf/pub/afman11-202v2_accsup/">AFMAN11-202V2_ACCSUP</a> — Aircrew Standardization And Evaluation Program — 2025-07-17</li>
+                <li><a href="/usaf/pub/afman11-202v2_accsup_15afsup/">AFMAN11-202V2_ACCSUP_15AFSUP</a> — Aircrew Standardization and Evaluation Program — 2026-04-21</li>
+                <li><a href="/usaf/pub/afman11-202v2_accsup_319rwsup/">AFMAN11-202V2_ACCSUP_319RWSUP</a> — Aircrew Standardization And Evaluation Program — 2024-03-12</li>
+                <li><a href="/usaf/pub/afman11-202v2_accsup_920rqwsup/">AFMAN11-202V2_ACCSUP_920RQWSUP</a> — Aircrew Standardization Evaluation Program — 2023-02-28</li>
+                <li><a href="/usaf/pub/afman11-202v2_accsup_bealeafbsup/">AFMAN11-202V2_ACCSUP_BEALEAFBSUP</a> — Aircrew Standardization And Evaluation Program — 2024-03-25</li>
+                <li><a href="/usaf/pub/afman11-202v2_accsup_seymourjohnsonairforcebasesup/">AFMAN11-202V2_ACCSUP_SEYMOURJOHNSONAIRFORCEBASESUP</a> — Aircrew Standardization And Evaluation Program — 2024-01-08</li>
+                <li><a href="/usaf/pub/afman11-202v2_aetcsup/">AFMAN11-202V2_AETCSUP</a> — Aircrew Standardization And Evaluation Program — 2022-09-01</li>
+                <li><a href="/usaf/pub/afman11-202v2_aetcsup_97amwsup/">AFMAN11-202V2_AETCSUP_97AMWSUP</a> — Aircrew Standardization And Evaluation Program — 2024-03-08</li>
+                <li><a href="/usaf/pub/afman11-202v2_afdwsup/">AFMAN11-202V2_AFDWSUP</a> — Aircrew Standardization/evaluation Program — 2022-04-21</li>
+                <li><a href="/usaf/pub/afman11-202v2_afgscsup/">AFMAN11-202V2_AFGSCSUP</a> — Aircrew Standardization And Evaluation Program — 2022-04-06</li>
+                <li><a href="/usaf/pub/afman11-202v2_afgscsup_ellsworthafbsup/">AFMAN11-202V2_AFGSCSUP_ELLSWORTHAFBSUP</a> — Aircrew Standardization And Evaluation Program — 2023-01-25</li>
+                <li><a href="/usaf/pub/afman11-202v2_afmcsup/">AFMAN11-202V2_AFMCSUP</a> — Aircrew Standardization And Evaluation Program — 2026-06-23</li>
+                <li><a href="/usaf/pub/afman11-202v2_afmcsup_96twsup/">AFMAN11-202V2_AFMCSUP_96TWSUP</a> — Aircrew Standardization And Evaluation Program — 2023-04-26</li>
+                <li><a href="/usaf/pub/afman11-202v2_afmcsup_edwardsafbsup/">AFMAN11-202V2_AFMCSUP_EDWARDSAFBSUP</a> — Aircrew Standardization And Evaluation Program — 2022-10-11</li>
+                <li><a href="/usaf/pub/afman11-202v2_afsocsup/">AFMAN11-202V2_AFSOCSUP</a> — Aircrew Standardization/evaluation Program — 2022-08-05</li>
+                <li><a href="/usaf/pub/afman11-202v2_amcsup/">AFMAN11-202V2_AMCSUP</a> — Aircrew Standardization And Evaluation Program — 2024-07-29</li>
+                <li><a href="/usaf/pub/afman11-202v2_pacafsup/">AFMAN11-202V2_PACAFSUP</a> — Aircrew Standardization And Evaluation Program — 2022-12-30</li>
+                <li><a href="/usaf/pub/afman11-202v2_usafe-afafricasup/">AFMAN11-202V2_USAFE-AFAFRICASUP</a> — Aircrew Standardization And Evaluation Program — 2022-07-01</li>
+                <li><a href="/usaf/pub/afman11-202v2_usafe-afafricasup_avianoabsup/">AFMAN11-202V2_USAFE-AFAFRICASUP_AVIANOABSUP</a> — Aircrew Standardization/evaluation Program — 2024-08-09</li>
+                <li><a href="/usaf/pub/afman11-202v2__911awsup/">AFMAN11-202V2__911AWSUP</a> — Aircrew Standardization/evaluation Program — 2023-11-02</li>
+                <li><a href="/usaf/pub/afman11-202v3/">AFMAN11-202V3</a> — Flight Operations — 2026-06-25</li>
+                <li><a href="/usaf/pub/afman11-202v3_accsup/">AFMAN11-202V3_ACCSUP</a> — Flight Operations — 2022-11-08</li>
+                <li><a href="/usaf/pub/afman11-202v3_aetcsup/">AFMAN11-202V3_AETCSUP</a> — Flight Operations — 2022-09-22</li>
+                <li><a href="/usaf/pub/afman11-202v3_afdwsup/">AFMAN11-202V3_AFDWSUP</a> — Flight Operations — 2022-10-27</li>
+                <li><a href="/usaf/pub/afman11-202v3_afgscsup/">AFMAN11-202V3_AFGSCSUP</a> — Flight Operations — 2021-12-23</li>
+                <li><a href="/usaf/pub/afman11-202v3_afmcsup/">AFMAN11-202V3_AFMCSUP</a> — Flight Operations — 2025-01-07</li>
+                <li><a href="/usaf/pub/afman11-202v3_afsocsup/">AFMAN11-202V3_AFSOCSUP</a> — Flight Operations — 2023-04-04</li>
+                <li><a href="/usaf/pub/afman11-202v3_amcsup/">AFMAN11-202V3_AMCSUP</a> — Flight Operations — 2024-07-29</li>
+                <li><a href="/usaf/pub/afman11-202v3_amcsup_439awsup/">AFMAN11-202V3_AMCSUP_439AWSUP</a> — Flying Operations — 2026-04-16</li>
+                <li><a href="/usaf/pub/afman11-202v3_pacafsup/">AFMAN11-202V3_PACAFSUP</a> — Flight Operations — 2023-08-31</li>
+                <li><a href="/usaf/pub/afman11-202v3_usafe-afafricasup/">AFMAN11-202V3_USAFE-AFAFRICASUP</a> — Flight Operations — 2022-07-18</li>
+                <li><a href="/usaf/pub/afman11-210/">AFMAN11-210</a> — Instrument Refresher Program (irp) — 2021-12-21</li>
+                <li><a href="/usaf/pub/afman11-212/">AFMAN11-212</a> — Requirements For Aircrew Munitions — 2020-06-25</li>
+                <li><a href="/usaf/pub/afman11-213/">AFMAN11-213</a> — Military Flight Data Telecommunications System — 2023-05-24</li>
+                <li><a href="/usaf/pub/afman11-214/">AFMAN11-214</a> — Air Operations Rules And Procedures — 2026-08-07</li>
+                <li><a href="/usaf/pub/afman11-214_pacafsup/">AFMAN11-214_PACAFSUP</a> — Air Operations Rules And Procedures — 2023-08-14</li>
+                <li><a href="/usaf/pub/afman11-218/">AFMAN11-218</a> — Aircraft Operations And Movement On The Ground — 2023-05-23</li>
+                <li><a href="/usaf/pub/afman11-218_aetcsup/">AFMAN11-218_AETCSUP</a> — Aircraft Operations And Movement On The Ground — 2019-08-02</li>
+                <li><a href="/usaf/pub/afman11-218_afsocsup/">AFMAN11-218_AFSOCSUP</a> — Aircraft Operations And Movement On The Ground — 2024-08-05</li>
+                <li><a href="/usaf/pub/afman11-223-i-v1/">AFMAN11-223(I)V1</a> — Multiservice Helicopter Sling Load:  Basic Operations And Equipment — 2012-07-23</li>
+                <li><a href="/usaf/pub/afman11-223-i-v2/">AFMAN11-223(I)V2</a> — Multiservice Helicopter Sling Load:  Single-point Load Rigging Procedures — 2013-07-05</li>
+                <li><a href="/usaf/pub/afman11-223-i-v3/">AFMAN11-223(I)V3</a> — Multiservice Helicopter Sling Load: Dual-point Load Rigging Procedrues — 2013-07-05</li>
+                <li><a href="/usaf/pub/afman11-225_ip/">AFMAN11-225_IP</a> — United States Standard Flight Inspection Manual — 2019-02-06</li>
+                <li><a href="/usaf/pub/afman11-231/">AFMAN11-231</a> — Computed Air Release Point Procedures — 2020-11-18</li>
+                <li><a href="/usaf/pub/afman11-231_afsocsup/">AFMAN11-231_AFSOCSUP</a> — Computed Air Release Point Procedures — 2021-11-24</li>
+                <li><a href="/usaf/pub/afman11-246/">AFMAN11-246</a> — Air Force Aircraft Demonstrations, Ac-130, Mc-130, Ec-130j, Cv-22 — 2020-03-20</li>
+                <li><a href="/usaf/pub/afman11-246v1/">AFMAN11-246V1</a> — Air Force Fighter Type Aircraft Demonstrations (a-10, F-16, F-22, F-35) — 2022-03-28</li>
+                <li><a href="/usaf/pub/afman11-246v2/">AFMAN11-246V2</a> — Aircraft Demonstrations (sailplanes) — 2024-07-30</li>
+                <li><a href="/usaf/pub/afman11-246v6/">AFMAN11-246V6</a> — Aircraft Demonstrations (c-17, C-130, Kc/nkc-135) — 2020-11-17</li>
+                <li><a href="/usaf/pub/afman11-290/">AFMAN11-290</a> — Cockpit/crew Resource Management And Threat &amp; Error Management Program — 2021-10-25</li>
+                <li><a href="/usaf/pub/afman11-290_accsup/">AFMAN11-290_ACCSUP</a> — Cockpit/crew Resource Management And Threat &amp; Error Management Program — 2026-03-17</li>
+                <li><a href="/usaf/pub/afman11-290_aetcsup/">AFMAN11-290_AETCSUP</a> — Cockpit/crew Resource And Threat &amp; Error Management Program — 2025-06-09</li>
+                <li><a href="/usaf/pub/afman11-290_afgscsup/">AFMAN11-290_AFGSCSUP</a> — Cockpit/crew Resource Management And Threat &amp; Error Management Program — 2023-02-08</li>
+                <li><a href="/usaf/pub/afman11-290_afsocsup/">AFMAN11-290_AFSOCSUP</a> — Cockpit/crew Resource Management And Threat &amp; Error Management Program — 2023-03-31</li>
+                <li><a href="/usaf/pub/afman11-2a-10cv1/">AFMAN11-2A-10CV1</a> — A-10c--aircrew Training — 2023-11-15</li>
+                <li><a href="/usaf/pub/afman11-2a-10cv2/">AFMAN11-2A-10CV2</a> — A-10c--aircrew Evaluation Criteria — 2023-11-06</li>
+                <li><a href="/usaf/pub/afman11-2a-10cv3/">AFMAN11-2A-10CV3</a> — A-10c -- Operations Procedures — 2023-11-06</li>
+                <li><a href="/usaf/pub/afman11-2ac-130jv1/">AFMAN11-2AC-130JV1</a> — Ac-130j Aircrew Training — 2023-09-26</li>
+                <li><a href="/usaf/pub/afman11-2ac-130jv2/">AFMAN11-2AC-130JV2</a> — Ac-130j Aircrew Evaluation Criteria — 2019-11-04</li>
+                <li><a href="/usaf/pub/afman11-2ac-130jv2_aetcsup/">AFMAN11-2AC-130JV2_AETCSUP</a> — Ac-130j Aircrew Evaluation Criteria — 2026-07-27</li>
+                <li><a href="/usaf/pub/afman11-2ac-130jv3/">AFMAN11-2AC-130JV3</a> — Ac-130j Operations Procedures — 2024-07-19</li>
+                <li><a href="/usaf/pub/afman11-2ac-130jv3_addendum-a/">AFMAN11-2AC-130JV3_ADDENDUM-A</a> — Ac-130j Operation Configuration/mission Planning — 2021-06-25</li>
+                <li><a href="/usaf/pub/afman11-2aev1/">AFMAN11-2AEV1</a> — Aeromedical Evacuation Aircrew Training — 2020-12-07</li>
+                <li><a href="/usaf/pub/afman11-2aev2/">AFMAN11-2AEV2</a> — Aeromedical Evacuation (ae) Aircrew Evaluation Criteria — 2023-02-07</li>
+                <li><a href="/usaf/pub/afman11-2aev2_375amwsup/">AFMAN11-2AEV2_375AMWSUP</a> — Aeromedical Evacuation Aircrew Evaluation Criteria — 2024-02-08</li>
+                <li><a href="/usaf/pub/afman11-2aev3/">AFMAN11-2AEV3</a> — Aeromedical Evacuation (ae) Operations Procedures — 2023-09-28</li>
+                <li><a href="/usaf/pub/afman11-2aev3addenda-a/">AFMAN11-2AEV3ADDENDA-A</a> — Aeromedical Evacuation Operations Configuration/mission Planning — 2020-06-16</li>
+                <li><a href="/usaf/pub/afman11-2aev3cl-1/">AFMAN11-2AEV3CL-1</a> — Aeromedical Evacuation Crew (aec) Checklist — 2023-09-28</li>
+                <li><a href="/usaf/pub/afman11-2apv1/">AFMAN11-2APV1</a> — Combat Camera Aircrew Training — 2018-07-12</li>
+                <li><a href="/usaf/pub/afman11-2apv2/">AFMAN11-2APV2</a> — Combat Camera Evaluation Criteria — 2018-07-12</li>
+                <li><a href="/usaf/pub/afman11-2apv3/">AFMAN11-2APV3</a> — Combat Camera Operational Procedures — 2018-07-12</li>
+                <li><a href="/usaf/pub/afman11-2b-1v1/">AFMAN11-2B-1V1</a> — B-1 Aircrew Training — 2020-10-30</li>
+                <li><a href="/usaf/pub/afman11-2b-1v2/">AFMAN11-2B-1V2</a> — B-1 Aircrew Evaluation Criteria — 2021-01-27</li>
+                <li><a href="/usaf/pub/afman11-2b-1v3/">AFMAN11-2B-1V3</a> — B-1 - Operationing Procedures — 2020-12-14</li>
+                <li><a href="/usaf/pub/afman11-2b-1v3_ellsworthafbsup/">AFMAN11-2B-1V3_ELLSWORTHAFBSUP</a> — B-1 Operations Procedures — 2021-06-28</li>
+                <li><a href="/usaf/pub/afman11-2b-2v1/">AFMAN11-2B-2V1</a> — B-2 Aircrew Training — 2020-08-20</li>
+                <li><a href="/usaf/pub/afman11-2b-2v2/">AFMAN11-2B-2V2</a> — B-2 Aircrew Evaluation Criteria — 2019-02-04</li>
+                <li><a href="/usaf/pub/afman11-2b-2v3/">AFMAN11-2B-2V3</a> — B-2--operations Procedures — 2020-10-30</li>
+                <li><a href="/usaf/pub/afman11-2b-52v1/">AFMAN11-2B-52V1</a> — B-52 Aircrew Training — 2022-04-19</li>
+                <li><a href="/usaf/pub/afman11-2b-52v2/">AFMAN11-2B-52V2</a> — B-52--aircrew Evaluation Criteria — 2022-07-18</li>
+                <li><a href="/usaf/pub/afman11-2b-52v3/">AFMAN11-2B-52V3</a> — B-52--operations Procedures — 2019-03-12</li>
+                <li><a href="/usaf/pub/afman11-2b-52v3_barksdaleafbsup/">AFMAN11-2B-52V3_BARKSDALEAFBSUP</a> — B-52 Operations Procedures — 2026-04-17</li>
+                <li><a href="/usaf/pub/afman11-2b-52v3_minotafbsup/">AFMAN11-2B-52V3_MINOTAFBSUP</a> — B-52 Operations Procedures — 2026-06-17</li>
+                <li><a href="/usaf/pub/afman11-2c-12/">AFMAN11-2C-12</a> — C-12 Aircrew Training, Operations, And Evaluations — 2025-04-08</li>
+                <li><a href="/usaf/pub/afman11-2c-130hv1/">AFMAN11-2C-130HV1</a> — C-130h Aircrew Training — 2020-10-22</li>
+                <li><a href="/usaf/pub/afman11-2c-130hv2/">AFMAN11-2C-130HV2</a> — C-130h Aircrew Evaluation Criteria — 2023-12-04</li>
+                <li><a href="/usaf/pub/afman11-2c-130hv3/">AFMAN11-2C-130HV3</a> — C-130h Operations Procedures — 2023-12-05</li>
+                <li><a href="/usaf/pub/afman11-2c-130hv3add-d/">AFMAN11-2C-130HV3ADD-D</a> — Lc-130 Ski Procedures — 2024-10-17</li>
+                <li><a href="/usaf/pub/afman11-2c-130hv3adda/">AFMAN11-2C-130HV3ADDA</a> — C-130h Operations Configurations/mission Planning — 2021-11-15</li>
+                <li><a href="/usaf/pub/afman11-2c-130hv3addbcl-1/">AFMAN11-2C-130HV3ADDBCL-1</a> — C-130h Maffs Operations Pilot Checklist — 2019-12-12</li>
+                <li><a href="/usaf/pub/afman11-2c-130hv3addbcl-2/">AFMAN11-2C-130HV3ADDBCL-2</a> — C-130h Maffs Operations Loadmaster Checklist — 2018-08-09</li>
+                <li><a href="/usaf/pub/afman11-2c-130jv1/">AFMAN11-2C-130JV1</a> — C-130j Aircrew Training — 2020-02-10</li>
+                <li><a href="/usaf/pub/afman11-2c-130jv2/">AFMAN11-2C-130JV2</a> — C-130j Aircrew Evaluation Criteria — 2021-06-07</li>
+                <li><a href="/usaf/pub/afman11-2c-130jv3/">AFMAN11-2C-130JV3</a> — C-130j Operations Procedures — 2023-08-01</li>
+                <li><a href="/usaf/pub/afman11-2c-130jv3adda/">AFMAN11-2C-130JV3ADDA</a> — C-130j Operations Configuration/mission Planning — 2023-11-16</li>
+                <li><a href="/usaf/pub/afman11-2c-130jv3addb/">AFMAN11-2C-130JV3ADDB</a> — C-130j Modular Airborne Fire Fighting System (maffs) Procedures — 2018-05-30</li>
+                <li><a href="/usaf/pub/afman11-2c-130jv3addbcl-1/">AFMAN11-2C-130JV3ADDBCL-1</a> — C-130j Maffs Operations Pilot Checklist — 2019-12-12</li>
+                <li><a href="/usaf/pub/afman11-2c-130jv3addbcl-2/">AFMAN11-2C-130JV3ADDBCL-2</a> — C-130j Maffs Operations Loadmaster Checklist — 2018-06-26</li>
+                <li><a href="/usaf/pub/afman11-2c-130v3addb/">AFMAN11-2C-130V3ADDB</a> — C-130h Modular Airborne Fire Fighting System (maffs) Procedures — 2018-07-30</li>
+                <li><a href="/usaf/pub/afman11-2c-130v3addc/">AFMAN11-2C-130V3ADDC</a> — C-130 Modular Aerial Spray System (mass) Procedures — 2018-06-04</li>
+                <li><a href="/usaf/pub/afman11-2c-130v3addccl-1/">AFMAN11-2C-130V3ADDCCL-1</a> — C-130 Mass Operations Pilots Checklist — 2018-06-25</li>
+                <li><a href="/usaf/pub/afman11-2c-130v3addccl-2/">AFMAN11-2C-130V3ADDCCL-2</a> — C-130 Mass Operations Flight Engineer Checklist — 2018-06-26</li>
+                <li><a href="/usaf/pub/afman11-2c-130v3addccl-3/">AFMAN11-2C-130V3ADDCCL-3</a> — C-130 Mass Operations Navigators Checklist — 2018-06-26</li>
+                <li><a href="/usaf/pub/afman11-2c-130v3addccl-4/">AFMAN11-2C-130V3ADDCCL-4</a> — C-130 Mass Operations Loadmasters Checklist — 2018-06-26</li>
+                <li><a href="/usaf/pub/afman11-2c-145av2/">AFMAN11-2C-145AV2</a> — C-145a Evaluation Criteria — 2019-12-19</li>
+                <li><a href="/usaf/pub/afman11-2c-145av3/">AFMAN11-2C-145AV3</a> — C-145a Operations Procedures — 2020-01-28</li>
+                <li><a href="/usaf/pub/afman11-2c-146av1/">AFMAN11-2C-146AV1</a> — C-146a Aircrew Training — 2022-07-15</li>
+                <li><a href="/usaf/pub/afman11-2c-146av2/">AFMAN11-2C-146AV2</a> — C-146a Aircrew Evaluation Criteria — 2022-07-15</li>
+                <li><a href="/usaf/pub/afman11-2c-146av3/">AFMAN11-2C-146AV3</a> — C-146a Operations Procedures — 2019-03-22</li>
+                <li><a href="/usaf/pub/afman11-2c-17v1/">AFMAN11-2C-17V1</a> — C-17 Aircrew Training — 2020-02-12</li>
+                <li><a href="/usaf/pub/afman11-2c-17v2/">AFMAN11-2C-17V2</a> — C-17 Aircrew Evaluation Criteria — 2021-08-04</li>
+                <li><a href="/usaf/pub/afman11-2c-17v3/">AFMAN11-2C-17V3</a> — C-17 Operations Procedures — 2024-08-19</li>
+                <li><a href="/usaf/pub/afman11-2c-17v3add-a/">AFMAN11-2C-17V3ADD-A</a> — C-17 Configuration And Mission Planning — 2024-07-08</li>
+                <li><a href="/usaf/pub/afman11-2c-17v3add-c/">AFMAN11-2C-17V3ADD-C</a> — C-17 Antarctic Operations — 2024-05-03</li>
+                <li><a href="/usaf/pub/afman11-2c-21v1/">AFMAN11-2C-21V1</a> — C-21 Aircrew Training — 2020-10-21</li>
+                <li><a href="/usaf/pub/afman11-2c-21v2/">AFMAN11-2C-21V2</a> — C-21 Aircrew Evaluation Criteria — 2024-09-26</li>
+                <li><a href="/usaf/pub/afman11-2c-21v3/">AFMAN11-2C-21V3</a> — C-21a Operations Procedures — 2024-06-20</li>
+                <li><a href="/usaf/pub/afman11-2c-32bv1/">AFMAN11-2C-32BV1</a> — C-32b Aircrew Training — 2020-07-27</li>
+                <li><a href="/usaf/pub/afman11-2c-32bv2/">AFMAN11-2C-32BV2</a> — C-32b Aircrew Evaluation Criteria — 2020-07-27</li>
+                <li><a href="/usaf/pub/afman11-2c-32bv3/">AFMAN11-2C-32BV3</a> — C-32b Operations Procedures — 2020-07-27</li>
+                <li><a href="/usaf/pub/afman11-2c-5v1/">AFMAN11-2C-5V1</a> — C-5 Aircrew Training — 2021-02-02</li>
+                <li><a href="/usaf/pub/afman11-2c-5v2/">AFMAN11-2C-5V2</a> — C-5 Aircrew Evaluation Criteria — 2024-07-23</li>
+                <li><a href="/usaf/pub/afman11-2c-5v3/">AFMAN11-2C-5V3</a> — C-5 Operations Procedures — 2022-10-20</li>
+                <li><a href="/usaf/pub/afman11-2c-5v3_439awsup/">AFMAN11-2C-5V3_439AWSUP</a> — C-5 Operations Procedures — 2024-09-24</li>
+                <li><a href="/usaf/pub/afman11-2c-5v3_addenda-a/">AFMAN11-2C-5V3_ADDENDA-A</a> — C-5 Operations Configuration And Mission Planning — 2023-06-12</li>
+                <li><a href="/usaf/pub/afman11-2cv-22v1/">AFMAN11-2CV-22V1</a> — Cv-22 Aircrew Training — 2020-03-10</li>
+                <li><a href="/usaf/pub/afman11-2cv-22v2/">AFMAN11-2CV-22V2</a> — Cv-22 Evaluation Criteria — 2023-03-10</li>
+                <li><a href="/usaf/pub/afman11-2cv-22v3/">AFMAN11-2CV-22V3</a> — Cv-22 Operations Procedures — 2021-09-13</li>
+                <li><a href="/usaf/pub/afman11-2cv-22v3cl-1/">AFMAN11-2CV-22V3CL-1</a> — Flight Crew Checklist Checklists And Signal Tables — 2023-11-07</li>
+                <li><a href="/usaf/pub/afman11-2e-11v1/">AFMAN11-2E-11V1</a> — E-11 Aircrew Training — 2025-02-10</li>
+                <li><a href="/usaf/pub/afman11-2e-11v2/">AFMAN11-2E-11V2</a> — E-11 Aircrew Evaluation Criteria — 2026-04-14</li>
+                <li><a href="/usaf/pub/afman11-2e-11v3/">AFMAN11-2E-11V3</a> — E-11 Operations Procedures — 2026-04-14</li>
+                <li><a href="/usaf/pub/afman11-2e-3gv1/">AFMAN11-2E-3GV1</a> — E-3g Aircrew Training — 2022-11-03</li>
+                <li><a href="/usaf/pub/afman11-2e-3gv2/">AFMAN11-2E-3GV2</a> — E-3g Aircrew Evaluation Criteria — 2022-11-03</li>
+                <li><a href="/usaf/pub/afman11-2e-3gv3/">AFMAN11-2E-3GV3</a> — E-3g Operations Procedures — 2022-11-03</li>
+                <li><a href="/usaf/pub/afman11-2e-3gv3_18wgsup/">AFMAN11-2E-3GV3_18WGSUP</a> — E-3g Operations Procedures — 2026-06-30</li>
+                <li><a href="/usaf/pub/afman11-2e-3v2/">AFMAN11-2E-3V2</a> — E-3 - Aircrew Evaluation Criteria — 2022-03-21</li>
+                <li><a href="/usaf/pub/afman11-2e-4bv1/">AFMAN11-2E-4BV1</a> — E-4b Aircrew Training — 2024-04-22</li>
+                <li><a href="/usaf/pub/afman11-2e-4bv2/">AFMAN11-2E-4BV2</a> — E-4b--aircrew Evaluation Criteria — 2023-08-03</li>
+                <li><a href="/usaf/pub/afman11-2e-4bv3/">AFMAN11-2E-4BV3</a> — E-4b Operations Procedures — 2019-07-09</li>
+                <li><a href="/usaf/pub/afman11-2eav1/">AFMAN11-2EAV1</a> — Executive Airlift (ea) Aircrew Training — 2020-07-28</li>
+                <li><a href="/usaf/pub/afman11-2eav2/">AFMAN11-2EAV2</a> — Executive Airlift Aircrew Evaluation Criteria — 2019-06-18</li>
+                <li><a href="/usaf/pub/afman11-2eav3/">AFMAN11-2EAV3</a> — Executive Airlift (ea) Operations Procedures — 2020-02-05</li>
+                <li><a href="/usaf/pub/afman11-2eav3_15wgsup/">AFMAN11-2EAV3_15WGSUP</a> — Executive Airlift (ea) Operations Procedures — 2021-11-02</li>
+                <li><a href="/usaf/pub/afman11-2eav3_89awsup_i/">AFMAN11-2EAV3_89AWSUP_I</a> — Executive Airlift (ea) Operations Procedures — 2021-03-01</li>
+                <li><a href="/usaf/pub/afman11-2ec-130jv1/">AFMAN11-2EC-130JV1</a> — Ec-130j Aircrew Training — 2024-01-24</li>
+                <li><a href="/usaf/pub/afman11-2ec-130jv2/">AFMAN11-2EC-130JV2</a> — Ec-130j Aircrew Evaluation Criteria — 2020-09-09</li>
+                <li><a href="/usaf/pub/afman11-2ec-mc-130jv3adda-a/">AFMAN11-2EC-MC-130JV3ADDA-A</a> — Ec/mc-130j Operation Configuration/mission Planning — 2020-12-09</li>
+                <li><a href="/usaf/pub/afman11-2erq-4v1/">AFMAN11-2ERQ-4V1</a> — E/rq-4 Crew Training — 2020-02-04</li>
+                <li><a href="/usaf/pub/afman11-2f-15ev3/">AFMAN11-2F-15EV3</a> — F-15e--operations Procedures — 2020-09-24</li>
+                <li><a href="/usaf/pub/afman11-2f-15ev3_seymourjohnsonairforcebasesup/">AFMAN11-2F-15EV3_SEYMOURJOHNSONAIRFORCEBASESUP</a> — F-15e Operations Procedures — 2023-11-20</li>
+                <li><a href="/usaf/pub/afman11-2f-15v1/">AFMAN11-2F-15V1</a> — F-15--aircrew Training — 2024-08-19</li>
+                <li><a href="/usaf/pub/afman11-2f-15v2/">AFMAN11-2F-15V2</a> — F-15--aircrew Evaluation Criteria — 2026-08-25</li>
+                <li><a href="/usaf/pub/afman11-2f-15v3/">AFMAN11-2F-15V3</a> — F-15 – Operations Procedures — 2020-11-25</li>
+                <li><a href="/usaf/pub/afman11-2f-15v3_kadenaabsup/">AFMAN11-2F-15V3_KADENAABSUP</a> — F-15 – Operations Procedures — 2022-06-07</li>
+                <li><a href="/usaf/pub/afman11-2f-16v1/">AFMAN11-2F-16V1</a> — F-16--aircrew Training — 2024-06-26</li>
+                <li><a href="/usaf/pub/afman11-2f-16v1_aetcsup/">AFMAN11-2F-16V1_AETCSUP</a> — F-16--aircrew Training — 2025-06-09</li>
+                <li><a href="/usaf/pub/afman11-2f-16v1_shawafbsup/">AFMAN11-2F-16V1_SHAWAFBSUP</a> — F-16--operations Procedures — 2021-09-02</li>
+                <li><a href="/usaf/pub/afman11-2f-16v2/">AFMAN11-2F-16V2</a> — F-16-aircrew Evaluation Criteria — 2019-02-08</li>
+                <li><a href="/usaf/pub/afman11-2f-16v2_aetcsup/">AFMAN11-2F-16V2_AETCSUP</a> — F-16 Aircrew Evaluation Criteria — 2022-09-01</li>
+                <li><a href="/usaf/pub/afman11-2f-16v3/">AFMAN11-2F-16V3</a> — F-16--operations Procedures — 2026-04-16</li>
+                <li><a href="/usaf/pub/afman11-2f-16v3_35fwsup/">AFMAN11-2F-16V3_35FWSUP</a> — F-16--operations Procedures — 2023-07-06</li>
+                <li><a href="/usaf/pub/afman11-2f-16v3_aetcsup/">AFMAN11-2F-16V3_AETCSUP</a> — F-16--operations Procedures — 2023-03-01</li>
+                <li><a href="/usaf/pub/afman11-2f-16v3_spangdahlemabsup/">AFMAN11-2F-16V3_SPANGDAHLEMABSUP</a> — Flying Operations — 2025-02-05</li>
+                <li><a href="/usaf/pub/afman11-2f-22av1/">AFMAN11-2F-22AV1</a> — F-22a-aircrew Training — 2025-08-07</li>
+                <li><a href="/usaf/pub/afman11-2f-22av2/">AFMAN11-2F-22AV2</a> — F-22a--aircrew Evaluation Criteria — 2023-08-14</li>
+                <li><a href="/usaf/pub/afman11-2f-22av3/">AFMAN11-2F-22AV3</a> — F-22a--operations Procedures — 2026-07-02</li>
+                <li><a href="/usaf/pub/afman11-2f-35av2/">AFMAN11-2F-35AV2</a> — F-35a-aircrew Evaluation Criteria — 2023-09-26</li>
+                <li><a href="/usaf/pub/afman11-2f-35av3/">AFMAN11-2F-35AV3</a> — F-35a--operations Procedures — 2022-05-16</li>
+                <li><a href="/usaf/pub/afman11-2f-35av3_aetcsup/">AFMAN11-2F-35AV3_AETCSUP</a> — F-35a—operations Procedures — 2022-08-22</li>
+                <li><a href="/usaf/pub/afman11-2f-35v1/">AFMAN11-2F-35V1</a> — F-35a--aircrew Training — 2026-08-20</li>
+                <li><a href="/usaf/pub/afman11-2ftv1/">AFMAN11-2FTV1</a> — Flight Test Aircrew Training — 2026-06-16</li>
+                <li><a href="/usaf/pub/afman11-2ftv1_96twsup/">AFMAN11-2FTV1_96TWSUP</a> — Flight Test Aircrew Training — 2020-06-29</li>
+                <li><a href="/usaf/pub/afman11-2ftv1_edwardsafbsup/">AFMAN11-2FTV1_EDWARDSAFBSUP</a> — Flight Test Aircrew Training — 2026-02-19</li>
+                <li><a href="/usaf/pub/afman11-2ftv2/">AFMAN11-2FTV2</a> — Flight Test Aircrew Evaluation Criteria — 2024-11-08</li>
+                <li><a href="/usaf/pub/afman11-2ftv3/">AFMAN11-2FTV3</a> — Flight Test Operations Procedures — 2020-12-29</li>
+                <li><a href="/usaf/pub/afman11-2ftv3_edwardsafbsup/">AFMAN11-2FTV3_EDWARDSAFBSUP</a> — Flight Test Operations Procedures — 2024-08-09</li>
+                <li><a href="/usaf/pub/afman11-2hc-130jv1/">AFMAN11-2HC-130JV1</a> — Hc-130j--aircrew Training — 2020-06-01</li>
+                <li><a href="/usaf/pub/afman11-2hc-130jv2/">AFMAN11-2HC-130JV2</a> — Hc -130j--aircrew Evaluation Criteria — 2024-03-04</li>
+                <li><a href="/usaf/pub/afman11-2hc-130jv3/">AFMAN11-2HC-130JV3</a> — Hc -130j--operations Procedures — 2023-01-24</li>
+                <li><a href="/usaf/pub/afman11-2hc-130jv3_addenda-a/">AFMAN11-2HC-130JV3_ADDENDA-A</a> — Rescue Hc-130j Configuration/mission Planning Guide — 2022-08-01</li>
+                <li><a href="/usaf/pub/afman11-2hh-60gv1/">AFMAN11-2HH-60GV1</a> — Hh-60g Aircrew Training — 2023-11-03</li>
+                <li><a href="/usaf/pub/afman11-2hh-60gv2/">AFMAN11-2HH-60GV2</a> — Hh-60g Aircrew Evaluation Criteria — 2024-02-29</li>
+                <li><a href="/usaf/pub/afman11-2hh-60gv3/">AFMAN11-2HH-60GV3</a> — Hh-60g--operations Procedures — 2023-08-24</li>
+                <li><a href="/usaf/pub/afman11-2hh-60gv3_avianoabsup/">AFMAN11-2HH-60GV3_AVIANOABSUP</a> — Hh-60g Operations Procedures — 2024-08-09</li>
+                <li><a href="/usaf/pub/afman11-2hh-60v3cl-1/">AFMAN11-2HH-60V3CL-1</a> — Hh-60g--helicopter Crew Briefing Guides And Checklists — 2023-08-02</li>
+                <li><a href="/usaf/pub/afman11-2hh-60wv1/">AFMAN11-2HH-60WV1</a> — Hh-60w Aircrew Training — 2022-01-05</li>
+                <li><a href="/usaf/pub/afman11-2hh-60wv1_aetcsup/">AFMAN11-2HH-60WV1_AETCSUP</a> — HH-60W Aircrew Training — 2022-09-16</li>
+                <li><a href="/usaf/pub/afman11-2hh-60wv2/">AFMAN11-2HH-60WV2</a> — Hh-60w Aircrew Evaluation Criteria — 2024-03-04</li>
+                <li><a href="/usaf/pub/afman11-2hh-60wv3/">AFMAN11-2HH-60WV3</a> — Hh-60w Operations Procedures — 2022-01-05</li>
+                <li><a href="/usaf/pub/afman11-2hh-60wv3_aetcsup_aetcgm2026-01/">AFMAN11-2HH-60WV3_AETCSUP_AETCGM2026-01</a> — Hh-60w Operations Procedures — 2026-03-17</li>
+                <li><a href="/usaf/pub/afman11-2kc-10v1/">AFMAN11-2KC-10V1</a> — Kc-10 Aircrew Training — 2020-09-10</li>
+                <li><a href="/usaf/pub/afman11-2kc-10v2/">AFMAN11-2KC-10V2</a> — Kc-10 Aircrew Evaluation Criteria — 2021-10-18</li>
+                <li><a href="/usaf/pub/afman11-2kc-10v3/">AFMAN11-2KC-10V3</a> — Kc-10 Operations Procedures — 2023-01-09</li>
+                <li><a href="/usaf/pub/afman11-2kc-10v3_addenda-a/">AFMAN11-2KC-10V3_ADDENDA-A</a> — Kc-10 Aircraft Configuration — 2019-04-08</li>
+                <li><a href="/usaf/pub/afman11-2kc-135v1/">AFMAN11-2KC-135V1</a> — Kc-135 Aircrew Training — 2020-07-29</li>
+                <li><a href="/usaf/pub/afman11-2kc-135v2/">AFMAN11-2KC-135V2</a> — Kc-135 Aircrew Evaluation Criteria — 2020-04-21</li>
+                <li><a href="/usaf/pub/afman11-2kc-135v3/">AFMAN11-2KC-135V3</a> — Kc-135 Operations Procedures — 2019-09-10</li>
+                <li><a href="/usaf/pub/afman11-2kc-135v3_914arwsup/">AFMAN11-2KC-135V3_914ARWSUP</a> — KC-135 Operations Procedures — 2024-08-20</li>
+                <li><a href="/usaf/pub/afman11-2kc-135v3_addenda-a/">AFMAN11-2KC-135V3_ADDENDA-A</a> — C/kc-135 Aircraft Configuration — 2020-01-07</li>
+                <li><a href="/usaf/pub/afman11-2kc-135v3_fairchildafbsup/">AFMAN11-2KC-135V3_FAIRCHILDAFBSUP</a> — C/kc-135 Operations Procedures — 2020-12-04</li>
+                <li><a href="/usaf/pub/afman11-2kc-46v1/">AFMAN11-2KC-46V1</a> — Kc-46 Aircrew Training — 2021-07-12</li>
+                <li><a href="/usaf/pub/afman11-2kc-46v2/">AFMAN11-2KC-46V2</a> — Kc-46 Aircrew Evaluation Criteria — 2021-07-12</li>
+                <li><a href="/usaf/pub/afman11-2kc-46v3/">AFMAN11-2KC-46V3</a> — Kc-46 Operations Procedures — 2024-05-02</li>
+                <li><a href="/usaf/pub/afman11-2mc-12wv1/">AFMAN11-2MC-12WV1</a> — Mc-12w Aircrew Training — 2022-07-01</li>
+                <li><a href="/usaf/pub/afman11-2mc-12wv2/">AFMAN11-2MC-12WV2</a> — Mc-12w Aircrew Evaluation Criteria — 2022-07-01</li>
+                <li><a href="/usaf/pub/afman11-2mc-12wv3/">AFMAN11-2MC-12WV3</a> — Mc-12w Operations Procedures — 2022-07-01</li>
+                <li><a href="/usaf/pub/afman11-2mc-130jv1/">AFMAN11-2MC-130JV1</a> — Mc-130j Aircrew Training — 2020-01-24</li>
+                <li><a href="/usaf/pub/afman11-2mc-130jv2/">AFMAN11-2MC-130JV2</a> — Mc-130j Aircrew Evaluation Criteria — 2018-09-28</li>
+                <li><a href="/usaf/pub/afman11-2mc-130jv3/">AFMAN11-2MC-130JV3</a> — Mc-130j--operations Procedures — 2020-04-03</li>
+                <li><a href="/usaf/pub/afman11-2mc-130jv3_afsocsup/">AFMAN11-2MC-130JV3_AFSOCSUP</a> — Mc-130j--operations Procedures — 2020-07-23</li>
+                <li><a href="/usaf/pub/afman11-2mh-139v1/">AFMAN11-2MH-139V1</a> — Mh-139 Aircrew Training — 2025-03-24</li>
+                <li><a href="/usaf/pub/afman11-2mh-139v3/">AFMAN11-2MH-139V3</a> — Mh-139 Operations Procedures — 2024-04-23</li>
+                <li><a href="/usaf/pub/afman11-2mq-9v1/">AFMAN11-2MQ-9V1</a> — Mq9--aircrew Training — 2023-01-12</li>
+                <li><a href="/usaf/pub/afman11-2mq-9v2/">AFMAN11-2MQ-9V2</a> — Mq-9 Crew Evaluation Criteria — 2023-01-12</li>
+                <li><a href="/usaf/pub/afman11-2mq-9v3/">AFMAN11-2MQ-9V3</a> — Mq-9--operations Procedures — 2023-01-12</li>
+                <li><a href="/usaf/pub/afman11-2physv1/">AFMAN11-2PHYSV1</a> — Aerospace Physiology Training — 2026-06-05</li>
+                <li><a href="/usaf/pub/afman11-2rq-4v2/">AFMAN11-2RQ-4V2</a> — Rq-4 - Aircrew Evaluation Criteria — 2024-01-24</li>
+                <li><a href="/usaf/pub/afman11-2sailplanev3/">AFMAN11-2SAILPLANEV3</a> — Sailplane Aircrew Operations — 2020-11-30</li>
+                <li><a href="/usaf/pub/afman11-2t-1v2/">AFMAN11-2T-1V2</a> — T-1a Aircrew Evaluation Criteria — 2020-07-24</li>
+                <li><a href="/usaf/pub/afman11-2t-38a-b/">AFMAN11-2T-38A-B</a> — T-38a/b Flying Fundamentals — 2022-04-20</li>
+                <li><a href="/usaf/pub/afman11-2t-38v1/">AFMAN11-2T-38V1</a> — T-38 Aircrew Training — 2020-05-14</li>
+                <li><a href="/usaf/pub/afman11-2t-38v1_accsup/">AFMAN11-2T-38V1_ACCSUP</a> — T-38 Aircrew Training — 2021-04-30</li>
+                <li><a href="/usaf/pub/afman11-2t-38v1_aetcsup/">AFMAN11-2T-38V1_AETCSUP</a> — T-38 Aircrew Training — 2026-03-18</li>
+                <li><a href="/usaf/pub/afman11-2t-38v1_afgscsup/">AFMAN11-2T-38V1_AFGSCSUP</a> — T-38 Aircrew Training — 2020-11-12</li>
+                <li><a href="/usaf/pub/afman11-2t-38v2/">AFMAN11-2T-38V2</a> — T-38 Aircrew Evaluation Criteria — 2026-06-08</li>
+                <li><a href="/usaf/pub/afman11-2t-38v3/">AFMAN11-2T-38V3</a> — T-38 Operations Procedures — 2023-08-21</li>
+                <li><a href="/usaf/pub/afman11-2t-38v3_aetcsup/">AFMAN11-2T-38V3_AETCSUP</a> — T-38 Operations Procedures — 2022-08-24</li>
+                <li><a href="/usaf/pub/afman11-2t-6v3/">AFMAN11-2T-6V3</a> — T-6 Operations Procedures — 2020-12-16</li>
+                <li><a href="/usaf/pub/afman11-2th-1hv1/">AFMAN11-2TH-1HV1</a> — Th-1h Helicopter Aircrew Training — 2023-06-23</li>
+                <li><a href="/usaf/pub/afman11-2th-1hv2/">AFMAN11-2TH-1HV2</a> — Th-1h Helicopter Aircrew Evaluation Criteria — 2023-08-21</li>
+                <li><a href="/usaf/pub/afman11-2th-1hv3/">AFMAN11-2TH-1HV3</a> — Th-1h Helicopter Operations Procedures — 2023-06-23</li>
+                <li><a href="/usaf/pub/afman11-2th-1hv3-cl-1/">AFMAN11-2TH-1HV3-CL-1</a> — Th-1h Helicopter Crew Briefing Guides And Checklists — 2018-06-01</li>
+                <li><a href="/usaf/pub/afman11-2u-28av1/">AFMAN11-2U-28AV1</a> — U-28a Aircrew Training — 2023-02-01</li>
+                <li><a href="/usaf/pub/afman11-2u-28v2/">AFMAN11-2U-28V2</a> — U-28 Aircrew Evaluation Criteria — 2023-02-14</li>
+                <li><a href="/usaf/pub/afman11-2u-28v3/">AFMAN11-2U-28V3</a> — U-28 Operations Procedures — 2023-02-01</li>
+                <li><a href="/usaf/pub/afman11-2u-2v1/">AFMAN11-2U-2V1</a> — U-2 Aircrew Training — 2023-05-31</li>
+                <li><a href="/usaf/pub/afman11-2u-2v2/">AFMAN11-2U-2V2</a> — U-2--aircrew Evaluation Criteria — 2024-06-25</li>
+                <li><a href="/usaf/pub/afman11-2u-2v3/">AFMAN11-2U-2V3</a> — U-2-operations Procedures — 2026-03-09</li>
+                <li><a href="/usaf/pub/afman11-2uh-1nv1/">AFMAN11-2UH-1NV1</a> — Uh-1n Helicopter Aircrew Training — 2023-01-09</li>
+                <li><a href="/usaf/pub/afman11-2uh-1nv1_afdwsup/">AFMAN11-2UH-1NV1_AFDWSUP</a> — Uh-1n Helicopter Aircrew Training — 2024-04-09</li>
+                <li><a href="/usaf/pub/afman11-2uh-1nv2/">AFMAN11-2UH-1NV2</a> — Uh-1n Aircrew Evaluation Criteria — 2023-03-24</li>
+                <li><a href="/usaf/pub/afman11-2uh-1nv3/">AFMAN11-2UH-1NV3</a> — Uh-1n Helicopter Operations Procedures — 2022-12-06</li>
+                <li><a href="/usaf/pub/afman11-2uh-1nv3cl-1/">AFMAN11-2UH-1NV3CL-1</a> — Uh-1n Crew Briefing Guides/checklists — 2022-05-18</li>
+                <li><a href="/usaf/pub/afman11-2uh-1nv3_aetcsup/">AFMAN11-2UH-1NV3_AETCSUP</a> — Uh-1n Helicopter Operations Procedures — 2023-03-30</li>
+                <li><a href="/usaf/pub/afman11-2uh-1nv3_afdwsup/">AFMAN11-2UH-1NV3_AFDWSUP</a> — Uh-1n Helicopter Operations Procedures — 2024-04-11</li>
+                <li><a href="/usaf/pub/afman11-2uh-1nv3_afgscsup/">AFMAN11-2UH-1NV3_AFGSCSUP</a> — Uh-1n Helicopter Operations Procedures — 2022-11-03</li>
+                <li><a href="/usaf/pub/afman11-2uh-1nv3_pacafsup/">AFMAN11-2UH-1NV3_PACAFSUP</a> — Uh-1n Helicopter Operations Procedures — 2020-10-28</li>
+                <li><a href="/usaf/pub/afman11-2uv-18v1/">AFMAN11-2UV-18V1</a> — Uv-18 Aircrew Training — 2020-04-28</li>
+                <li><a href="/usaf/pub/afman11-2uv-18v2/">AFMAN11-2UV-18V2</a> — Uv-18 Aircrew Evaluation Criteria — 2020-09-23</li>
+                <li><a href="/usaf/pub/afman11-2uv-18v3/">AFMAN11-2UV-18V3</a> — Uv-18 Operations Procedures — 2020-11-20</li>
+                <li><a href="/usaf/pub/afman11-2wc-130jv1/">AFMAN11-2WC-130JV1</a> — Wc-130j Aircrew Training — 2021-07-14</li>
+                <li><a href="/usaf/pub/afman11-2wc-130jv2/">AFMAN11-2WC-130JV2</a> — Wc-130j Aircrew Evaluation Criteria — 2021-07-14</li>
+                <li><a href="/usaf/pub/afman11-2wc-130jv3/">AFMAN11-2WC-130JV3</a> — Wc-130j Operations Procedures — 2021-07-14</li>
+                <li><a href="/usaf/pub/afman11-301/">AFMAN11-301</a> — Aircrew Flight Equipment (afe) — 2026-08-13</li>
+                <li><a href="/usaf/pub/afman11-301v1_afgscsup/">AFMAN11-301V1_AFGSCSUP</a> — Aircrew Flight Equipment (afe) — 2024-12-27</li>
+                <li><a href="/usaf/pub/afman11-301v1_amcsup/">AFMAN11-301V1_AMCSUP</a> — Aircrew Flight Equipment Program — 2025-06-16</li>
+                <li><a href="/usaf/pub/afman11-402_aetcsup/">AFMAN11-402_AETCSUP</a> — Aviation And Parachutist Service — 2021-04-07</li>
+                <li><a href="/usaf/pub/afman11-402_afmcsup/">AFMAN11-402_AFMCSUP</a> — Aviation And Parachutist Service — 2024-07-26</li>
+                <li><a href="/usaf/pub/afman11-402_afsocsup/">AFMAN11-402_AFSOCSUP</a> — Aviation And Parachutist Service — 2020-02-05</li>
+                <li><a href="/usaf/pub/afman11-403/">AFMAN11-403</a> — Aerospace Physiology Training Program — 2024-03-18</li>
+                <li><a href="/usaf/pub/afman11-403_accsup/">AFMAN11-403_ACCSUP</a> — Aerospace Physiological Training Program — 2025-08-05</li>
+                <li><a href="/usaf/pub/afman11-403_pacafsup/">AFMAN11-403_PACAFSUP</a> — Aerospace Physiological Training Program — 2021-08-16</li>
+                <li><a href="/usaf/pub/afman11-404/">AFMAN11-404</a> — Fighter Aircrew Acceleration Training Program — 2026-03-11</li>
+                <li><a href="/usaf/pub/afman11-409/">AFMAN11-409</a> — High Altitude Airdrop Mission Support Capability Program — 2020-11-20</li>
+                <li><a href="/usaf/pub/afman11-420/">AFMAN11-420</a> — Static Line Parachuting Techniques And Tactics — 2018-10-24</li>
+                <li><a href="/usaf/pub/afman11-421/">AFMAN11-421</a> — Aviation Resource Management — 2020-03-23</li>
+                <li><a href="/usaf/pub/afman11-421_afrcsup/">AFMAN11-421_AFRCSUP</a> — Aviation Resource Management — 2025-08-08</li>
+                <li><a href="/usaf/pub/afman13-106/">AFMAN13-106</a> — Air Mobility Liaison Officers (amlo) — 2020-12-07</li>
+                <li><a href="/usaf/pub/afman13-116/">AFMAN13-116</a> — Tactical Data Link Planning And Operations — 2020-08-13</li>
+                <li><a href="/usaf/pub/afman13-1aocv1/">AFMAN13-1AOCV1</a> — Ground Environment Training-air Operations Center (aoc) / Operations Center (oc) — 2024-05-15</li>
+                <li><a href="/usaf/pub/afman13-1aocv2/">AFMAN13-1AOCV2</a> — Standardization/evaluation Program -air Operations Center (aoc) / Operations Center (oc) — 2020-02-18</li>
+                <li><a href="/usaf/pub/afman13-1aocv3/">AFMAN13-1AOCV3</a> — Operational Procedures-air Operations Center (aoc) / Operations Center (oc) — 2024-06-25</li>
+                <li><a href="/usaf/pub/afman13-1aocv3_afsocsup/">AFMAN13-1AOCV3_AFSOCSUP</a> — Operational Procedures-air Operations Center (aoc)/operations Center (oc) — 2024-10-22</li>
+                <li><a href="/usaf/pub/afman13-1bccv1/">AFMAN13-1BCCV1</a> — Battle Control Center (bcc) Training — 2026-05-08</li>
+                <li><a href="/usaf/pub/afman13-1bccv2/">AFMAN13-1BCCV2</a> — Battle Control Center (bcc) Evaluation Criteria — 2026-05-11</li>
+                <li><a href="/usaf/pub/afman13-1bccv3/">AFMAN13-1BCCV3</a> — Operating Procedures-battle Control Center (bcc) — 2026-05-13</li>
+                <li><a href="/usaf/pub/afman13-1crcv1/">AFMAN13-1CRCV1</a> — Control And Reporting Center (crc)-training — 2024-04-23</li>
+                <li><a href="/usaf/pub/afman13-1crcv2/">AFMAN13-1CRCV2</a> — Control And Reporting Center (crc) - Evaluation Criteria — 2024-06-07</li>
+                <li><a href="/usaf/pub/afman13-1crcv3/">AFMAN13-1CRCV3</a> — Operating Procedures - Control And Reporting Center (crc) — 2024-04-26</li>
+                <li><a href="/usaf/pub/afman13-1gbmc2v2/">AFMAN13-1GBMC2V2</a> — Ground Battle Management Command And Control (gbmc2)standardization/evaluation Program — 2024-05-20</li>
+                <li><a href="/usaf/pub/afman13-204v1/">AFMAN13-204V1</a> — Management Of Airfield Operations — 2026-03-12</li>
+                <li><a href="/usaf/pub/afman13-204v1_accsup/">AFMAN13-204V1_ACCSUP</a> — Management Of Airfield Operations — 2025-06-05</li>
+                <li><a href="/usaf/pub/afman13-204v1_aetcsup/">AFMAN13-204V1_AETCSUP</a> — Management Of Airfield Operations — 2022-07-26</li>
+                <li><a href="/usaf/pub/afman13-204v1_afgscsup/">AFMAN13-204V1_AFGSCSUP</a> — Management Of Airfield Operations — 2021-06-24</li>
+                <li><a href="/usaf/pub/afman13-204v1_afrcsup/">AFMAN13-204V1_AFRCSUP</a> — Management Of Airfield Operations — 2021-04-14</li>
+                <li><a href="/usaf/pub/afman13-204v1_amcsup/">AFMAN13-204V1_AMCSUP</a> — Management Of Airfield Operations — 2026-07-20</li>
+                <li><a href="/usaf/pub/afman13-204v2_aetcsup/">AFMAN13-204V2_AETCSUP</a> — Airfield Management — 2022-07-20</li>
+                <li><a href="/usaf/pub/afman13-204v2_amcsup/">AFMAN13-204V2_AMCSUP</a> — Airfield Management — 2021-06-07</li>
+                <li><a href="/usaf/pub/afman13-204v3/">AFMAN13-204V3</a> — Air Traffic Control — 2024-04-26</li>
+                <li><a href="/usaf/pub/afman13-204v3_aetcsup/">AFMAN13-204V3_AETCSUP</a> — Air Traffic Control — 2022-07-26</li>
+                <li><a href="/usaf/pub/afman13-204v3_afgscsup/">AFMAN13-204V3_AFGSCSUP</a> — Air Traffic Control — 2022-06-09</li>
+                <li><a href="/usaf/pub/afman13-204v3_afsocsup/">AFMAN13-204V3_AFSOCSUP</a> — Air Traffic Control — 2022-02-15</li>
+                <li><a href="/usaf/pub/afman13-204v3_usafe-afafricasup/">AFMAN13-204V3_USAFE-AFAFRICASUP</a> — Air Traffic Control — 2023-03-30</li>
+                <li><a href="/usaf/pub/afman13-204v4_aetcsup/">AFMAN13-204V4_AETCSUP</a> — Radar, Airfield, And Weather Systems — 2022-07-25</li>
+                <li><a href="/usaf/pub/afman13-212v1/">AFMAN13-212V1</a> — Range Planning And Operations — 2023-03-14</li>
+                <li><a href="/usaf/pub/afman13-212v1_accsup/">AFMAN13-212V1_ACCSUP</a> — Range Planning And Operations — 2023-02-16</li>
+                <li><a href="/usaf/pub/afman13-212v1_accsup_nttrsup_add_a/">AFMAN13-212V1_ACCSUP_NTTRSUP_ADD_A</a> — Range Planning And Operations — 2026-07-21</li>
+                <li><a href="/usaf/pub/afman13-212v1_aetcsup/">AFMAN13-212V1_AETCSUP</a> — Range Planning And Operations — 2020-10-14</li>
+                <li><a href="/usaf/pub/afman13-212v1_afgscsup/">AFMAN13-212V1_AFGSCSUP</a> — Range Planning And Operations — 2019-08-28</li>
+                <li><a href="/usaf/pub/afman13-212v1_afsocsup/">AFMAN13-212V1_AFSOCSUP</a> — Range Planning And Operations — 2023-11-07</li>
+                <li><a href="/usaf/pub/afman13-212v1_angsup/">AFMAN13-212V1_ANGSUP</a> — Range Planning And Operations — 2024-10-29</li>
+                <li><a href="/usaf/pub/afman13-212v1_edwardsafbsup/">AFMAN13-212V1_EDWARDSAFBSUP</a> — Range Planning And Operations — 2024-01-22</li>
+                <li><a href="/usaf/pub/afman13-212v1_pacafsup/">AFMAN13-212V1_PACAFSUP</a> — Range Planning And Operations — 2026-04-22</li>
+                <li><a href="/usaf/pub/afman13-255v1/">AFMAN13-255V1</a> — Air Operation Center (aoc), Flight Manager Training — 2026-02-13</li>
+                <li><a href="/usaf/pub/afman13-255v2/">AFMAN13-255V2</a> — Air Operations Center (aoc), Flight Manager Standardization/evaluation Program — 2026-02-13</li>
+                <li><a href="/usaf/pub/afman13-255v3/">AFMAN13-255V3</a> — Air Operations Center (aoc), Flight Manager Responsibilities And Procedures — 2026-02-13</li>
+                <li><a href="/usaf/pub/afman14-402/">AFMAN14-402</a> — Intelligence Mission Roles, Responsibilities, And Program Management — 2025-01-27</li>
+                <li><a href="/usaf/pub/afman14-402_afgscsup/">AFMAN14-402_AFGSCSUP</a> — Intelligence Mission Roles, Responsibilities, And Program Management — 2025-09-30</li>
+                <li><a href="/usaf/pub/afman14-403/">AFMAN14-403</a> — Sensitive Compartmented Information Security And Intelligenc,, Surveillance, And Reconnaissance Systems Cybersecurity And Governance — 2019-09-03</li>
+                <li><a href="/usaf/pub/afman14-405/">AFMAN14-405</a> — Multi-intelligence — 2020-05-11</li>
+                <li><a href="/usaf/pub/afman15-111/">AFMAN15-111</a> — Surface Weather Observations — 2019-03-12</li>
+                <li><a href="/usaf/pub/afman15-124/">AFMAN15-124</a> — Meteorological Codes — 2019-01-16</li>
+                <li><a href="/usaf/pub/afman17-1203_eglinafbsup/">AFMAN17-1203_EGLINAFBSUP</a> — Information Technology (it) Asset Management (itam) — 2019-10-25</li>
+                <li><a href="/usaf/pub/afman17-1203_sheppardafbsup/">AFMAN17-1203_SHEPPARDAFBSUP</a> — Information Technology (it) Asset Management (itam) — 2022-07-05</li>
+                <li><a href="/usaf/pub/afman17-1402/">AFMAN17-1402</a> — Clinger-cohen Act (cca) Compliance — 2018-06-20</li>
+                <li><a href="/usaf/pub/afman17-204/">AFMAN17-204</a> — Air Force On-the-job Training Products For Cyber Support Enlisted Specialty Training — 2020-02-26</li>
+                <li><a href="/usaf/pub/afman17-2101/">AFMAN17-2101</a> — Long-haul Communications Management — 2018-05-22</li>
+                <li><a href="/usaf/pub/afman20-116/">AFMAN20-116</a> — Propulsion Life Cycle Management For Aerial Vehicles — 2022-04-13</li>
+                <li><a href="/usaf/pub/afman21-111/">AFMAN21-111</a> — Advanced Maintenance And Munitions Operations School — 2019-03-06</li>
+                <li><a href="/usaf/pub/afman21-200_usafe-afafricasup/">AFMAN21-200_USAFE-AFAFRICASUP</a> — Munitions And Missile Maintenance Management — 2023-07-06</li>
+                <li><a href="/usaf/pub/afman21-201_cannonafbsup/">AFMAN21-201_CANNONAFBSUP</a> — Munitions Management — 2020-06-05</li>
+                <li><a href="/usaf/pub/afman21-202/">AFMAN21-202</a> — Missile Maintenance Management — 2024-05-30</li>
+                <li><a href="/usaf/pub/afman21-202_afgscsup/">AFMAN21-202_AFGSCSUP</a> — Missile Maintenance Management — 2025-05-22</li>
+                <li><a href="/usaf/pub/afman21-202_afmcsup/">AFMAN21-202_AFMCSUP</a> — Missile Maintenance Management — 2025-02-11</li>
+                <li><a href="/usaf/pub/afman21-203/">AFMAN21-203</a> — Nuclear Accountability Procedures — 2026-05-26</li>
+                <li><a href="/usaf/pub/afman21-204/">AFMAN21-204</a> — Nuclear Weapons Maintenance — 2025-12-02</li>
+                <li><a href="/usaf/pub/afman21-204_usafe-afafricasup/">AFMAN21-204_USAFE-AFAFRICASUP</a> — Nuclear Weapons Maintenance — 2025-01-13</li>
+                <li><a href="/usaf/pub/afman21-206/">AFMAN21-206</a> — Aircraft Armament Systems Management — 2025-09-25</li>
+                <li><a href="/usaf/pub/afman21-206_aetcsup/">AFMAN21-206_AETCSUP</a> — Aircraft Armament Systems Management — 2026-05-06</li>
+                <li><a href="/usaf/pub/afman21-206_afgscsup/">AFMAN21-206_AFGSCSUP</a> — Aircraft Armament Systems Management — 2026-03-17</li>
+                <li><a href="/usaf/pub/afman21-206_afmcsup/">AFMAN21-206_AFMCSUP</a> — Aircraft Armament Systems Management — 2026-08-26</li>
+                <li><a href="/usaf/pub/afman21-206_afrcsup/">AFMAN21-206_AFRCSUP</a> — Aircaft Armament Systems Management — 2026-08-17</li>
+                <li><a href="/usaf/pub/afman21-206_angsup/">AFMAN21-206_ANGSUP</a> — Aircraft Armament Systems Management — 2024-04-26</li>
+                <li><a href="/usaf/pub/afman21-206_pacafsup/">AFMAN21-206_PACAFSUP</a> — Aircraft Armament Systems Management — 2026-08-31</li>
+                <li><a href="/usaf/pub/afman21-206_pacafsup_osanabsup/">AFMAN21-206_PACAFSUP_OSANABSUP</a> — Aircraft Armament Systems Management — 2024-06-11</li>
+                <li><a href="/usaf/pub/afman21-206_usafe-afafricasup/">AFMAN21-206_USAFE-AFAFRICASUP</a> — Aircraft Armament Systems Management — 2023-07-06</li>
+                <li><a href="/usaf/pub/afman21-209v2/">AFMAN21-209V2</a> — Demolition Munitions — 2021-12-08</li>
+                <li><a href="/usaf/pub/afman23-110v2pt2ch21_354fwsup/">AFMAN23-110V2PT2CH21_354FWSUP</a> — Special Logistics Support Procedures — 2012-01-05</li>
+                <li><a href="/usaf/pub/afman23-110v2pt2ch22_354fwsup/">AFMAN23-110V2PT2CH22_354FWSUP</a> — Equipment Management — 2012-01-11</li>
+                <li><a href="/usaf/pub/afman23-120/">AFMAN23-120</a> — Spares Requirements Review Board (srrb) — 2023-06-01</li>
+                <li><a href="/usaf/pub/afman23-122_afmcsup/">AFMAN23-122_AFMCSUP</a> — Materiel Management Procedures — 2025-06-25</li>
+                <li><a href="/usaf/pub/afman23-122_amcsup/">AFMAN23-122_AMCSUP</a> — Material Management Procedures — 2021-06-22</li>
+                <li><a href="/usaf/pub/afman23-125_ip/">AFMAN23-125_IP</a> — Stock Readiness — 2020-10-21</li>
+                <li><a href="/usaf/pub/afman23-220_22arwsup1/">AFMAN23-220_22ARWSUP1</a> — Reports of Survey of Air Force Property — 1999-09-10</li>
+                <li><a href="/usaf/pub/afman23-230/">AFMAN23-230</a> — Maintaining Air Force Dod Activity Address Codes (dodaac) — 2019-01-31</li>
+                <li><a href="/usaf/pub/afman24-206/">AFMAN24-206</a> — Packaging Of Materiel — 2024-02-13</li>
+                <li><a href="/usaf/pub/afman24-604/">AFMAN24-604</a> — Preparing Hazardous Materials For Military Air Shipments — 2025-06-06</li>
+                <li><a href="/usaf/pub/afman31-116_21swsup/">AFMAN31-116_21SWSUP</a> — Air Force Motor Vehicle Traffic Supervision — 2020-04-09</li>
+                <li><a href="/usaf/pub/afman31-116_barksdaleafbsup/">AFMAN31-116_BARKSDALEAFBSUP</a> — Air Force Motor Vehicle Traffic Supervision — 2017-12-08</li>
+                <li><a href="/usaf/pub/afman31-116_creechafbsup/">AFMAN31-116_CREECHAFBSUP</a> — Motor Vehicle Traffic Supervision — 2021-08-31</li>
+                <li><a href="/usaf/pub/afman31-116_maxwellafbsup/">AFMAN31-116_MAXWELLAFBSUP</a> — Air Force Motor Vehicle Traffic Supervision — 2017-08-25</li>
+                <li><a href="/usaf/pub/afman31-116_mountainhomeafbsup/">AFMAN31-116_MOUNTAINHOMEAFBSUP</a> — Air Force Motor Vehicle Traffic Supervision — 2019-11-22</li>
+                <li><a href="/usaf/pub/afman31-116_offuttafbsup/">AFMAN31-116_OFFUTTAFBSUP</a> — Air Force Motor Vehicle Traffic Supervision — 2019-11-19</li>
+                <li><a href="/usaf/pub/afman31-116_tyndallafbsup/">AFMAN31-116_TYNDALLAFBSUP</a> — Air Force Motor Vehicle Traffic Supervision — 2013-10-07</li>
+                <li><a href="/usaf/pub/afman32-1007/">AFMAN32-1007</a> — Emergency Management Operations — 2019-10-03</li>
+                <li><a href="/usaf/pub/afman32-1040/">AFMAN32-1040</a> — Civil Engineer Airfield Infrastructure Systems — 2019-08-23</li>
+                <li><a href="/usaf/pub/afman32-1053/">AFMAN32-1053</a> — Integrated Pest Management — 2019-08-06</li>
+                <li><a href="/usaf/pub/afman32-1062/">AFMAN32-1062</a> — Electrical Systems, Power Plants And Generators — 2020-10-20</li>
+                <li><a href="/usaf/pub/afman32-1065/">AFMAN32-1065</a> — Grounding &amp; Electrical Systems — 2020-07-17</li>
+                <li><a href="/usaf/pub/afman32-1065_usafe-afafricasup/">AFMAN32-1065_USAFE-AFAFRICASUP</a> — Grounding &amp; Electrical Systems — 2025-09-05</li>
+                <li><a href="/usaf/pub/afman32-1068/">AFMAN32-1068</a> — Heating Systems And Unfired Pressure Vessels — 2020-06-16</li>
+                <li><a href="/usaf/pub/afman32-1072_ip/">AFMAN32-1072_IP</a> — Water-well Drilling Operations — 2026-04-15</li>
+                <li><a href="/usaf/pub/afman32-7002_bealeafbsup/">AFMAN32-7002_BEALEAFBSUP</a> — Environmental Compliance And Pollution Prevention — 2023-07-13</li>
+                <li><a href="/usaf/pub/afman32-7002_ellsworthafbsup/">AFMAN32-7002_ELLSWORTHAFBSUP</a> — Environment Compliance And Pollution Prevention — 2024-12-12</li>
+                <li><a href="/usaf/pub/afman32-7002_tinkerafbsup/">AFMAN32-7002_TINKERAFBSUP</a> — Environmental Compliance And Pollution Prevention — 2025-07-14</li>
+                <li><a href="/usaf/pub/afman33-153_mountainhomeafbsup/">AFMAN33-153_MOUNTAINHOMEAFBSUP</a> — Information Technology (it) Asset Management (itam) — 2017-01-09</li>
+                <li><a href="/usaf/pub/afman33-326/">AFMAN33-326</a> — Preparing Official Communications — 2019-07-31</li>
+                <li><a href="/usaf/pub/afman33-396/">AFMAN33-396</a> — Knowledge Management — 2019-08-12</li>
+                <li><a href="/usaf/pub/afman34-135_433awsup/">AFMAN34-135_433AWSUP</a> — 433d Airlift Wing Lodging Procedures — 2021-11-16</li>
+                <li><a href="/usaf/pub/afman34-202/">AFMAN34-202</a> — Procedures For Protecting Nonappropriated Funds Assets — 2019-06-25</li>
+                <li><a href="/usaf/pub/afman34-209/">AFMAN34-209</a> — Nonappropriated Fund Financial Management And Accounting — 2019-10-02</li>
+                <li><a href="/usaf/pub/afman34-212_usafasup_i/">AFMAN34-212_USAFASUP_I</a> — Control Procedures For Protecting Naf Assets — 2022-06-15</li>
+                <li><a href="/usaf/pub/afman34-302/">AFMAN34-302</a> — Nonappropriated Funds (naf) Personnel Benefit Programs — 2023-06-29</li>
+                <li><a href="/usaf/pub/afman34-515/">AFMAN34-515</a> — Usaf Honor Guard — 2015-08-11</li>
+                <li><a href="/usaf/pub/afman35-101/">AFMAN35-101</a> — Public Affairs Procedures — 2020-12-07</li>
+                <li><a href="/usaf/pub/afman36-203_usafesup_i/">AFMAN36-203_USAFESUP_I</a> — Staffing Civilian Positions — 2012-06-19</li>
+                <li><a href="/usaf/pub/afman36-2111/">AFMAN36-2111</a> — The Logistics Career Broadening Program — 2025-09-26</li>
+                <li><a href="/usaf/pub/afman36-2136_944fwsup/">AFMAN36-2136_944FWSUP</a> — Reserve Personnel Participation — 2023-10-31</li>
+                <li><a href="/usaf/pub/afman36-2806_incirliksup/">AFMAN36-2806_INCIRLIKSUP</a> — Military Awards Program — 2024-06-27</li>
+                <li><a href="/usaf/pub/afman36-2905/">AFMAN36-2905</a> — Air Force Physical Fitness Readiness Program — 2026-03-24</li>
+                <li><a href="/usaf/pub/afman36-2905_2afsup/">AFMAN36-2905_2AFSUP</a> — Air Force Physical Fitness Readiness Program — 2026-08-25</li>
+                <li><a href="/usaf/pub/afman36-2919/">AFMAN36-2919</a> — Air Force Special Warfare Operator Fitness Test — 2023-05-23</li>
+                <li><a href="/usaf/pub/afman36-2930/">AFMAN36-2930</a> — Explosive Ordnance Disposal (eod) Occupationally Specific Physical Fitness Assessment (ospfa) — 2025-07-08</li>
+                <li><a href="/usaf/pub/afman38-102/">AFMAN38-102</a> — Manpower And Organization Standard Work Processes And Procedures — 2024-07-05</li>
+                <li><a href="/usaf/pub/afman40-201/">AFMAN40-201</a> — Radioactive Materials (ram) Management — 2019-03-29</li>
+                <li><a href="/usaf/pub/afman40-201_eglinafbsup/">AFMAN40-201_EGLINAFBSUP</a> — Radioactive Materials (ram) Management — 2022-10-20</li>
+                <li><a href="/usaf/pub/afman40-401/">AFMAN40-401</a> — The Care And Use Of Laboratory Animals In Dod Programs — 2022-10-21</li>
+                <li><a href="/usaf/pub/afman41-108/">AFMAN41-108</a> — Training Affiliation Agreement Program — 2025-06-17</li>
+                <li><a href="/usaf/pub/afman41-111/">AFMAN41-111</a> — Standards For Blood Banks And Transfusion Services - 23rd Edition (restricted To Medical Services Only) — 2016-07-01</li>
+                <li><a href="/usaf/pub/afman41-210_59mdwsup/">AFMAN41-210_59MDWSUP</a> — Tricare Operations And Patient Administration — 2021-01-07</li>
+                <li><a href="/usaf/pub/afman44-144/">AFMAN44-144</a> — Nutritional Medicine — 2016-01-20</li>
+                <li><a href="/usaf/pub/afman44-156/">AFMAN44-156</a> — Treatment Of Biological Warfare Agent Casualties — 2000-07-17</li>
+                <li><a href="/usaf/pub/afman44-198/">AFMAN44-198</a> — Air Force Civilian Drug Demand Reduction Program — 2022-10-05</li>
+                <li><a href="/usaf/pub/afman48-126/">AFMAN48-126</a> — Bioenvironmental Engineering Equipment Standardization And Modernization — 2019-03-28</li>
+                <li><a href="/usaf/pub/afman48-138_ip/">AFMAN48-138_IP</a> — Sanitary Control And Surveillance Of Field Water Supplies — 2017-12-18</li>
+                <li><a href="/usaf/pub/afman48-147/">AFMAN48-147</a> — Tri-service Food Code — 2023-06-21</li>
+                <li><a href="/usaf/pub/afman48-148/">AFMAN48-148</a> — Ionizing Radiation Protection — 2020-07-20</li>
+                <li><a href="/usaf/pub/afman48-148_eglinafbsup/">AFMAN48-148_EGLINAFBSUP</a> — Ionizing Radiation Protection — 2025-08-27</li>
+                <li><a href="/usaf/pub/afman48-148_keeslerafbsup/">AFMAN48-148_KEESLERAFBSUP</a> — Ionizing Radiation Protection — 2024-12-13</li>
+                <li><a href="/usaf/pub/afman48-149/">AFMAN48-149</a> — Flight And Operational Medicine Program (fomp) — 2020-10-13</li>
+                <li><a href="/usaf/pub/afman63-143/">AFMAN63-143</a> — Centralized Asset Management Procedures — 2025-08-19</li>
+                <li><a href="/usaf/pub/afman63-143-afscsup/">AFMAN63-143-AFSCSUP</a> — Centralized Asset Management Procedures — 2026-03-12</li>
+                <li><a href="/usaf/pub/afman64-118/">AFMAN64-118</a> — Air Force Nonappropriated Fund (naf) Purchase Card Program — 2020-08-28</li>
+                <li><a href="/usaf/pub/afman65-114514amwsup/">AFMAN65-114514AMWSUP</a> — Travel– Procedures For Financial Managemnt Flights, Finance Offices-reserve Components, Air Force Installation And Mission Support Center-finance Component — 2021-07-22</li>
+                <li><a href="/usaf/pub/afman65-114_910awsup/">AFMAN65-114_910AWSUP</a> — Travel– Procedures For  Financial Managemnt Flights,  Finance Offices-reserve  Components, Air Force  Installation And Mission  Support Center-finance  Component — 2024-11-01</li>
+                <li><a href="/usaf/pub/afman65-116v2/">AFMAN65-116V2</a> — Defense Joint Military Pay System Active Component (djms-ac) Unit Procedures Excluding Financial Management Flights — 2019-12-23</li>
+                <li><a href="/usaf/pub/afman65-502/">AFMAN65-502</a> — Inflation — 2018-10-30</li>
+                <li><a href="/usaf/pub/afman65-506/">AFMAN65-506</a> — Economic Analysis — 2019-09-06</li>
+                <li><a href="/usaf/pub/afman71-102/">AFMAN71-102</a> — Air Force Criminal Indexing — 2020-07-21</li>
+                <li><a href="/usaf/pub/afman91-201_accsup_davismonthanafbsup/">AFMAN91-201_ACCSUP_DAVISMONTHANAFBSUP</a> — Explosives Safety Standards — 2019-05-22</li>
+                <li><a href="/usaf/pub/afman91-201_andersenafbsup/">AFMAN91-201_ANDERSENAFBSUP</a> — Explosives Safety Standards — 2019-06-20</li>
+                <li><a href="/usaf/pub/afman91-201_moodyafbsup/">AFMAN91-201_MOODYAFBSUP</a> — Explosive Safety Standards — 2015-07-08</li>
+                <li><a href="/usaf/pub/afman91-201_pacafsup_354fwsup/">AFMAN91-201_PACAFSUP_354FWSUP</a> — Explosives Safety Standards — 2019-10-29</li>
+                <li><a href="/usaf/pub/afman91-223_18wgsup/">AFMAN91-223_18WGSUP</a> — Aviation Safety Investigations And Reports — 2022-10-11</li>
+                <li><a href="/usaf/pub/afman99-108/">AFMAN99-108</a> — Programming And Reporting Aerial Target And Missile Expenditures In Test And Evaluation — 2023-06-06</li>
+                <li><a href="/usaf/pub/afman99-120/">AFMAN99-120</a> — Forecasting And Programming Munitions Telemetry And Flight Termination Systems — 2022-05-11</li>
+                <li><a href="/usaf/pub/afman99-151/">AFMAN99-151</a> — Air Launched Munition Analysis Group (almag) — 2019-08-14</li>
+                <li><a href="/usaf/pub/afman_11-2f-16v3_avianoabsup/">AFMAN_11-2F-16V3_AVIANOABSUP</a> — F-16--Operations Procedure — 2024-04-24</li>
+                <li><a href="/usaf/pub/afmcman20-101/">AFMCMAN20-101</a> — Integrated Materiel Management (IMM) Assignment and Change Management — 2026-03-18</li>
+                <li><a href="/usaf/pub/afmcman20-106/">AFMCMAN20-106</a> — Provisioning — 2023-08-11</li>
+                <li><a href="/usaf/pub/afmcman21-102/">AFMCMAN21-102</a> — Engineering Data Storage, Distribution, Control, And Configuration Control — 2020-04-03</li>
+                <li><a href="/usaf/pub/afmcman21-149/">AFMCMAN21-149</a> — Contract Depot Maintenance (cdm) Program — 2024-06-13</li>
+                <li><a href="/usaf/pub/afmcman23-102/">AFMCMAN23-102</a> — Computation Of Requirements For Equipment Items — 2025-11-19</li>
+                <li><a href="/usaf/pub/afmcman23-103/">AFMCMAN23-103</a> — Cataloging And Standardization — 2025-08-21</li>
+                <li><a href="/usaf/pub/afmcman23-501v1/">AFMCMAN23-501V1</a> — D035a, D035b, Ramp And Whsl Module Data Subsystems — 2017-04-11</li>
+                <li><a href="/usaf/pub/afmcman23-501v2/">AFMCMAN23-501V2</a> — Readiness Based Leveling (RBL) User's Manual (D035E) — 2021-04-27</li>
+                <li><a href="/usaf/pub/afmcman36-2601/">AFMCMAN36-2601</a> — Functional Depot Maintenance Courseware Development And Management — 2026-02-12</li>
+                <li><a href="/usaf/pub/afmcman63-1202/">AFMCMAN63-1202</a> — Air Force Materiel Command Engineering Technical Assistance Request (etar) Process — 2026-04-20</li>
+                <li><a href="/usaf/pub/afosiman71-146/">AFOSIMAN71-146</a> — Use Of Force And Tactics — 2026-01-15</li>
+                <li><a href="/usaf/pub/afrcman10-401/">AFRCMAN10-401</a> — Planning, Scheduling, And Execution — 2022-05-04</li>
+                <li><a href="/usaf/pub/afrcman21-109/">AFRCMAN21-109</a> — Mission Design Series Council - Ngrea Request Process — 2023-08-07</li>
+                <li><a href="/usaf/pub/afrcman36-104/">AFRCMAN36-104</a> — Air Reserve Technician Time And Attendance — 2023-01-25</li>
+                <li><a href="/usaf/pub/afrcman36-2004/">AFRCMAN36-2004</a> — Air Force Reserve Recruiting And Accessions — 2021-03-26</li>
+                <li><a href="/usaf/pub/afrlman36-104/">AFRLMAN36-104</a> — Laboratory Personnel Demonstration Project — 2026-03-03</li>
+                <li><a href="/usaf/pub/afsccman14-402/">AFSCCMAN14-402</a> — Command Language Program — 2025-08-05</li>
+                <li><a href="/usaf/pub/afscman21-102_oo-alcsup/">AFSCMAN21-102_OO-ALCSUP</a> — Depot Maintenance Management — 2023-07-26</li>
+                <li><a href="/usaf/pub/afscman62-602/">AFSCMAN62-602</a> — Military Repair Station Manual — 2025-07-21</li>
+                <li><a href="/usaf/pub/afscman65-101/">AFSCMAN65-101</a> — Depot Maintenance Accounting And Production System (dmaps) Processes And Procedures — 2024-01-11</li>
+                <li><a href="/usaf/pub/afscman65-101_wr-alcsup/">AFSCMAN65-101_WR-ALCSUP</a> — Depot Maintenance Accounting and Production System (DMAPS) Processes and Procedures — 2026-03-10</li>
+                <li><a href="/usaf/pub/afsocman10-410/">AFSOCMAN10-410</a> — Operations Planning: Presentation of Air Force Special Operations Forces — 2020-05-20</li>
+                <li><a href="/usaf/pub/afsocman10-4301v1/">AFSOCMAN10-4301V1</a> — Combat Aviation Advisor Training — 2021-05-05</li>
+                <li><a href="/usaf/pub/afsocman10-4301v3/">AFSOCMAN10-4301V3</a> — Combat Aviation Advisor (caa) Operations — 2021-04-08</li>
+                <li><a href="/usaf/pub/afsocman11-201/">AFSOCMAN11-201</a> — Hostile Environment Repair Procedures — 2020-03-06</li>
+                <li><a href="/usaf/pub/afsocman11-207/">AFSOCMAN11-207</a> — Weapons And Tactics Program — 2025-06-06</li>
+                <li><a href="/usaf/pub/afsocman11-219v1/">AFSOCMAN11-219V1</a> — Combat Aviation Advisor Aircrew Training — 2020-05-07</li>
+                <li><a href="/usaf/pub/afsocman11-219v2/">AFSOCMAN11-219V2</a> — Additional Aircraft Aircrew Evaluation Criteria — 2020-03-25</li>
+                <li><a href="/usaf/pub/afsocman11-219v3/">AFSOCMAN11-219V3</a> — Combat Aviation Advisor Operations Procedures — 2020-02-05</li>
+                <li><a href="/usaf/pub/afsocman11-2dsov1/">AFSOCMAN11-2DSOV1</a> — Direct Support Operator Aircrew Training — 2023-11-28</li>
+                <li><a href="/usaf/pub/afsocman11-2dsov2/">AFSOCMAN11-2DSOV2</a> — Direct Support Operator Aircrew Evaluation Criteria — 2023-11-28</li>
+                <li><a href="/usaf/pub/afsocman11-2dsov3/">AFSOCMAN11-2DSOV3</a> — Direct Support Operator Operations Procedures — 2023-11-28</li>
+                <li><a href="/usaf/pub/afsocman11-2tsov1/">AFSOCMAN11-2TSOV1</a> — Tactical Systems Operator Aircrew Training — 2023-11-29</li>
+                <li><a href="/usaf/pub/afsocman11-2tsov2/">AFSOCMAN11-2TSOV2</a> — Tactical Systems Operator Evaluation Criteria — 2023-11-29</li>
+                <li><a href="/usaf/pub/afsocman11-2tsov3/">AFSOCMAN11-2TSOV3</a> — Tactical Systems Operator Operations Procedures — 2023-11-29</li>
+                <li><a href="/usaf/pub/amcman10-4301v1/">AMCMAN10-4301V1</a> — Air Advisor Education And Training — 2025-01-06</li>
+                <li><a href="/usaf/pub/amcman10-4301v2/">AMCMAN10-4301V2</a> — Air Advisor Standardization and Evaluation — 2025-01-06</li>
+                <li><a href="/usaf/pub/amcman14-402/">AMCMAN14-402</a> — Mobility Air Forces Intelligence Missions Roles, Responsibilities, And Program Management — 2025-12-10</li>
+                <li><a href="/usaf/pub/angman36-2603/">ANGMAN36-2603</a> — Recruiting and Retention Training Program — 2026-07-20</li>
+                <li><a href="/usaf/pub/angman90-161/">ANGMAN90-161</a> — Management Of Air National Guard Waivers — 2023-06-15</li>
+                <li><a href="/usaf/pub/dafafman21-200_afgscsup/">DAFAFMAN21-200_AFGSCSUP</a> — Munitions And Missile Maintenance Management — 2025-12-01</li>
+                <li><a href="/usaf/pub/dafman1-101/">DAFMAN1-101</a> — Commander Directed Investigations — 2021-04-09</li>
+                <li><a href="/usaf/pub/dafman10-211/">DAFMAN10-211</a> — Integrated Operational Support (ios) — 2026-01-21</li>
+                <li><a href="/usaf/pub/dafman10-246/">DAFMAN10-246</a> — Food and Water Defense Program — 2025-08-15</li>
+                <li><a href="/usaf/pub/dafman10-406/">DAFMAN10-406</a> — Unit Type Code Management — 2021-10-06</li>
+                <li><a href="/usaf/pub/dafman10-703/">DAFMAN10-703</a> — Electromagnetic Warfare Integrated Reprogramming — 2021-06-02</li>
+                <li><a href="/usaf/pub/dafman10-703_442fwsup/">DAFMAN10-703_442FWSUP</a> — Electronic Warfare Integrated Reprogramming Procedures — 2022-09-22</li>
+                <li><a href="/usaf/pub/dafman10-703_51fwsup/">DAFMAN10-703_51FWSUP</a> — Electromagnetic Warfare Integrated Reprogramming — 2026-03-03</li>
+                <li><a href="/usaf/pub/dafman10-703_bealeafbsup/">DAFMAN10-703_BEALEAFBSUP</a> — Electronic Warfare Integrated Reprogramming — 2024-03-22</li>
+                <li><a href="/usaf/pub/dafman10-703_ellsworthafbsup/">DAFMAN10-703_ELLSWORTHAFBSUP</a> — Electromagnetic Warfare Integrated Reprogramming — 2022-01-20</li>
+                <li><a href="/usaf/pub/dafman11-201/">DAFMAN11-201</a> — Flight Information Publication — 2026-02-26</li>
+                <li><a href="/usaf/pub/dafman11-230/">DAFMAN11-230</a> — Instrument Procedures — 2025-11-21</li>
+                <li><a href="/usaf/pub/dafman11-230_accsup/">DAFMAN11-230_ACCSUP</a> — Instrument Procedures — 2026-07-02</li>
+                <li><a href="/usaf/pub/dafman11-260/">DAFMAN11-260</a> — Tactics Development Program — 2023-03-17</li>
+                <li><a href="/usaf/pub/dafman11-2ec-130jv3/">DAFMAN11-2EC-130JV3</a> — Ec-130j-operations Procedures — 2020-11-30</li>
+                <li><a href="/usaf/pub/dafman11-401/">DAFMAN11-401</a> — Aviation Management — 2020-10-27</li>
+                <li><a href="/usaf/pub/dafman11-401_accsup/">DAFMAN11-401_ACCSUP</a> — Aviation Management — 2023-05-25</li>
+                <li><a href="/usaf/pub/dafman11-401_aetcsup/">DAFMAN11-401_AETCSUP</a> — Aviation Management — 2023-06-06</li>
+                <li><a href="/usaf/pub/dafman11-401_afdwsup/">DAFMAN11-401_AFDWSUP</a> — Aviation Management — 2022-01-21</li>
+                <li><a href="/usaf/pub/dafman11-401_afgscsup/">DAFMAN11-401_AFGSCSUP</a> — Aviation Management — 2026-02-25</li>
+                <li><a href="/usaf/pub/dafman11-401_afmcsup/">DAFMAN11-401_AFMCSUP</a> — Aviation Management — 2023-03-30</li>
+                <li><a href="/usaf/pub/dafman11-401_afmcsup_96twsup/">DAFMAN11-401_AFMCSUP_96TWSUP</a> — Aviation Management — 2024-04-19</li>
+                <li><a href="/usaf/pub/dafman11-401_afmcsup_edwardsafbsup/">DAFMAN11-401_AFMCSUP_EDWARDSAFBSUP</a> — Aviation Management — 2024-05-16</li>
+                <li><a href="/usaf/pub/dafman11-401_afrcsup/">DAFMAN11-401_AFRCSUP</a> — Aviation Management — 2023-07-12</li>
+                <li><a href="/usaf/pub/dafman11-401_afsocsup/">DAFMAN11-401_AFSOCSUP</a> — Aviation Management — 2022-01-07</li>
+                <li><a href="/usaf/pub/dafman11-401_amcsup/">DAFMAN11-401_AMCSUP</a> — Aviation Management — 2023-06-22</li>
+                <li><a href="/usaf/pub/dafman11-401_pacafsup/">DAFMAN11-401_PACAFSUP</a> — Aviation Management — 2021-07-30</li>
+                <li><a href="/usaf/pub/dafman11-401_pacafsup_35fwsup/">DAFMAN11-401_PACAFSUP_35FWSUP</a> — Aviation Management — 2024-03-08</li>
+                <li><a href="/usaf/pub/dafman11-401_usafe-afafricasup/">DAFMAN11-401_USAFE-AFAFRICASUP</a> — Aviation Management — 2026-07-24</li>
+                <li><a href="/usaf/pub/dafman11-402/">DAFMAN11-402</a> — Aviation, Missile,  And Parachutist Service — 2025-01-24</li>
+                <li><a href="/usaf/pub/dafman11-402_afgscsup/">DAFMAN11-402_AFGSCSUP</a> — Aviation, Missile, And Parachutist Service — 2025-09-30</li>
+                <li><a href="/usaf/pub/dafman11-415/">DAFMAN11-415</a> — Weapons And Tactics Programs — 2023-08-01</li>
+                <li><a href="/usaf/pub/dafman11-501/">DAFMAN11-501</a> — Small Unmanned Aircraft Systems Management — 2025-01-10</li>
+                <li><a href="/usaf/pub/dafman11-502/">DAFMAN11-502</a> — GROUP(s) 1 AND 2 SMALL UNMANNED AIRCRAFT SYSTEMS — 2025-01-10</li>
+                <li><a href="/usaf/pub/dafman13-201/">DAFMAN13-201</a> — Airspace Management — 2020-12-10</li>
+                <li><a href="/usaf/pub/dafman13-201_accsup/">DAFMAN13-201_ACCSUP</a> — Airspace Management — 2025-04-21</li>
+                <li><a href="/usaf/pub/dafman13-201_afsocsup/">DAFMAN13-201_AFSOCSUP</a> — Airspace Management — 2022-01-11</li>
+                <li><a href="/usaf/pub/dafman13-204v1_angsup/">DAFMAN13-204V1_ANGSUP</a> — Management Of Airfield Operations — 2026-03-25</li>
+                <li><a href="/usaf/pub/dafman13-204v2/">DAFMAN13-204V2</a> — Airfield Management — 2024-09-20</li>
+                <li><a href="/usaf/pub/dafman13-204v2_afgscsup/">DAFMAN13-204V2_AFGSCSUP</a> — Airfield Management — 2025-02-13</li>
+                <li><a href="/usaf/pub/dafman13-204v2_afrcsup/">DAFMAN13-204V2_AFRCSUP</a> — Airfield Management — 2025-05-27</li>
+                <li><a href="/usaf/pub/dafman13-204v2_angsup/">DAFMAN13-204V2_ANGSUP</a> — Airfield Management — 2026-03-04</li>
+                <li><a href="/usaf/pub/dafman13-204v2_usafe-afafricasup/">DAFMAN13-204V2_USAFE-AFAFRICASUP</a> — Airfield Management — 2026-05-14</li>
+                <li><a href="/usaf/pub/dafman13-204v3_accsup/">DAFMAN13-204V3_ACCSUP</a> — Air Traffic Control — 2025-05-15</li>
+                <li><a href="/usaf/pub/dafman13-204v3_afrcsup/">DAFMAN13-204V3_AFRCSUP</a> — Air Traffic Control — 2025-06-12</li>
+                <li><a href="/usaf/pub/dafman13-204v3_amcsup/">DAFMAN13-204V3_AMCSUP</a> — Air Traffic Control — 2025-02-05</li>
+                <li><a href="/usaf/pub/dafman13-204v3_angsup/">DAFMAN13-204V3_ANGSUP</a> — Air Traffic Control — 2026-03-04</li>
+                <li><a href="/usaf/pub/dafman13-204v4/">DAFMAN13-204V4</a> — Radar, Airfield, And Weather Systems — 2024-05-13</li>
+                <li><a href="/usaf/pub/dafman13-204v4_afrcsup/">DAFMAN13-204V4_AFRCSUP</a> — Radar, Airfield, and Weather System — 2025-05-09</li>
+                <li><a href="/usaf/pub/dafman13-204v4_pacafsup/">DAFMAN13-204V4_PACAFSUP</a> — Radar, Airfield, And Weather Systems — 2024-09-26</li>
+                <li><a href="/usaf/pub/dafman13-204_ramsteinsup/">DAFMAN13-204_RAMSTEINSUP</a> — Airfield Operations — 2024-02-25</li>
+                <li><a href="/usaf/pub/dafman13-212v3/">DAFMAN13-212V3</a> — Cyberspace Range Planning And Operations — 2022-02-11</li>
+                <li><a href="/usaf/pub/dafman13-212v3_accsup/">DAFMAN13-212V3_ACCSUP</a> — Cyberspace Range Planning And Operations — 2023-06-23</li>
+                <li><a href="/usaf/pub/dafman13-215v2/">DAFMAN13-215V2</a> — Airfield Operations Charts And Instrument Procedures Support — 2025-12-16</li>
+                <li><a href="/usaf/pub/dafman13-217/">DAFMAN13-217</a> — Drop Zone, Landing Zone, And Helicopter Landing Zone Operations — 2021-04-22</li>
+                <li><a href="/usaf/pub/dafman13-217_accsup/">DAFMAN13-217_ACCSUP</a> — Drop Zone, Landing Zone, And Helicopter Landing Zone Operations — 2025-06-16</li>
+                <li><a href="/usaf/pub/dafman13-217_afdwsup/">DAFMAN13-217_AFDWSUP</a> — Drop Zone, Landing Zone, And Helicopter Landing Zone Operations — 2022-04-26</li>
+                <li><a href="/usaf/pub/dafman13-217_afgscsup/">DAFMAN13-217_AFGSCSUP</a> — Drop Zone, Landing Zone, And Helicopter Landing Zone Operations — 2022-04-22</li>
+                <li><a href="/usaf/pub/dafman13-217_amcsup/">DAFMAN13-217_AMCSUP</a> — Drop Zone, Landing Zone, And Helicopter Landing Zone Operations — 2025-02-12</li>
+                <li><a href="/usaf/pub/dafman13-217_pacafsup/">DAFMAN13-217_PACAFSUP</a> — Drop Zone, Landing Zone, And Helicopter Landing Zone Operations — 2025-07-03</li>
+                <li><a href="/usaf/pub/dafman13-217_usafe-afafricasup/">DAFMAN13-217_USAFE-AFAFRICASUP</a> — Drop Zone, Landing Zone, And Helicopter Landing Zone Operations — 2025-10-02</li>
+                <li><a href="/usaf/pub/dafman16-101/">DAFMAN16-101</a> — Security Cooperation (sc) And Security Assistance (sa) Management — 2024-12-13</li>
+                <li><a href="/usaf/pub/dafman16-114/">DAFMAN16-114</a> — Participation In International Armaments Cooperation (iac) Programs — 2025-08-26</li>
+                <li><a href="/usaf/pub/dafman16-201/">DAFMAN16-201</a> — Department Of The Air Force Foreign Disclosure And Technology Transfer Program — 2021-01-19</li>
+                <li><a href="/usaf/pub/dafman16-201_aetcsup/">DAFMAN16-201_AETCSUP</a> — Department Of The Air Force Foreign Disclosure And Technology Transfer Program — 2022-12-13</li>
+                <li><a href="/usaf/pub/dafman16-201_afmcsup/">DAFMAN16-201_AFMCSUP</a> — Department Of The Air Force Foreign Disclosure And Technology Transfer Program — 2025-12-30</li>
+                <li><a href="/usaf/pub/dafman16-201_eglinafbsup/">DAFMAN16-201_EGLINAFBSUP</a> — Department Of The Air Force Foreign Disclosure And Technology Transfer Program — 2024-03-20</li>
+                <li><a href="/usaf/pub/dafman17-1203/">DAFMAN17-1203</a> — Information Technology (it) Asset Management (itam) — 2022-09-13</li>
+                <li><a href="/usaf/pub/dafman17-1203_aedcsup/">DAFMAN17-1203_AEDCSUP</a> — Information Technology Asset Management (itam) And Accountability — 2024-08-09</li>
+                <li><a href="/usaf/pub/dafman17-1203_afdwsup/">DAFMAN17-1203_AFDWSUP</a> — Information Technology (it) Asset Management (itam) — 2022-01-21</li>
+                <li><a href="/usaf/pub/dafman17-1203_afrssup/">DAFMAN17-1203_AFRSSUP</a> — Information Technology Asset Management — 2026-03-05</li>
+                <li><a href="/usaf/pub/dafman17-1203_kirtlandafbsup/">DAFMAN17-1203_KIRTLANDAFBSUP</a> — Information Technology Asset Management (itam) And Accountability — 2023-01-31</li>
+                <li><a href="/usaf/pub/dafman17-1203_maxwellafbsup/">DAFMAN17-1203_MAXWELLAFBSUP</a> — Information Technology Asset Management (itam) And Accountability — 2024-06-04</li>
+                <li><a href="/usaf/pub/dafman17-1203_usafasup/">DAFMAN17-1203_USAFASUP</a> — Information Technology (it) Asset Management (itam) — 2024-07-01</li>
+                <li><a href="/usaf/pub/dafman17-1203_yokotaabsup/">DAFMAN17-1203_YOKOTAABSUP</a> — Information Technology Asset Management (itam) And Accountability — 2023-11-01</li>
+                <li><a href="/usaf/pub/dafman17-1301/">DAFMAN17-1301</a> — Computer Security (compusec) — 2024-12-09</li>
+                <li><a href="/usaf/pub/dafman17-1304/">DAFMAN17-1304</a> — Identity, Credential and Access Management (ICAM) — 2021-08-18</li>
+                <li><a href="/usaf/pub/dafman17-1305/">DAFMAN17-1305</a> — Department Of Air Force Cyberspace Workforce Management Program — 2024-06-07</li>
+                <li><a href="/usaf/pub/dafman20-110/">DAFMAN20-110</a> — Nuclear Weapons-related Materiel Management — 2024-10-03</li>
+                <li><a href="/usaf/pub/dafman21-106/">DAFMAN21-106</a> — Joint Regulation Governing The Use And Application Of Uniform Source, Maintenance, And Recoverability Codes — 2026-04-29</li>
+                <li><a href="/usaf/pub/dafman21-113/">DAFMAN21-113</a> — Air Force Metrology And Calibration Program Management — 2023-12-27</li>
+                <li><a href="/usaf/pub/dafman21-200/">DAFMAN21-200</a> — Munitions And Missile Maintenance Management — 2024-12-13</li>
+                <li><a href="/usaf/pub/dafman21-201/">DAFMAN21-201</a> — Munitions Management — 2024-10-24</li>
+                <li><a href="/usaf/pub/dafman21-201_62awsup/">DAFMAN21-201_62AWSUP</a> — Munitions Management — 2022-09-21</li>
+                <li><a href="/usaf/pub/dafman21-201_7afsup/">DAFMAN21-201_7AFSUP</a> — Munitions Management — 2025-08-13</li>
+                <li><a href="/usaf/pub/dafman21-201_afgscsup/">DAFMAN21-201_AFGSCSUP</a> — Munitions Management — 2025-05-27</li>
+                <li><a href="/usaf/pub/dafman21-201_afmcsup/">DAFMAN21-201_AFMCSUP</a> — Munitions Management — 2026-03-27</li>
+                <li><a href="/usaf/pub/dafman21-201_usafe-afafricasup/">DAFMAN21-201_USAFE-AFAFRICASUP</a> — Munitions Management — 2024-05-13</li>
+                <li><a href="/usaf/pub/dafman21-209v1/">DAFMAN21-209V1</a> — Ground Munitions — 2025-02-20</li>
+                <li><a href="/usaf/pub/dafman23-119/">DAFMAN23-119</a> — Government Furnished Property — 2022-04-06</li>
+                <li><a href="/usaf/pub/dafman23-300/">DAFMAN23-300</a> — Materiel Management Procedures — 2025-07-22</li>
+                <li><a href="/usaf/pub/dafman23-300_accsup/">DAFMAN23-300_ACCSUP</a> — Materiel Management Procedures — 2025-12-22</li>
+                <li><a href="/usaf/pub/dafman23-300_afsocsup/">DAFMAN23-300_AFSOCSUP</a> — Materiel Management Procedures — 2026-03-03</li>
+                <li><a href="/usaf/pub/dafman24-210/">DAFMAN24-210</a> — Packaging Of Hazardous Materials — 2026-05-27</li>
+                <li><a href="/usaf/pub/dafman31-103v1_kirtlandafbsup/">DAFMAN31-103V1_KIRTLANDAFBSUP</a> — Law Enforcement Operations — 2026-01-20</li>
+                <li><a href="/usaf/pub/dafman31-115v1_lukeafbsup/">DAFMAN31-115V1_LUKEAFBSUP</a> — Department Of The Air Force Corrections System — 2022-08-01</li>
+                <li><a href="/usaf/pub/dafman31-131v1/">DAFMAN31-131V1</a> — Combat Arms Training And Maintenance (catm) Operations — 2025-06-17</li>
+                <li><a href="/usaf/pub/dafman31-131v2/">DAFMAN31-131V2</a> — Small Arms And Light Weapons Qualification Programs — 2025-06-17</li>
+                <li><a href="/usaf/pub/dafman31-131v3/">DAFMAN31-131V3</a> — Small Arms And Light Weapons Handling Procedures — 2025-04-01</li>
+                <li><a href="/usaf/pub/dafman32-1061/">DAFMAN32-1061</a> — Providing Utilities To Department Of The Air Force Installations — 2023-08-18</li>
+                <li><a href="/usaf/pub/dafman32-1067/">DAFMAN32-1067</a> — Water And Fuel Systems — 2025-07-01</li>
+                <li><a href="/usaf/pub/dafman32-1084/">DAFMAN32-1084</a> — Standard Facility Requirements — 2020-01-15</li>
+                <li><a href="/usaf/pub/dafman32-2670/">DAFMAN32-2670</a> — Civil Engineering Federal Wage System Force Development — 2025-06-25</li>
+                <li><a href="/usaf/pub/dafman32-3001/">DAFMAN32-3001</a> — Explosive Ordnance Disposal (eod) Program — 2025-06-24</li>
+                <li><a href="/usaf/pub/dafman32-7002/">DAFMAN32-7002</a> — Environmental Compliance And Pollution Prevention — 2025-06-13</li>
+                <li><a href="/usaf/pub/dafman32-7002_oc-alcsup/">DAFMAN32-7002_OC-ALCSUP</a> — Environmental Compliance And Pollution Prevention — 2025-11-20</li>
+                <li><a href="/usaf/pub/dafman32-7003/">DAFMAN32-7003</a> — Environmental Conservation — 2024-06-26</li>
+                <li><a href="/usaf/pub/dafman32-9006/">DAFMAN32-9006</a> — Army And Air Force Basic Real Estate Agreements — 2021-06-15</li>
+                <li><a href="/usaf/pub/dafman34-119/">DAFMAN34-119</a> — Property Management — 2023-07-05</li>
+                <li><a href="/usaf/pub/dafman34-123/">DAFMAN34-123</a> — Nonappropriated Fund Property And Liability Program — 2023-08-31</li>
+                <li><a href="/usaf/pub/dafman34-131/">DAFMAN34-131</a> — Appropriated Fund (apf) Food Service Program Management — 2025-06-17</li>
+                <li><a href="/usaf/pub/dafman34-135/">DAFMAN34-135</a> — Lodging Program — 2024-07-23</li>
+                <li><a href="/usaf/pub/dafman34-135_307bwsup/">DAFMAN34-135_307BWSUP</a> — Air Force Lodging Program — 2025-05-30</li>
+                <li><a href="/usaf/pub/dafman34-147/">DAFMAN34-147</a> — Fisher House Program — 2023-06-14</li>
+                <li><a href="/usaf/pub/dafman34-151/">DAFMAN34-151</a> — Gaming Operating Procedures — 2026-06-25</li>
+                <li><a href="/usaf/pub/dafman34-152/">DAFMAN34-152</a> — Air Force Aero Club Operations — 2023-12-26</li>
+                <li><a href="/usaf/pub/dafman34-201/">DAFMAN34-201</a> — Use Of Nonappropriated Funds (nafs) — 2018-09-28</li>
+                <li><a href="/usaf/pub/dafman35-106/">DAFMAN35-106</a> — Music, Ceremonies, And Accessions — 2022-09-14</li>
+                <li><a href="/usaf/pub/dafman36-142/">DAFMAN36-142</a> — Civilian Career Field Management And Centrally-managed Programs — 2025-09-25</li>
+                <li><a href="/usaf/pub/dafman36-162/">DAFMAN36-162</a> — Overseas Employment — 2025-11-20</li>
+                <li><a href="/usaf/pub/dafman36-2012/">DAFMAN36-2012</a> — Record Of Disenrollment From Officer Candidate-type Training — 2023-04-26</li>
+                <li><a href="/usaf/pub/dafman36-203/">DAFMAN36-203</a> — Staffing Civilian Positions — 2021-10-31</li>
+                <li><a href="/usaf/pub/dafman36-2032/">DAFMAN36-2032</a> — Military Recruiting And Accessions — 2025-12-09</li>
+                <li><a href="/usaf/pub/dafman36-2100/">DAFMAN36-2100</a> — Military Classification, Technical Training, And Retraining — 2026-07-07</li>
+                <li><a href="/usaf/pub/dafman36-2102/">DAFMAN36-2102</a> — Base-level Relocation Procedures — 2026-03-04</li>
+                <li><a href="/usaf/pub/dafman36-2114/">DAFMAN36-2114</a> — Management Of The Air Force Reserve Individual Reserve (ir) And Full-time Support (fts) Programs — 2021-05-24</li>
+                <li><a href="/usaf/pub/dafman36-2136/">DAFMAN36-2136</a> — Reserve Personnel Participation — 2023-12-15</li>
+                <li><a href="/usaf/pub/dafman36-2139/">DAFMAN36-2139</a> — Active Duty Service Commitments (adsc) — 2025-07-01</li>
+                <li><a href="/usaf/pub/dafman36-2602/">DAFMAN36-2602</a> — Active Duty Service Determination For Civilians Or Contractual Groups — 2024-08-23</li>
+                <li><a href="/usaf/pub/dafman36-2604/">DAFMAN36-2604</a> — Service Dates And Dates Of Rank — 2026-07-07</li>
+                <li><a href="/usaf/pub/dafman36-2611/">DAFMAN36-2611</a> — Air Force Obstacle Course Program — 2021-01-12</li>
+                <li><a href="/usaf/pub/dafman36-2643/">DAFMAN36-2643</a> — Coaching And Mentoring Program — 2025-07-23</li>
+                <li><a href="/usaf/pub/dafman36-2664/">DAFMAN36-2664</a> — Personnel Assessment Program — 2025-07-15</li>
+                <li><a href="/usaf/pub/dafman36-2689/">DAFMAN36-2689</a> — Training Program — 2024-01-22</li>
+                <li><a href="/usaf/pub/dafman36-2806/">DAFMAN36-2806</a> — Military Awards: Criteria And Procedures — 2025-08-13</li>
+                <li><a href="/usaf/pub/dafman36-2806_446awsup/">DAFMAN36-2806_446AWSUP</a> — Military Awards: Criteria And Procedures — 2026-08-21</li>
+                <li><a href="/usaf/pub/dafman36-2806_944fwsup/">DAFMAN36-2806_944FWSUP</a> — Military Awards: Criteria And Procedures — 2025-09-03</li>
+                <li><a href="/usaf/pub/dafman36-2806_accsup/">DAFMAN36-2806_ACCSUP</a> — Military Awards Criteria And Procedures — 2026-03-05</li>
+                <li><a href="/usaf/pub/dafman36-2806_aetcsup/">DAFMAN36-2806_AETCSUP</a> — Military Awards: Criteria And Procedures — 2023-05-22</li>
+                <li><a href="/usaf/pub/dafman36-2806_afgscsup/">DAFMAN36-2806_AFGSCSUP</a> — Military Awards: Criteria And Procedures — 2025-09-16</li>
+                <li><a href="/usaf/pub/dafman36-2806_amcsup/">DAFMAN36-2806_AMCSUP</a> — Military Awards Criteria And Procedures — 2025-09-17</li>
+                <li><a href="/usaf/pub/dafman36-2905_lukeafbsup/">DAFMAN36-2905_LUKEAFBSUP</a> — Department Of The Air Force Physical Fitness Program — 2022-11-04</li>
+                <li><a href="/usaf/pub/dafman36-3004/">DAFMAN36-3004</a> — Experienced Aviator Retention Incentive (eari) Program — 2025-07-08</li>
+                <li><a href="/usaf/pub/dafman36-3026/">DAFMAN36-3026</a> — Mission Partner Identity, Credentialing, And Access Management — 2024-08-15</li>
+                <li><a href="/usaf/pub/dafman36-3805/">DAFMAN36-3805</a> — Personnel Accountability Program Management — 2026-01-14</li>
+                <li><a href="/usaf/pub/dafman41-210/">DAFMAN41-210</a> — Patient Administration Support — 2026-01-12</li>
+                <li><a href="/usaf/pub/dafman44-197/">DAFMAN44-197</a> — Military Drug Demand Reduction Program — 2023-09-05</li>
+                <li><a href="/usaf/pub/dafman48-105/">DAFMAN48-105</a> — Public Health Surveillance — 2023-10-11</li>
+                <li><a href="/usaf/pub/dafman48-108/">DAFMAN48-108</a> — Physical Evaluation Board Liaison Officer (peblo) Functions: Pre-disability Evaluation System (des) And Medical Evaluation Board (meb) Processing — 2021-08-05</li>
+                <li><a href="/usaf/pub/dafman48-123/">DAFMAN48-123</a> — Medical Examinations And Standards — 2020-12-08</li>
+                <li><a href="/usaf/pub/dafman48-125/">DAFMAN48-125</a> — Personnel Ionizing Radiation Dosimetry — 2020-10-27</li>
+                <li><a href="/usaf/pub/dafman48-143/">DAFMAN48-143</a> — Environment Health Program Management — 2026-01-16</li>
+                <li><a href="/usaf/pub/dafman48-146/">DAFMAN48-146</a> — Occupational Health Program Management — 2022-12-01</li>
+                <li><a href="/usaf/pub/dafman51-203/">DAFMAN51-203</a> — Records Of Trial — 2021-04-21</li>
+                <li><a href="/usaf/pub/dafman51-507/">DAFMAN51-507</a> — Enlisted Discharge Boards And Boards Of Officers — 2023-07-27</li>
+                <li><a href="/usaf/pub/dafman52-107/">DAFMAN52-107</a> — Chapel Tithes And Offerings Fund Management — 2021-01-20</li>
+                <li><a href="/usaf/pub/dafman63-119/">DAFMAN63-119</a> — Mission-oriented Test Readiness Certification — 2021-04-15</li>
+                <li><a href="/usaf/pub/dafman63-122/">DAFMAN63-122</a> — Depot Source Of Repair Planning And Activation — 2024-09-27</li>
+                <li><a href="/usaf/pub/dafman64-119/">DAFMAN64-119</a> — Nonappropriated Fund (naf) Contracting Procedures — 2023-08-30</li>
+                <li><a href="/usaf/pub/dafman65-114/">DAFMAN65-114</a> — Travel– Procedures For Financial Managemnt Flights, Finance Offices-reserve Components, Air Force Installation And Mission Support Center-finance Component — 2026-02-24</li>
+                <li><a href="/usaf/pub/dafman65-116v1/">DAFMAN65-116V1</a> — Defense Joint Military Pay System Active Component (djms-ac) Financial Management Flight (fmf) Procedures — 2025-08-08</li>
+                <li><a href="/usaf/pub/dafman65-116v3/">DAFMAN65-116V3</a> — Defense Joint Military Pay System (djms) - Reserve Component (djms-rc) — 2026-02-19</li>
+                <li><a href="/usaf/pub/dafman65-604/">DAFMAN65-604</a> — Appropriation Symbols And Budget Codes (fiscal Year 2026) — 2025-09-25</li>
+                <li><a href="/usaf/pub/dafman65-605v1/">DAFMAN65-605V1</a> — Budget Guidance And Technical Procedures — 2025-08-15</li>
+                <li><a href="/usaf/pub/dafman65-605v1_944fw/">DAFMAN65-605V1_944FW</a> — Budget Guidance And Technical Procedures — 2025-12-22</li>
+                <li><a href="/usaf/pub/dafman90-161/">DAFMAN90-161</a> — Publishing Processes And Procedures — 2023-10-18</li>
+                <li><a href="/usaf/pub/dafman90-161_58sowsup/">DAFMAN90-161_58SOWSUP</a> — Publishing Processes and Procedures — 2022-05-23</li>
+                <li><a href="/usaf/pub/dafman90-161_8fwsup/">DAFMAN90-161_8FWSUP</a> — Publishing Processes And Procedures — 2023-08-18</li>
+                <li><a href="/usaf/pub/dafman90-161_914arwsup/">DAFMAN90-161_914ARWSUP</a> — Publishing Processes And Procedures — 2024-07-10</li>
+                <li><a href="/usaf/pub/dafman90-161_maxwellafbsup/">DAFMAN90-161_MAXWELLAFBSUP</a> — Publishing Processes And Procedures — 2024-09-06</li>
+                <li><a href="/usaf/pub/dafman90-161_osanabsup/">DAFMAN90-161_OSANABSUP</a> — Publishing Processes And Procedures — 2024-03-12</li>
+                <li><a href="/usaf/pub/dafman90-161_sbd3sup/">DAFMAN90-161_SBD3SUP</a> — Publications And Forms Management — 2024-05-16</li>
+                <li><a href="/usaf/pub/dafman90-161_usafasup/">DAFMAN90-161_USAFASUP</a> — Publishing Processes And Procedures — 2023-09-13</li>
+                <li><a href="/usaf/pub/dafman91-110/">DAFMAN91-110</a> — Nuclear Safety Review And Launch Approval For Space Or Missile Use Of Radioactive Material — 2022-02-24</li>
+                <li><a href="/usaf/pub/dafman91-118/">DAFMAN91-118</a> — Safety Design Criteria For Nuclear Weapon Systems — 2025-07-17</li>
+                <li><a href="/usaf/pub/dafman91-119/">DAFMAN91-119</a> — Safety Design Criteria For Nuclear Weapon Systems Software — 2026-07-15</li>
+                <li><a href="/usaf/pub/dafman91-203/">DAFMAN91-203</a> — Department Of The Air Force Occupational Safety Fire And Health Standards — 2026-02-24</li>
+                <li><a href="/usaf/pub/dafman91-203_accsup/">DAFMAN91-203_ACCSUP</a> — Air Force Occupational Safety, Fire, And Health Standards — 2023-04-24</li>
+                <li><a href="/usaf/pub/dafman91-203_oc-alcsup/">DAFMAN91-203_OC-ALCSUP</a> — Air Force Occupational Safety, Fire, And Health Standards — 2025-06-09</li>
+                <li><a href="/usaf/pub/dafman91-203_oo-alcsup/">DAFMAN91-203_OO-ALCSUP</a> — Air Force Occupational Safety, Fire, And Health Standards — 2022-05-12</li>
+                <li><a href="/usaf/pub/dafman91-221/">DAFMAN91-221</a> — Weapons Safety Investigations And Reports — 2024-09-12</li>
+                <li><a href="/usaf/pub/dafman91-221_afgscsup/">DAFMAN91-221_AFGSCSUP</a> — Weapons Safety Investigations And Reports — 2024-12-18</li>
+                <li><a href="/usaf/pub/dafman91-222/">DAFMAN91-222</a> — Space Safety Investigations And Reports — 2025-03-06</li>
+                <li><a href="/usaf/pub/dafman91-223/">DAFMAN91-223</a> — Aviation Safety Investigations And Reports — 2022-09-20</li>
+                <li><a href="/usaf/pub/dafman91-223_aetcsup/">DAFMAN91-223_AETCSUP</a> — Aviation Safety Investigations And Reports — 2024-05-06</li>
+                <li><a href="/usaf/pub/dafman91-223_afmcsup_afmcgm2026-01/">DAFMAN91-223_AFMCSUP_AFMCGM2026-01</a> — Aviation Safety Investigations And Reports — 2026-01-22</li>
+                <li><a href="/usaf/pub/dafman91-223_amcsup/">DAFMAN91-223_AMCSUP</a> — Aviation Safety Investigations And Reports — 2026-07-06</li>
+                <li><a href="/usaf/pub/dafman91-224/">DAFMAN91-224</a> — Ground Safety Investigations And Reports — 2022-01-21</li>
+                <li><a href="/usaf/pub/dafman91-224_afgscsup/">DAFMAN91-224_AFGSCSUP</a> — Ground Safety Investigation And Hazard Reporting — 2023-12-11</li>
+                <li><a href="/usaf/pub/dafman91-224_amcsup/">DAFMAN91-224_AMCSUP</a> — Ground Safety Investigation And Hazard Reporting — 2024-06-03</li>
+                <li><a href="/usaf/pub/dodman5200.02_dafman16-1405/">DoDMAN5200.02_DAFMAN16-1405</a> — Department Of Air Force Personnel Security Program — 2023-11-29</li>
+                <li><a href="/usaf/pub/eglinafbman91-202/">EGLINAFBMAN91-202</a> — Designation Of Explosive Loaded Aircraft Parking Areas, Load/unload Areas And Arm/de-arm Areas — 2026-06-10</li>
+                <li><a href="/usaf/pub/fairchildafbman31-104/">FAIRCHILDAFBMAN31-104</a> — Primary Security Coordinator Program — 2021-06-17</li>
+                <li><a href="/usaf/pub/jbsanantonioman10-002/">JBSANANTONIOMAN10-002</a> — Contingency Plans Development — 2023-09-13</li>
+                <li><a href="/usaf/pub/laughlinafbman13-204/">LAUGHLINAFBMAN13-204</a> — Airfield Operations — 2025-09-24</li>
+                <li><a href="/usaf/pub/maxwellafbman90-101/">MAXWELLAFBMAN90-101</a> — Maxwell Afb Base Bulletin — 2024-01-22</li>
+                <li><a href="/usaf/pub/pacafman32-1067/">PACAFMAN32-1067</a> — Water Treatment Operator Training And Certification Program For Overseas Locations And Water System Operation And Maintenance Requirements — 2026-04-13</li>
+                <li><a href="/usaf/pub/usafaman36-3526/">USAFAMAN36-3526</a> — Developing Leaders Of Character At Usafa — 2024-05-31</li>
+                <li><a href="/usaf/pub/yokotaabman65-101/">YOKOTAABMAN65-101</a> — Master Labor Contract (mlc) Time And Attendance Reporting And Payroll-making — 2024-03-07</li>
+            </ul>
+            <p><a href="/">Ask Reggie.Bot about MAN publications</a></p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

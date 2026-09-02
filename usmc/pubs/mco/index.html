@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Compose resolves relative asset paths (./composeResources/...) against
+         the document URL. Without this, every deep link such as /pub/ar-670-1
+         asks for /pub/composeResources/... and 404s, which throws out of
+         composition and freezes the canvas. Must precede the first script. -->
+    <base href="/">
+    <meta name="description" content="All 461 MCO publications (Marine Corps Orders), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.">
+    <title>MCO — Marine Corps Orders</title>
+    <link rel="canonical" href="https://reggie.bot/usmc/pubs/mco/">
+    <!-- The shell is shared by every page, so this names no one service.
+         It said "Army regulations, AR 670-1, ... armypubs" while the Army
+         owned the root, which put one service on the Coast Guard's pages
+         too. Search engines ignore this tag; it is corrected because it
+         was wrong, not because it ranks. -->
+    <meta name="keywords" content="military regulations, Army regulations, Marine Corps orders, Coast Guard instructions, Space Force publications, Air Force instructions, armypubs, MCPEL, e-Publishing, military publications search">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://reggie.bot/usmc/pubs/mco/">
+    <meta property="og:site_name" content="Reggie.Bot">
+    <meta property="og:title" content="MCO — Marine Corps Orders">
+    <meta property="og:description" content="All 461 MCO publications (Marine Corps Orders), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.">
+    <!-- icon-512, not icon_round: that one is 192x192, and previews commonly
+         refuse an image below 200x200 outright -- which is why a shared answer
+         arrived with no picture at all rather than a small one. Dimensions are
+         declared so a preview can lay out its card without fetching the image
+         first. -->
+    <meta property="og:image" content="https://reggie.bot/icon-512.png">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:alt" content="Reggie.Bot">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="MCO — Marine Corps Orders">
+    <meta name="twitter:description" content="All 461 MCO publications (Marine Corps Orders), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.">
+    <meta name="twitter:image" content="https://reggie.bot/icon-512.png">
+
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "MCO — Marine Corps Orders",
+  "description": "All 461 MCO publications (Marine Corps Orders), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.",
+  "url": "https://reggie.bot/usmc/pubs/mco/"
+}
+    </script>
+    <!-- A disc that touches all four edges, cropped tight to the mark.
+         The old favicon was the app icon as drawn for the app: its circle sat
+         inset inside the square with transparent margin, and the head filled
+         only 63% of that circle. Google crops favicons to a circle of its own,
+         so what arrived was a small disc inside a ring of page background --
+         the white padding in a search result. Now the disc fills the square
+         exactly, so Google's crop lands on the artwork's own edge, and the
+         head fills more of it.
+         Still a circle rather than a square: a tab draws the icon as given,
+         with no crop, and a circle is what this app looks like.
+         PNGs first and sized -- Google wants a square multiple of 48px -- with
+         the .ico kept for anything that asks for one. -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <!-- Installable. theme-color paints the browser chrome and the splash
+         screen; without apple-touch-icon iOS renders a screenshot instead. -->
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#141414">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Reggie.Bot">
+    <!-- The branch, decided before the first paint.
+
+         The app takes seconds to boot -- 15MB of wasm has to arrive and start
+         -- and until it does, this file is the whole of what a reader sees.
+         Both branch-coloured things on it, the spinner and the mark, used to
+         be the Army's outright, so anyone who had chosen another service
+         watched a gold screen resolve into their own colour on every single
+         load. On the 1,546 generated pages too: all of them are rendered from
+         this template.
+
+         So the two colours are read from the same localStorage key the app
+         writes ("branch", set by SettingsBranchStore) and applied as custom
+         properties on the root element, inline and synchronously, before the
+         stylesheet below is ever used to draw anything.
+
+         Kept deliberately dumb -- a literal table, no fetch, no dependency on
+         the wasm having loaded -- because anything that can fail here fails in
+         the one window where nothing else is running yet. An unreadable or
+         unrecognised value leaves the Army showing, which is what every
+         reader who has never chosen a service should see anyway.
+
+         model.seo.BootPaletteTest pins this table against Branch: plain HTML
+         is invisible to the compiler, so nothing else would notice the day a
+         service is added or a palette is retuned. -->
+    <script>
+        (function () {
+            // Valid JSON on purpose: model.seo.BootPaletteTest parses this
+            // table and checks every path in it against Branch and against
+            // the files on disk. Plain HTML is invisible to the compiler, and
+            // the exhaustive `when`s that stop Branch drifting elsewhere have
+            // no reach in here, so this is the only thing that will notice the
+            // day a service is added or a palette retuned.
+            var BRANDS = {
+                "usa": {
+                    "accent": "#FFCB05",
+                    "mark": "/icon_round.png",
+                    "manifest": "/manifest.webmanifest",
+                    "favicon192": "/favicon-192.png",
+                    "favicon96": "/favicon-96.png",
+                    "appIcon": "/icon-192.png"
+                },
+                "usmc": {
+                    "accent": "#E04B4B",
+                    "mark": "/icon_round_usmc.png",
+                    "manifest": "/manifest-usmc.webmanifest",
+                    "favicon192": "/favicon-192-usmc.png",
+                    "favicon96": "/favicon-96-usmc.png",
+                    "appIcon": "/icon-192-usmc.png"
+                },
+                "usaf": {
+                    "accent": "#7FB3F0",
+                    "mark": "/icon_round_usaf.png",
+                    "manifest": "/manifest-usaf.webmanifest",
+                    "favicon192": "/favicon-192-usaf.png",
+                    "favicon96": "/favicon-96-usaf.png",
+                    "appIcon": "/icon-192-usaf.png"
+                },
+                "ussf": {
+                    "accent": "#C8D2E0",
+                    "mark": "/icon_round_ussf.png",
+                    "manifest": "/manifest-ussf.webmanifest",
+                    "favicon192": "/favicon-192-ussf.png",
+                    "favicon96": "/favicon-96-ussf.png",
+                    "appIcon": "/icon-192-ussf.png"
+                },
+                "uscg": {
+                    "accent": "#F57C00",
+                    "mark": "/icon_round_uscg.png",
+                    "manifest": "/manifest-uscg.webmanifest",
+                    "favicon192": "/favicon-192-uscg.png",
+                    "favicon96": "/favicon-96-uscg.png",
+                    "appIcon": "/icon-192-uscg.png"
+                }
+            };
+
+            // Nobody's colours until somebody has chosen. The Army was the
+            // default here, so a reader who had never answered the picker
+            // watched the app load in gold behind a gold favicon -- the
+            // question still on screen and already answered underneath.
+            //
+            // Grey is ui.theme.NEUTRAL_PRIMARY, the same colour the app paints
+            // while the picker is open, so the handover from HTML to Compose
+            // is invisible instead of a flash of the wrong service.
+            var NEUTRAL = {
+                "accent": "#D4D4D4",
+                "mark": "/icon_round_neutral.png",
+                "manifest": "/manifest.webmanifest",
+                "favicon192": "/favicon-192-neutral.png",
+                "favicon96": "/favicon-96-neutral.png",
+                "appIcon": "/icon-192-neutral.png"
+            };
+
+            var slug = null;
+            // Saved before the services were renamed. Those strings sit in
+            // browsers and keep arriving; Branch.bySlug and the database's
+            // branch_canonical() map them the same way.
+            var LEGACY = {"army": "usa", "navy": "usn", "marine-corps": "usmc",
+                          "air-force": "usaf", "space-force": "ussf",
+                          "coast-guard": "uscg"};
+            // localStorage throws outright rather than returning null when a
+            // browser blocks storage, so the read is guarded and not just the
+            // value it returns.
+            // The address first. A shared link names the service, and that is
+            // a firmer answer than whatever this browser chose last time --
+            // reading only localStorage meant arriving cold at /usaf/news/
+            // painted Army gold until Compose started. Route.serviceOf is the
+            // same rule in Kotlin; an unprefixed path is nobody's here,
+            // because the picker has to be free to ask.
+            var first = (location.pathname.split("/")[1] || "").toLowerCase();
+            first = LEGACY[first] || first;
+            if (BRANDS[first]) slug = first;
+
+            // localStorage throws outright rather than returning null when a
+            // browser blocks storage, so the read is guarded and not just the
+            // value it returns.
+            if (slug === null) {
+                try {
+                    var stored = localStorage.getItem("branch");
+                    stored = LEGACY[stored] || stored;
+                    if (BRANDS[stored]) slug = stored;
+                } catch (e) { /* no reachable choice; stay neutral and ask */ }
+            }
+
+            var brand = slug === null ? NEUTRAL : BRANDS[slug];
+            var root = document.documentElement;
+            root.setAttribute("data-branch", slug === null ? "neutral" : slug);
+            root.style.setProperty("--brand", brand.accent);
+            root.style.setProperty("--brand-logo", "url(" + brand.mark + ")");
+
+            // The tab icon, and the app if it has been installed.
+            //
+            // These are rewritten rather than written, so this script has to
+            // sit below the links it edits -- which is why it is at the end of
+            // <head> rather than the top. Still ahead of the stylesheet and of
+            // every element it colours, which is what matters for the paint.
+            //
+            // The manifest is the one branch-coloured thing nothing above can
+            // reach: an installed app's splash screen is drawn by the
+            // operating system, from icons it fetched for itself, so the only
+            // lever we have is which URL the link names. One manifest per
+            // service is written into the distribution by GenerateSeoPages,
+            // derived from the Army's; all six share an id, so switching
+            // service re-skins the installed app rather than offering a
+            // second copy of it.
+            function repoint(selector, href) {
+                var link = document.querySelector(selector);
+                if (link) link.href = href;
+            }
+            repoint('link[rel="manifest"]', brand.manifest);
+            repoint('link[rel="icon"][sizes="192x192"]', brand.favicon192);
+            repoint('link[rel="icon"][sizes="96x96"]', brand.favicon96);
+            repoint('link[rel="apple-touch-icon"]', brand.appIcon);
+        })();
+    </script>
+    <style>
+        /* The flex centering that used to live here sized #root to its
+           content rather than stretching it, so the app rendered in a narrow
+           column once ComposeViewport replaced the fixed-size canvas. */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #0a0a0a;
+            color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+
+        #ComposeTarget {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        /* Readable if the app never boots, invisible the moment it does. */
+        #seo-fallback {
+            max-width: 46rem;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            font-family: Arial, sans-serif;
+            line-height: 1.5;
+        }
+
+        /* No flex centering here: it existed to centre the old fixed-size
+           canvas. As a flex item the Compose container sized to its content
+           (300px) instead of stretching, so the app rendered in a narrow
+           column. ComposeViewport fills whatever container it is given. */
+        #root {
+            width: 100%;
+            height: 100%;
+            /* Anchors #boot, which is layered over the app rather than sitting
+               inside it. */
+            position: relative;
+        }
+
+        /* The SEO copy has to be real markup in the initial response, but a
+           wall of unstyled text is not what a visitor should stare at for the
+           seconds wasm takes to boot. #boot covers it with the app's own
+           colours; both are removed the moment Compose paints. */
+        /* Layered over the app, not inside it. It used to live inside
+           #ComposeTarget so that Compose would tear it down on mount -- which
+           it did, instantly and before any transition could run, so the
+           loading screen vanished in a hard cut. Out here its removal is ours
+           to time, and it can fade.
+
+           pointer-events: none is what makes that safe. An earlier overlay
+           swallowed the pointer, and Compose, never having seen the pointer
+           enter its canvas, ignored the first click anywhere in the app even
+           after the overlay was gone. Transparent to input from the first
+           frame, the canvas underneath gets every event as usual. Absolute
+           within #root, never fixed. */
+        #boot {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #141414;
+            transition: opacity .45s ease;
+
+            /* The ring sits immediately outside the logo, touching it, so the
+               two sizes are derived from one another rather than set
+               independently. */
+            --boot-logo: clamp(160px, 42vmin, 300px);
+            --boot-ring-width: 7px;
+        }
+
+        #boot.done { opacity: 0; }
+
+        /* Square by construction: the ring is a border on a circle, and a
+           circle drawn on a non-square box is an ellipse. */
+        /* Only ever inserted when the app did not start. Centred over the
+           fallback text rather than replacing it, so the page still says what
+           the site is. */
+        #boot-failed {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            max-width: 22rem;
+            padding: 1.25rem 1.5rem;
+            border-radius: 12px;
+            background: #1c1c1c;
+            color: #f2f2f2;
+            font: 16px/1.5 system-ui, -apple-system, sans-serif;
+            text-align: center;
+        }
+
+        #boot-failed p { margin: 0 0 1rem; }
+
+        #boot-failed button {
+            font: inherit;
+            padding: 0.5rem 1.25rem;
+            border: 0;
+            border-radius: 8px;
+            background: var(--brand, #FFCB05);
+            color: #141414;
+            cursor: pointer;
+        }
+
+        #boot-mark {
+            position: relative;
+            width: calc(var(--boot-logo) + 2 * var(--boot-ring-width));
+            height: calc(var(--boot-logo) + 2 * var(--boot-ring-width));
+        }
+
+        /* A background image, not an <img>: the source has to be settled
+           before the first paint, and the script that settles it runs in
+           <head>, where there is no element yet to set a src on. A custom
+           property crosses that gap; a DOM write cannot. */
+        #boot-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: var(--boot-logo);
+            height: var(--boot-logo);
+            margin: calc(var(--boot-logo) / -2) 0 0 calc(var(--boot-logo) / -2);
+            border-radius: 50%;
+            background-image: var(--brand-logo, url(/icon_round.png));
+            background-size: cover;
+        }
+
+        /* One arc travelling around the logo. The track is drawn in the same
+           near-black the app uses for a raised surface, so only the coloured
+           arc reads as motion.
+
+           The fallbacks here and on the mark are what a reader sees if the
+           script above never ran at all -- scripting off, or a CSP that
+           refuses it. The Army's colours, which is what the app itself falls
+           back to. */
+        #boot-ring {
+            position: absolute;
+            inset: 0;
+            border: var(--boot-ring-width) solid #2D2D2D;
+            border-top-color: var(--brand, #FFCB05);
+            border-radius: 50%;
+            animation: boot-spin 1.1s linear infinite;
+        }
+
+        @keyframes boot-spin { to { transform: rotate(360deg); } }
+
+        /* Respect a reduced-motion preference: keep the indicator, drop the
+           spin. */
+        @media (prefers-reduced-motion: reduce) {
+            #boot-ring { animation: none; }
+            /* Uncover the app at once rather than dissolving into it. */
+            #boot { transition: none; }
+        }
+    </style>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CEQC3WB0MN"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-CEQC3WB0MN');
+    </script>
+    <script type="application/javascript">
+        // Function to create an object from a list of parameters and values
+        function createParamValueObject(params, values) {
+            var paramArray = params.split(',');
+            var valueArray = values.split(',');
+
+            if (paramArray.length !== valueArray.length) {
+                throw new Error('The number of parameters must match the number of values');
+            }
+
+            var result = {};
+            for (var i = 0; i < paramArray.length; i++) {
+                result[paramArray[i].trim()] = valueArray[i].trim();
+            }
+
+            return result;
+        }
+
+        // Read one archived publication and hand back its text.
+        //
+        // The corpus is stored gzipped -- 616MB of Air Force text is 169MB
+        // packed -- and the services after the Army keep no text column in
+        // Postgres, so a result card's supporting line is found here from the
+        // archive instead. DecompressionStream unpacks the body as it
+        // arrives, which is why this is a few lines of JS rather than an
+        // inflate implementation in Kotlin, and why the bytes never cross the
+        // wasm boundary.
+        //
+        // Resolves to null for anything at all -- a 404, an offline browser,
+        // a body that is not gzip. A missing snippet is a card with one less
+        // line on it; a thrown error is a search that looks broken.
+        function fetchArchivedText(url) {
+            return fetch(url)
+                .then(function (response) {
+                    if (!response.ok || !response.body) return null;
+                    return new Response(
+                        response.body.pipeThrough(new DecompressionStream('gzip'))
+                    ).text();
+                })
+                .catch(function () { return null; });
+        }
+
+        function shareContent(text) {
+            const url = window.location.href; // Get the current page URL
+            if (navigator.share) {
+                navigator.share({
+                    // Named explicitly rather than taken from document.title.
+                    // What is being shared is an answer, not the page it was
+                    // read on, and the sheet showed whichever page the app had
+                    // been served as -- "Army Links" on top of a regulation
+                    // answer, for anyone who arrived through that link.
+                    title: 'Reggie.Bot',
+                    text: text,
+                    url: url
+                }).then(() => {
+                    console.log('Successfully shared');
+                }).catch((error) => {
+                    console.error('Error sharing:', error);
+                });
+            } else {
+                console.error('Web Share API not supported in this browser');
+            }
+        }
+
+        // Waits for the helpers the app expects, but not forever.
+        //
+        // This polled every 100ms with no limit. Anything it waited on that
+        // never arrived -- a blocked third-party script, an extension that
+        // removed a global -- was a permanent, silent blank page: no error, no
+        // timeout, and the wasm never even requested. Loading the app late is
+        // recoverable; never loading it is not, so the deadline calls through
+        // anyway rather than giving up.
+        function waitForFunctions(functionNames, callback) {
+            var deadline = Date.now() + 5000;
+
+            function checkFunctions() {
+                for (let i = 0; i < functionNames.length; i++) {
+                    if (typeof window[functionNames[i]] !== "function") {
+                        if (Date.now() > deadline) {
+                            console.warn('proceeding without ' + functionNames[i]);
+                            break;
+                        }
+                        setTimeout(checkFunctions, 100);
+                        return;
+                    }
+                }
+                callback();
+            }
+
+            checkFunctions();
+        }
+
+        function detectUnsupportedBrowser() {
+            const userAgent = navigator.userAgent;
+
+            // Check if the browser is Safari and not Chrome or Firefox on iOS
+            const isSafari = /^((?!chrome|android|crios|fxios).)*safari/i.test(userAgent);
+
+            if (isSafari) {
+                // Extract the Safari version from the userAgent
+                const versionMatch = userAgent.match(/Version\/(\d+\.\d+)/);
+                if (versionMatch) {
+                    const safariVersion = parseFloat(versionMatch[1]);
+                    console.log(`Safari version detected: ${safariVersion}`);
+                    return safariVersion < 18.2;
+                }
+            }
+            console.log("Browser is not Safari or version not detected.");
+            return false;
+        }
+
+        if (detectUnsupportedBrowser()) {
+            window.location.href = "unsupported_browser.html";
+        } else {
+            window.onload = function() {
+                function dismissBootScreen() {
+                    var boot = document.getElementById('boot');
+                    if (!boot || boot.classList.contains('done')) return;
+                    boot.classList.add('done');
+                    // transitionend removes it as soon as the fade finishes;
+                    // the timer is the backstop for a browser that never fires
+                    // one (a reduced-motion setting removes the transition
+                    // altogether), so the overlay can never be left behind.
+                    boot.addEventListener('transitionend', function () { boot.remove(); });
+                    setTimeout(function () { boot.remove(); }, 1000);
+                }
+
+                // Compose renders to a canvas, and that canvas is the signal
+                // that the app is really up. It is not in the document though:
+                // Compose Multiplatform 1.11 puts it inside a shadow root, so
+                // document.querySelector('canvas') returns null forever and
+                // waiting on that meant waiting on something that never came.
+                function composeCanvas(root) {
+                    if (root.querySelector('canvas')) return true;
+                    var hosts = root.querySelectorAll('*');
+                    for (var i = 0; i < hosts.length; i++) {
+                        var shadow = hosts[i].shadowRoot;
+                        if (shadow && shadow.querySelector('canvas')) return true;
+                    }
+                    return false;
+                }
+
+                // Two frames after it mounts it has painted, so the overlay can
+                // dissolve into the app rather than off a blank canvas.
+                function dismissWhenComposePaints() {
+                    var target = document.getElementById('ComposeTarget');
+                    if (!target) return;
+                    var observer = new MutationObserver(function () {
+                        if (!composeCanvas(target)) return;
+                        observer.disconnect();
+                        requestAnimationFrame(function () {
+                            requestAnimationFrame(dismissBootScreen);
+                        });
+                    });
+                    observer.observe(target, { childList: true, subtree: true });
+
+                    // If wasm never boots, say so. This used to dismiss the
+                    // overlay and nothing else, so a failed boot and a slow one
+                    // looked the same -- and both looked like a broken site
+                    // with no way out but knowing to reload.
+                    setTimeout(function () {
+                        observer.disconnect();
+                        dismissBootScreen();
+                        if (!composeCanvas(target)) showBootFailed();
+                    }, 25000);
+                }
+
+                dismissWhenComposePaints();
+
+                // Registered after load, and deliberately after the wasm has
+                // been asked for: the app is ~15MB and the worker must not
+                // compete with it on a first visit. It pays off on the second.
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('/sw.js').catch(function (e) {
+                        // Not fatal - the app works without it.
+                        console.warn('service worker registration failed', e);
+                    });
+                }
+
+                // Shown only when the app really did not start. The fallback
+                // text underneath says what the site is; this says what
+                // happened and offers the one thing that fixes it.
+                function showBootFailed() {
+                    if (document.getElementById('boot-failed')) return;
+                    var box = document.createElement('div');
+                    box.id = 'boot-failed';
+                    box.setAttribute('role', 'alert');
+                    box.innerHTML =
+                        '<p>Reggie could not finish loading.</p>' +
+                        '<button type="button">Reload</button>';
+                    box.querySelector('button').addEventListener('click', function () {
+                        // Bypass both caches: the likeliest cause is a cached
+                        // copy that is no longer whole.
+                        if (window.caches && caches.keys) {
+                            caches.keys().then(function (names) {
+                                return Promise.all(names.map(function (n) { return caches.delete(n); }));
+                            }).catch(function () {}).then(function () { location.reload(); });
+                        } else {
+                            location.reload();
+                        }
+                    });
+                    document.getElementById('root').appendChild(box);
+                }
+
+                // A tab the browser reclaimed and then restored.
+                //
+                // Everything here runs inside window.onload, and a page
+                // restored from the back/forward cache never fires load again
+                // -- so if whatever was on screen is gone, nothing rebuilds
+                // it. Storage pressure can also empty the cache the app was
+                // served from, which is what leaves a blank white document
+                // rather than this app's own dark shell.
+                window.addEventListener('pageshow', function (event) {
+                    if (!event.persisted) return;
+                    var target = document.getElementById('ComposeTarget');
+                    if (target && composeCanvas(target)) return;
+                    location.reload();
+                });
+
+                function loadWasm() {
+                    var canvas = document.getElementById('ComposeTarget');
+                    canvas.focus();
+
+                    var script = document.createElement('script');
+                    // Absolute: this same file is served at /news, /pubs and
+                    // friends so deep links work, and a relative path would
+                    // look for /news/composeApp.js and never boot.
+                    script.src = "/composeApp.js";
+                    document.head.appendChild(script);
+                }
+
+                // List of functions to wait for
+                const functionsToWaitFor = ["createParamValueObject", "gtag", "shareContent"];
+
+                // Wait for all functions before loading Wasm
+                waitForFunctions(functionsToWaitFor, loadWasm);
+            };
+        }
+    </script>
+</head>
+<body>
+<!-- ComposeViewport (Compose Multiplatform 1.11, which replaced
+     CanvasBasedWindow) attaches to a CONTAINER and creates its own canvas
+     inside it. Leaving a <canvas> here gives an unsized 300x150 default that
+     renders nothing, and a second canvas nested inside it. -->
+<div id="root">
+    <!-- No visible text: the mark and the ring around it say "loading" on
+         their own. aria-label keeps that legible to a screen reader without
+         putting a caption back on the screen. -->
+    <div id="boot" role="status" aria-live="polite" aria-label="Loading Reggie.Bot">
+        <div id="boot-mark">
+            <div id="boot-ring"></div>
+            <div id="boot-logo"></div>
+        </div>
+    </div>
+
+    <!-- Compose replaces the contents of #ComposeTarget on boot, so users never
+         see this. Crawlers do: the app renders to a <canvas>, which search
+         engines cannot read at all, leaving the site with no indexable text
+         whatsoever. This is the only content Google gets today. -->
+    <div id="ComposeTarget" aria-label="Interactive application area" tabindex="0">
+        <!-- Not wrapped in <noscript>: crawlers that execute JS ignore it, and
+             this needs to be real markup in the initial response. Compose
+             clears the container when it mounts, so users see it only for the
+             instant before the app boots. -->
+        <div id="seo-fallback">
+            <h1>MCO — Marine Corps Orders</h1>
+            <p>All 461 MCO publications (Marine Corps Orders), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.</p>
+            <h2>461 publications</h2>
+            <ul>
+                <li><a href="/usmc/pub/mco-1000.12/">MCO 1000.12</a> — Naval Reserve Program Nine Personnel Support To The U.s. Marine Corps... — 4 Jun 1998</li>
+                <li><a href="/usmc/pub/mco-1000.14/">MCO 1000.14</a> — National Call To Service Enslisted Commissioning Program — 28 Jan 2011</li>
+                <li><a href="/usmc/pub/mco-1000.6/">MCO 1000.6</a> — Assignment, Classification, And Travel System Manual (actsman) — 3 Jul 2013</li>
+                <li><a href="/usmc/pub/mco-1000.8/">MCO 1000.8</a> — Fleet Assistance Program (fap) — 12 Jul 1994</li>
+                <li><a href="/usmc/pub/mco-1001.39k/">MCO 1001.39K</a> — Pre-separation Counseling Concerning Marine Corps Reserve (mcr)... — 29 Dec 1994</li>
+                <li><a href="/usmc/pub/mco-1001.52k/">MCO 1001.52K</a> — Active Reserve (ar) Support To The United States Marine Corps Reserve — 15 Feb 2019</li>
+                <li><a href="/usmc/pub/mco-1001.59a/">MCO 1001.59A</a> — Active Duty For Operational Suppport (ados) In Support Of The Total Force... — 19 Jan 2011</li>
+                <li><a href="/usmc/pub/mco-1001.61a/">MCO 1001.61A</a> — Policy And Procedures For Sourcing Personnel To Meet Individual... — 22 Feb 2013</li>
+                <li><a href="/usmc/pub/mco-1001.62c/">MCO 1001.62C</a> — Individual Mobilization Augmentee (ima) Program — 11 Aug 2021</li>
+                <li><a href="/usmc/pub/mco-1001.65a/">MCO 1001.65A</a> — Active Component Officer Retention And Prior Service Accessions — 3 Feb 2021</li>
+                <li><a href="/usmc/pub/mco-1001r.1l/">MCO 1001R.1L</a> — Marine Corps Reserve Administrative Management Manual (short Title: Mcramm) — 7 Mar 2025</li>
+                <li><a href="/usmc/pub/mco-1001r.65/">MCO 1001R.65</a> — Reserve Officer Commissioning Programs (short Title: Rocp) — 19 Jul 2016</li>
+                <li><a href="/usmc/pub/mco-10110.14n/">MCO 10110.14N</a> — Marine Corps Food Service And Subsistence Program — 7 Mar 2018</li>
+                <li><a href="/usmc/pub/mco-10110.38_/">MCO 10110.38_</a> — Dod Hazardous Food And Nonprescription Drug Recall System — 6 Sep 2018</li>
+                <li><a href="/usmc/pub/mco-10110.47a/">MCO 10110.47A</a> — Basic Allowance For Subsistence (bas) And Meal Card Program — 25 Sep 2013</li>
+                <li><a href="/usmc/pub/mco-10110.49/">MCO 10110.49</a> — Nutrition And Menu Standards For Human Performance Optimization — 3 Feb 2017</li>
+                <li><a href="/usmc/pub/mco-1020.34h/">MCO 1020.34H</a> — Marine Corps Uniform Regulations — 1 May 2018</li>
+                <li><a href="/usmc/pub/mco-1020.35/">MCO 1020.35</a> — Involuntary Removal Of The Marine Special Operator Insignia (msoi) — 5 Aug 2019</li>
+                <li><a href="/usmc/pub/mco-1040.31/">MCO 1040.31</a> — Enlisted Retention And Career Development Program — 8 Sep 2010</li>
+                <li><a href="/usmc/pub/mco-1040.42b/">MCO 1040.42B</a> — Warrant Officer (wo) And Limited Duty Officer (ldo) Accession Programs — 7 Mar 2025</li>
+                <li><a href="/usmc/pub/mco-1040.43b/">MCO 1040.43B</a> — Enlisted To Officer Commissioning Programs — 29 Oct 2015</li>
+                <li><a href="/usmc/pub/mco-1040r.31/">MCO 1040R.31</a> — Marine Corps Reserve Enlisted Retention And Career Development Program — 26 Jun 2020</li>
+                <li><a href="/usmc/pub/mco-1050.16a/">MCO 1050.16A</a> — Appellate Leave Awaiting Punitive Separation — 19 Jun 1998</li>
+                <li><a href="/usmc/pub/mco-1050.3j/">MCO 1050.3J</a> — Regulations For Leave, Liberty, And Administrative Absence — 19 May 2009</li>
+                <li><a href="/usmc/pub/mco-10510.76/">MCO 10510.76</a> — Disassociation Of Test Equipment From Maintenance Groups An/tya-23,... — 15 Jun 1987</li>
+                <li><a href="/usmc/pub/mco-10550.8/">MCO 10550.8</a> — Joint Electronics Type Designation System — 2 Feb 1974</li>
+                <li><a href="/usmc/pub/mco-1070.1/">MCO 1070.1</a> — Official Military Personnel File (ompf) — 14 May 2019</li>
+                <li><a href="/usmc/pub/mco-11000.11a/">MCO 11000.11A</a> — Marine Corps Fire Protection And Emergency Services Program — 16 Aug 2017</li>
+                <li><a href="/usmc/pub/mco-11000.12/">MCO 11000.12</a> — Real Property Facilities Manual, Facilities Planning And Programming — 8 Sep 2014</li>
+                <li><a href="/usmc/pub/mco-11000.22/">MCO 11000.22</a> — Marine Corps Bachelor And Family Housing Management — 22 Jan 2018</li>
+                <li><a href="/usmc/pub/mco-11000.25a/">MCO 11000.25A</a> — Installation Geospatial Information And Services — 3 Jul 2013</li>
+                <li><a href="/usmc/pub/mco-11000.5/">MCO 11000.5</a> — Facilities Sustainment, Restoration And Modernization Program — 3 Jun 2016</li>
+                <li><a href="/usmc/pub/mco-1100r.78a/">MCO 1100R.78A</a> — Active Reserve Career Recruiter Program (arcrp) — 8 Aug 2007</li>
+                <li><a href="/usmc/pub/mco-11010.16a/">MCO 11010.16A</a> — Air Installations Compatible Use Zones (aicuz) Program — 11 Apr 2022</li>
+                <li><a href="/usmc/pub/mco-11011.23a/">MCO 11011.23A</a> — Marine Corps Encroachment Management Program — 20 Jul 2020</li>
+                <li><a href="/usmc/pub/mco-11162.1/">MCO 11162.1</a> — Fuels And Fuels Infrastructure Management — 11 Dec 2023</li>
+                <li><a href="/usmc/pub/mco-11240.106d/">MCO 11240.106D</a> — Non-tactical Vehicle Management — 14 Jan 2025</li>
+                <li><a href="/usmc/pub/mco-11240.118a/">MCO 11240.118A</a> — Licensing Program For Tactical Wheeled Motor Transport Equipment Operators — 13 Jul 2020</li>
+                <li><a href="/usmc/pub/mco-11262.2c/">MCO 11262.2C</a> — Standard Policy For Inspection, Testing, And Certification Of Tactical... — 31 Aug 2021</li>
+                <li><a href="/usmc/pub/mco-1130.53r/">MCO 1130.53R</a> — Enlistment Incentive Programs — 20 Mar 2012</li>
+                <li><a href="/usmc/pub/mco-1130.56e/">MCO 1130.56E</a> — Total Force Recruiting — 13 May 2025</li>
+                <li><a href="/usmc/pub/mco-1130.62c/">MCO 1130.62C</a> — Command Recruiting Program — 3 Dec 2020</li>
+                <li><a href="/usmc/pub/mco-1130.76d/">MCO 1130.76D</a> — Conduct Of Recruiting Operations — 7 Mar 2017</li>
+                <li><a href="/usmc/pub/mco-1130.80b/">MCO 1130.80B</a> — Prior Service And Reserve Augmentation Enlistments Into The Regular Marine... — 14 Nov 2016</li>
+                <li><a href="/usmc/pub/mco-1133r.27/">MCO 1133R.27</a> — Reserve Optional Enlistment Program And Incremental Initial Active Duty... — 11 Feb 2016</li>
+                <li><a href="/usmc/pub/mco-1200.13g/">MCO 1200.13G</a> — Marine Corps Front-end Analysis Program — 7 Mar 2012</li>
+                <li><a href="/usmc/pub/mco-1200.15c/">MCO 1200.15C</a> — Mos System Modification Process — 7 Mar 2025</li>
+                <li><a href="/usmc/pub/mco-1200.18/">MCO 1200.18</a> — Military Occupational Specialties (mos) Program Order (short Title: Mos... — 8 Dec 2014</li>
+                <li><a href="/usmc/pub/mco-12000.10/">MCO 12000.10</a> — Employment Protection For Certain Nonappropriated Fund Instrumentality... — 21 Oct 1985</li>
+                <li><a href="/usmc/pub/mco-1210.9a/">MCO 1210.9A</a> — Lateral Move (lm) Programs For Marine Corps Officers — 5 Apr 2020</li>
+                <li><a href="/usmc/pub/mco-12250.3/">MCO 12250.3</a> — Civilian Human Resources Management In The United States Marine Corps — 21 May 2018</li>
+                <li><a href="/usmc/pub/mco-12271.1/">MCO 12271.1</a> — Telework For Civilian Marines — 5 Sep 2018</li>
+                <li><a href="/usmc/pub/mco-1230.5c/">MCO 1230.5C</a> — Classification Testing — 4 Feb 2014</li>
+                <li><a href="/usmc/pub/mco-12301.1c/">MCO 12301.1C</a> — Foreign Area Employment-overseas Tour Extensions — 11 Sep 2017</li>
+                <li><a href="/usmc/pub/mco-12335.1/">MCO 12335.1</a> — Merit Staffing Program — 24 Oct 1990</li>
+                <li><a href="/usmc/pub/mco-1235.1a/">MCO 1235.1A</a> — Administration And Management Of The Individual Ready Reserve (irr) — 21 Nov 2019</li>
+                <li><a href="/usmc/pub/mco-12410.24a/">MCO 12410.24A</a> — Civilian Workforce Training, Education, And Professional Development — 29 Jan 2021</li>
+                <li><a href="/usmc/pub/mco-12410.25/">MCO 12410.25</a> — Civilian Community Of Interest Program — 25 Jul 2014</li>
+                <li><a href="/usmc/pub/mco-12430.2/">MCO 12430.2</a> — Performance Management Program — 29 Dec 1998</li>
+                <li><a href="/usmc/pub/mco-12451.2d/">MCO 12451.2D</a> — Honorary Awards For Civilian Employees — 7 Nov 2016</li>
+                <li><a href="/usmc/pub/mco-12451.3b/">MCO 12451.3B</a> — Incentive Awards Program For Hqmc Civilians — 26 Aug 2009</li>
+                <li><a href="/usmc/pub/mco-12510.2d/">MCO 12510.2D</a> — Manage To Payroll — 3 Mar 2018</li>
+                <li><a href="/usmc/pub/mco-12515.1/">MCO 12515.1</a> — Managing To Payroll — 24 Aug 1989</li>
+                <li><a href="/usmc/pub/mco-12620.2/">MCO 12620.2</a> — Alternative Work Schedule (aws) Program For Civilian Marine Employees — 17 Nov 2009</li>
+                <li><a href="/usmc/pub/mco-12630.1/">MCO 12630.1</a> — Voluntary Leave Transfer Program — 26 Apr 1991</li>
+                <li><a href="/usmc/pub/mco-12630.2/">MCO 12630.2</a> — Hours Of Duty, Absence, And Leave — 24 Sep 1992</li>
+                <li><a href="/usmc/pub/mco-12630.3/">MCO 12630.3</a> — Family And Medical Leave — 14 Oct 1993</li>
+                <li><a href="/usmc/pub/mco-12711.1a/">MCO 12711.1A</a> — Responsibility And Procedures For Handling Labor-management Relations... — 15 Feb 2019</li>
+                <li><a href="/usmc/pub/mco-12713.6a/">MCO 12713.6A</a> — Equal Employment Opportunity Program — 5 Dec 1997</li>
+                <li><a href="/usmc/pub/mco-12713.7/">MCO 12713.7</a> — Affirmative Employment Program — 6 Jun 1989</li>
+                <li><a href="/usmc/pub/mco-12713.8/">MCO 12713.8</a> — Handicapped Individuals Program (hip) — 25 Apr 1990</li>
+                <li><a href="/usmc/pub/mco-12771.3/">MCO 12771.3</a> — Civilian Marine Administrative Grievance System (ags) — 28 Mar 2013</li>
+                <li><a href="/usmc/pub/mco-12790.2/">MCO 12790.2</a> — Civilian Nonappropriated Fund Instrumentality (nafi) And Civilian Morale,... — 27 Jun 1990</li>
+                <li><a href="/usmc/pub/mco-12810.1/">MCO 12810.1</a> — Federal Employees’ Compensation Act Program — 31 Jan 2008</li>
+                <li><a href="/usmc/pub/mco-12920.1b/">MCO 12920.1B</a> — Management Of Senior Executive Service (ses) And Other Senior Executive... — 28 May 2003</li>
+                <li><a href="/usmc/pub/mco-1300.64b/">MCO 1300.64B</a> — Command Screening Program (csp) — 23 Mar 2017</li>
+                <li><a href="/usmc/pub/mco-1300.8/">MCO 1300.8</a> — Marine Corps Personnel Assignment Policy — 7 Mar 2025</li>
+                <li><a href="/usmc/pub/mco-1300r.65d/">MCO 1300R.65D</a> — Reserve Command Screening Program (rcsp) — 14 Aug 2017</li>
+                <li><a href="/usmc/pub/mco-1301.25c/">MCO 1301.25C</a> — Assignment Of Aviation Officers As Forward Air Controllers — 9 Feb 2012</li>
+                <li><a href="/usmc/pub/mco-1306.16f/">MCO 1306.16F</a> — Conscientious Objectors — 11 Jun 2013</li>
+                <li><a href="/usmc/pub/mco-1306.18b/">MCO 1306.18B</a> — Marine Corps Enlisted Aide Program — 13 Feb 2024</li>
+                <li><a href="/usmc/pub/mco-1320.11h/">MCO 1320.11H</a> — Marine Corps Sponsorship Program (mcsp) — 7 Mar 2025</li>
+                <li><a href="/usmc/pub/mco-1326.2h/">MCO 1326.2H</a> — Administration Of Temporary Flight Orders — 21 Oct 2019</li>
+                <li><a href="/usmc/pub/mco-1326.5e/">MCO 1326.5E</a> — Marine Corps Web Orders Systems (web Orders) — 16 May 2013</li>
+                <li><a href="/usmc/pub/mco-1326.6/">MCO 1326.6</a> — Selecting, Screening, And Preparing Enlisted Marines For Screenable Billets... — 11 May 2021</li>
+                <li><a href="/usmc/pub/mco-1326.7f/">MCO 1326.7F</a> — Selection And Screening Criteria For Marines Desiring Assignment To Marine... — 17 Jan 2016</li>
+                <li><a href="/usmc/pub/mco-1331.2k/">MCO 1331.2K</a> — Transition/conversion Training For Marine Naval Aviators And Naval Flight... — 18 Dec 2003</li>
+                <li><a href="/usmc/pub/mco-13670.1g/">MCO 13670.1G</a> — Management And Administration Of United States Marine Corps Mobile Facility... — 21 May 2018</li>
+                <li><a href="/usmc/pub/mco-1400.31d/">MCO 1400.31D</a> — Marine Corps Promotion Manual, Volume 1, Officer Promotions (marcorpromman,... — 28 Oct 2021</li>
+                <li><a href="/usmc/pub/mco-1500.52e/">MCO 1500.52E</a> — Marine Corps Water Survival Program (mcwsp) — 2 Mar 2026</li>
+                <li><a href="/usmc/pub/mco-1500.53b/">MCO 1500.53B</a> — Marine Air-ground Task Force Staff Training Program — 5 Mar 2013</li>
+                <li><a href="/usmc/pub/mco-1500.55/">MCO 1500.55</a> — Military Thinking And Decision Making Exercises — 12 Apr 1997</li>
+                <li><a href="/usmc/pub/mco-1500.56/">MCO 1500.56</a> — Marine Corps Values Program — 16 Dec 1996</li>
+                <li><a href="/usmc/pub/mco-1500.59a/">MCO 1500.59A</a> — Marine Corps Martial Arts Program (mcmap) — 23 Sep 2019</li>
+                <li><a href="/usmc/pub/mco-1500.60a/">MCO 1500.60A</a> — Force Preservation Council (fpc) — 13 Dec 2024</li>
+                <li><a href="/usmc/pub/mco-1500.61/">MCO 1500.61</a> — Marine Leader Development — 28 Jul 2017</li>
+                <li><a href="/usmc/pub/mco-1500.62/">MCO 1500.62</a> — Force Fitness Instructor Program (ffip) — 18 Dec 2018</li>
+                <li><a href="/usmc/pub/mco-1500.63a/">MCO 1500.63A</a> — Marine Corps Common Military Training Requirements — 10 Apr 2026</li>
+                <li><a href="/usmc/pub/mco-1500r.36g/">MCO 1500R.36G</a> — Training/pay Category P (cat P) Program — 2 Apr 1999</li>
+                <li><a href="/usmc/pub/mco-1510.121a/">MCO 1510.121A</a> — Marine Corps Common Skills (mccs) Program — 1 Oct 2004</li>
+                <li><a href="/usmc/pub/mco-1510.32f/">MCO 1510.32F</a> — Recruit Training — 20 Dec 2012</li>
+                <li><a href="/usmc/pub/mco-1520.29/">MCO 1520.29</a> — Marine Corps Aviator Production Processes And Stakeholder Responsibilities — 28 Jun 2011</li>
+                <li><a href="/usmc/pub/mco-1524.1/">MCO 1524.1</a> — Marine Corps Graduate Education Program (mcgep) — 30 May 2019</li>
+                <li><a href="/usmc/pub/mco-1524.2/">MCO 1524.2</a> — Marine Corps Doctor Of Philosophy Program (phdp) — 19 May 2021</li>
+                <li><a href="/usmc/pub/mco-1533.6e/">MCO 1533.6E</a> — Marine Corps Junior Reserve Officers' Training Corps (mcjrotc) Program — 7 Mar 2025</li>
+                <li><a href="/usmc/pub/mco-1540.32a/">MCO 1540.32A</a> — United States Marine Corps Landing Signal Officer (lso) Program — 7 Sep 1982</li>
+                <li><a href="/usmc/pub/mco-1540.33/">MCO 1540.33</a> — International Affairs Program — 11 Mar 2025</li>
+                <li><a href="/usmc/pub/mco-1542.1h/">MCO 1542.1H</a> — Field Accession Of Naval Aviators And Naval Flight Officers — 7 Nov 2003</li>
+                <li><a href="/usmc/pub/mco-1542.3e/">MCO 1542.3E</a> — United States Navy/united States Air Force Test Pilot Schools — 15 Nov 2024</li>
+                <li><a href="/usmc/pub/mco-1550.25a/">MCO 1550.25A</a> — Marine Corps Foreign Language Program — 6 Mar 2012</li>
+                <li><a href="/usmc/pub/mco-1550.4e/">MCO 1550.4E</a> — Management Of Defense Foreign Language Training — 12 Apr 2018</li>
+                <li><a href="/usmc/pub/mco-1553.10/">MCO 1553.10</a> — Marine Corps Training Information Management System (mctims) Standing... — 23 Oct 2014</li>
+                <li><a href="/usmc/pub/mco-1553.1c/">MCO 1553.1C</a> — The Marine Corps Training And Education System — 20 Dec 2024</li>
+                <li><a href="/usmc/pub/mco-1553.2d/">MCO 1553.2D</a> — Marine Corps Formal School Management Policy — 7 Mar 2025</li>
+                <li><a href="/usmc/pub/mco-1553.3c/">MCO 1553.3C</a> — Unit Training Management (utm) Program — 9 Aug 2023</li>
+                <li><a href="/usmc/pub/mco-1553.4b/">MCO 1553.4B</a> — Professional Military Education (pme) — 25 Jan 2008</li>
+                <li><a href="/usmc/pub/mco-1560.21e/">MCO 1560.21E</a> — Staff Noncommissioned Officers Degree Completion Program (sncodcp) — 13 May 2013</li>
+                <li><a href="/usmc/pub/mco-1560.25/">MCO 1560.25</a> — Marine Corps Lifelong Learning Program (short Title: Ll Program) — 1 Sep 2010</li>
+                <li><a href="/usmc/pub/mco-1560.33/">MCO 1560.33</a> — Marine Corps Tuition Assistance Program (mctap) — 4 May 2000</li>
+                <li><a href="/usmc/pub/mco-1560r.30b/">MCO 1560R.30B</a> — Montgomery Gi Bill-reserve (mgib-r) — 23 Aug 1993</li>
+                <li><a href="/usmc/pub/mco-1610.7b/">MCO 1610.7B</a> — Performance Evaluation System (short Title: Pes) — 5 Jun 2023</li>
+                <li><a href="/usmc/pub/mco-1616.1/">MCO 1616.1</a> — Junior Enlisted Performance Evaluation System (jepes) — 25 Nov 2020</li>
+                <li><a href="/usmc/pub/mco-1620.3a/">MCO 1620.3A</a> — Marine Corps Absentee And Deserter Apprehension Program — 27 Dec 2011</li>
+                <li><a href="/usmc/pub/mco-1630.3d/">MCO 1630.3D</a> — Operation And Administration Of Holding Cells And Detention Spaces — 6 Dec 2000</li>
+                <li><a href="/usmc/pub/mco-1640.3f/">MCO 1640.3F</a> — Procedures For The Transfer Of Marine Corps Prisoners — 28 May 2025</li>
+                <li><a href="/usmc/pub/mco-1640.5b/">MCO 1640.5B</a> — Standardized Prisoner Uniform For Pretrial And Post-trial Personnel... — 10 Nov 1992</li>
+                <li><a href="/usmc/pub/mco-1650.17f/">MCO 1650.17F</a> — Marine Corps Military Incentive Awards Program — 11 Dec 1986</li>
+                <li><a href="/usmc/pub/mco-1650.19j/">MCO 1650.19J</a> — Administrative And Issue Porcedures For Decorations, Medals, And Awards — 15 Oct 2012</li>
+                <li><a href="/usmc/pub/mco-1650.29h/">MCO 1650.29H</a> — Aviation Awards — 22 Sep 2010</li>
+                <li><a href="/usmc/pub/mco-1650.39b/">MCO 1650.39B</a> — Commandant Of The Marine Corps (cmc) Combined Awards Program — 9 May 2005</li>
+                <li><a href="/usmc/pub/mco-1650.45b/">MCO 1650.45B</a> — Marine Corps Awards For Logistics Excellence — 12 Jul 2011</li>
+                <li><a href="/usmc/pub/mco-1650.46b/">MCO 1650.46B</a> — Andrew J. Higgins, Eugene M. Stoner, And Donald Roebling Awards For... — 13 Nov 2012</li>
+                <li><a href="/usmc/pub/mco-1650.47/">MCO 1650.47</a> — Marine Corps Communications Awards Program (mccap) — 1 Dec 2004</li>
+                <li><a href="/usmc/pub/mco-1650.52b/">MCO 1650.52B</a> — The Gunnery Sergeant Edwin W. Johnson Jr. Memorial Marine Corps Ammunition... — 25 Feb 2025</li>
+                <li><a href="/usmc/pub/mco-1650.57a/">MCO 1650.57A</a> — Marine Corps Music Awards Program — 14 Nov 2024</li>
+                <li><a href="/usmc/pub/mco-1650.60/">MCO 1650.60</a> — Marine Corps Ground Awards Program (mcgap) — 30 Aug 2018</li>
+                <li><a href="/usmc/pub/mco-1650.61/">MCO 1650.61</a> — Marine Corps Installations And Logistics Awards Program (mcilap) — 14 Nov 2018</li>
+                <li><a href="/usmc/pub/mco-1650r.35f/">MCO 1650R.35F</a> — Chambers Award For Outstanding Leadership — 26 Apr 2018</li>
+                <li><a href="/usmc/pub/mco-1650r.36a/">MCO 1650R.36A</a> — Naval Enlisted Reserve Association (nera) &quot;outstanding Enlisted Marine... — 13 Aug 1992</li>
+                <li><a href="/usmc/pub/mco-1700.22g/">MCO 1700.22G</a> — Alcoholic Beverage Control In The Marine Corps — 16 Nov 2015</li>
+                <li><a href="/usmc/pub/mco-1700.23g/">MCO 1700.23G</a> — Request Mast Procedures — 21 Jun 2019</li>
+                <li><a href="/usmc/pub/mco-1700.29/">MCO 1700.29</a> — Semper Fit Fitness And Health Promotion Policy — 7 Mar 2025</li>
+                <li><a href="/usmc/pub/mco-1700.30/">MCO 1700.30</a> — Marine Corps Community Services Business Operations Manual — 23 Sep 2009</li>
+                <li><a href="/usmc/pub/mco-1700.31a/">MCO 1700.31A</a> — Transition Readiness Program (trp) — 2 Mar 2026</li>
+                <li><a href="/usmc/pub/mco-1700.32a/">MCO 1700.32A</a> — Leadership Scholar Program (lsp) — 22 Apr 2026</li>
+                <li><a href="/usmc/pub/mco-1700.33/">MCO 1700.33</a> — Marine Corps General Library Program (library Program) — 18 Sep 2015</li>
+                <li><a href="/usmc/pub/mco-1700.36b/">MCO 1700.36B</a> — Single Marine Program (smp) — 5 Mar 2019</li>
+                <li><a href="/usmc/pub/mco-1700.37/">MCO 1700.37</a> — Personal Financial Management Program (pfmp) — 11 Dec 2014</li>
+                <li><a href="/usmc/pub/mco-1700.38a/">MCO 1700.38A</a> — Family Member Employment Assistance Program (fmeap) — 6 Apr 2026</li>
+                <li><a href="/usmc/pub/mco-1700.39/">MCO 1700.39</a> — Marine Corps Recreation Programs — 21 May 2025</li>
+                <li><a href="/usmc/pub/mco-1700.41/">MCO 1700.41</a> — Marine Corps Embedded Preventive Behavioral Health Capability — 24 Jan 2016</li>
+                <li><a href="/usmc/pub/mco-1710.30a/">MCO 1710.30A</a> — Marine Corps Child And Youth Programs (short Title: Cyp) — 12 Dec 2024</li>
+                <li><a href="/usmc/pub/mco-1720.2a/">MCO 1720.2A</a> — Marine Corps Suicide Prevention System (mcsps) — 2 Aug 2021</li>
+                <li><a href="/usmc/pub/mco-1730.6g/">MCO 1730.6G</a> — Religious Ministry In The Marine Corps — 28 May 2024</li>
+                <li><a href="/usmc/pub/mco-1730.7b/">MCO 1730.7B</a> — Marine Corps Worship Service — 14 Jul 2017</li>
+                <li><a href="/usmc/pub/mco-1730.8a/">MCO 1730.8A</a> — United States Marine Corps Organization And Utilization Of Navy Reserve... — 21 Jun 2024</li>
+                <li><a href="/usmc/pub/mco-1730.9/">MCO 1730.9</a> — Accommodation Of Religious Practices In The Marine Corps — 12 Jul 2021</li>
+                <li><a href="/usmc/pub/mco-1738.1b/">MCO 1738.1B</a> — Chaplains Religious Enrichment Development Operation — 1 Mar 2023</li>
+                <li><a href="/usmc/pub/mco-1740.13d/">MCO 1740.13D</a> — Family Care Plans — 14 Jun 2018</li>
+                <li><a href="/usmc/pub/mco-1741.11d/">MCO 1741.11D</a> — Survivor Annuity Program - Survivor Benefit Plans (sbp) — 2 Oct 2012</li>
+                <li><a href="/usmc/pub/mco-1741.8/">MCO 1741.8</a> — Marine Corps Government Life Insurance Manual (short Title Marcorglinsman) — 19 Feb 2010</li>
+                <li><a href="/usmc/pub/mco-1742.1c/">MCO 1742.1C</a> — Voting Assistance Program — 25 Jun 2021</li>
+                <li><a href="/usmc/pub/mco-1751.3/">MCO 1751.3</a> — Marine Corps Dependency Determination And Support Program For Basic... — 1 Jul 2021</li>
+                <li><a href="/usmc/pub/mco-1752.5c/">MCO 1752.5C</a> — Sexual Assault Prevention And Response (sapr) Program — 3 Jun 2019</li>
+                <li><a href="/usmc/pub/mco-1754.10b/">MCO 1754.10B</a> — Marine Corps Information, Referral And Relocation (ir&amp;r) Program — 2 Feb 2022</li>
+                <li><a href="/usmc/pub/mco-1754.11a/">MCO 1754.11A</a> — Marine Corps Family Advocacy Program — 8 Apr 2021</li>
+                <li><a href="/usmc/pub/mco-1754.14/">MCO 1754.14</a> — Marine Corps Community Counseling Program (ccp) — 21 May 2025</li>
+                <li><a href="/usmc/pub/mco-1754.4c/">MCO 1754.4C</a> — Exceptional Family Member Program — 8 Oct 2020</li>
+                <li><a href="/usmc/pub/mco-1754.6c/">MCO 1754.6C</a> — Marine Corps Family Team Building (mcftb) — 9 Feb 2012</li>
+                <li><a href="/usmc/pub/mco-1754.9b/">MCO 1754.9B</a> — Unit, Personal And Family Readiness Program (upfrp) — 25 Mar 2019</li>
+                <li><a href="/usmc/pub/mco-1755.3a/">MCO 1755.3A</a> — School Liaison Program (slp) — 1 Jul 2021</li>
+                <li><a href="/usmc/pub/mco-1771.1c/">MCO 1771.1C</a> — Collection Of Deoxyribonucleic Acid (dna) Reference Specimens To Aid In... — 20 Feb 2026</li>
+                <li><a href="/usmc/pub/mco-1771.2/">MCO 1771.2</a> — Pay And Allowance Continuation (pac) Program — 23 Feb 2017</li>
+                <li><a href="/usmc/pub/mco-1800.11a/">MCO 1800.11A</a> — Policy And Procedures For Reserve Component (rc) Member Service Beyond 16... — 27 Mar 2020</li>
+                <li><a href="/usmc/pub/mco-1800.12/">MCO 1800.12</a> — Blended Retirement System (brs) Policy — 9 Apr 2026</li>
+                <li><a href="/usmc/pub/mco-1900.16/">MCO 1900.16</a> — Separation And Retirement Manual (short Title: Marcorsepman) — 28 May 2025</li>
+                <li><a href="/usmc/pub/mco-2020.1a/">MCO 2020.1A</a> — Marine Corps Aviation Logistics Information Management Systems Department... — 26 Jan 2025</li>
+                <li><a href="/usmc/pub/mco-2400.2a/">MCO 2400.2A</a> — Marine Corps Management And Use Of The Electromagnetic Spectrum — 7 Oct 2009</li>
+                <li><a href="/usmc/pub/mco-3000.11e/">MCO 3000.11E</a> — Ground Equipment Condition And Supply Materiel Readiness Reporting (mrr)... — 5 Apr 2012</li>
+                <li><a href="/usmc/pub/mco-3000.13b/">MCO 3000.13B</a> — Marine Corps Readiness Reporting — 14 Jul 2020</li>
+                <li><a href="/usmc/pub/mco-3000.17/">MCO 3000.17</a> — Marine Corps Prepositioning Programs — 17 Oct 2013</li>
+                <li><a href="/usmc/pub/mco-3000.18b/">MCO 3000.18B</a> — Marine Corps Force Deployment Planning And Execution Manual, (short Title: ... — 27 Apr 2012</li>
+                <li><a href="/usmc/pub/mco-3000.2j/">MCO 3000.2J</a> — Submission Requirements For The Commanders' Operational Stituation Report... — 1 Apr 2011</li>
+                <li><a href="/usmc/pub/mco-3030.1a/">MCO 3030.1A</a> — Marine Corps Continuity Of Operations (coop) Program — 14 Aug 2020</li>
+                <li><a href="/usmc/pub/mco-3040.4/">MCO 3040.4</a> — Marine Corps Casualty Assistance Program (short Title: Marcorcasastpro) — 1 Mar 2011</li>
+                <li><a href="/usmc/pub/mco-3058.1/">MCO 3058.1</a> — Marine Corps Mission Assurance — 23 Oct 2014</li>
+                <li><a href="/usmc/pub/mco-3061.1/">MCO 3061.1</a> — Total Force Mobilization And Deployment Plan (tfmdp) Volume 2 — 10 Jun 2026</li>
+                <li><a href="/usmc/pub/mco-3070.3/">MCO 3070.3</a> — Personal Portable Electronic Device (pped) Policy — 26 Mar 2024</li>
+                <li><a href="/usmc/pub/mco-3090.2/">MCO 3090.2</a> — Policy For Marine Air Ground Task Force (magtf) Command And Control (c2)... — 23 Jan 2013</li>
+                <li><a href="/usmc/pub/mco-3093.3/">MCO 3093.3</a> — Marine Corps Policy For Coordinated Implementation Of Military Standards... — 15 Jun 2011</li>
+                <li><a href="/usmc/pub/mco-3093.4/">MCO 3093.4</a> — Marine Corps Policy For Assignment, Management, And Operational Use Of The... — 15 Jun 2011</li>
+                <li><a href="/usmc/pub/mco-3100.4a/">MCO 3100.4A</a> — Marine Corps Cyberspace Operations — 25 Mar 2026</li>
+                <li><a href="/usmc/pub/mco-3104.1b/">MCO 3104.1B</a> — Marine Corps Combat Camera Program — 25 Oct 2011</li>
+                <li><a href="/usmc/pub/mco-3110.5/">MCO 3110.5</a> — Military Information Support Operations (miso) — 20 Nov 2015</li>
+                <li><a href="/usmc/pub/mco-3120.10a/">MCO 3120.10A</a> — Marine Corps Information Operations — 8 Nov 2013</li>
+                <li><a href="/usmc/pub/mco-3120.11a/">MCO 3120.11A</a> — Marine Corps Parachuting Policy And Program Administration — 17 Dec 2014</li>
+                <li><a href="/usmc/pub/mco-3120.12a/">MCO 3120.12A</a> — Marine Corps Global Force Management (gfm) And Force Synchronization — 3 Jun 2020</li>
+                <li><a href="/usmc/pub/mco-3120.13/">MCO 3120.13</a> — Policy For Marine Expeditionary Units (meu) — 29 Oct 2015</li>
+                <li><a href="/usmc/pub/mco-3120.8a/">MCO 3120.8A</a> — Policy For The Organization Of Fleet Marine Forces For Combat — 26 Jun 1992</li>
+                <li><a href="/usmc/pub/mco-3125.1b/">MCO 3125.1B</a> — Marine Corps Flying Hour Program (fhp) Management — 27 Apr 2009</li>
+                <li><a href="/usmc/pub/mco-3150.4a/">MCO 3150.4A</a> — Marine Corps Diving Policy And Program Administration — 22 Oct 2015</li>
+                <li><a href="/usmc/pub/mco-3300.4a/">MCO 3300.4A</a> — Marine Corps Law Of War Program — 9 Jan 2014</li>
+                <li><a href="/usmc/pub/mco-3311.2a/">MCO 3311.2A</a> — Marine Corps Tactical Air Control Party (tacp) Program — 1 Jun 2022</li>
+                <li><a href="/usmc/pub/mco-3400.11/">MCO 3400.11</a> — Countering Weapons Of Mass Destruction (cwmd) Policy — 13 Feb 2019</li>
+                <li><a href="/usmc/pub/mco-3400.12/">MCO 3400.12</a> — Chemical, Biological, Radiological And Nuclear Defense (cbrnd) Program — 7 Feb 2025</li>
+                <li><a href="/usmc/pub/mco-3400.3h/">MCO 3400.3H</a> — Chemical, Biological, Radiological, And Nuclear Defense (cbrnd) Policy And... — 7 Mar 2019</li>
+                <li><a href="/usmc/pub/mco-3430.2d/">MCO 3430.2D</a> — Policy For Electromagnetic Warfare — 6 Jun 2023</li>
+                <li><a href="/usmc/pub/mco-3440.10/">MCO 3440.10</a> — Marine Corps Emergency Management Policy — 7 Feb 2025</li>
+                <li><a href="/usmc/pub/mco-3440.7c/">MCO 3440.7C</a> — Marine Corps Roles And Responsibilities In Defense Support Of Civil... — 21 May 2019</li>
+                <li><a href="/usmc/pub/mco-3440.8b/">MCO 3440.8B</a> — Installation Chemical, Biological, Radiological, Nuclear And High-yield... — 10 Apr 2026</li>
+                <li><a href="/usmc/pub/mco-3440.9/">MCO 3440.9</a> — Marine Corps Installation Emergency Management (iem) Program — 19 May 2014</li>
+                <li><a href="/usmc/pub/mco-3460.3/">MCO 3460.3</a> — Policy For Personnel Recovery (pr) — 2 Sep 2016</li>
+                <li><a href="/usmc/pub/mco-3500.109a/">MCO 3500.109A</a> — Marine Corps Aviation Weapons And Tactics Training Program (wttp) — 26 Dec 2019</li>
+                <li><a href="/usmc/pub/mco-3500.110/">MCO 3500.110</a> — Policy And Guidance For Mission Essential Task List (metl) Development,... — 15 Jul 2011</li>
+                <li><a href="/usmc/pub/mco-3500.11g/">MCO 3500.11G</a> — Service-level Training Exercise Program (slte-p) — 20 Jul 2021</li>
+                <li><a href="/usmc/pub/mco-3500.14/">MCO 3500.14</a> — Aviation Training And Readiness (t&amp;r) Program — 22 Nov 2024</li>
+                <li><a href="/usmc/pub/mco-3500.18a/">MCO 3500.18A</a> — Preparation And Deployment Of Fixed Wing Marine Corps Aviation Units On... — 20 Sep 2012</li>
+                <li><a href="/usmc/pub/mco-3500.28/">MCO 3500.28</a> — Marine Corps Unit Cohesion Program Standing Operating Procedures (short... — 20 Aug 2004</li>
+                <li><a href="/usmc/pub/mco-3500.32/">MCO 3500.32</a> — Intelligence Training And Readiness Manual (short Title: Intel T&amp;r Manual) — 20 Aug 2004</li>
+                <li><a href="/usmc/pub/mco-3500.40/">MCO 3500.40</a> — Career Planner Training And Readiness Manual (short Title: Career Planners... — 20 Aug 2004</li>
+                <li><a href="/usmc/pub/mco-3500.41/">MCO 3500.41</a> — Signals Intelligence Training And Readiness Manual (short Title:sigint T&amp;r... — 20 Aug 2004</li>
+                <li><a href="/usmc/pub/mco-3500.42c/">MCO 3500.42C</a> — Marine Corps Helicopter/tiltrotor Rope Suspension Techniques (hrst) And... — 18 Apr 2016</li>
+                <li><a href="/usmc/pub/mco-3501.17/">MCO 3501.17</a> — Marine Corps Combat Readiness Evaluation System (mccres) Volume Xiii,... — 8 Feb 1995</li>
+                <li><a href="/usmc/pub/mco-3501.1e/">MCO 3501.1E</a> — Marine Corps Combat Readiness Evaluation (mccre) — 25 Feb 2019</li>
+                <li><a href="/usmc/pub/mco-3501.36b/">MCO 3501.36B</a> — Marine Corps Critical Infrastructure Program — 12 Feb 2021</li>
+                <li><a href="/usmc/pub/mco-3502.10/">MCO 3502.10</a> — Counter-improvised Explosive Device Training And Education Program — 11 Dec 2018</li>
+                <li><a href="/usmc/pub/mco-3502.11/">MCO 3502.11</a> — Policy For Amphibious Operations Training (aot) — 30 May 2019</li>
+                <li><a href="/usmc/pub/mco-3502.2a/">MCO 3502.2A</a> — Marine Expeditionary Unit (special Operations Capable) (meu(soc)) Special... — 26 Aug 1996</li>
+                <li><a href="/usmc/pub/mco-3502.3d/">MCO 3502.3D</a> — Marine Expeditionary Unit Pre-deployment Training Program — 14 Nov 2024</li>
+                <li><a href="/usmc/pub/mco-3502.40/">MCO 3502.40</a> — Policy For Coordinating Interagency (ia) Support Into Marine Corps Training... — 7 Jul 2023</li>
+                <li><a href="/usmc/pub/mco-3502.6a/">MCO 3502.6A</a> — Marine Corps Force Generation Process — 7 Jun 2013</li>
+                <li><a href="/usmc/pub/mco-3502.7a/">MCO 3502.7A</a> — Marine Corps Ground Combat Element Operations And Tactics Training Program... — 20 Jan 2016</li>
+                <li><a href="/usmc/pub/mco-3502.8a/">MCO 3502.8A</a> — Marine Corps Logistics Tactics, Training, And Education Program — 12 Jun 2020</li>
+                <li><a href="/usmc/pub/mco-3502.9/">MCO 3502.9</a> — Marine Corps Policy On Organizing, Training, And Equipping For Operations... — 15 Jul 2014</li>
+                <li><a href="/usmc/pub/mco-3504.1a/">MCO 3504.1A</a> — Marine Corps Lessons Learned Program — 2 Jan 2025</li>
+                <li><a href="/usmc/pub/mco-3504.2a/">MCO 3504.2A</a> — Operations Event/incident Report (oprep-3) Reporting — 7 Aug 2013</li>
+                <li><a href="/usmc/pub/mco-3550.10/">MCO 3550.10</a> — Policies And Procedures For Range And Training Area Management — 15 Feb 2018</li>
+                <li><a href="/usmc/pub/mco-3550.12a/">MCO 3550.12A</a> — Operational Range Clearance (orc) Program — 6 May 2021</li>
+                <li><a href="/usmc/pub/mco-3550.13/">MCO 3550.13</a> — Range Compatible Use Zones (rcuz) Program — 27 Apr 2021</li>
+                <li><a href="/usmc/pub/mco-3550.14/">MCO 3550.14</a> — Policies And Procedures For Synthetic Ground Training Systems — 23 Jun 2021</li>
+                <li><a href="/usmc/pub/mco-3550.9a/">MCO 3550.9A</a> — Operational Training Range Certification / Recertification Program — 3 Mar 2023</li>
+                <li><a href="/usmc/pub/mco-3571.2h/">MCO 3571.2H</a> — Explosive Ordnance Disposal (eod) Program — 8 Aug 2015</li>
+                <li><a href="/usmc/pub/mco-3574.2m/">MCO 3574.2M</a> — Marine Corps Combat Marksmanship Programs — 6 Apr 2022</li>
+                <li><a href="/usmc/pub/mco-3591.2l/">MCO 3591.2L</a> — Small Arms Marksmanship Competition — 9 Dec 2024</li>
+                <li><a href="/usmc/pub/mco-3710.6a/">MCO 3710.6A</a> — Marine Corps Aviation Training System (ats) — 30 Sep 2011</li>
+                <li><a href="/usmc/pub/mco-3710.7/">MCO 3710.7</a> — Marine Corps Aviation Current Readiness Program — 9 Apr 2018</li>
+                <li><a href="/usmc/pub/mco-3710.8/">MCO 3710.8</a> — United States Marine Corps Naval Air Training And Operating Procedures... — 30 Sep 2011</li>
+                <li><a href="/usmc/pub/mco-3800.2b/">MCO 3800.2B</a> — Oversight Of Intelligence Activities — 30 Apr 2004</li>
+                <li><a href="/usmc/pub/mco-3821.2/">MCO 3821.2</a> — The Defense Attache System (das) — 9 Jul 2009</li>
+                <li><a href="/usmc/pub/mco-3900.17/">MCO 3900.17</a> — The Marine Corps Urgent Needs Process (unp) And The Urgent Universal Need... — 17 Oct 2008</li>
+                <li><a href="/usmc/pub/mco-3900.18/">MCO 3900.18</a> — Human Research Protection Program (hrpp) — 21 Jan 2011</li>
+                <li><a href="/usmc/pub/mco-3900.19/">MCO 3900.19</a> — Applying Energy Performance Metrics And Measures In Requirements... — 23 May 2013</li>
+                <li><a href="/usmc/pub/mco-3900.20/">MCO 3900.20</a> — Marine Corps Capabilities Based Assessment — 27 Sep 2016</li>
+                <li><a href="/usmc/pub/mco-3902.1e/">MCO 3902.1E</a> — Marine Corps Studies System — 27 Jun 2022</li>
+                <li><a href="/usmc/pub/mco-3960.6/">MCO 3960.6</a> — Marine Corps Science And Technology (s&amp;t) — 30 Aug 2002</li>
+                <li><a href="/usmc/pub/mco-4000.52a/">MCO 4000.52A</a> — Marine Corps Procedures For Processing Export Licenses — 5 Apr 1995</li>
+                <li><a href="/usmc/pub/mco-4000.56a/">MCO 4000.56A</a> — Marine Corps Policy On Depot Maintenance Core Capabilities — 5 Jan 2017</li>
+                <li><a href="/usmc/pub/mco-4000.57b/">MCO 4000.57B</a> — Integrated Force Sustainment Of Ground Equipment (ifsge) — 7 Apr 2023</li>
+                <li><a href="/usmc/pub/mco-4000.58/">MCO 4000.58</a> — Prepositioning Programs Tailoring Policy — 19 Aug 2016</li>
+                <li><a href="/usmc/pub/mco-4000.59/">MCO 4000.59</a> — Marine Corps Policy On Depot Maintenance Workload Distribution (50/50)... — 10 Aug 2017</li>
+                <li><a href="/usmc/pub/mco-4000.60/">MCO 4000.60</a> — Logistics And Supply Chain Management Business Process Management Program — 27 Apr 2021</li>
+                <li><a href="/usmc/pub/mco-4000.61/">MCO 4000.61</a> — Electronic Commerce User Access Management — 1 Feb 2024</li>
+                <li><a href="/usmc/pub/mco-4061.1a/">MCO 4061.1A</a> — Food Safety Training Program — 31 May 2022</li>
+                <li><a href="/usmc/pub/mco-4066.18/">MCO 4066.18</a> — Marine Corps Community Services Asset Protection Order — 16 Sep 2014</li>
+                <li><a href="/usmc/pub/mco-4081.2/">MCO 4081.2</a> — Marine Corps Performance Based Logistics (pbl) — 5 Jan 2007</li>
+                <li><a href="/usmc/pub/mco-4105.1b/">MCO 4105.1B</a> — Weapon System Management (wsm) Within The Marine Corps — 17 Dec 2012</li>
+                <li><a href="/usmc/pub/mco-4105.2a/">MCO 4105.2A</a> — Marine Corps Ground Equipment Warranty Program — 22 Dec 2023</li>
+                <li><a href="/usmc/pub/mco-4151.22/">MCO 4151.22</a> — Condition Based Maintenance Plus (cbm+) Order — 17 Jan 2020</li>
+                <li><a href="/usmc/pub/mco-4200.22f/">MCO 4200.22F</a> — Marine Corps Spare Parts Breakout Program — 14 Dec 2012</li>
+                <li><a href="/usmc/pub/mco-4200.33a/">MCO 4200.33A</a> — Contractor Logistics Support (cls) For Marine Corps Ground Equipment And... — 4 Dec 2020</li>
+                <li><a href="/usmc/pub/mco-4200.34/">MCO 4200.34</a> — Contingency Contracting Force (ccf) Program — 14 Sep 2016</li>
+                <li><a href="/usmc/pub/mco-4400.150/">MCO 4400.150</a> — Consumer-level Supply Policy — 29 Jan 2014</li>
+                <li><a href="/usmc/pub/mco-4400.160/">MCO 4400.160</a> — Field Supply And Maintenance Analysis Office (short Title: Fsmao) Program — 26 Nov 2013</li>
+                <li><a href="/usmc/pub/mco-4400.16h/">MCO 4400.16H</a> — Uniform Materiel Movement And Issue Priority System (ummips) — 13 Sep 2010</li>
+                <li><a href="/usmc/pub/mco-4400.177h/">MCO 4400.177H</a> — Marine Corps Aviation Supply Desk-top Procedures — 29 Jan 2025</li>
+                <li><a href="/usmc/pub/mco-4400.194/">MCO 4400.194</a> — Marine Corps Class Vii Stock Rotation Policy — 14 Dec 2012</li>
+                <li><a href="/usmc/pub/mco-4400.195/">MCO 4400.195</a> — Primary Inventory Control Activity (pica) Assignment Policy — 17 Dec 2012</li>
+                <li><a href="/usmc/pub/mco-4400.200a/">MCO 4400.200A</a> — Marine Corps Coordinated Secondary Reparable Management (csm) Program — 20 May 2020</li>
+                <li><a href="/usmc/pub/mco-4400.201/">MCO 4400.201</a> — Management Of Property In The Possession Of The Marine Corps — 21 May 2025</li>
+                <li><a href="/usmc/pub/mco-4400.39a/">MCO 4400.39A</a> — War Reserve Materiel (wrm) Policy — 21 May 2025</li>
+                <li><a href="/usmc/pub/mco-4400.79/">MCO 4400.79</a> — Provisioning Policy — 23 May 2007</li>
+                <li><a href="/usmc/pub/mco-4410.27a/">MCO 4410.27A</a> — Processing Cataloging Actions Requests (car) — 17 Dec 2012</li>
+                <li><a href="/usmc/pub/mco-4410.28/">MCO 4410.28</a> — Item Unique Identification (iuid) Of Ground Equipment — 1 Feb 2010</li>
+                <li><a href="/usmc/pub/mco-4410.29/">MCO 4410.29</a> — Assignment Of Marine Corps Stock Numbers (mcsn) And Criteria Determining... — 20 Dec 2012</li>
+                <li><a href="/usmc/pub/mco-4443.13/">MCO 4443.13</a> — Standard Pricing Policy For The Marine Corps Supply Management Activity... — 14 Dec 2012</li>
+                <li><a href="/usmc/pub/mco-4450.12a/">MCO 4450.12A</a> — Storage And Handling Of Hazardous Materials — 4 Mar 2020</li>
+                <li><a href="/usmc/pub/mco-4470.1b/">MCO 4470.1B</a> — United States Marine Corps (usmc) Marine Air Ground Task Force (magtf)... — 20 Dec 2019</li>
+                <li><a href="/usmc/pub/mco-4600.39/">MCO 4600.39</a> — Marine Corps Personal Property Transportation Program — 19 Aug 2016</li>
+                <li><a href="/usmc/pub/mco-4600.40c/">MCO 4600.40C</a> — Government Travel Charge Card Program (gtccp) — 12 Jan 2026</li>
+                <li><a href="/usmc/pub/mco-4600.41b/">MCO 4600.41B</a> — Marine Corps Distribution Manual — 12 Oct 2021</li>
+                <li><a href="/usmc/pub/mco-4600.7a/">MCO 4600.7A</a> — Marine Corps Passenger Transportation Program — 21 May 2025</li>
+                <li><a href="/usmc/pub/mco-4610.37g/">MCO 4610.37G</a> — Marine Corps Transportation Account Code (tac) Policy — 24 Jun 2020</li>
+                <li><a href="/usmc/pub/mco-4630.20/">MCO 4630.20</a> — Use Of Military Airlift Command Transportation Priority-4 Airlift... — 15 Dec 1982</li>
+                <li><a href="/usmc/pub/mco-4650.39a/">MCO 4650.39A</a> — Defense Travel System (dts) — 24 Feb 2014</li>
+                <li><a href="/usmc/pub/mco-4651.4/">MCO 4651.4</a> — Marine Corps Community Services {mccs) And Miscellaneous Marine Corps... — 15 Mar 2010</li>
+                <li><a href="/usmc/pub/mco-4690.1b/">MCO 4690.1B</a> — Marine Corps Container Management Policy — 22 Nov 2022</li>
+                <li><a href="/usmc/pub/mco-4700.4a/">MCO 4700.4A</a> — Advanced Manufacturing Policy — 8 May 2026</li>
+                <li><a href="/usmc/pub/mco-4733.1d/">MCO 4733.1D</a> — Marine Corps Ground Test, Measurement, And Diagnostic Equipment (tmde)... — 30 May 2023</li>
+                <li><a href="/usmc/pub/mco-4790.18c/">MCO 4790.18C</a> — Corrosion Prevention And Control (cpac) Program — 21 Aug 2014</li>
+                <li><a href="/usmc/pub/mco-4790.2/">MCO 4790.2</a> — Field-level Maintenance Management Policy (flmmp) — 21 Jan 2016</li>
+                <li><a href="/usmc/pub/mco-4790.21/">MCO 4790.21</a> — Depot Level Source Of Repair (dlsor) Policy — 19 May 2005</li>
+                <li><a href="/usmc/pub/mco-4790.24/">MCO 4790.24</a> — Enterprise Lifecycle Maintenance Program (elmp) — 23 Jan 2012</li>
+                <li><a href="/usmc/pub/mco-4790.25/">MCO 4790.25</a> — Ground Equipment Maintenance Program (gemp) — 12 Jan 2014</li>
+                <li><a href="/usmc/pub/mco-4855.10c/">MCO 4855.10C</a> — Product Quality Deficiency Report (pqdr) Program — 23 Dec 2014</li>
+                <li><a href="/usmc/pub/mco-4860.3d/">MCO 4860.3D</a> — Commercial Activities (ca) Program — 14 Jan 1992</li>
+                <li><a href="/usmc/pub/mco-5000.12f/">MCO 5000.12F</a> — Marine Corps Policy Concerning Parenthood And Pregnancy — 28 May 2025</li>
+                <li><a href="/usmc/pub/mco-5000.14d/">MCO 5000.14D</a> — Marine Corps Administrative Procedures (short Title: Mcap) — 4 Jun 2004</li>
+                <li><a href="/usmc/pub/mco-5000.18a/">MCO 5000.18A</a> — Fleet Marine Band Program — 3 Oct 2025</li>
+                <li><a href="/usmc/pub/mco-5000.23/">MCO 5000.23</a> — Policy For The Fielding Of Ground Weapon Systems And Equipment Policy — 14 Dec 2012</li>
+                <li><a href="/usmc/pub/mco-5000.27/">MCO 5000.27</a> — Marine Corps Roles &amp; Responsibilities For The Acquisition And Sustainment... — 15 Nov 2024</li>
+                <li><a href="/usmc/pub/mco-5030.2c/">MCO 5030.2C</a> — Policies And Procedures Concerning The Use Of Code Words, Nicknames, And... — 18 Feb 1992</li>
+                <li><a href="/usmc/pub/mco-5040.6k/">MCO 5040.6K</a> — Inspector General Of The Marine Corps Inspections Program — 1 May 2026</li>
+                <li><a href="/usmc/pub/mco-5050.13/">MCO 5050.13</a> — Travel To Norway In Usmc Prepositioning — 1 Feb 1990</li>
+                <li><a href="/usmc/pub/mco-5060.19c/">MCO 5060.19C</a> — Award Of The Title Honorary Marine — 13 Mar 2019</li>
+                <li><a href="/usmc/pub/mco-5060.20/">MCO 5060.20</a> — Marine Corps Drill And Ceremonies Manual — 15 May 2019</li>
+                <li><a href="/usmc/pub/mco-5090.2/">MCO 5090.2</a> — Environmental Compliance And Protection Program — 11 Jun 2018</li>
+                <li><a href="/usmc/pub/mco-5090.4a/">MCO 5090.4A</a> — Conservation Law Enforcement Program — 13 Feb 2007</li>
+                <li><a href="/usmc/pub/mco-5100.29c-volumes-1-9/">MCO 5100.29C VOLUMES 1-9</a> — Marine Corps Safety Management System (mcsms) — 8 Feb 2022</li>
+                <li><a href="/usmc/pub/mco-5100.34a/">MCO 5100.34A</a> — Deadline Safety Of Use Message Instructions To Suspend Operations Of Marine... — 19 Jun 2017</li>
+                <li><a href="/usmc/pub/mco-5100.8/">MCO 5100.8</a> — Marine Corps Occupational Safety And Health (osh) Policy Order — 15 May 2006</li>
+                <li><a href="/usmc/pub/mco-5104.2/">MCO 5104.2</a> — Marine Corps Radiation Safety Program For Depleted Uranium Ammunition — 15 Apr 2019</li>
+                <li><a href="/usmc/pub/mco-5110.4b/">MCO 5110.4B</a> — Marine Corps Postal Affairs And Official Mail Program — 9 Dec 2021</li>
+                <li><a href="/usmc/pub/mco-5200.17f/">MCO 5200.17F</a> — Standardization Of Military And Associated Terminology — 10 Aug 2023</li>
+                <li><a href="/usmc/pub/mco-5200.24f/">MCO 5200.24F</a> — Marine Corps’ Risk Management And Internal Control Program — 18 Dec 2024</li>
+                <li><a href="/usmc/pub/mco-5200.26b/">MCO 5200.26B</a> — The Commander In Chief's Annual Award For Installation Excellence — 11 Aug 2005</li>
+                <li><a href="/usmc/pub/mco-5200.28b/">MCO 5200.28B</a> — Marine Corps Modeling And Simulation (m&amp;s) Management — 11 Dec 2024</li>
+                <li><a href="/usmc/pub/mco-5210.11f/">MCO 5210.11F</a> — Marine Corps Records Management Program — 7 Apr 2015</li>
+                <li><a href="/usmc/pub/mco-5211.4/">MCO 5211.4</a> — File Of General Officers Speeches — 31 Aug 1992</li>
+                <li><a href="/usmc/pub/mco-5211.5/">MCO 5211.5</a> — United States Marine Corps (usmc) Privacy Program — 28 Aug 2024</li>
+                <li><a href="/usmc/pub/mco-5214.2g/">MCO 5214.2G</a> — Marine Corps Information Requirements (reports) Management Program — 2 Aug 2018</li>
+                <li><a href="/usmc/pub/mco-5215.16c/">MCO 5215.16C</a> — Instructions For The Interservicing Of Technical Manuals And Related... — 22 Mar 2024</li>
+                <li><a href="/usmc/pub/mco-5215.17d/">MCO 5215.17D</a> — Marine Corps Technical Publication Management — 26 Oct 2016</li>
+                <li><a href="/usmc/pub/mco-5215.1k/">MCO 5215.1K</a> — Marine Corps Directives Management Program — 29 Sep 2025</li>
+                <li><a href="/usmc/pub/mco-5216.16b/">MCO 5216.16B</a> — Proper Use Of The Terms Reference And Enclosure — 23 Mar 1983</li>
+                <li><a href="/usmc/pub/mco-5216.19a/">MCO 5216.19A</a> — Administrative Action (aa) Form, Navmc 10274 (rev. 9-11) — 24 Jan 2012</li>
+                <li><a href="/usmc/pub/mco-5216.20b/">MCO 5216.20B</a> — Marine Corps Supplement To The Department Of The Navy Correspondence Manual... — 29 Sep 2025</li>
+                <li><a href="/usmc/pub/mco-5216.21/">MCO 5216.21</a> — Joint Actions Processing — 6 May 2021</li>
+                <li><a href="/usmc/pub/mco-5216.9y/">MCO 5216.9Y</a> — Headquarters U.s. Marine Corps Organization And Organization Codes — 29 Jul 2015</li>
+                <li><a href="/usmc/pub/mco-5220.13/">MCO 5220.13</a> — Enterprise Performance Improvement Strategic Prioritization Process — 1 Aug 2016</li>
+                <li><a href="/usmc/pub/mco-5223.3a/">MCO 5223.3A</a> — Assignment And Utilization Of Center For Naval Analyses (cna) Field... — 14 Apr 2008</li>
+                <li><a href="/usmc/pub/mco-5230.18/">MCO 5230.18</a> — Clearance Of Department Of Defense Information For Public Release — 10 Jun 1994</li>
+                <li><a href="/usmc/pub/mco-5230.19a/">MCO 5230.19A</a> — Logistics Data Management — 27 Mar 2017</li>
+                <li><a href="/usmc/pub/mco-5230.20/">MCO 5230.20</a> — Marine Corps Enterprise Architecture — 22 Aug 2011</li>
+                <li><a href="/usmc/pub/mco-5230.21/">MCO 5230.21</a> — Information Technology Portfolio Management — 3 Oct 2012</li>
+                <li><a href="/usmc/pub/mco-5230.22/">MCO 5230.22</a> — Section 508 Electronic And Information Technology (e&amp;it) Policy — 26 Dec 2013</li>
+                <li><a href="/usmc/pub/mco-5230.23/">MCO 5230.23</a> — Performance Management Planning — 20 Aug 2014</li>
+                <li><a href="/usmc/pub/mco-5231.4/">MCO 5231.4</a> — Marine Corps Data And Artificial Intelligence (ai) — 11 Mar 2024</li>
+                <li><a href="/usmc/pub/mco-5239.2b/">MCO 5239.2B</a> — Marine Corps Cybersecurity — 5 Nov 2015</li>
+                <li><a href="/usmc/pub/mco-5250.1/">MCO 5250.1</a> — Human Resource Development Process (hrdp) — 21 May 2025</li>
+                <li><a href="/usmc/pub/mco-5271.1b/">MCO 5271.1B</a> — Information Resources Management (irm) Standards And Guidelines Program — 1 Dec 2011</li>
+                <li><a href="/usmc/pub/mco-5300.17a/">MCO 5300.17A</a> — Marine Corps Substance Abuse Program — 21 May 2025</li>
+                <li><a href="/usmc/pub/mco-5300.18/">MCO 5300.18</a> — Marine Corps Survey Program — 21 May 2025</li>
+                <li><a href="/usmc/pub/mco-5300.19/">MCO 5300.19</a> — Marine Corps Enlisted Production Process — 23 Jan 2018</li>
+                <li><a href="/usmc/pub/mco-5305.6/">MCO 5305.6</a> — Productivity Improvement Award — 6 Sep 1991</li>
+                <li><a href="/usmc/pub/mco-5311.1e/">MCO 5311.1E</a> — Total Force Structure Process — 21 May 2025</li>
+                <li><a href="/usmc/pub/mco-5320.12h/">MCO 5320.12H</a> — Precedence Levels For Manning And Staffing — 20 May 2019</li>
+                <li><a href="/usmc/pub/mco-5351.1-a/">MCO 5351.1 A</a> — Operational Stress Control And Readiness (oscar) Program — 18 Mar 2026</li>
+                <li><a href="/usmc/pub/mco-5354.1g/">MCO 5354.1G</a> — Marine Corps Prohibited Activities And Conduct (pac) Prevention And... — 31 May 2024</li>
+                <li><a href="/usmc/pub/mco-5360.10d/">MCO 5360.10D</a> — Conduct Of Military Funerals For The Commandant Of The Marine Corps (cmc),... — 16 Jun 2026</li>
+                <li><a href="/usmc/pub/mco-5360.9a/">MCO 5360.9A</a> — Military Funerals Conducted At Arlington National Cemetery — 31 Jan 2002</li>
+                <li><a href="/usmc/pub/mco-5370.8a/">MCO 5370.8A</a> — Marine Corps Hotline Program — 21 May 2025</li>
+                <li><a href="/usmc/pub/mco-5380.2/">MCO 5380.2</a> — Marine Corps Volunteer Services Managment — 18 Sep 2015</li>
+                <li><a href="/usmc/pub/mco-5400.52/">MCO 5400.52</a> — Department Of The Navy Deputy Chief Information Officer Marine Corps Roles... — 7 Jan 2010</li>
+                <li><a href="/usmc/pub/mco-5400.53a/">MCO 5400.53A</a> — Marine Corps Space Policy — 3 May 2022</li>
+                <li><a href="/usmc/pub/mco-5400.54/">MCO 5400.54</a> — Marine Corps Installations Command Roles And Responsibilities — 19 Apr 2013</li>
+                <li><a href="/usmc/pub/mco-5400.55/">MCO 5400.55</a> — Roles And Responsibilities For Marine Corps Defense Policy Review... — 9 Oct 2020</li>
+                <li><a href="/usmc/pub/mco-5401.1/">MCO 5401.1</a> — Concept Generation And Development — 2 Oct 2023</li>
+                <li><a href="/usmc/pub/mco-5420.16d/">MCO 5420.16D</a> — Enlisted Remedial Selection Board (ersb) — 2 Nov 2008</li>
+                <li><a href="/usmc/pub/mco-5420.25/">MCO 5420.25</a> — The Marine Requirements Oversight Council (mroc) — 26 Nov 2024</li>
+                <li><a href="/usmc/pub/mco-5420r.15b/">MCO 5420R.15B</a> — National Committee For Employer Support Of The Guard And Reserve (ncesgr) — 29 Jan 1996</li>
+                <li><a href="/usmc/pub/mco-5420r.8h/">MCO 5420R.8H</a> — The Marine Corps Reserve Policy Board (mcrpb) — 28 May 2025</li>
+                <li><a href="/usmc/pub/mco-5430.1a/">MCO 5430.1A</a> — Marine Corps Inspector General Program — 23 Jan 2025</li>
+                <li><a href="/usmc/pub/mco-5430.2/">MCO 5430.2</a> — Roles And Responsibilities Of The Staff Judge Advocate To The Commandant Of... — 12 Dec 2013</li>
+                <li><a href="/usmc/pub/mco-5500.6h/">MCO 5500.6H</a> — Arming Of Law Enforcement And Security Personnel And The Use Of Force — 21 Aug 2013</li>
+                <li><a href="/usmc/pub/mco-5510.18b/">MCO 5510.18B</a> — United States Marine Corps Information And Personnel Security Program... — 30 Jan 2017</li>
+                <li><a href="/usmc/pub/mco-5510.20c/">MCO 5510.20C</a> — Disclosure Of Military Information To Foreign Governments And Interests — 18 Nov 2020</li>
+                <li><a href="/usmc/pub/mco-5512.11f-volume-2/">MCO 5512.11F VOLUME 2</a> — Common Access Card (cac) — 24 Jan 2023</li>
+                <li><a href="/usmc/pub/mco-5530.13/">MCO 5530.13</a> — Marine Corps Site Perimeter Access Control — 7 May 2021</li>
+                <li><a href="/usmc/pub/mco-5530.14a/">MCO 5530.14A</a> — Marine Corps Physical Security Program Manual — 5 Jun 2009</li>
+                <li><a href="/usmc/pub/mco-5530.15/">MCO 5530.15</a> — U. S. Marine Corps Interior Guard Manual — 14 Oct 2008</li>
+                <li><a href="/usmc/pub/mco-5530.16a/">MCO 5530.16A</a> — Security Augmentation Force And Course Of Instruction — 18 Nov 2020</li>
+                <li><a href="/usmc/pub/mco-5530.17/">MCO 5530.17</a> — MARINE CORPS IDENTITY OPERATIONS (IdOps) — 13 Nov 2012</li>
+                <li><a href="/usmc/pub/mco-5580.2b/">MCO 5580.2B</a> — Law Enforcement Manual — 21 May 2025</li>
+                <li><a href="/usmc/pub/mco-5580.4a/">MCO 5580.4A</a> — The Amended Law Enforcement Officers Safety Act Of 2004 (leosa) — 22 Dec 2025</li>
+                <li><a href="/usmc/pub/mco-5580.5/">MCO 5580.5</a> — Marine Corps Civilian Law Enforcement Policy — 28 May 2025</li>
+                <li><a href="/usmc/pub/mco-5580.7/">MCO 5580.7</a> — U.s. Marine Corps Criminal Investigation Division (usmc Cid) — 24 Aug 2021</li>
+                <li><a href="/usmc/pub/mco-5585.5a/">MCO 5585.5A</a> — Marine Corps Military Working Dog (mwd) Manual — 7 Apr 2020</li>
+                <li><a href="/usmc/pub/mco-5600.20s/">MCO 5600.20S</a> — Marine Corps Doctrine And Training Publications System — 28 May 2025</li>
+                <li><a href="/usmc/pub/mco-5600.31b/">MCO 5600.31B</a> — Marine Corps Printing, Publishing, And Reprographics Equipment Regulations — 17 Jan 2018</li>
+                <li><a href="/usmc/pub/mco-5600.48d/">MCO 5600.48D</a> — United States Marine Corps Procedures For Participation In The Development... — 14 Sep 2023</li>
+                <li><a href="/usmc/pub/mco-5700.45/">MCO 5700.45</a> — Communication Strategy And Operations Volumes 1-6 — 16 Apr 2025</li>
+                <li><a href="/usmc/pub/mco-5710.07/">MCO 5710.07</a> — Marine Corps Military Personnel Exchange Program (mpep) — 8 Oct 2025</li>
+                <li><a href="/usmc/pub/mco-5710.6e/">MCO 5710.6E</a> — Marine Corps Security Cooperation — 15 Oct 2025</li>
+                <li><a href="/usmc/pub/mco-5710.7/">MCO 5710.7</a> — Usmc Foreign And Marine Liaison Officer Programs — 16 Jan 2007</li>
+                <li><a href="/usmc/pub/mco-5710.8/">MCO 5710.8</a> — Marine Personnel And Materiel Embarked On Foreign Vessels — 17 Jul 2017</li>
+                <li><a href="/usmc/pub/mco-5711.1g/">MCO 5711.1G</a> — Marine Corps Procedures For Participation In The Allied Military... — 10 Feb 2017</li>
+                <li><a href="/usmc/pub/mco-5720.74/">MCO 5720.74</a> — Department Of Defense Newspapers, Magazines And Civilian Publications — 25 Nov 1997</li>
+                <li><a href="/usmc/pub/mco-5720.77/">MCO 5720.77</a> — Marine Corps Public Affairs (pa) Order — 8 Jul 2010</li>
+                <li><a href="/usmc/pub/mco-5726.14f/">MCO 5726.14F</a> — U.s. Marine Corps Reserve Toys For Tots Program — 4 Mar 2004</li>
+                <li><a href="/usmc/pub/mco-5740.4b/">MCO 5740.4B</a> — Relationship With The Surveys And Investigations Staff, House... — 11 Apr 2001</li>
+                <li><a href="/usmc/pub/mco-5750.1h/">MCO 5750.1H</a> — Manual For The Marine Corps Historical Program — 13 Feb 2009</li>
+                <li><a href="/usmc/pub/mco-5760.4c/">MCO 5760.4C</a> — Procedures And Support For Non-federal Entities Authorized To Operate On... — 6 Apr 2010</li>
+                <li><a href="/usmc/pub/mco-5800.12/">MCO 5800.12</a> — Area Counsel Offices — 26 Sep 1989</li>
+                <li><a href="/usmc/pub/mco-5800.16-w-ch-1-7-w-vol-1-17/">MCO 5800.16 W/CH 1-7 W/VOL 1-17</a> — Legal Support And Administration Manual (short Title: Lsam) — 26 Aug 2021</li>
+                <li><a href="/usmc/pub/mco-5802.2b/">MCO 5802.2B</a> — Naturalization Of Aliens Serving In The Armed Forces Of The United States... — 29 Jun 1999</li>
+                <li><a href="/usmc/pub/mco-6100.13a/">MCO 6100.13A</a> — Marine Corps Physical Fitness And Combat Fitness Tests (pft/cft) — 28 May 2025</li>
+                <li><a href="/usmc/pub/mco-6100.14/">MCO 6100.14</a> — Marine Corps Physical Fitness Program (mcpfp) — 18 Dec 2018</li>
+                <li><a href="/usmc/pub/mco-6110.3a/">MCO 6110.3A</a> — Marine Corps Body Composition And Military Appearance Program — 28 May 2025</li>
+                <li><a href="/usmc/pub/mco-6220.1/">MCO 6220.1</a> — Usmc Pandemic Influenza (pi) Response Plan — 6 Nov 2009</li>
+                <li><a href="/usmc/pub/mco-6220.2/">MCO 6220.2</a> — Disease Containment Planning Guidance — 4 Dec 2017</li>
+                <li><a href="/usmc/pub/mco-6260.3a/">MCO 6260.3A</a> — Marine Corps Hearing Conservation Program — 26 Sep 2016</li>
+                <li><a href="/usmc/pub/mco-6310.1c/">MCO 6310.1C</a> — Pseudofolliculitis Barbae — 9 Oct 2012</li>
+                <li><a href="/usmc/pub/mco-6320.2f/">MCO 6320.2F</a> — Processing Of Wounded, Ill, Injured And Hospitalized Marines — 13 May 2019</li>
+                <li><a href="/usmc/pub/mco-6320.4a/">MCO 6320.4A</a> — Health Care Quality Assurance Policies For Operating Forces. — 16 Dec 2022</li>
+                <li><a href="/usmc/pub/mco-6400.1a/">MCO 6400.1A</a> — Training, Certification, Supervision, And Employment Of Independent Duty... — 24 Jan 2019</li>
+                <li><a href="/usmc/pub/mco-6600.3b/">MCO 6600.3B</a> — Dental Health Care Program — 30 Jul 2020</li>
+                <li><a href="/usmc/pub/mco-7000.1/">MCO 7000.1</a> — Marine Corps Planning, Programming, Budgeting, Execution, And Assessment... — 23 Aug 2022</li>
+                <li><a href="/usmc/pub/mco-7010.19/">MCO 7010.19</a> — Marine Corps Community Services (mccs) Financual Management Procedures... — 14 Oct 2010</li>
+                <li><a href="/usmc/pub/mco-7010.20a/">MCO 7010.20A</a> — Nonappropriated Fund (naf) Procurement Policy — 26 Jul 2024</li>
+                <li><a href="/usmc/pub/mco-7040.11a/">MCO 7040.11A</a> — Marine Corps Birthday Ball Funding — 4 Aug 2008</li>
+                <li><a href="/usmc/pub/mco-7040.12/">MCO 7040.12</a> — Presentation Of Recognition Items For Military Recruitment And Retention... — 17 Jul 2007</li>
+                <li><a href="/usmc/pub/mco-7042.6c/">MCO 7042.6C</a> — Award Of Trophies And Similar Devices In Recognition Of Accomplishments — 25 Mar 2004</li>
+                <li><a href="/usmc/pub/mco-7100.13/">MCO 7100.13</a> — Marine Corps Prepositioning Programs Budget Guidance — 25 Jan 2017</li>
+                <li><a href="/usmc/pub/mco-7220.12r/">MCO 7220.12R</a> — Special Duty Assignment Pay (sdap) Program — 6 Aug 2013</li>
+                <li><a href="/usmc/pub/mco-7220.13h/">MCO 7220.13H</a> — Marine Corps Administrative Analysis Team (mcaat) — 7 May 2013</li>
+                <li><a href="/usmc/pub/mco-7220.21f/">MCO 7220.21F</a> — Advance Pay Incident To A Permanent Change Of Station (pcs) — 5 Aug 2013</li>
+                <li><a href="/usmc/pub/mco-7220.24p/">MCO 7220.24P</a> — Selective Retention Bonus (srb) And Broken Service Selective Retention... — 21 Oct 2016</li>
+                <li><a href="/usmc/pub/mco-7220.39d/">MCO 7220.39D</a> — Standard/flat Rate Per Diem Allowances — 12 Jun 2007</li>
+                <li><a href="/usmc/pub/mco-7220.52g/">MCO 7220.52G</a> — Foreign Language Proficiency Bonus Program (flpb) — 10 Jan 2025</li>
+                <li><a href="/usmc/pub/mco-7220.56a/">MCO 7220.56A</a> — Entitlement To Basic Allowance For Housing (bah) At Locations Other Than... — 31 Aug 2015</li>
+                <li><a href="/usmc/pub/mco-7220r.39/">MCO 7220R.39</a> — Selected Reserve Incentive Program (srip) — 28 Jan 2016</li>
+                <li><a href="/usmc/pub/mco-7300.19/">MCO 7300.19</a> — Marine Aircraft Group (mag) Financial Management Order — 4 Oct 2013</li>
+                <li><a href="/usmc/pub/mco-7300.21b/">MCO 7300.21B</a> — Marine Corps Financial Management Standard Operating Procedure Manual — 18 May 2015</li>
+                <li><a href="/usmc/pub/mco-7300.22a/">MCO 7300.22A</a> — Controlling Conference Costs — 11 Feb 2004</li>
+                <li><a href="/usmc/pub/mco-7322.1/">MCO 7322.1</a> — Submittal Of Quarterly Property Activities Data — 6 Oct 2019</li>
+                <li><a href="/usmc/pub/mco-7510.2f/">MCO 7510.2F</a> — Internal Audit Of Nonappropriated Fund Instrumentalities By The Marine... — 8 Oct 2024</li>
+                <li><a href="/usmc/pub/mco-7540.2f/">MCO 7540.2F</a> — Resource Evaluation And Analysis (rea) Function — 25 Sep 2018</li>
+                <li><a href="/usmc/pub/mco-8000.7a/">MCO 8000.7A</a> — Marine Corps Munitions Requirements Process (mcmrp) — 7 Feb 2013</li>
+                <li><a href="/usmc/pub/mco-8000.8/">MCO 8000.8</a> — Class V(w) Total Life Cycle Management (tlcm) — 14 Mar 2012</li>
+                <li><a href="/usmc/pub/mco-8011.5b/">MCO 8011.5B</a> — Class V(w) Ammunition Policies, Procedures And Information For Training,... — 8 Jan 2021</li>
+                <li><a href="/usmc/pub/mco-8020.13/">MCO 8020.13</a> — Explosives Safety Review, Oversight, And Verification Of Response Actions... — 14 Oct 2003</li>
+                <li><a href="/usmc/pub/mco-8020.14a/">MCO 8020.14A</a> — Marine Corps Explosives Safety Compliance Program (esmp) — 24 May 2021</li>
+                <li><a href="/usmc/pub/mco-8023.3e/">MCO 8023.3E</a> — Personnel Qualification And Certification Program For Class V Ammunition... — 29 Oct 2025</li>
+                <li><a href="/usmc/pub/mco-8025.1e/">MCO 8025.1E</a> — Class V(w) Malfunction And Defect Reporting — 29 Oct 2009</li>
+                <li><a href="/usmc/pub/mco-8300.1d/">MCO 8300.1D</a> — Marine Corps Serialized Small Arms/light Weapons Accountability Program... — 16 Feb 2012</li>
+                <li><a href="/usmc/pub/mco-8400.6a/">MCO 8400.6A</a> — Licensing Procedures For Ground Ordnance Vehicle Operators — 27 Apr 2021</li>
+                <li><a href="/usmc/pub/mco-p10110.42b/">MCO P10110.42B</a> — Armed Forces Recipe Service — 1 Jun 2003</li>
+                <li><a href="/usmc/pub/mco-p1070.12k/">MCO P1070.12K</a> — Marine Corps Individual Records Administration Manual (short Title: Iram) — 14 Jul 2000</li>
+                <li><a href="/usmc/pub/mco-p11000.14/">MCO P11000.14</a> — Real Property Facilities Manual, Volume Ix — 3 May 1977</li>
+                <li><a href="/usmc/pub/mco-p11000.9c/">MCO P11000.9C</a> — Real Property Facilities Manual, Volume Vi, Energy And Utilities Management — 12 Nov 1991</li>
+                <li><a href="/usmc/pub/mco-p11000r.20/">MCO P11000R.20</a> — Real Property Facilities Manual, Vol Xiv, Reserve Facilities — 8 Aug 1988</li>
+                <li><a href="/usmc/pub/mco-p12000.11a/">MCO P12000.11A</a> — Marine Corps Nonappropriated Fund Personnel Policy Manual (short Title:... — 16 Sep 2014</li>
+                <li><a href="/usmc/pub/mco-p1400.32d/">MCO P1400.32D</a> — Marine Corps Promotion Manual, Volume 2, Enlisted Promotions — 14 Jun 2012</li>
+                <li><a href="/usmc/pub/mco-p1700.27b/">MCO P1700.27B</a> — Marine Corps Community Services Policy Manual (short Title: Mccs Policy... — 9 Mar 2007</li>
+                <li><a href="/usmc/pub/mco-p1710.16e/">MCO P1710.16E</a> — Marine Corps Aero Club Program Manual — 6 May 1993</li>
+                <li><a href="/usmc/pub/mco-p3000.15b/">MCO P3000.15B</a> — Manpower Unit Deployment Program Standing Operating Procedures (short... — 11 Oct 2001</li>
+                <li><a href="/usmc/pub/mco-p3121.1/">MCO P3121.1</a> — Marine Corps Planning And Programming Manual — 1 Oct 1991</li>
+                <li><a href="/usmc/pub/mco-p3500.72a/">MCO P3500.72A</a> — Marine Corps Ground Training And Readiness (t&amp;r) Program — 23 Jan 2025</li>
+                <li><a href="/usmc/pub/mco-p4030.30c/">MCO P4030.30C</a> — Preparation Of Freight For Airlift Transportation — 22 Dec 1991</li>
+                <li><a href="/usmc/pub/mco-p4400.151b/">MCO P4400.151B</a> — Intermediate-level Supply Management Policy Manual — 14 Dec 2012</li>
+                <li><a href="/usmc/pub/mco-p7301.104/">MCO P7301.104</a> — Accounting Under The Appropriations &quot;military Personnel, Marine Corps&quot; And... — 20 Aug 1982</li>
+            </ul>
+            <p><a href="/">Ask Reggie.Bot about MCO publications</a></p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

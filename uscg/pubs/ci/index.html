@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Compose resolves relative asset paths (./composeResources/...) against
+         the document URL. Without this, every deep link such as /pub/ar-670-1
+         asks for /pub/composeResources/... and 404s, which throws out of
+         composition and freezes the canvas. Must precede the first script. -->
+    <base href="/">
+    <meta name="description" content="All 250 CI publications (Commandant Instructions), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.">
+    <title>CI — Commandant Instructions</title>
+    <link rel="canonical" href="https://reggie.bot/uscg/pubs/ci/">
+    <!-- The shell is shared by every page, so this names no one service.
+         It said "Army regulations, AR 670-1, ... armypubs" while the Army
+         owned the root, which put one service on the Coast Guard's pages
+         too. Search engines ignore this tag; it is corrected because it
+         was wrong, not because it ranks. -->
+    <meta name="keywords" content="military regulations, Army regulations, Marine Corps orders, Coast Guard instructions, Space Force publications, Air Force instructions, armypubs, MCPEL, e-Publishing, military publications search">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://reggie.bot/uscg/pubs/ci/">
+    <meta property="og:site_name" content="Reggie.Bot">
+    <meta property="og:title" content="CI — Commandant Instructions">
+    <meta property="og:description" content="All 250 CI publications (Commandant Instructions), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.">
+    <!-- icon-512, not icon_round: that one is 192x192, and previews commonly
+         refuse an image below 200x200 outright -- which is why a shared answer
+         arrived with no picture at all rather than a small one. Dimensions are
+         declared so a preview can lay out its card without fetching the image
+         first. -->
+    <meta property="og:image" content="https://reggie.bot/icon-512.png">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:alt" content="Reggie.Bot">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="CI — Commandant Instructions">
+    <meta name="twitter:description" content="All 250 CI publications (Commandant Instructions), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.">
+    <meta name="twitter:image" content="https://reggie.bot/icon-512.png">
+
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "CI — Commandant Instructions",
+  "description": "All 250 CI publications (Commandant Instructions), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.",
+  "url": "https://reggie.bot/uscg/pubs/ci/"
+}
+    </script>
+    <!-- A disc that touches all four edges, cropped tight to the mark.
+         The old favicon was the app icon as drawn for the app: its circle sat
+         inset inside the square with transparent margin, and the head filled
+         only 63% of that circle. Google crops favicons to a circle of its own,
+         so what arrived was a small disc inside a ring of page background --
+         the white padding in a search result. Now the disc fills the square
+         exactly, so Google's crop lands on the artwork's own edge, and the
+         head fills more of it.
+         Still a circle rather than a square: a tab draws the icon as given,
+         with no crop, and a circle is what this app looks like.
+         PNGs first and sized -- Google wants a square multiple of 48px -- with
+         the .ico kept for anything that asks for one. -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <!-- Installable. theme-color paints the browser chrome and the splash
+         screen; without apple-touch-icon iOS renders a screenshot instead. -->
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#141414">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Reggie.Bot">
+    <!-- The branch, decided before the first paint.
+
+         The app takes seconds to boot -- 15MB of wasm has to arrive and start
+         -- and until it does, this file is the whole of what a reader sees.
+         Both branch-coloured things on it, the spinner and the mark, used to
+         be the Army's outright, so anyone who had chosen another service
+         watched a gold screen resolve into their own colour on every single
+         load. On the 1,546 generated pages too: all of them are rendered from
+         this template.
+
+         So the two colours are read from the same localStorage key the app
+         writes ("branch", set by SettingsBranchStore) and applied as custom
+         properties on the root element, inline and synchronously, before the
+         stylesheet below is ever used to draw anything.
+
+         Kept deliberately dumb -- a literal table, no fetch, no dependency on
+         the wasm having loaded -- because anything that can fail here fails in
+         the one window where nothing else is running yet. An unreadable or
+         unrecognised value leaves the Army showing, which is what every
+         reader who has never chosen a service should see anyway.
+
+         model.seo.BootPaletteTest pins this table against Branch: plain HTML
+         is invisible to the compiler, so nothing else would notice the day a
+         service is added or a palette is retuned. -->
+    <script>
+        (function () {
+            // Valid JSON on purpose: model.seo.BootPaletteTest parses this
+            // table and checks every path in it against Branch and against
+            // the files on disk. Plain HTML is invisible to the compiler, and
+            // the exhaustive `when`s that stop Branch drifting elsewhere have
+            // no reach in here, so this is the only thing that will notice the
+            // day a service is added or a palette retuned.
+            var BRANDS = {
+                "usa": {
+                    "accent": "#FFCB05",
+                    "mark": "/icon_round.png",
+                    "manifest": "/manifest.webmanifest",
+                    "favicon192": "/favicon-192.png",
+                    "favicon96": "/favicon-96.png",
+                    "appIcon": "/icon-192.png"
+                },
+                "usmc": {
+                    "accent": "#E04B4B",
+                    "mark": "/icon_round_usmc.png",
+                    "manifest": "/manifest-usmc.webmanifest",
+                    "favicon192": "/favicon-192-usmc.png",
+                    "favicon96": "/favicon-96-usmc.png",
+                    "appIcon": "/icon-192-usmc.png"
+                },
+                "usaf": {
+                    "accent": "#7FB3F0",
+                    "mark": "/icon_round_usaf.png",
+                    "manifest": "/manifest-usaf.webmanifest",
+                    "favicon192": "/favicon-192-usaf.png",
+                    "favicon96": "/favicon-96-usaf.png",
+                    "appIcon": "/icon-192-usaf.png"
+                },
+                "ussf": {
+                    "accent": "#C8D2E0",
+                    "mark": "/icon_round_ussf.png",
+                    "manifest": "/manifest-ussf.webmanifest",
+                    "favicon192": "/favicon-192-ussf.png",
+                    "favicon96": "/favicon-96-ussf.png",
+                    "appIcon": "/icon-192-ussf.png"
+                },
+                "uscg": {
+                    "accent": "#F57C00",
+                    "mark": "/icon_round_uscg.png",
+                    "manifest": "/manifest-uscg.webmanifest",
+                    "favicon192": "/favicon-192-uscg.png",
+                    "favicon96": "/favicon-96-uscg.png",
+                    "appIcon": "/icon-192-uscg.png"
+                }
+            };
+
+            // Nobody's colours until somebody has chosen. The Army was the
+            // default here, so a reader who had never answered the picker
+            // watched the app load in gold behind a gold favicon -- the
+            // question still on screen and already answered underneath.
+            //
+            // Grey is ui.theme.NEUTRAL_PRIMARY, the same colour the app paints
+            // while the picker is open, so the handover from HTML to Compose
+            // is invisible instead of a flash of the wrong service.
+            var NEUTRAL = {
+                "accent": "#D4D4D4",
+                "mark": "/icon_round_neutral.png",
+                "manifest": "/manifest.webmanifest",
+                "favicon192": "/favicon-192-neutral.png",
+                "favicon96": "/favicon-96-neutral.png",
+                "appIcon": "/icon-192-neutral.png"
+            };
+
+            var slug = null;
+            // Saved before the services were renamed. Those strings sit in
+            // browsers and keep arriving; Branch.bySlug and the database's
+            // branch_canonical() map them the same way.
+            var LEGACY = {"army": "usa", "navy": "usn", "marine-corps": "usmc",
+                          "air-force": "usaf", "space-force": "ussf",
+                          "coast-guard": "uscg"};
+            // localStorage throws outright rather than returning null when a
+            // browser blocks storage, so the read is guarded and not just the
+            // value it returns.
+            // The address first. A shared link names the service, and that is
+            // a firmer answer than whatever this browser chose last time --
+            // reading only localStorage meant arriving cold at /usaf/news/
+            // painted Army gold until Compose started. Route.serviceOf is the
+            // same rule in Kotlin; an unprefixed path is nobody's here,
+            // because the picker has to be free to ask.
+            var first = (location.pathname.split("/")[1] || "").toLowerCase();
+            first = LEGACY[first] || first;
+            if (BRANDS[first]) slug = first;
+
+            // localStorage throws outright rather than returning null when a
+            // browser blocks storage, so the read is guarded and not just the
+            // value it returns.
+            if (slug === null) {
+                try {
+                    var stored = localStorage.getItem("branch");
+                    stored = LEGACY[stored] || stored;
+                    if (BRANDS[stored]) slug = stored;
+                } catch (e) { /* no reachable choice; stay neutral and ask */ }
+            }
+
+            var brand = slug === null ? NEUTRAL : BRANDS[slug];
+            var root = document.documentElement;
+            root.setAttribute("data-branch", slug === null ? "neutral" : slug);
+            root.style.setProperty("--brand", brand.accent);
+            root.style.setProperty("--brand-logo", "url(" + brand.mark + ")");
+
+            // The tab icon, and the app if it has been installed.
+            //
+            // These are rewritten rather than written, so this script has to
+            // sit below the links it edits -- which is why it is at the end of
+            // <head> rather than the top. Still ahead of the stylesheet and of
+            // every element it colours, which is what matters for the paint.
+            //
+            // The manifest is the one branch-coloured thing nothing above can
+            // reach: an installed app's splash screen is drawn by the
+            // operating system, from icons it fetched for itself, so the only
+            // lever we have is which URL the link names. One manifest per
+            // service is written into the distribution by GenerateSeoPages,
+            // derived from the Army's; all six share an id, so switching
+            // service re-skins the installed app rather than offering a
+            // second copy of it.
+            function repoint(selector, href) {
+                var link = document.querySelector(selector);
+                if (link) link.href = href;
+            }
+            repoint('link[rel="manifest"]', brand.manifest);
+            repoint('link[rel="icon"][sizes="192x192"]', brand.favicon192);
+            repoint('link[rel="icon"][sizes="96x96"]', brand.favicon96);
+            repoint('link[rel="apple-touch-icon"]', brand.appIcon);
+        })();
+    </script>
+    <style>
+        /* The flex centering that used to live here sized #root to its
+           content rather than stretching it, so the app rendered in a narrow
+           column once ComposeViewport replaced the fixed-size canvas. */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #0a0a0a;
+            color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+
+        #ComposeTarget {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        /* Readable if the app never boots, invisible the moment it does. */
+        #seo-fallback {
+            max-width: 46rem;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            font-family: Arial, sans-serif;
+            line-height: 1.5;
+        }
+
+        /* No flex centering here: it existed to centre the old fixed-size
+           canvas. As a flex item the Compose container sized to its content
+           (300px) instead of stretching, so the app rendered in a narrow
+           column. ComposeViewport fills whatever container it is given. */
+        #root {
+            width: 100%;
+            height: 100%;
+            /* Anchors #boot, which is layered over the app rather than sitting
+               inside it. */
+            position: relative;
+        }
+
+        /* The SEO copy has to be real markup in the initial response, but a
+           wall of unstyled text is not what a visitor should stare at for the
+           seconds wasm takes to boot. #boot covers it with the app's own
+           colours; both are removed the moment Compose paints. */
+        /* Layered over the app, not inside it. It used to live inside
+           #ComposeTarget so that Compose would tear it down on mount -- which
+           it did, instantly and before any transition could run, so the
+           loading screen vanished in a hard cut. Out here its removal is ours
+           to time, and it can fade.
+
+           pointer-events: none is what makes that safe. An earlier overlay
+           swallowed the pointer, and Compose, never having seen the pointer
+           enter its canvas, ignored the first click anywhere in the app even
+           after the overlay was gone. Transparent to input from the first
+           frame, the canvas underneath gets every event as usual. Absolute
+           within #root, never fixed. */
+        #boot {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #141414;
+            transition: opacity .45s ease;
+
+            /* The ring sits immediately outside the logo, touching it, so the
+               two sizes are derived from one another rather than set
+               independently. */
+            --boot-logo: clamp(160px, 42vmin, 300px);
+            --boot-ring-width: 7px;
+        }
+
+        #boot.done { opacity: 0; }
+
+        /* Square by construction: the ring is a border on a circle, and a
+           circle drawn on a non-square box is an ellipse. */
+        /* Only ever inserted when the app did not start. Centred over the
+           fallback text rather than replacing it, so the page still says what
+           the site is. */
+        #boot-failed {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            max-width: 22rem;
+            padding: 1.25rem 1.5rem;
+            border-radius: 12px;
+            background: #1c1c1c;
+            color: #f2f2f2;
+            font: 16px/1.5 system-ui, -apple-system, sans-serif;
+            text-align: center;
+        }
+
+        #boot-failed p { margin: 0 0 1rem; }
+
+        #boot-failed button {
+            font: inherit;
+            padding: 0.5rem 1.25rem;
+            border: 0;
+            border-radius: 8px;
+            background: var(--brand, #FFCB05);
+            color: #141414;
+            cursor: pointer;
+        }
+
+        #boot-mark {
+            position: relative;
+            width: calc(var(--boot-logo) + 2 * var(--boot-ring-width));
+            height: calc(var(--boot-logo) + 2 * var(--boot-ring-width));
+        }
+
+        /* A background image, not an <img>: the source has to be settled
+           before the first paint, and the script that settles it runs in
+           <head>, where there is no element yet to set a src on. A custom
+           property crosses that gap; a DOM write cannot. */
+        #boot-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: var(--boot-logo);
+            height: var(--boot-logo);
+            margin: calc(var(--boot-logo) / -2) 0 0 calc(var(--boot-logo) / -2);
+            border-radius: 50%;
+            background-image: var(--brand-logo, url(/icon_round.png));
+            background-size: cover;
+        }
+
+        /* One arc travelling around the logo. The track is drawn in the same
+           near-black the app uses for a raised surface, so only the coloured
+           arc reads as motion.
+
+           The fallbacks here and on the mark are what a reader sees if the
+           script above never ran at all -- scripting off, or a CSP that
+           refuses it. The Army's colours, which is what the app itself falls
+           back to. */
+        #boot-ring {
+            position: absolute;
+            inset: 0;
+            border: var(--boot-ring-width) solid #2D2D2D;
+            border-top-color: var(--brand, #FFCB05);
+            border-radius: 50%;
+            animation: boot-spin 1.1s linear infinite;
+        }
+
+        @keyframes boot-spin { to { transform: rotate(360deg); } }
+
+        /* Respect a reduced-motion preference: keep the indicator, drop the
+           spin. */
+        @media (prefers-reduced-motion: reduce) {
+            #boot-ring { animation: none; }
+            /* Uncover the app at once rather than dissolving into it. */
+            #boot { transition: none; }
+        }
+    </style>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CEQC3WB0MN"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-CEQC3WB0MN');
+    </script>
+    <script type="application/javascript">
+        // Function to create an object from a list of parameters and values
+        function createParamValueObject(params, values) {
+            var paramArray = params.split(',');
+            var valueArray = values.split(',');
+
+            if (paramArray.length !== valueArray.length) {
+                throw new Error('The number of parameters must match the number of values');
+            }
+
+            var result = {};
+            for (var i = 0; i < paramArray.length; i++) {
+                result[paramArray[i].trim()] = valueArray[i].trim();
+            }
+
+            return result;
+        }
+
+        // Read one archived publication and hand back its text.
+        //
+        // The corpus is stored gzipped -- 616MB of Air Force text is 169MB
+        // packed -- and the services after the Army keep no text column in
+        // Postgres, so a result card's supporting line is found here from the
+        // archive instead. DecompressionStream unpacks the body as it
+        // arrives, which is why this is a few lines of JS rather than an
+        // inflate implementation in Kotlin, and why the bytes never cross the
+        // wasm boundary.
+        //
+        // Resolves to null for anything at all -- a 404, an offline browser,
+        // a body that is not gzip. A missing snippet is a card with one less
+        // line on it; a thrown error is a search that looks broken.
+        function fetchArchivedText(url) {
+            return fetch(url)
+                .then(function (response) {
+                    if (!response.ok || !response.body) return null;
+                    return new Response(
+                        response.body.pipeThrough(new DecompressionStream('gzip'))
+                    ).text();
+                })
+                .catch(function () { return null; });
+        }
+
+        function shareContent(text) {
+            const url = window.location.href; // Get the current page URL
+            if (navigator.share) {
+                navigator.share({
+                    // Named explicitly rather than taken from document.title.
+                    // What is being shared is an answer, not the page it was
+                    // read on, and the sheet showed whichever page the app had
+                    // been served as -- "Army Links" on top of a regulation
+                    // answer, for anyone who arrived through that link.
+                    title: 'Reggie.Bot',
+                    text: text,
+                    url: url
+                }).then(() => {
+                    console.log('Successfully shared');
+                }).catch((error) => {
+                    console.error('Error sharing:', error);
+                });
+            } else {
+                console.error('Web Share API not supported in this browser');
+            }
+        }
+
+        // Waits for the helpers the app expects, but not forever.
+        //
+        // This polled every 100ms with no limit. Anything it waited on that
+        // never arrived -- a blocked third-party script, an extension that
+        // removed a global -- was a permanent, silent blank page: no error, no
+        // timeout, and the wasm never even requested. Loading the app late is
+        // recoverable; never loading it is not, so the deadline calls through
+        // anyway rather than giving up.
+        function waitForFunctions(functionNames, callback) {
+            var deadline = Date.now() + 5000;
+
+            function checkFunctions() {
+                for (let i = 0; i < functionNames.length; i++) {
+                    if (typeof window[functionNames[i]] !== "function") {
+                        if (Date.now() > deadline) {
+                            console.warn('proceeding without ' + functionNames[i]);
+                            break;
+                        }
+                        setTimeout(checkFunctions, 100);
+                        return;
+                    }
+                }
+                callback();
+            }
+
+            checkFunctions();
+        }
+
+        function detectUnsupportedBrowser() {
+            const userAgent = navigator.userAgent;
+
+            // Check if the browser is Safari and not Chrome or Firefox on iOS
+            const isSafari = /^((?!chrome|android|crios|fxios).)*safari/i.test(userAgent);
+
+            if (isSafari) {
+                // Extract the Safari version from the userAgent
+                const versionMatch = userAgent.match(/Version\/(\d+\.\d+)/);
+                if (versionMatch) {
+                    const safariVersion = parseFloat(versionMatch[1]);
+                    console.log(`Safari version detected: ${safariVersion}`);
+                    return safariVersion < 18.2;
+                }
+            }
+            console.log("Browser is not Safari or version not detected.");
+            return false;
+        }
+
+        if (detectUnsupportedBrowser()) {
+            window.location.href = "unsupported_browser.html";
+        } else {
+            window.onload = function() {
+                function dismissBootScreen() {
+                    var boot = document.getElementById('boot');
+                    if (!boot || boot.classList.contains('done')) return;
+                    boot.classList.add('done');
+                    // transitionend removes it as soon as the fade finishes;
+                    // the timer is the backstop for a browser that never fires
+                    // one (a reduced-motion setting removes the transition
+                    // altogether), so the overlay can never be left behind.
+                    boot.addEventListener('transitionend', function () { boot.remove(); });
+                    setTimeout(function () { boot.remove(); }, 1000);
+                }
+
+                // Compose renders to a canvas, and that canvas is the signal
+                // that the app is really up. It is not in the document though:
+                // Compose Multiplatform 1.11 puts it inside a shadow root, so
+                // document.querySelector('canvas') returns null forever and
+                // waiting on that meant waiting on something that never came.
+                function composeCanvas(root) {
+                    if (root.querySelector('canvas')) return true;
+                    var hosts = root.querySelectorAll('*');
+                    for (var i = 0; i < hosts.length; i++) {
+                        var shadow = hosts[i].shadowRoot;
+                        if (shadow && shadow.querySelector('canvas')) return true;
+                    }
+                    return false;
+                }
+
+                // Two frames after it mounts it has painted, so the overlay can
+                // dissolve into the app rather than off a blank canvas.
+                function dismissWhenComposePaints() {
+                    var target = document.getElementById('ComposeTarget');
+                    if (!target) return;
+                    var observer = new MutationObserver(function () {
+                        if (!composeCanvas(target)) return;
+                        observer.disconnect();
+                        requestAnimationFrame(function () {
+                            requestAnimationFrame(dismissBootScreen);
+                        });
+                    });
+                    observer.observe(target, { childList: true, subtree: true });
+
+                    // If wasm never boots, say so. This used to dismiss the
+                    // overlay and nothing else, so a failed boot and a slow one
+                    // looked the same -- and both looked like a broken site
+                    // with no way out but knowing to reload.
+                    setTimeout(function () {
+                        observer.disconnect();
+                        dismissBootScreen();
+                        if (!composeCanvas(target)) showBootFailed();
+                    }, 25000);
+                }
+
+                dismissWhenComposePaints();
+
+                // Registered after load, and deliberately after the wasm has
+                // been asked for: the app is ~15MB and the worker must not
+                // compete with it on a first visit. It pays off on the second.
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('/sw.js').catch(function (e) {
+                        // Not fatal - the app works without it.
+                        console.warn('service worker registration failed', e);
+                    });
+                }
+
+                // Shown only when the app really did not start. The fallback
+                // text underneath says what the site is; this says what
+                // happened and offers the one thing that fixes it.
+                function showBootFailed() {
+                    if (document.getElementById('boot-failed')) return;
+                    var box = document.createElement('div');
+                    box.id = 'boot-failed';
+                    box.setAttribute('role', 'alert');
+                    box.innerHTML =
+                        '<p>Reggie could not finish loading.</p>' +
+                        '<button type="button">Reload</button>';
+                    box.querySelector('button').addEventListener('click', function () {
+                        // Bypass both caches: the likeliest cause is a cached
+                        // copy that is no longer whole.
+                        if (window.caches && caches.keys) {
+                            caches.keys().then(function (names) {
+                                return Promise.all(names.map(function (n) { return caches.delete(n); }));
+                            }).catch(function () {}).then(function () { location.reload(); });
+                        } else {
+                            location.reload();
+                        }
+                    });
+                    document.getElementById('root').appendChild(box);
+                }
+
+                // A tab the browser reclaimed and then restored.
+                //
+                // Everything here runs inside window.onload, and a page
+                // restored from the back/forward cache never fires load again
+                // -- so if whatever was on screen is gone, nothing rebuilds
+                // it. Storage pressure can also empty the cache the app was
+                // served from, which is what leaves a blank white document
+                // rather than this app's own dark shell.
+                window.addEventListener('pageshow', function (event) {
+                    if (!event.persisted) return;
+                    var target = document.getElementById('ComposeTarget');
+                    if (target && composeCanvas(target)) return;
+                    location.reload();
+                });
+
+                function loadWasm() {
+                    var canvas = document.getElementById('ComposeTarget');
+                    canvas.focus();
+
+                    var script = document.createElement('script');
+                    // Absolute: this same file is served at /news, /pubs and
+                    // friends so deep links work, and a relative path would
+                    // look for /news/composeApp.js and never boot.
+                    script.src = "/composeApp.js";
+                    document.head.appendChild(script);
+                }
+
+                // List of functions to wait for
+                const functionsToWaitFor = ["createParamValueObject", "gtag", "shareContent"];
+
+                // Wait for all functions before loading Wasm
+                waitForFunctions(functionsToWaitFor, loadWasm);
+            };
+        }
+    </script>
+</head>
+<body>
+<!-- ComposeViewport (Compose Multiplatform 1.11, which replaced
+     CanvasBasedWindow) attaches to a CONTAINER and creates its own canvas
+     inside it. Leaving a <canvas> here gives an unsized 300x150 default that
+     renders nothing, and a second canvas nested inside it. -->
+<div id="root">
+    <!-- No visible text: the mark and the ring around it say "loading" on
+         their own. aria-label keeps that legible to a screen reader without
+         putting a caption back on the screen. -->
+    <div id="boot" role="status" aria-live="polite" aria-label="Loading Reggie.Bot">
+        <div id="boot-mark">
+            <div id="boot-ring"></div>
+            <div id="boot-logo"></div>
+        </div>
+    </div>
+
+    <!-- Compose replaces the contents of #ComposeTarget on boot, so users never
+         see this. Crawlers do: the app renders to a <canvas>, which search
+         engines cannot read at all, leaving the site with no indexable text
+         whatsoever. This is the only content Google gets today. -->
+    <div id="ComposeTarget" aria-label="Interactive application area" tabindex="0">
+        <!-- Not wrapped in <noscript>: crawlers that execute JS ignore it, and
+             this needs to be real markup in the initial response. Compose
+             clears the container when it mounts, so users see it only for the
+             instant before the app boots. -->
+        <div id="seo-fallback">
+            <h1>CI — Commandant Instructions</h1>
+            <p>All 250 CI publications (Commandant Instructions), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.</p>
+            <h2>250 publications</h2>
+            <ul>
+                <li><a href="/uscg/pub/comdtinst-1000.10b/">COMDTINST 1000.10B</a> — Military Substance Abuse And Behavioral Addiction Program — 10/31/2022</li>
+                <li><a href="/uscg/pub/comdtinst-1000.15/">COMDTINST 1000.15</a> — Military Religious Accommodations — 8/30/2021</li>
+                <li><a href="/uscg/pub/comdtinst-1000.1f/">COMDTINST 1000.1F</a> — Tattoo, Branding, Body Piercing, And Mutilation Standards — 5/14/2024</li>
+                <li><a href="/uscg/pub/comdtinst-1000.4c/">COMDTINST 1000.4C</a> — Military Separations — 8/23/2024</li>
+                <li><a href="/uscg/pub/comdtinst-1000.9/">COMDTINST 1000.9</a> — Pregnancy In The Coast Guard — 9/29/2011</li>
+                <li><a href="/uscg/pub/comdtinst-1001.2a/">COMDTINST 1001.2A</a> — Reserve Duty Status And Participation — 6/13/2023</li>
+                <li><a href="/uscg/pub/comdtinst-1001.3/">COMDTINST 1001.3</a> — Coast Guard Reserve — Training Management System (cgr-tms) — 11/19/2021</li>
+                <li><a href="/uscg/pub/comdtinst-1020.8i/">COMDTINST 1020.8I</a> — Body Composition Standards Program — 3/31/2022</li>
+                <li><a href="/uscg/pub/comdtinst-1040.7/">COMDTINST 1040.7</a> — Transition Of Service Members With Job Training Opportunities And Employment Skills Under The Department Of Defense (dod) Skillbridge Voluntary Employment Skills Training Program — 2/3/2022</li>
+                <li><a href="/uscg/pub/comdtinst-10470.10i/">COMDTINST 10470.10I</a> — Rescue And Survival Systems — 7/17/2026</li>
+                <li><a href="/uscg/pub/comdtinst-10550.25d/">COMDTINST 10550.25D</a> — Electronics Manual — 5/16/2024</li>
+                <li><a href="/uscg/pub/comdtinst-1080.10j/">COMDTINST 1080.10J</a> — Coast Guard Military Human Resource Record (cgmhrr) System — 12/4/2022</li>
+                <li><a href="/uscg/pub/comdtinst-1100.2i/">COMDTINST 1100.2I</a> — Coast Guard Recruiting — 6/3/2025</li>
+                <li><a href="/uscg/pub/comdtinst-11101.13h/">COMDTINST 11101.13H</a> — Housing Program — 12/17/2024</li>
+                <li><a href="/uscg/pub/comdtinst-11101.15c/">COMDTINST 11101.15C</a> — Critical Housing Areas (cha) — 2/19/2025</li>
+                <li><a href="/uscg/pub/comdtinst-11260.1/">COMDTINST 11260.1</a> — U.s. Coast Guard Support Equipment - Weight And Material Handling Program Policy — 12/22/2021</li>
+                <li><a href="/uscg/pub/comdtinst-1200.2a/">COMDTINST 1200.2A</a> — Prevention Operations Ashore Qualification Insignia — 4/19/2023</li>
+                <li><a href="/uscg/pub/comdtinst-1200.3/">COMDTINST 1200.3</a> — Intelligence Professional Insignia — 9/11/2023</li>
+                <li><a href="/uscg/pub/comdtinst-1200.4a/">COMDTINST 1200.4A</a> — Response Operations Ashore Qualification Insignia — 4/26/2024</li>
+                <li><a href="/uscg/pub/comdtinst-1200.4b/">COMDTINST 1200.4B</a> — Response Operations Ashore Qualification Insignia — 6/16/2026</li>
+                <li><a href="/uscg/pub/comdtinst-1200.8/">COMDTINST 1200.8</a> — Financial Operations Qualification Insignia — 6/15/2026</li>
+                <li><a href="/uscg/pub/comdtinst-12300.7b/">COMDTINST 12300.7B</a> — Detail Of Appropriated Fund Civilian Employees In The Competitive And Excepted Service — 8/17/2021</li>
+                <li><a href="/uscg/pub/comdtinst-12310.3c/">COMDTINST 12310.3C</a> — Restrictions On The Employment Of Relatives And Advocating For The Employment Of Relatives — 2/6/2025</li>
+                <li><a href="/uscg/pub/comdtinst-12335.4b/">COMDTINST 12335.4B</a> — Coast Guard Merit Promotion Plan — 8/2/2019</li>
+                <li><a href="/uscg/pub/comdtinst-12351.1a/">COMDTINST 12351.1A</a> — Assigning Performance Credit For Reduction-in-force (rif) — 10/10/2024</li>
+                <li><a href="/uscg/pub/comdtinst-12451.3b/">COMDTINST 12451.3B</a> — Coast Guard Nonappropriated Fund (naf) Employee Of The Year (eoy) Award Program — 5/12/2016</li>
+                <li><a href="/uscg/pub/comdtinst-12500.3a/">COMDTINST 12500.3A</a> — Student Loan Repayment Program — 2/17/2023</li>
+                <li><a href="/uscg/pub/comdtinst-12500.4/">COMDTINST 12500.4</a> — Cybersecurity Employee Retention Incentive Program — 10/9/2019</li>
+                <li><a href="/uscg/pub/comdtinst-12531.11b/">COMDTINST 12531.11B</a> — Environmental Differential Pay Under The Federal Wage System (fws) — 7/2/2024</li>
+                <li><a href="/uscg/pub/comdtinst-12550.11a/">COMDTINST 12550.11A</a> — Pay For Irregular Or Intermittent Duty Involving Physical Hardship Or Hazard — 3/2/2023</li>
+                <li><a href="/uscg/pub/comdtinst-12550.21b/">COMDTINST 12550.21B</a> — Death Gratuity — 5/30/2023</li>
+                <li><a href="/uscg/pub/comdtinst-12570.3h/">COMDTINST 12570.3H</a> — Invitational Travel Authorizations — 5/24/2023</li>
+                <li><a href="/uscg/pub/comdtinst-12771.1a/">COMDTINST 12771.1A</a> — Administrative Grievance Procedure — 12/8/2021</li>
+                <li><a href="/uscg/pub/comdtinst-12800.1b/">COMDTINST 12800.1B</a> — Professional Liability Insurance Reimbursement (plir) — 3/28/2023</li>
+                <li><a href="/uscg/pub/comdtinst-12800.2a/">COMDTINST 12800.2A</a> — U.s. Coast Guard Nonappropriated Fund (naf) Back-to-work (btw) Program — 1/27/2017</li>
+                <li><a href="/uscg/pub/comdtinst-13020.3b/">COMDTINST 13020.3B</a> — Contractor's Flight And Ground Operations — 2/6/2023</li>
+                <li><a href="/uscg/pub/comdtinst-1306.1i/">COMDTINST 1306.1I</a> — Command Senior Enlisted Leader (csel) Rating Force Master Chief (rfmc) And Senior Enlisted Leader (sel) Program — 7/12/2023</li>
+                <li><a href="/uscg/pub/comdtinst-1410.3/">COMDTINST 1410.3</a> — Officer In Charge Review Board — 1/8/2025</li>
+                <li><a href="/uscg/pub/comdtinst-1430.1q/">COMDTINST 1430.1Q</a> — Special Duty Pay (sdp) — 10/1/2018</li>
+                <li><a href="/uscg/pub/comdtinst-1430.2a/">COMDTINST 1430.2A</a> — Meritorious Advancement Program — 7/23/2020</li>
+                <li><a href="/uscg/pub/comdtinst-1500.10d/">COMDTINST 1500.10D</a> — Performance, Training And Education Manual (ptem) — 4/19/2023</li>
+                <li><a href="/uscg/pub/comdtinst-1500.26a/">COMDTINST 1500.26A</a> — Intelligence Training — 2/2/2022</li>
+                <li><a href="/uscg/pub/comdtinst-1500.27/">COMDTINST 1500.27</a> — Public Affairs Advanced Education Program — 1/28/2021</li>
+                <li><a href="/uscg/pub/comdtinst-1500.2a/">COMDTINST 1500.2A</a> — Cyber Training And Qualification — 7/3/2025</li>
+                <li><a href="/uscg/pub/comdtinst-1500.3/">COMDTINST 1500.3</a> — Mission Support Industry Training Program — 5/29/2020</li>
+                <li><a href="/uscg/pub/comdtinst-1500.4/">COMDTINST 1500.4</a> — Marine Industry Training Program — 8/6/2017</li>
+                <li><a href="/uscg/pub/comdtinst-1500.6c/">COMDTINST 1500.6C</a> — Enlisted Marine Inspector Training Program (emitp) — 6/16/2026</li>
+                <li><a href="/uscg/pub/comdtinst-1500.7/">COMDTINST 1500.7</a> — Reserve Component (rc) Use Of Electronic-based Distributed Learning (ebdl) Methods For Training — 2/5/2021</li>
+                <li><a href="/uscg/pub/comdtinst-1520.3/">COMDTINST 1520.3</a> — Apprentice Prevention Officer (apo) Program — 8/19/2025</li>
+                <li><a href="/uscg/pub/comdtinst-1540.10/">COMDTINST 1540.10</a> — Coast Guard Voluntary Credentialing Program (vcp) — 1/10/2020</li>
+                <li><a href="/uscg/pub/comdtinst-1540.2/">COMDTINST 1540.2</a> — Military To Mariner Voluntary Credentialing Program — 5/13/2020</li>
+                <li><a href="/uscg/pub/comdtinst-1550.26/">COMDTINST 1550.26</a> — Forcecom Commercially Contracted “c” School Courses — 12/14/2018</li>
+                <li><a href="/uscg/pub/comdtinst-1560.3/">COMDTINST 1560.3</a> — Recoupment Of Advanced Education Costs In The Event Of Separation Before Completion Of Obligated Service — 9/29/2015</li>
+                <li><a href="/uscg/pub/comdtinst-16000.14b/">COMDTINST 16000.14B</a> — Marine Environmental Response And Preparedness — 3/24/2025</li>
+                <li><a href="/uscg/pub/comdtinst-16000.28b/">COMDTINST 16000.28B</a> — Marine Transportation System Recovery Planning And Operations — 2/6/2019</li>
+                <li><a href="/uscg/pub/comdtinst-16000.4a/">COMDTINST 16000.4A</a> — Cutter Boat Interface Test And Evaluation (it&amp;e) Instruction — 9/22/2020</li>
+                <li><a href="/uscg/pub/comdtinst-16000.70/">COMDTINST 16000.70</a> — Marine Safety: Marine Inspection Administration — 9/20/2021</li>
+                <li><a href="/uscg/pub/comdtinst-16000.71/">COMDTINST 16000.71</a> — Marine Safety: Domestic Inspection Programs — 9/20/2021</li>
+                <li><a href="/uscg/pub/comdtinst-16000.72/">COMDTINST 16000.72</a> — Marine Safety: Inspection Of Engineering Systems, Equipment, And Materials — 9/20/2021</li>
+                <li><a href="/uscg/pub/comdtinst-16000.73/">COMDTINST 16000.73</a> — Marine Safety: Port State Control — 9/20/2021</li>
+                <li><a href="/uscg/pub/comdtinst-16000.74/">COMDTINST 16000.74</a> — Marine Safety: International Conventions, Treaties, Standards, And Regulations — 9/20/2021</li>
+                <li><a href="/uscg/pub/comdtinst-16000.75/">COMDTINST 16000.75</a> — Marine Safety: Carriage Of Hazardous Materials — 9/20/2021</li>
+                <li><a href="/uscg/pub/comdtinst-16000.76/">COMDTINST 16000.76</a> — Marine Safety: Outer Continental Shelf Activities — 9/20/2021</li>
+                <li><a href="/uscg/pub/comdtinst-16003.2c/">COMDTINST 16003.2C</a> — Marine Planning Of The Marine Transportation System (mts) — 9/26/2025</li>
+                <li><a href="/uscg/pub/comdtinst-16004.4a/">COMDTINST 16004.4A</a> — Coast Guard Operations And Federal Marine Protected Area Programs — 6/19/2018</li>
+                <li><a href="/uscg/pub/comdtinst-16010.9a/">COMDTINST 16010.9A</a> — Support To Local Harbor Safety Committees — 1/13/2025</li>
+                <li><a href="/uscg/pub/comdtinst-16101.2/">COMDTINST 16101.2</a> — Search And Rescue (sar) Training And Competency Management — 2/2/2026</li>
+                <li><a href="/uscg/pub/comdtinst-16107.1/">COMDTINST 16107.1</a> — Search And Rescue (sar) Continuous Improvement Program (cip) — 6/18/2024</li>
+                <li><a href="/uscg/pub/comdtinst-16114.32h/">COMDTINST 16114.32H</a> — Boat Operations And Training (boat), Volume I — 8/5/2025</li>
+                <li><a href="/uscg/pub/comdtinst-16114.33f/">COMDTINST 16114.33F</a> — Boat Operations And Training (boat), Volume Ii — 7/21/2025</li>
+                <li><a href="/uscg/pub/comdtinst-16114.4c/">COMDTINST 16114.4C</a> — Boat Management — 7/8/2024</li>
+                <li><a href="/uscg/pub/comdtinst-16122.2b/">COMDTINST 16122.2B</a> — Management Of The Automated Mutual Assistance Vessel Rescue (amver) Program — 3/3/2023</li>
+                <li><a href="/uscg/pub/comdtinst-16130.2i/">COMDTINST 16130.2I</a> — The U.s. Coast Guard Addendum To The United States National Search And Rescue Supplement (nss) To The International Aeronautical And Maritime Search And Rescue Manual (iamsar) — 2/2/2026</li>
+                <li><a href="/uscg/pub/comdtinst-16151.1d/">COMDTINST 16151.1D</a> — Domestic Icebreaking Policy — 12/21/2011</li>
+                <li><a href="/uscg/pub/comdtinst-16155.2d/">COMDTINST 16155.2D</a> — Polar Icebreaker Cruise Reports — 10/11/2024</li>
+                <li><a href="/uscg/pub/comdtinst-16200.5c/">COMDTINST 16200.5C</a> — Coast Guard Hearing Officer Procedural Administration Of Civil Penalty Cases — 4/27/2023</li>
+                <li><a href="/uscg/pub/comdtinst-16450.32/">COMDTINST 16450.32</a> — Certificate Of Adequacy Program — 1/17/2024</li>
+                <li><a href="/uscg/pub/comdtinst-1650.17/">COMDTINST 1650.17</a> — Ancient Trident Award — 5/23/2016</li>
+                <li><a href="/uscg/pub/comdtinst-1650.18/">COMDTINST 1650.18</a> — Master Marine Inspector Certificate — 1/18/2017</li>
+                <li><a href="/uscg/pub/comdtinst-1650.26b/">COMDTINST 1650.26B</a> — Recognition Programs — 6/4/2025</li>
+                <li><a href="/uscg/pub/comdtinst-1650.37/">COMDTINST 1650.37</a> — External Affairs Awards — 12/1/2021</li>
+                <li><a href="/uscg/pub/comdtinst-16502.10/">COMDTINST 16502.10</a> — Development Of New Nautical Charts And Publications — 6/22/1987</li>
+                <li><a href="/uscg/pub/comdtinst-16575.1a/">COMDTINST 16575.1A</a> — Processing Of Global Positioning System (gps) Interference Test Requests — 2/28/2017</li>
+                <li><a href="/uscg/pub/comdtinst-16590.5d/">COMDTINST 16590.5D</a> — Bridge Program — 7/25/2022</li>
+                <li><a href="/uscg/pub/comdtinst-16601.11a/">COMDTINST 16601.11A</a> — Space Launch And Reentry Activities Affecting The Marine Transportation System — 9/20/2023</li>
+                <li><a href="/uscg/pub/comdtinst-16601.13/">COMDTINST 16601.13</a> — Permitting Of Regattas And Marine Parades — 7/24/2026</li>
+                <li><a href="/uscg/pub/comdtinst-16601.28c/">COMDTINST 16601.28C</a> — Area Maritime Security Plan (amsp) And Area Maritime Security (ams) Assessment Development And Maintenance Process — 12/27/2023</li>
+                <li><a href="/uscg/pub/comdtinst-16672.5h/">COMDTINST 16672.5H</a> — Deck Watch Officer (dwo) Examination Program — 3/11/2026</li>
+                <li><a href="/uscg/pub/comdtinst-16703.2b/">COMDTINST 16703.2B</a> — Marine Safety And Security Council: Oversight Of The Coast Guard Regulatory Program — 12/22/2021</li>
+                <li><a href="/uscg/pub/comdtinst-16711.13b/">COMDTINST 16711.13B</a> — Implementation Of The Commercial Fishing Industry Vessel Regulations — 8/17/1995</li>
+                <li><a href="/uscg/pub/comdtinst-16711.14/">COMDTINST 16711.14</a> — Commercial Fishing Industry Vessel Safety Training And Qualification — 3/3/1993</li>
+                <li><a href="/uscg/pub/comdtinst-16711.2a/">COMDTINST 16711.2A</a> — Mass Rescue Operations (mro) Program — 12/17/2024</li>
+                <li><a href="/uscg/pub/comdtinst-16715.5a/">COMDTINST 16715.5A</a> — Marine Safety Center Regulation Interpretation Responsibility — 11/1/2021</li>
+                <li><a href="/uscg/pub/comdtinst-16721.1/">COMDTINST 16721.1</a> — &quot;standards For Oversight Of Licensing And Seaman's Certification Activities — 1/7/2000</li>
+                <li><a href="/uscg/pub/comdtinst-16722.4/">COMDTINST 16722.4</a> — Enforcement Of The Chemical Testing Regulations — 6/28/1995</li>
+                <li><a href="/uscg/pub/comdtinst-16751.1/">COMDTINST 16751.1</a> — National Recreational Boating Safety (rbs) Program — 3/4/2025</li>
+                <li><a href="/uscg/pub/comdtinst-1710.12/">COMDTINST 1710.12</a> — Youth Programs (yp) And Activities For Dependent Children — 11/24/2024</li>
+                <li><a href="/uscg/pub/comdtinst-1710.13e/">COMDTINST 1710.13E</a> — Morale, Well-being, And Recreation — 9/6/2023</li>
+                <li><a href="/uscg/pub/comdtinst-1730.5b/">COMDTINST 1730.5B</a> — Auxiliary Chaplain Support Program — 6/24/2022</li>
+                <li><a href="/uscg/pub/comdtinst-1734.1a/">COMDTINST 1734.1A</a> — Suicide Prevention Program — 12/7/2009</li>
+                <li><a href="/uscg/pub/comdtinst-1740.3b/">COMDTINST 1740.3B</a> — Qualified Designated Organizations And The Use Of Approved Non-governmental Educational Materials And Presenters — 9/7/2023</li>
+                <li><a href="/uscg/pub/comdtinst-1740.7c/">COMDTINST 1740.7C</a> — Employee Assistance Program (eap) — 1/13/2025</li>
+                <li><a href="/uscg/pub/comdtinst-1740.8a/">COMDTINST 1740.8A</a> — Coast Guard Personal Financial Management Program — 12/10/2020</li>
+                <li><a href="/uscg/pub/comdtinst-1742.3l/">COMDTINST 1742.3L</a> — Coast Guard Voting Assistance Program — 6/6/2017</li>
+                <li><a href="/uscg/pub/comdtinst-1750.4g/">COMDTINST 1750.4G</a> — Ombudsman Program — 3/31/2026</li>
+                <li><a href="/uscg/pub/comdtinst-1750.6e/">COMDTINST 1750.6E</a> — Coast Guard Spouses’ Clubs — 12/10/2019</li>
+                <li><a href="/uscg/pub/comdtinst-1752.1a/">COMDTINST 1752.1A</a> — Family Advocacy Program (fap) — 5/5/2025</li>
+                <li><a href="/uscg/pub/comdtinst-1754.16b/">COMDTINST 1754.16B</a> — Transitional Compensation And Other Benefits For Abused Dependents — 7/22/2022</li>
+                <li><a href="/uscg/pub/comdtinst-1754.3b/">COMDTINST 1754.3B</a> — Critical Incident Stress Management (cism) — 1/13/2025</li>
+                <li><a href="/uscg/pub/comdtinst-1754.7c/">COMDTINST 1754.7C</a> — Special Needs Program — 4/9/2020</li>
+                <li><a href="/uscg/pub/comdtinst-1754.9c/">COMDTINST 1754.9C</a> — Reimbursement Of Adoption Expenses — 7/28/2022</li>
+                <li><a href="/uscg/pub/comdtinst-1755.2/">COMDTINST 1755.2</a> — Coast Guard U.s. Virgin Island Dependent Private Schooling — 2/24/2020</li>
+                <li><a href="/uscg/pub/comdtinst-1780.2d/">COMDTINST 1780.2D</a> — Internships In Nonappropriated Fund Instrumentalities (nafi) — 12/18/2024</li>
+                <li><a href="/uscg/pub/comdtinst-1800.5i/">COMDTINST 1800.5I</a> — Retiree Services Program — 6/20/2024</li>
+                <li><a href="/uscg/pub/comdtinst-1900.2b/">COMDTINST 1900.2B</a> — Transition Assistance Program — 11/3/2021</li>
+                <li><a href="/uscg/pub/comdtinst-1900.4f/">COMDTINST 1900.4F</a> — Certificate Of Uniformed Service — 7/22/2025</li>
+                <li><a href="/uscg/pub/comdtinst-2400.1i/">COMDTINST 2400.1I</a> — Electromagnetic Spectrum Management Operations In The Electromagnetic Environment — 9/14/2022</li>
+                <li><a href="/uscg/pub/comdtinst-2450.1a/">COMDTINST 2450.1A</a> — Electromagnetic Environmental Effects (e3) — 12/27/2022</li>
+                <li><a href="/uscg/pub/comdtinst-3010.13d/">COMDTINST 3010.13D</a> — Emergency Management Manual Volume Iii – Exercises — 5/2/2022</li>
+                <li><a href="/uscg/pub/comdtinst-3010.19e/">COMDTINST 3010.19E</a> — Coast Guard After Action Program (cgaap) And Corrective Action Program (cap) — 3/13/2023</li>
+                <li><a href="/uscg/pub/comdtinst-3058.1/">COMDTINST 3058.1</a> — Co-sector Risk Management Agency (srma) — 7/12/2023</li>
+                <li><a href="/uscg/pub/comdtinst-3061.2a/">COMDTINST 3061.2A</a> — Activation Of The Reserve Component — 11/3/2023</li>
+                <li><a href="/uscg/pub/comdtinst-3090.5/">COMDTINST 3090.5</a> — Socium Interface For Tracking International Engagements — 3/8/2024</li>
+                <li><a href="/uscg/pub/comdtinst-3111.1c/">COMDTINST 3111.1C</a> — Cutter Homeport Decision Process (chdp) — 4/3/2024</li>
+                <li><a href="/uscg/pub/comdtinst-3120.20b/">COMDTINST 3120.20B</a> — Command Center Operations — 3/26/2025</li>
+                <li><a href="/uscg/pub/comdtinst-3120.4c/">COMDTINST 3120.4C</a> — Coast Guard Global Force Management (cg Gfm) — 7/16/2024</li>
+                <li><a href="/uscg/pub/comdtinst-3123.12k/">COMDTINST 3123.12K</a> — Preparation Of Cutter Logs — 9/29/2025</li>
+                <li><a href="/uscg/pub/comdtinst-3150.1e/">COMDTINST 3150.1E</a> — Diving Program — 9/22/2025</li>
+                <li><a href="/uscg/pub/comdtinst-3500.3a/">COMDTINST 3500.3A</a> — Risk Management (rm) — 3/5/2018</li>
+                <li><a href="/uscg/pub/comdtinst-3501.4/">COMDTINST 3501.4</a> — Health Services Deployment Competency Management — 12/3/2024</li>
+                <li><a href="/uscg/pub/comdtinst-3502.11d/">COMDTINST 3502.11D</a> — Naval Engineer Personnel Qualification Standard Program — 8/11/2025</li>
+                <li><a href="/uscg/pub/comdtinst-3510.11/">COMDTINST 3510.11</a> — National Strike Force (nsf) Qualification Insignia — 5/23/2025</li>
+                <li><a href="/uscg/pub/comdtinst-3590.1b/">COMDTINST 3590.1B</a> — Competitive Marksmanship Program — 2/1/2023</li>
+                <li><a href="/uscg/pub/comdtinst-3820.12b/">COMDTINST 3820.12B</a> — National Intelligence Activities — 3/1/2024</li>
+                <li><a href="/uscg/pub/comdtinst-3820.5a/">COMDTINST 3820.5A</a> — Implementing Enhanced Safeguards For Signals Intelligence Activities Under Executive Order 14086 — 3/4/2026</li>
+                <li><a href="/uscg/pub/comdtinst-3830.1/">COMDTINST 3830.1</a> — Releasing Identities Of U.s. Persons In Disseminated Intelligence Reports — 7/8/2024</li>
+                <li><a href="/uscg/pub/comdtinst-3870.4b/">COMDTINST 3870.4B</a> — Coast Guard Intelligence Fellows Program — 6/29/2026</li>
+                <li><a href="/uscg/pub/comdtinst-4000.12/">COMDTINST 4000.12</a> — Operatonal Logistics Support Plan (olsp) For The Acquistion Of Bar Code Equipment For The U.s. Coast Guard — 10/13/1995</li>
+                <li><a href="/uscg/pub/comdtinst-4000.13/">COMDTINST 4000.13</a> — Headquarters Materiel Management Projects At The Engineering Logistics Center — 9/14/1999</li>
+                <li><a href="/uscg/pub/comdtinst-4061.5b/">COMDTINST 4061.5B</a> — Culinary Operations Management — 7/26/2023</li>
+                <li><a href="/uscg/pub/comdtinst-4061.7b/">COMDTINST 4061.7B</a> — Forrest O. Rednour Memorial Award Program For Excellence In Culinary Operations And Culinary Specialist Of The Year — 10/3/2024</li>
+                <li><a href="/uscg/pub/comdtinst-4105.2/">COMDTINST 4105.2</a> — U.s. Coast Guard Technical Data Management (tdm) Policy — 3/10/2020</li>
+                <li><a href="/uscg/pub/comdtinst-4130.6c/">COMDTINST 4130.6C</a> — Coast Guard Configuration Management Policy — 4/17/2019</li>
+                <li><a href="/uscg/pub/comdtinst-4491.1a/">COMDTINST 4491.1A</a> — Inventory Control Point Remote Stock Location Parts And Material Request Forms Policy — 5/26/2017</li>
+                <li><a href="/uscg/pub/comdtinst-4700.1/">COMDTINST 4700.1</a> — Cutter Capital Asset Management Plan (ccamp) — 10/9/2012</li>
+                <li><a href="/uscg/pub/comdtinst-5000.10h/">COMDTINST 5000.10H</a> — Major Systems Acquisition Manangement (msam) — 8/11/2023</li>
+                <li><a href="/uscg/pub/comdtinst-5000.11e/">COMDTINST 5000.11E</a> — Non-major Acquisition Program (nmap) — 8/11/2023</li>
+                <li><a href="/uscg/pub/comdtinst-5000.12/">COMDTINST 5000.12</a> — Coast Guard Acquisition Management Roles &amp; Responsibilities — 7/6/2012</li>
+                <li><a href="/uscg/pub/comdtinst-5000.13a/">COMDTINST 5000.13A</a> — Cutter Major Maintenance Availability (mma) Governance And Management — 7/31/2024</li>
+                <li><a href="/uscg/pub/comdtinst-5040.6a/">COMDTINST 5040.6A</a> — Coast Guard Assessment, Inspection, And Audit Governance — 9/6/2018</li>
+                <li><a href="/uscg/pub/comdtinst-5090.1/">COMDTINST 5090.1</a> — U.s. Coast Guard Environmental Planning Policy — 4/23/2019</li>
+                <li><a href="/uscg/pub/comdtinst-5090.14/">COMDTINST 5090.14</a> — Historic And Cultural Resources Management (hcrm) Program; Compliance, Requirements, And Tribal Consultation — 11/10/2025</li>
+                <li><a href="/uscg/pub/comdtinst-5090.15/">COMDTINST 5090.15</a> — Environmental Compliance Program — 3/27/2026</li>
+                <li><a href="/uscg/pub/comdtinst-5090.18/">COMDTINST 5090.18</a> — Qualified Recycling Program (qrp) — 12/28/2022</li>
+                <li><a href="/uscg/pub/comdtinst-5090.3a/">COMDTINST 5090.3A</a> — Natural Resources Management — 8/2/2024</li>
+                <li><a href="/uscg/pub/comdtinst-5090.9a/">COMDTINST 5090.9A</a> — Petroleum, Oil, And Lubrictant (pol) Storage System Management — 10/28/2020</li>
+                <li><a href="/uscg/pub/comdtinst-5110.1c/">COMDTINST 5110.1C</a> — Mail Management Program Policy — 1/31/2022</li>
+                <li><a href="/uscg/pub/comdtinst-5200.10a/">COMDTINST 5200.10A</a> — Management's Responsibility For Internal Controls And Reporting Requirements — 11/2/2022</li>
+                <li><a href="/uscg/pub/comdtinst-5200.15/">COMDTINST 5200.15</a> — Program Management — 5/19/2023</li>
+                <li><a href="/uscg/pub/comdtinst-5200.3/">COMDTINST 5200.3</a> — Enterprise Risk Management — 5/16/2023</li>
+                <li><a href="/uscg/pub/comdtinst-5200.4c/">COMDTINST 5200.4C</a> — Mission Management System (mms) — 9/4/2025</li>
+                <li><a href="/uscg/pub/comdtinst-5200.7a/">COMDTINST 5200.7A</a> — Coast Guard Enterprise Data Management (edm) Policy — 12/17/2018</li>
+                <li><a href="/uscg/pub/comdtinst-5210.11a/">COMDTINST 5210.11A</a> — Information Quality Management For Publicly Disseminated Information — 6/30/2022</li>
+                <li><a href="/uscg/pub/comdtinst-5212.12b/">COMDTINST 5212.12B</a> — Records &amp; Information Management Program Roles And Responsibilities — 1/26/2021</li>
+                <li><a href="/uscg/pub/comdtinst-5213.9b/">COMDTINST 5213.9B</a> — Forms Management Program (fmp) — 2/1/2024</li>
+                <li><a href="/uscg/pub/comdtinst-5215.6j/">COMDTINST 5215.6J</a> — Directives System Program: Commandant Instruction (ci), Alcoast, And Other Publications — 10/24/2023</li>
+                <li><a href="/uscg/pub/comdtinst-5216.18a/">COMDTINST 5216.18A</a> — Memoranda Of Understanding/agreement — 6/7/2023</li>
+                <li><a href="/uscg/pub/comdtinst-5216.4e/">COMDTINST 5216.4E</a> — Correspondence Manual — 2/1/2024</li>
+                <li><a href="/uscg/pub/comdtinst-5224.5a/">COMDTINST 5224.5A</a> — Change Management — 11/28/2023</li>
+                <li><a href="/uscg/pub/comdtinst-5230.60d/">COMDTINST 5230.60D</a> — Section 508 Compliance — 6/26/2025</li>
+                <li><a href="/uscg/pub/comdtinst-5230.68a/">COMDTINST 5230.68A</a> — U.s. Coast Guard Enterprise Architecture (ea) Policy — 11/1/2019</li>
+                <li><a href="/uscg/pub/comdtinst-5230.72a/">COMDTINST 5230.72A</a> — Command, Control, Communications, Computers, Cyber, And Intelligence (c5i) Sustainment Management Policy — 2/4/2021</li>
+                <li><a href="/uscg/pub/comdtinst-5230.77b/">COMDTINST 5230.77B</a> — U.s. Coast Guard And Department Of Homeland Security Chief Information Officer (cio) Review And Approval Of Information Technology (it) Acquisitions — 3/16/2020</li>
+                <li><a href="/uscg/pub/comdtinst-5230.9/">COMDTINST 5230.9</a> — Information Technology Asset Management — 4/5/2022</li>
+                <li><a href="/uscg/pub/comdtinst-5300.13c/">COMDTINST 5300.13C</a> — Special Command Aide Management — 12/1/2017</li>
+                <li><a href="/uscg/pub/comdtinst-5300.2b/">COMDTINST 5300.2B</a> — Workforce Competency Management System (cms) — 2/2/2024</li>
+                <li><a href="/uscg/pub/comdtinst-5310.6b/">COMDTINST 5310.6B</a> — Workforce Requirements Determination (wrd) Program — 8/28/2024</li>
+                <li><a href="/uscg/pub/comdtinst-5320.4b/">COMDTINST 5320.4B</a> — Reserve Force Readiness System (rfrs) — 7/9/2024</li>
+                <li><a href="/uscg/pub/comdtinst-5330.11/">COMDTINST 5330.11</a> — Remote Work Program — 10/27/2022</li>
+                <li><a href="/uscg/pub/comdtinst-5330.4a/">COMDTINST 5330.4A</a> — Telework Program — 10/27/2022</li>
+                <li><a href="/uscg/pub/comdtinst-5350.6a/">COMDTINST 5350.6A</a> — Harassing Behavior Prevention, Response, And Accountability — 11/13/2025</li>
+                <li><a href="/uscg/pub/comdtinst-5351.3b/">COMDTINST 5351.3B</a> — Leadership Development Framework — 6/6/2025</li>
+                <li><a href="/uscg/pub/comdtinst-5351.6a/">COMDTINST 5351.6A</a> — Coast Guard Organizational Assessment Survey (cg-oas) — 4/11/2022</li>
+                <li><a href="/uscg/pub/comdtinst-5357.3/">COMDTINST 5357.3</a> — Mentoring Program — 1/28/2026</li>
+                <li><a href="/uscg/pub/comdtinst-5375.1e/">COMDTINST 5375.1E</a> — Limited Personal Use Of Government Desktop Equipment, Wifi, And Mobile Devices — 8/9/2022</li>
+                <li><a href="/uscg/pub/comdtinst-5382.1a/">COMDTINST 5382.1A</a> — Commuter Transit Subsidy Benefits Program — 11/15/2023</li>
+                <li><a href="/uscg/pub/comdtinst-5400.1b/">COMDTINST 5400.1B</a> — Obtaining Personnel Resources To Meet Surge Requirements — 8/6/2018</li>
+                <li><a href="/uscg/pub/comdtinst-5400.7g/">COMDTINST 5400.7G</a> — Organization Management — 1/5/2024</li>
+                <li><a href="/uscg/pub/comdtinst-5401.5a/">COMDTINST 5401.5A</a> — Commandant (cg-6) Directorate And Associated Duties — 5/6/2014</li>
+                <li><a href="/uscg/pub/comdtinst-5402.3/">COMDTINST 5402.3</a> — Chief Financial Officer (cfo) Technical Authority — 11/10/2009</li>
+                <li><a href="/uscg/pub/comdtinst-5402.4/">COMDTINST 5402.4</a> — Deputy Commandant For Mission Support (dcms) Engineering Technical Authority (eta) Policy — 5/19/2015</li>
+                <li><a href="/uscg/pub/comdtinst-5402.5/">COMDTINST 5402.5</a> — Data And Analytics Technical Authority — 5/24/2024</li>
+                <li><a href="/uscg/pub/comdtinst-5410.2a/">COMDTINST 5410.2A</a> — Incorporating The Joint Staff Action Process (jsap) — 1/21/2025</li>
+                <li><a href="/uscg/pub/comdtinst-5420.1/">COMDTINST 5420.1</a> — Flexible Pal (flexpal) For Selected Reserve (selres) Positions — 10/2/2020</li>
+                <li><a href="/uscg/pub/comdtinst-5420.32a/">COMDTINST 5420.32A</a> — Standards Development Program (sdp) For Marine Safety, Security, And Environmental Stewardship Programs — 9/22/2022</li>
+                <li><a href="/uscg/pub/comdtinst-5420.40c/">COMDTINST 5420.40C</a> — Commandant’s Executive Decision Making (edm) Process — 8/10/2021</li>
+                <li><a href="/uscg/pub/comdtinst-5441.6a/">COMDTINST 5441.6A</a> — Register Of Cutters — 10/24/2023</li>
+                <li><a href="/uscg/pub/comdtinst-5500.18a/">COMDTINST 5500.18A</a> — Mission Partner Identity, Credential, And Access Management (mp Icam) — 7/10/2026</li>
+                <li><a href="/uscg/pub/comdtinst-5512.1c/">COMDTINST 5512.1C</a> — Identification Cards For Members Of The Uniformed Services, Their Eligible Family Members, And Other Eligible Personnel — 6/1/2023</li>
+                <li><a href="/uscg/pub/comdtinst-5520.5g/">COMDTINST 5520.5G</a> — Coast Guard Investigative Service Roles And Responsibilities — 1/11/2023</li>
+                <li><a href="/uscg/pub/comdtinst-5527.4/">COMDTINST 5527.4</a> — Special Agent Insignia — 8/7/2024</li>
+                <li><a href="/uscg/pub/comdtinst-5603.1b/">COMDTINST 5603.1B</a> — Printing Of Executive Stationery For Routine Use, Official Ceremonies, And Special Events — 9/30/2020</li>
+                <li><a href="/uscg/pub/comdtinst-5604.1a/">COMDTINST 5604.1A</a> — Print Publishing Program — 1/29/2025</li>
+                <li><a href="/uscg/pub/comdtinst-5700.1a/">COMDTINST 5700.1A</a> — Cooperative Research And Development Agreement (crada) — 5/9/2024</li>
+                <li><a href="/uscg/pub/comdtinst-5710.4/">COMDTINST 5710.4</a> — END USE CERTIFICATES (EUCs) AND DECLARATIONS BY END USER (DEUs) — 5/4/2007</li>
+                <li><a href="/uscg/pub/comdtinst-5720.3/">COMDTINST 5720.3</a> — Documenting The 2003 Uscg Operation Enduring Freedom — 3/19/2003</li>
+                <li><a href="/uscg/pub/comdtinst-5725.1e/">COMDTINST 5725.1E</a> — Reserve Policy Board — 7/10/2024</li>
+                <li><a href="/uscg/pub/comdtinst-5726.10d/">COMDTINST 5726.10D</a> — Naming Of Cutters, Shore Facilities, And Assigning Sponsors And Long Glass Presenters — 2/3/2026</li>
+                <li><a href="/uscg/pub/comdtinst-5728.5a/">COMDTINST 5728.5A</a> — Internal Lending Of Coast Guard Art And Artifacts To Coast Guard Flag Officers And Senior Executives — 11/3/2023</li>
+                <li><a href="/uscg/pub/comdtinst-5740.5d/">COMDTINST 5740.5D</a> — Working Agreement Between The National Oceanic And Atmospheric Administration (noaa) National Data Buoy Center (ndbc) And The United States Coast Guard (uscg); Support For  Ndbc In The Atlantic And Pacific Areas — 6/1/2021</li>
+                <li><a href="/uscg/pub/comdtinst-5760.1/">COMDTINST 5760.1</a> — Coast Guard Donor Recognition — 6/26/2026</li>
+                <li><a href="/uscg/pub/comdtinst-5760.12b/">COMDTINST 5760.12B</a> — Relations With The Coast Guard Foundation — 12/7/2020</li>
+                <li><a href="/uscg/pub/comdtinst-5800.2/">COMDTINST 5800.2</a> — Coordination Of Procurement Fraud And Corruption Investigations And Remedies — 10/27/2016</li>
+                <li><a href="/uscg/pub/comdtinst-5801.4h/">COMDTINST 5801.4H</a> — Legal Assistance Program — 5/30/2025</li>
+                <li><a href="/uscg/pub/comdtinst-5801.5b/">COMDTINST 5801.5B</a> — Special Victims’ Counsel And Disability Evaluation System Counsel — 7/10/2025</li>
+                <li><a href="/uscg/pub/comdtinst-5814.1a/">COMDTINST 5814.1A</a> — Clemency Board — 2/29/2024</li>
+                <li><a href="/uscg/pub/comdtinst-5830.3/">COMDTINST 5830.3</a> — Communication Among Personnel From The Office Of Investigations And Analysis (cg-inv), The Office Of The Chief Administrative Law Judge (cg-00j), And The Office Of The Judge Advocate General (cg-094) And (cg-094c) — 2/14/2017</li>
+                <li><a href="/uscg/pub/comdtinst-5860.2d/">COMDTINST 5860.2D</a> — Coast Guard Legislation — 8/7/2026</li>
+                <li><a href="/uscg/pub/comdtinst-6000.10/">COMDTINST 6000.10</a> — Pharmacy Operations And Drug Control — 10/28/2022</li>
+                <li><a href="/uscg/pub/comdtinst-6000.11/">COMDTINST 6000.11</a> — Access To Care For Beneficiaries — 6/2/2023</li>
+                <li><a href="/uscg/pub/comdtinst-6000.12a/">COMDTINST 6000.12A</a> — Health Services Change Requests — 3/29/2025</li>
+                <li><a href="/uscg/pub/comdtinst-6000.13/">COMDTINST 6000.13</a> — Medical Practice Management — 7/17/2025</li>
+                <li><a href="/uscg/pub/comdtinst-6000.14/">COMDTINST 6000.14</a> — Health Services Program Management — 8/20/2025</li>
+                <li><a href="/uscg/pub/comdtinst-6000.2/">COMDTINST 6000.2</a> — Dental Program For Military Service Personnel — 4/24/2025</li>
+                <li><a href="/uscg/pub/comdtinst-6000.5/">COMDTINST 6000.5</a> — Behavioral Health — 9/13/2022</li>
+                <li><a href="/uscg/pub/comdtinst-6000.8/">COMDTINST 6000.8</a> — Health Insurance Portability And Accountability Act (hipaa) Privacy Rule Compliance In Cg Health Care Programs — 4/30/2024</li>
+                <li><a href="/uscg/pub/comdtinst-6000.9a/">COMDTINST 6000.9A</a> — Health Informatics (hi) — 7/19/2026</li>
+                <li><a href="/uscg/pub/comdtinst-6010.2f/">COMDTINST 6010.2F</a> — U.s. Coast Guard Auxiliarist Support To Coast Guard Health Care Facilities — 5/6/2022</li>
+                <li><a href="/uscg/pub/comdtinst-6010.8/">COMDTINST 6010.8</a> — Coast Guard Physician Undergraduate And Graduate Medical Education Program — 9/7/2022</li>
+                <li><a href="/uscg/pub/comdtinst-6100.1/">COMDTINST 6100.1</a> — Physical Readiness Program (prp) — 6/16/2026</li>
+                <li><a href="/uscg/pub/comdtinst-6150.3a/">COMDTINST 6150.3A</a> — Coast Guard Periodic Health Assessment (pha) — 2/13/2018</li>
+                <li><a href="/uscg/pub/comdtinst-6200.2/">COMDTINST 6200.2</a> — Operational Stress Control (osc) Program — 6/26/2023</li>
+                <li><a href="/uscg/pub/comdtinst-6220.4/">COMDTINST 6220.4</a> — Infection Prevention And Control Program For Coast Guard Health Care Facilities And Workers — 8/22/2014</li>
+                <li><a href="/uscg/pub/comdtinst-6230.10b/">COMDTINST 6230.10B</a> — Coast Guard Smallpox Vaccine Program (svp) — 2/19/2019</li>
+                <li><a href="/uscg/pub/comdtinst-6230.3d/">COMDTINST 6230.3D</a> — Coast Guard Anthrax Vaccine Immunization Program (avip) — 2/19/2019</li>
+                <li><a href="/uscg/pub/comdtinst-6300.3c/">COMDTINST 6300.3C</a> — Telehealth — 7/12/2026</li>
+                <li><a href="/uscg/pub/comdtinst-6320.4/">COMDTINST 6320.4</a> — Auricular Acupuncture, Comdtinst 6320.4 — 9/21/2017</li>
+                <li><a href="/uscg/pub/comdtinst-6320.9/">COMDTINST 6320.9</a> — Emergency Medical Services (ems) — 4/22/2025</li>
+                <li><a href="/uscg/pub/comdtinst-7010.13/">COMDTINST 7010.13</a> — Pay Telephone Long Distance Service Contracts — 1/8/1991</li>
+                <li><a href="/uscg/pub/comdtinst-7010.15/">COMDTINST 7010.15</a> — Organizational Name And Terminology Changes — 8/21/1991</li>
+                <li><a href="/uscg/pub/comdtinst-7010.5d/">COMDTINST 7010.5D</a> — Coast Guard Nonappropriated Fund Instrumentalities (nafi) — 8/2/2022</li>
+                <li><a href="/uscg/pub/comdtinst-7100.1a/">COMDTINST 7100.1A</a> — Coast Guard Planning, Programming, Budgeting, And Execution (ppbe) Process — 8/18/2021</li>
+                <li><a href="/uscg/pub/comdtinst-7220.20a/">COMDTINST 7220.20A</a> — AVIATION INCENTIVE PAY (AvIP) AND BONUS (AvB) PROGRAM — 1/6/2020</li>
+                <li><a href="/uscg/pub/comdtinst-7220.2a/">COMDTINST 7220.2A</a> — Military Bonus And Incentive Programs — 8/29/2022</li>
+                <li><a href="/uscg/pub/comdtinst-7220.39/">COMDTINST 7220.39</a> — Management And Administration Of Aviation Incentive Pays — 8/1/1994</li>
+                <li><a href="/uscg/pub/comdtinst-7302.2/">COMDTINST 7302.2</a> — Class &quot;c&quot; School Funding Process — 2/19/1999</li>
+                <li><a href="/uscg/pub/comdtinst-7310.1x/">COMDTINST 7310.1X</a> — Reimbursable Standard Rates — 6/25/2025</li>
+                <li><a href="/uscg/pub/comdtinst-9077.1d/">COMDTINST 9077.1D</a> — Equipment Lockout/tags-plus Instruction — 11/8/2018</li>
+                <li><a href="/uscg/pub/comdtinst-9090.1/">COMDTINST 9090.1</a> — Uscg Combat System Certification Policy — 10/31/2018</li>
+                <li><a href="/uscg/pub/comdtinst-9091.1a/">COMDTINST 9091.1A</a> — Shipboard Fire Prevention And Fire Marshal — 4/23/2024</li>
+            </ul>
+            <p><a href="/">Ask Reggie.Bot about CI publications</a></p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -2,6 +2,7 @@
   "name": "Reggie.Bot — AI Search for US Army Regulations",
   "short_name": "Reggie.Bot",
   "description": "Ask a question about US Army regulations and get an answer citing the governing regulation, with paragraph and page references.",
+  "id": "/",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Compose resolves relative asset paths (./composeResources/...) against
+         the document URL. Without this, every deep link such as /pub/ar-670-1
+         asks for /pub/composeResources/... and 404s, which throws out of
+         composition and freezes the canvas. Must precede the first script. -->
+    <base href="/">
+    <meta name="description" content="All 293 OTHER publications (Other Publications), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.">
+    <title>OTHER — Other Publications</title>
+    <link rel="canonical" href="https://reggie.bot/usaf/pubs/other/">
+    <!-- The shell is shared by every page, so this names no one service.
+         It said "Army regulations, AR 670-1, ... armypubs" while the Army
+         owned the root, which put one service on the Coast Guard's pages
+         too. Search engines ignore this tag; it is corrected because it
+         was wrong, not because it ranks. -->
+    <meta name="keywords" content="military regulations, Army regulations, Marine Corps orders, Coast Guard instructions, Space Force publications, Air Force instructions, armypubs, MCPEL, e-Publishing, military publications search">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://reggie.bot/usaf/pubs/other/">
+    <meta property="og:site_name" content="Reggie.Bot">
+    <meta property="og:title" content="OTHER — Other Publications">
+    <meta property="og:description" content="All 293 OTHER publications (Other Publications), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.">
+    <!-- icon-512, not icon_round: that one is 192x192, and previews commonly
+         refuse an image below 200x200 outright -- which is why a shared answer
+         arrived with no picture at all rather than a small one. Dimensions are
+         declared so a preview can lay out its card without fetching the image
+         first. -->
+    <meta property="og:image" content="https://reggie.bot/icon-512.png">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:alt" content="Reggie.Bot">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="OTHER — Other Publications">
+    <meta name="twitter:description" content="All 293 OTHER publications (Other Publications), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.">
+    <meta name="twitter:image" content="https://reggie.bot/icon-512.png">
+
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "OTHER — Other Publications",
+  "description": "All 293 OTHER publications (Other Publications), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.",
+  "url": "https://reggie.bot/usaf/pubs/other/"
+}
+    </script>
+    <!-- A disc that touches all four edges, cropped tight to the mark.
+         The old favicon was the app icon as drawn for the app: its circle sat
+         inset inside the square with transparent margin, and the head filled
+         only 63% of that circle. Google crops favicons to a circle of its own,
+         so what arrived was a small disc inside a ring of page background --
+         the white padding in a search result. Now the disc fills the square
+         exactly, so Google's crop lands on the artwork's own edge, and the
+         head fills more of it.
+         Still a circle rather than a square: a tab draws the icon as given,
+         with no crop, and a circle is what this app looks like.
+         PNGs first and sized -- Google wants a square multiple of 48px -- with
+         the .ico kept for anything that asks for one. -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <!-- Installable. theme-color paints the browser chrome and the splash
+         screen; without apple-touch-icon iOS renders a screenshot instead. -->
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#141414">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Reggie.Bot">
+    <!-- The branch, decided before the first paint.
+
+         The app takes seconds to boot -- 15MB of wasm has to arrive and start
+         -- and until it does, this file is the whole of what a reader sees.
+         Both branch-coloured things on it, the spinner and the mark, used to
+         be the Army's outright, so anyone who had chosen another service
+         watched a gold screen resolve into their own colour on every single
+         load. On the 1,546 generated pages too: all of them are rendered from
+         this template.
+
+         So the two colours are read from the same localStorage key the app
+         writes ("branch", set by SettingsBranchStore) and applied as custom
+         properties on the root element, inline and synchronously, before the
+         stylesheet below is ever used to draw anything.
+
+         Kept deliberately dumb -- a literal table, no fetch, no dependency on
+         the wasm having loaded -- because anything that can fail here fails in
+         the one window where nothing else is running yet. An unreadable or
+         unrecognised value leaves the Army showing, which is what every
+         reader who has never chosen a service should see anyway.
+
+         model.seo.BootPaletteTest pins this table against Branch: plain HTML
+         is invisible to the compiler, so nothing else would notice the day a
+         service is added or a palette is retuned. -->
+    <script>
+        (function () {
+            // Valid JSON on purpose: model.seo.BootPaletteTest parses this
+            // table and checks every path in it against Branch and against
+            // the files on disk. Plain HTML is invisible to the compiler, and
+            // the exhaustive `when`s that stop Branch drifting elsewhere have
+            // no reach in here, so this is the only thing that will notice the
+            // day a service is added or a palette retuned.
+            var BRANDS = {
+                "usa": {
+                    "accent": "#FFCB05",
+                    "mark": "/icon_round.png",
+                    "manifest": "/manifest.webmanifest",
+                    "favicon192": "/favicon-192.png",
+                    "favicon96": "/favicon-96.png",
+                    "appIcon": "/icon-192.png"
+                },
+                "usmc": {
+                    "accent": "#E04B4B",
+                    "mark": "/icon_round_usmc.png",
+                    "manifest": "/manifest-usmc.webmanifest",
+                    "favicon192": "/favicon-192-usmc.png",
+                    "favicon96": "/favicon-96-usmc.png",
+                    "appIcon": "/icon-192-usmc.png"
+                },
+                "usaf": {
+                    "accent": "#7FB3F0",
+                    "mark": "/icon_round_usaf.png",
+                    "manifest": "/manifest-usaf.webmanifest",
+                    "favicon192": "/favicon-192-usaf.png",
+                    "favicon96": "/favicon-96-usaf.png",
+                    "appIcon": "/icon-192-usaf.png"
+                },
+                "ussf": {
+                    "accent": "#C8D2E0",
+                    "mark": "/icon_round_ussf.png",
+                    "manifest": "/manifest-ussf.webmanifest",
+                    "favicon192": "/favicon-192-ussf.png",
+                    "favicon96": "/favicon-96-ussf.png",
+                    "appIcon": "/icon-192-ussf.png"
+                },
+                "uscg": {
+                    "accent": "#F57C00",
+                    "mark": "/icon_round_uscg.png",
+                    "manifest": "/manifest-uscg.webmanifest",
+                    "favicon192": "/favicon-192-uscg.png",
+                    "favicon96": "/favicon-96-uscg.png",
+                    "appIcon": "/icon-192-uscg.png"
+                }
+            };
+
+            // Nobody's colours until somebody has chosen. The Army was the
+            // default here, so a reader who had never answered the picker
+            // watched the app load in gold behind a gold favicon -- the
+            // question still on screen and already answered underneath.
+            //
+            // Grey is ui.theme.NEUTRAL_PRIMARY, the same colour the app paints
+            // while the picker is open, so the handover from HTML to Compose
+            // is invisible instead of a flash of the wrong service.
+            var NEUTRAL = {
+                "accent": "#D4D4D4",
+                "mark": "/icon_round_neutral.png",
+                "manifest": "/manifest.webmanifest",
+                "favicon192": "/favicon-192-neutral.png",
+                "favicon96": "/favicon-96-neutral.png",
+                "appIcon": "/icon-192-neutral.png"
+            };
+
+            var slug = null;
+            // Saved before the services were renamed. Those strings sit in
+            // browsers and keep arriving; Branch.bySlug and the database's
+            // branch_canonical() map them the same way.
+            var LEGACY = {"army": "usa", "navy": "usn", "marine-corps": "usmc",
+                          "air-force": "usaf", "space-force": "ussf",
+                          "coast-guard": "uscg"};
+            // localStorage throws outright rather than returning null when a
+            // browser blocks storage, so the read is guarded and not just the
+            // value it returns.
+            // The address first. A shared link names the service, and that is
+            // a firmer answer than whatever this browser chose last time --
+            // reading only localStorage meant arriving cold at /usaf/news/
+            // painted Army gold until Compose started. Route.serviceOf is the
+            // same rule in Kotlin; an unprefixed path is nobody's here,
+            // because the picker has to be free to ask.
+            var first = (location.pathname.split("/")[1] || "").toLowerCase();
+            first = LEGACY[first] || first;
+            if (BRANDS[first]) slug = first;
+
+            // localStorage throws outright rather than returning null when a
+            // browser blocks storage, so the read is guarded and not just the
+            // value it returns.
+            if (slug === null) {
+                try {
+                    var stored = localStorage.getItem("branch");
+                    stored = LEGACY[stored] || stored;
+                    if (BRANDS[stored]) slug = stored;
+                } catch (e) { /* no reachable choice; stay neutral and ask */ }
+            }
+
+            var brand = slug === null ? NEUTRAL : BRANDS[slug];
+            var root = document.documentElement;
+            root.setAttribute("data-branch", slug === null ? "neutral" : slug);
+            root.style.setProperty("--brand", brand.accent);
+            root.style.setProperty("--brand-logo", "url(" + brand.mark + ")");
+
+            // The tab icon, and the app if it has been installed.
+            //
+            // These are rewritten rather than written, so this script has to
+            // sit below the links it edits -- which is why it is at the end of
+            // <head> rather than the top. Still ahead of the stylesheet and of
+            // every element it colours, which is what matters for the paint.
+            //
+            // The manifest is the one branch-coloured thing nothing above can
+            // reach: an installed app's splash screen is drawn by the
+            // operating system, from icons it fetched for itself, so the only
+            // lever we have is which URL the link names. One manifest per
+            // service is written into the distribution by GenerateSeoPages,
+            // derived from the Army's; all six share an id, so switching
+            // service re-skins the installed app rather than offering a
+            // second copy of it.
+            function repoint(selector, href) {
+                var link = document.querySelector(selector);
+                if (link) link.href = href;
+            }
+            repoint('link[rel="manifest"]', brand.manifest);
+            repoint('link[rel="icon"][sizes="192x192"]', brand.favicon192);
+            repoint('link[rel="icon"][sizes="96x96"]', brand.favicon96);
+            repoint('link[rel="apple-touch-icon"]', brand.appIcon);
+        })();
+    </script>
+    <style>
+        /* The flex centering that used to live here sized #root to its
+           content rather than stretching it, so the app rendered in a narrow
+           column once ComposeViewport replaced the fixed-size canvas. */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #0a0a0a;
+            color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+
+        #ComposeTarget {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        /* Readable if the app never boots, invisible the moment it does. */
+        #seo-fallback {
+            max-width: 46rem;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            font-family: Arial, sans-serif;
+            line-height: 1.5;
+        }
+
+        /* No flex centering here: it existed to centre the old fixed-size
+           canvas. As a flex item the Compose container sized to its content
+           (300px) instead of stretching, so the app rendered in a narrow
+           column. ComposeViewport fills whatever container it is given. */
+        #root {
+            width: 100%;
+            height: 100%;
+            /* Anchors #boot, which is layered over the app rather than sitting
+               inside it. */
+            position: relative;
+        }
+
+        /* The SEO copy has to be real markup in the initial response, but a
+           wall of unstyled text is not what a visitor should stare at for the
+           seconds wasm takes to boot. #boot covers it with the app's own
+           colours; both are removed the moment Compose paints. */
+        /* Layered over the app, not inside it. It used to live inside
+           #ComposeTarget so that Compose would tear it down on mount -- which
+           it did, instantly and before any transition could run, so the
+           loading screen vanished in a hard cut. Out here its removal is ours
+           to time, and it can fade.
+
+           pointer-events: none is what makes that safe. An earlier overlay
+           swallowed the pointer, and Compose, never having seen the pointer
+           enter its canvas, ignored the first click anywhere in the app even
+           after the overlay was gone. Transparent to input from the first
+           frame, the canvas underneath gets every event as usual. Absolute
+           within #root, never fixed. */
+        #boot {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #141414;
+            transition: opacity .45s ease;
+
+            /* The ring sits immediately outside the logo, touching it, so the
+               two sizes are derived from one another rather than set
+               independently. */
+            --boot-logo: clamp(160px, 42vmin, 300px);
+            --boot-ring-width: 7px;
+        }
+
+        #boot.done { opacity: 0; }
+
+        /* Square by construction: the ring is a border on a circle, and a
+           circle drawn on a non-square box is an ellipse. */
+        /* Only ever inserted when the app did not start. Centred over the
+           fallback text rather than replacing it, so the page still says what
+           the site is. */
+        #boot-failed {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            max-width: 22rem;
+            padding: 1.25rem 1.5rem;
+            border-radius: 12px;
+            background: #1c1c1c;
+            color: #f2f2f2;
+            font: 16px/1.5 system-ui, -apple-system, sans-serif;
+            text-align: center;
+        }
+
+        #boot-failed p { margin: 0 0 1rem; }
+
+        #boot-failed button {
+            font: inherit;
+            padding: 0.5rem 1.25rem;
+            border: 0;
+            border-radius: 8px;
+            background: var(--brand, #FFCB05);
+            color: #141414;
+            cursor: pointer;
+        }
+
+        #boot-mark {
+            position: relative;
+            width: calc(var(--boot-logo) + 2 * var(--boot-ring-width));
+            height: calc(var(--boot-logo) + 2 * var(--boot-ring-width));
+        }
+
+        /* A background image, not an <img>: the source has to be settled
+           before the first paint, and the script that settles it runs in
+           <head>, where there is no element yet to set a src on. A custom
+           property crosses that gap; a DOM write cannot. */
+        #boot-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: var(--boot-logo);
+            height: var(--boot-logo);
+            margin: calc(var(--boot-logo) / -2) 0 0 calc(var(--boot-logo) / -2);
+            border-radius: 50%;
+            background-image: var(--brand-logo, url(/icon_round.png));
+            background-size: cover;
+        }
+
+        /* One arc travelling around the logo. The track is drawn in the same
+           near-black the app uses for a raised surface, so only the coloured
+           arc reads as motion.
+
+           The fallbacks here and on the mark are what a reader sees if the
+           script above never ran at all -- scripting off, or a CSP that
+           refuses it. The Army's colours, which is what the app itself falls
+           back to. */
+        #boot-ring {
+            position: absolute;
+            inset: 0;
+            border: var(--boot-ring-width) solid #2D2D2D;
+            border-top-color: var(--brand, #FFCB05);
+            border-radius: 50%;
+            animation: boot-spin 1.1s linear infinite;
+        }
+
+        @keyframes boot-spin { to { transform: rotate(360deg); } }
+
+        /* Respect a reduced-motion preference: keep the indicator, drop the
+           spin. */
+        @media (prefers-reduced-motion: reduce) {
+            #boot-ring { animation: none; }
+            /* Uncover the app at once rather than dissolving into it. */
+            #boot { transition: none; }
+        }
+    </style>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CEQC3WB0MN"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-CEQC3WB0MN');
+    </script>
+    <script type="application/javascript">
+        // Function to create an object from a list of parameters and values
+        function createParamValueObject(params, values) {
+            var paramArray = params.split(',');
+            var valueArray = values.split(',');
+
+            if (paramArray.length !== valueArray.length) {
+                throw new Error('The number of parameters must match the number of values');
+            }
+
+            var result = {};
+            for (var i = 0; i < paramArray.length; i++) {
+                result[paramArray[i].trim()] = valueArray[i].trim();
+            }
+
+            return result;
+        }
+
+        // Read one archived publication and hand back its text.
+        //
+        // The corpus is stored gzipped -- 616MB of Air Force text is 169MB
+        // packed -- and the services after the Army keep no text column in
+        // Postgres, so a result card's supporting line is found here from the
+        // archive instead. DecompressionStream unpacks the body as it
+        // arrives, which is why this is a few lines of JS rather than an
+        // inflate implementation in Kotlin, and why the bytes never cross the
+        // wasm boundary.
+        //
+        // Resolves to null for anything at all -- a 404, an offline browser,
+        // a body that is not gzip. A missing snippet is a card with one less
+        // line on it; a thrown error is a search that looks broken.
+        function fetchArchivedText(url) {
+            return fetch(url)
+                .then(function (response) {
+                    if (!response.ok || !response.body) return null;
+                    return new Response(
+                        response.body.pipeThrough(new DecompressionStream('gzip'))
+                    ).text();
+                })
+                .catch(function () { return null; });
+        }
+
+        function shareContent(text) {
+            const url = window.location.href; // Get the current page URL
+            if (navigator.share) {
+                navigator.share({
+                    // Named explicitly rather than taken from document.title.
+                    // What is being shared is an answer, not the page it was
+                    // read on, and the sheet showed whichever page the app had
+                    // been served as -- "Army Links" on top of a regulation
+                    // answer, for anyone who arrived through that link.
+                    title: 'Reggie.Bot',
+                    text: text,
+                    url: url
+                }).then(() => {
+                    console.log('Successfully shared');
+                }).catch((error) => {
+                    console.error('Error sharing:', error);
+                });
+            } else {
+                console.error('Web Share API not supported in this browser');
+            }
+        }
+
+        // Waits for the helpers the app expects, but not forever.
+        //
+        // This polled every 100ms with no limit. Anything it waited on that
+        // never arrived -- a blocked third-party script, an extension that
+        // removed a global -- was a permanent, silent blank page: no error, no
+        // timeout, and the wasm never even requested. Loading the app late is
+        // recoverable; never loading it is not, so the deadline calls through
+        // anyway rather than giving up.
+        function waitForFunctions(functionNames, callback) {
+            var deadline = Date.now() + 5000;
+
+            function checkFunctions() {
+                for (let i = 0; i < functionNames.length; i++) {
+                    if (typeof window[functionNames[i]] !== "function") {
+                        if (Date.now() > deadline) {
+                            console.warn('proceeding without ' + functionNames[i]);
+                            break;
+                        }
+                        setTimeout(checkFunctions, 100);
+                        return;
+                    }
+                }
+                callback();
+            }
+
+            checkFunctions();
+        }
+
+        function detectUnsupportedBrowser() {
+            const userAgent = navigator.userAgent;
+
+            // Check if the browser is Safari and not Chrome or Firefox on iOS
+            const isSafari = /^((?!chrome|android|crios|fxios).)*safari/i.test(userAgent);
+
+            if (isSafari) {
+                // Extract the Safari version from the userAgent
+                const versionMatch = userAgent.match(/Version\/(\d+\.\d+)/);
+                if (versionMatch) {
+                    const safariVersion = parseFloat(versionMatch[1]);
+                    console.log(`Safari version detected: ${safariVersion}`);
+                    return safariVersion < 18.2;
+                }
+            }
+            console.log("Browser is not Safari or version not detected.");
+            return false;
+        }
+
+        if (detectUnsupportedBrowser()) {
+            window.location.href = "unsupported_browser.html";
+        } else {
+            window.onload = function() {
+                function dismissBootScreen() {
+                    var boot = document.getElementById('boot');
+                    if (!boot || boot.classList.contains('done')) return;
+                    boot.classList.add('done');
+                    // transitionend removes it as soon as the fade finishes;
+                    // the timer is the backstop for a browser that never fires
+                    // one (a reduced-motion setting removes the transition
+                    // altogether), so the overlay can never be left behind.
+                    boot.addEventListener('transitionend', function () { boot.remove(); });
+                    setTimeout(function () { boot.remove(); }, 1000);
+                }
+
+                // Compose renders to a canvas, and that canvas is the signal
+                // that the app is really up. It is not in the document though:
+                // Compose Multiplatform 1.11 puts it inside a shadow root, so
+                // document.querySelector('canvas') returns null forever and
+                // waiting on that meant waiting on something that never came.
+                function composeCanvas(root) {
+                    if (root.querySelector('canvas')) return true;
+                    var hosts = root.querySelectorAll('*');
+                    for (var i = 0; i < hosts.length; i++) {
+                        var shadow = hosts[i].shadowRoot;
+                        if (shadow && shadow.querySelector('canvas')) return true;
+                    }
+                    return false;
+                }
+
+                // Two frames after it mounts it has painted, so the overlay can
+                // dissolve into the app rather than off a blank canvas.
+                function dismissWhenComposePaints() {
+                    var target = document.getElementById('ComposeTarget');
+                    if (!target) return;
+                    var observer = new MutationObserver(function () {
+                        if (!composeCanvas(target)) return;
+                        observer.disconnect();
+                        requestAnimationFrame(function () {
+                            requestAnimationFrame(dismissBootScreen);
+                        });
+                    });
+                    observer.observe(target, { childList: true, subtree: true });
+
+                    // If wasm never boots, say so. This used to dismiss the
+                    // overlay and nothing else, so a failed boot and a slow one
+                    // looked the same -- and both looked like a broken site
+                    // with no way out but knowing to reload.
+                    setTimeout(function () {
+                        observer.disconnect();
+                        dismissBootScreen();
+                        if (!composeCanvas(target)) showBootFailed();
+                    }, 25000);
+                }
+
+                dismissWhenComposePaints();
+
+                // Registered after load, and deliberately after the wasm has
+                // been asked for: the app is ~15MB and the worker must not
+                // compete with it on a first visit. It pays off on the second.
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('/sw.js').catch(function (e) {
+                        // Not fatal - the app works without it.
+                        console.warn('service worker registration failed', e);
+                    });
+                }
+
+                // Shown only when the app really did not start. The fallback
+                // text underneath says what the site is; this says what
+                // happened and offers the one thing that fixes it.
+                function showBootFailed() {
+                    if (document.getElementById('boot-failed')) return;
+                    var box = document.createElement('div');
+                    box.id = 'boot-failed';
+                    box.setAttribute('role', 'alert');
+                    box.innerHTML =
+                        '<p>Reggie could not finish loading.</p>' +
+                        '<button type="button">Reload</button>';
+                    box.querySelector('button').addEventListener('click', function () {
+                        // Bypass both caches: the likeliest cause is a cached
+                        // copy that is no longer whole.
+                        if (window.caches && caches.keys) {
+                            caches.keys().then(function (names) {
+                                return Promise.all(names.map(function (n) { return caches.delete(n); }));
+                            }).catch(function () {}).then(function () { location.reload(); });
+                        } else {
+                            location.reload();
+                        }
+                    });
+                    document.getElementById('root').appendChild(box);
+                }
+
+                // A tab the browser reclaimed and then restored.
+                //
+                // Everything here runs inside window.onload, and a page
+                // restored from the back/forward cache never fires load again
+                // -- so if whatever was on screen is gone, nothing rebuilds
+                // it. Storage pressure can also empty the cache the app was
+                // served from, which is what leaves a blank white document
+                // rather than this app's own dark shell.
+                window.addEventListener('pageshow', function (event) {
+                    if (!event.persisted) return;
+                    var target = document.getElementById('ComposeTarget');
+                    if (target && composeCanvas(target)) return;
+                    location.reload();
+                });
+
+                function loadWasm() {
+                    var canvas = document.getElementById('ComposeTarget');
+                    canvas.focus();
+
+                    var script = document.createElement('script');
+                    // Absolute: this same file is served at /news, /pubs and
+                    // friends so deep links work, and a relative path would
+                    // look for /news/composeApp.js and never boot.
+                    script.src = "/composeApp.js";
+                    document.head.appendChild(script);
+                }
+
+                // List of functions to wait for
+                const functionsToWaitFor = ["createParamValueObject", "gtag", "shareContent"];
+
+                // Wait for all functions before loading Wasm
+                waitForFunctions(functionsToWaitFor, loadWasm);
+            };
+        }
+    </script>
+</head>
+<body>
+<!-- ComposeViewport (Compose Multiplatform 1.11, which replaced
+     CanvasBasedWindow) attaches to a CONTAINER and creates its own canvas
+     inside it. Leaving a <canvas> here gives an unsized 300x150 default that
+     renders nothing, and a second canvas nested inside it. -->
+<div id="root">
+    <!-- No visible text: the mark and the ring around it say "loading" on
+         their own. aria-label keeps that legible to a screen reader without
+         putting a caption back on the screen. -->
+    <div id="boot" role="status" aria-live="polite" aria-label="Loading Reggie.Bot">
+        <div id="boot-mark">
+            <div id="boot-ring"></div>
+            <div id="boot-logo"></div>
+        </div>
+    </div>
+
+    <!-- Compose replaces the contents of #ComposeTarget on boot, so users never
+         see this. Crawlers do: the app renders to a <canvas>, which search
+         engines cannot read at all, leaving the site with no indexable text
+         whatsoever. This is the only content Google gets today. -->
+    <div id="ComposeTarget" aria-label="Interactive application area" tabindex="0">
+        <!-- Not wrapped in <noscript>: crawlers that execute JS ignore it, and
+             this needs to be real markup in the initial response. Compose
+             clears the container when it mounts, so users see it only for the
+             instant before the app boots. -->
+        <div id="seo-fallback">
+            <h1>OTHER — Other Publications</h1>
+            <p>All 293 OTHER publications (Other Publications), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.</p>
+            <h2>293 publications</h2>
+            <ul>
+                <li><a href="/usaf/pub/482fw91-203/">482FW91-203</a> — Lockout/tag Out, Signs And Tags — 2020-09-16</li>
+                <li><a href="/usaf/pub/afjqs2s0x1/">AFJQS2S0X1</a> — F-35 Materiel Management — 2026-01-23</li>
+                <li><a href="/usaf/pub/afjqs2s0x1-2/">AFJQS2S0X1-2</a> — Special Tactics Materiel Management — 2023-10-01</li>
+                <li><a href="/usaf/pub/afjqs2t0x1-f-35/">AFJQS2T0X1-F-35</a> — Air Force Job Qualification Standard  F-35 Traffic Management (2t0x1) — 2025-10-09</li>
+                <li><a href="/usaf/pub/afjqs2t3x1/">AFJQS2T3X1</a> — Special Tactics Vehicle Management — 2024-10-10</li>
+                <li><a href="/usaf/pub/afjqs2xxxx/">AFJQS2XXXX</a> — Logistics Readiness (lr) Quality Assurance (qa) Evaluator — 2022-04-13</li>
+                <li><a href="/usaf/pub/afjqs3cs/">AFJQS3CS</a> — COUNTER-SMALL UNMANNED AIRCRAFT SYSTEM (C-sUAS) OPERATOR — 2023-03-15</li>
+                <li><a href="/usaf/pub/afjqs3f1x1-1/">AFJQS3F1X1-1</a> — Intercontinental Ballistic Missile (icbm) Food Service Specialist — 2024-10-15</li>
+                <li><a href="/usaf/pub/afjqs3f1x1-2/">AFJQS3F1X1-2</a> — Air Force Job Qualification Standard  3F1X1-2, Community Programming and Recreation — 2026-04-09</li>
+                <li><a href="/usaf/pub/afjqs3f1x1-3/">AFJQS3F1X1-3</a> — Af Job Qualification Standard 3f1x1-3, Resource Management (rm) — 2026-04-02</li>
+                <li><a href="/usaf/pub/afjqs3n0x2/">AFJQS3N0X2</a> — Armed Forces Radio And Television Service (afrts) — 2009-03-01</li>
+                <li><a href="/usaf/pub/afjqs3n0xx/">AFJQS3N0XX</a> — Air Force Job Qualification Standard (AFJQS) 3N0XX - Combat Camera (CTCS) — 2017-11-30</li>
+                <li><a href="/usaf/pub/afjqs3p0x1b/">AFJQS3P0X1B</a> — Combat Arms Training And Maintenance (catm) — 2025-04-09</li>
+                <li><a href="/usaf/pub/afjqs5j0x1-1/">AFJQS5J0X1-1</a> — Air Force Court Reporter — 2016-12-20</li>
+                <li><a href="/usaf/pub/afjqs5j0x1-2/">AFJQS5J0X1-2</a> — Defense Paralegal — 2016-12-20</li>
+                <li><a href="/usaf/pub/afjqs5j0x1-3/">AFJQS5J0X1-3</a> — Special Victim Paralegal — 2016-12-20</li>
+                <li><a href="/usaf/pub/afjqs8a300/">AFJQS8A300</a> — Air Force Job Qualification Standard (AFJQS) Protocol Special Duty Identifier (SDI) (8A300) — 2026-07-15</li>
+                <li><a href="/usaf/pub/afjqs8c000/">AFJQS8C000</a> — Airman And Family Readiness Center (a&amp;frc) Readiness Noncommissioned Officer (rnco) — 2026-04-06</li>
+                <li><a href="/usaf/pub/afjqs8h000/">AFJQS8H000</a> — Air Force Job Qualification Standard (afjqs) Airman  Special Duty Identifier (sdi) 8h000 Airmen Dorm Leader — 2025-10-27</li>
+                <li><a href="/usaf/pub/afjqs8u000/">AFJQS8U000</a> — Air Force Job Qualification Standard (afjqs) Unit Deployment Manager (udm) — 2025-12-09</li>
+                <li><a href="/usaf/pub/afjqs9z2xx/">AFJQS9Z2XX</a> — Special Warfare Mission Support Superintendent — 2026-08-11</li>
+                <li><a href="/usaf/pub/afjqsdwt/">AFJQSDWT</a> — Defender Weapons Trainer (dwt) — 2024-09-05</li>
+                <li><a href="/usaf/pub/afjqstacpswms/">AFJQSTACPSWMS</a> — Tactical Air Control Party (tacp) Special Warfare Mission Support — 2025-02-11</li>
+                <li><a href="/usaf/pub/afjqs_l3-3le/">AFJQS_L3/3LE</a> — Law Enforcement — 2024-10-03</li>
+                <li><a href="/usaf/pub/afjqs_sei321/">AFJQS_SEI321</a> — Security Forces Investigator — 2024-10-15</li>
+                <li><a href="/usaf/pub/afrcjqs2a5x2_mh139a/">AFRCJQS2A5X2_MH139A</a> — Helicopter/tiltrotor Aircraft Maintenance (2a5x2/mh-139) — 2026-08-10</li>
+                <li><a href="/usaf/pub/afrcjqs2a9x4_mh139a/">AFRCJQS2A9X4_MH139A</a> — Helicopter Aircraft Integrated Avionics (2a9x4/mh-139) — 2026-08-10</li>
+                <li><a href="/usaf/pub/afscc14-401/">AFSCC14-401</a> — Airborne Cryptologic Skills Program — 2025-06-25</li>
+                <li><a href="/usaf/pub/cfetpgs0081/">CFETPGS0081</a> — Fire And Emergency Services — 2026-04-15</li>
+                <li><a href="/usaf/pub/desr6055.09_afman91-201_aetcsup/">DESR6055.09_AFMAN91-201_AETCSUP</a> — Explosives Safety Standards — 2024-12-09</li>
+                <li><a href="/usaf/pub/desr6055.09_afman91-201_afgscsup_barksdaleafbsup/">DESR6055.09_AFMAN91-201_AFGSCSUP_BARKSDALEAFBSUP</a> — Explosives Safety Standards — 2021-05-26</li>
+                <li><a href="/usaf/pub/desr6055.09_afman91-201_afgscsup_whitemanafbsup/">DESR6055.09_AFMAN91-201_AFGSCSUP_WHITEMANAFBSUP</a> — Explosives Safety Standards — 2024-07-31</li>
+                <li><a href="/usaf/pub/desr6055.09_afman91-201_afrcsup_944fwsup/">DESR6055.09_AFMAN91-201_AFRCSUP_944FWSUP</a> — Explosive Safety Standards — 2026-08-01</li>
+                <li><a href="/usaf/pub/desr6055.09_afman91-201_angsup/">DESR6055.09_AFMAN91-201_ANGSUP</a> — Explosives Safety Standards — 2024-10-02</li>
+                <li><a href="/usaf/pub/desr6055.09_afman91-201_doverafbsup/">DESR6055.09_AFMAN91-201_DOVERAFBSUP</a> — Explosive Safety Standards — 2022-08-23</li>
+                <li><a href="/usaf/pub/desr6055.09_afman91-201_sheppardafbsup/">DESR6055.09_AFMAN91-201_SHEPPARDAFBSUP</a> — Explosives Safety Standards — 2022-01-20</li>
+                <li><a href="/usaf/pub/desr6055.09_afman91-201_usafe-afafricasup/">DESR6055.09_AFMAN91-201_USAFE-AFAFRICASUP</a> — Explosives Safety Standards — 2024-11-21</li>
+                <li><a href="/usaf/pub/desr6055.09_afman91-201_yokotaabsup/">DESR6055.09_AFMAN91-201_YOKOTAABSUP</a> — Explosives Safety Standards — 2023-08-30</li>
+                <li><a href="/usaf/pub/desr6055.09_dafman91-201/">DESR6055.09_DAFMAN91-201</a> — Explosives Safety Standards — 2025-06-18</li>
+                <li><a href="/usaf/pub/desr6055.09_dafman91-201_accsup/">DESR6055.09_DAFMAN91-201_ACCSUP</a> — Explosives Safety Standards — 2026-03-10</li>
+                <li><a href="/usaf/pub/desr6055.09_dafman91-201_afgscsup/">DESR6055.09_DAFMAN91-201_AFGSCSUP</a> — Explosive Safety Standards — 2026-01-21</li>
+                <li><a href="/usaf/pub/desr6055.09_dafman91-201_afmcsup/">DESR6055.09_DAFMAN91-201_AFMCSUP</a> — Explosives Safety Standards — 2025-12-02</li>
+                <li><a href="/usaf/pub/desr6055.09_dafman91-201_afrcsup/">DESR6055.09_DAFMAN91-201_AFRCSUP</a> — Explosives Safety Standards — 2026-07-10</li>
+                <li><a href="/usaf/pub/desr6055.09_dafman91-201_afsocsup/">DESR6055.09_DAFMAN91-201_AFSOCSUP</a> — Explosives Safety Standards — 2026-03-11</li>
+                <li><a href="/usaf/pub/desr6055.09_dafman91-201_amcsup/">DESR6055.09_DAFMAN91-201_AMCSUP</a> — Explosives Safety Standards — 2026-06-14</li>
+                <li><a href="/usaf/pub/desr6055.09_dafman91-201_pacafsup/">DESR6055.09_DAFMAN91-201_PACAFSUP</a> — Explosives Safety Standards — 2026-04-14</li>
+                <li><a href="/usaf/pub/desr6055.09_dafman91-201_pacafsup_kadenaabsup/">DESR6055.09_DAFMAN91-201_PACAFSUP_KADENAABSUP</a> — Explosives Safety Standards — 2026-05-07</li>
+                <li><a href="/usaf/pub/desr6055.9_afman91-201_afmcsup_eglinafbsup/">DESR6055.9_AFMAN91-201_AFMCSUP_EGLINAFBSUP</a> — Defense Explosives Safety Eglin Air Force Base (afmc) Regulation 6055.09_air Force Manual 91-201 — 2024-11-13</li>
+                <li><a href="/usaf/pub/desr6055.9_afman91-201_afsocsup-24sowsup/">DESR6055.9_AFMAN91-201_AFSOCSUP-24SOWSUP</a> — Explosive Safety Standards — 2022-08-17</li>
+                <li><a href="/usaf/pub/dodd3000.7_afpd10-42/">DODD3000.7_AFPD10-42</a> — Irregular Warfare — 2018-10-18</li>
+                <li><a href="/usaf/pub/dodd5105.83_afpd90-19/">DODD5105.83_AFPD90-19</a> — National Guard Joint Force Headquarters - State  (jfhq-s) — 2023-02-07</li>
+                <li><a href="/usaf/pub/dodm4525.8_afman33-306_losangelesafbsup/">DODM4525.8_AFMAN33-306_LOSANGELESAFBSUP</a> — Dod Official Mail Manual — 2017-11-01</li>
+                <li><a href="/usaf/pub/dodm4525.8_afman33-306_wrightpattersonafbsup/">DODM4525.8_AFMAN33-306_WRIGHTPATTERSONAFBSUP</a> — Dod Official Mail Manual — 2019-05-16</li>
+                <li><a href="/usaf/pub/dodm5100.76_afman31-101v2_amcsup/">DODM5100.76_AFMAN31-101V2_AMCSUP</a> — Physical Security Of Sensitive Conventional Arms, Ammunition &amp; Explosives (aa&amp;e) — 2026-02-18</li>
+                <li><a href="/usaf/pub/dodm5200.01v1_dafman16-1404v1_afrssup/">DODM5200.01V1_DAFMAN16-1404V1_AFRSSUP</a> — Air Force Information Security Program — 2025-06-05</li>
+                <li><a href="/usaf/pub/dodm5400.07_afman33-302/">DODM5400.07_AFMAN33-302</a> — Freedom Of Information Act Program — 2018-04-26</li>
+                <li><a href="/usaf/pub/dodm5100.76_dafman31-101v2/">DoDM5100.76_DAFMAN31-101V2</a> — Physical Security of Sensitive Conventional Arms, Ammunition, &amp; Explosives (AA&amp;E) — 2025-07-16</li>
+                <li><a href="/usaf/pub/dodm5200.01v1_afman16-1404v1/">DoDM5200.01V1_AFMAN16-1404V1</a> — Information Security Program: Overview, Classification and Declassification — 2022-04-06</li>
+                <li><a href="/usaf/pub/dodm5200.01v1_afman16-1404v1_hillafbsup/">DoDM5200.01V1_AFMAN16-1404V1_HILLAFBSUP</a> — Information Security Program: Overview,  Classification, And Declassification — 2025-09-19</li>
+                <li><a href="/usaf/pub/dodm5200.01v1_dafman16-1404v1_afgscsup/">DoDM5200.01V1_DAFMAN16-1404V1_AFGSCSUP</a> — Information Security Program: Overview, Classification And Declassification — 2025-07-01</li>
+                <li><a href="/usaf/pub/dodm5200.01v1_dafman16-1404v1_sheppardafb/">DoDM5200.01V1_DAFMAN16-1404V1_SHEPPARDAFB</a> — Air Force Information Security Program — 2026-05-28</li>
+                <li><a href="/usaf/pub/dodm5200.01v2_afman16-1404v2/">DoDM5200.01V2_AFMAN16-1404V2</a> — Information Security Program: Marking of Classified Information — 2025-06-17</li>
+                <li><a href="/usaf/pub/dodm5200.01v3_afman16-1404v3_aftcgm2021-16-01/">DoDM5200.01V3_AFMAN16-1404V3_AFTCGM2021-16-01</a> — Air Force Information Security Program; Protection of Classified Information — 2021-04-09</li>
+                <li><a href="/usaf/pub/dodm5200.01v3_dafman16-1404v3/">DoDM5200.01V3_DAFMAN16-1404V3</a> — Information Security Program: Protection Of Classified Information — 2022-04-12</li>
+                <li><a href="/usaf/pub/dodm5200.01v3_dafman16-1404v3_ellsworthafbsup/">DoDM5200.01V3_DAFMAN16-1404V3_ELLSWORTHAFBSUP</a> — Information Security Program Management — 2024-02-20</li>
+                <li><a href="/usaf/pub/dodm5200.01v3_dafman16-1404v3_sheppardafbgm2026-01/">DoDM5200.01V3_DAFMAN16-1404V3_SHEPPARDAFBGM2026-01</a> — Information Security Program: Protection Of Classified Information — 2026-04-30</li>
+                <li><a href="/usaf/pub/dodm5200.08_dafman31-101v3_lukeafbsup/">DoDM5200.08_DAFMAN31-101V3_LUKEAFBSUP</a> — Installation Perimeter Access Control — 2026-03-16</li>
+                <li><a href="/usaf/pub/dodm5210.42_dafman13-501/">DoDM5210.42_DAFMAN13-501</a> — Nuclear Weapons Personnel Reliability Program (prp) — 2024-04-03</li>
+                <li><a href="/usaf/pub/dodm5220.22v2_afman16-1406v2_afmcsup/">DoDM5220.22V2_AFMAN16-1406V2_AFMCSUP</a> — National Industrial Security Program: Industrial Security Procedures for Government Activities — 2025-07-10</li>
+                <li><a href="/usaf/pub/dodm5220.32v1_dafman16-1406v1/">DoDM5220.32V1_DAFMAN16-1406V1</a> — National Industrial Security Program: Industrial Security Procedures for Government Activities — 2026-03-06</li>
+                <li><a href="/usaf/pub/fairchildafb21-104/">FAIRCHILDAFB21-104</a> — Foreign Object Damage (fod)/dropped Object  Prevention Program (dopp) — 2022-09-21</li>
+                <li><a href="/usaf/pub/goodfellowafbsup91-202/">GOODFELLOWAFBSUP91-202</a> — Goodfellow Air Force Base Mishap Prevention Program — 2026-08-21</li>
+                <li><a href="/usaf/pub/jbelmendorf-richardsoni10-202-o/">JBELMENDORF-RICHARDSONI10-202-O</a> — Recall Procedures — 2025-05-15</li>
+                <li><a href="/usaf/pub/jbelmendorf-richardsoni10-409/">JBELMENDORF-RICHARDSONI10-409</a> — Installation Plans Program — 2020-01-14</li>
+                <li><a href="/usaf/pub/jbelmendorf-richardsoni17-130/">JBELMENDORF-RICHARDSONI17-130</a> — Network Security — 2022-10-19</li>
+                <li><a href="/usaf/pub/jbelmendorf-richardsoni24-302/">JBELMENDORF-RICHARDSONI24-302</a> — Vehicle Management — 2022-09-13</li>
+                <li><a href="/usaf/pub/jbelmendorf-richardsoni31-107/">JBELMENDORF-RICHARDSONI31-107</a> — Weapons Registration And Access Prevention — 2024-02-09</li>
+                <li><a href="/usaf/pub/jbelmendorf-richardsoni31-118/">JBELMENDORF-RICHARDSONI31-118</a> — Motor Vehicle Traffic Supervison Program — 2023-12-05</li>
+                <li><a href="/usaf/pub/jbelmendorf-richardsoni32-1004/">JBELMENDORF-RICHARDSONI32-1004</a> — Jbelmendorf-richardson Airdrome Sweeping — 2022-11-28</li>
+                <li><a href="/usaf/pub/jbelmendorf-richardsoni32-2001/">JBELMENDORF-RICHARDSONI32-2001</a> — Fire Prevention Program — 2023-07-19</li>
+                <li><a href="/usaf/pub/jbelmendorf-richardsoni32-6008/">JBELMENDORF-RICHARDSONI32-6008</a> — Temporary Lodging Allowance — 2025-09-05</li>
+                <li><a href="/usaf/pub/jbelmendorf-richardsoni32-7004/">JBELMENDORF-RICHARDSONI32-7004</a> — Land Use Control Management — 2022-03-04</li>
+                <li><a href="/usaf/pub/jbelmendorf-richardsoni33-300/">JBELMENDORF-RICHARDSONI33-300</a> — Enterprise Information Management—sharepoint® — 2024-01-05</li>
+                <li><a href="/usaf/pub/jbelmendorf-richardsoni34-101/">JBELMENDORF-RICHARDSONI34-101</a> — Ice Program — 2023-10-17</li>
+                <li><a href="/usaf/pub/jbelmendorf-richardsoni34-110/">JBELMENDORF-RICHARDSONI34-110</a> — Six Mile Lake (sml) Recreational Aircraft Storage Area (rasa) — 2023-12-14</li>
+                <li><a href="/usaf/pub/jbelmendorf-richardsoni34-135/">JBELMENDORF-RICHARDSONI34-135</a> — Prime Knight — 2024-08-27</li>
+                <li><a href="/usaf/pub/jbelmendorf-richardsoni36-2502/">JBELMENDORF-RICHARDSONI36-2502</a> — Senior Airman Below-The-Zone Promotion Program — 2021-06-24</li>
+                <li><a href="/usaf/pub/jbelmendorf-richardsoni48-148/">JBELMENDORF-RICHARDSONI48-148</a> — Installation Ionizing And Non-ionizing Radiation Safety Program — 2026-08-18</li>
+                <li><a href="/usaf/pub/jbelmendorf-richardsoni51-501/">JBELMENDORF-RICHARDSONI51-501</a> — Dependent Misconduct Program — 2023-03-01</li>
+                <li><a href="/usaf/pub/jbelmendorf-richardsoni91-200/">JBELMENDORF-RICHARDSONI91-200</a> — Explosive Safety Management Program — 2026-04-22</li>
+                <li><a href="/usaf/pub/jbelmendorf-richardsoni91-201/">JBELMENDORF-RICHARDSONI91-201</a> — Adverse Weather Notification Procedures — 2024-10-01</li>
+                <li><a href="/usaf/pub/jbelmendorf_richardsonva90-301/">JBELMENDORF_RICHARDSONVA90-301</a> — Joint Base Elmendorf-richardson Inspector General And  Fraud, Waste, And Abuse Officer — 2025-09-23</li>
+                <li><a href="/usaf/pub/jbelmendort-richardsoni34-102/">JBELMENDORT-RICHARDSONI34-102</a> — JBER Management of Installation Meetings — 2026-06-18</li>
+                <li><a href="/usaf/pub/jbelmendorf-richardsoni31-160/">JBElMENDORF-RICHARDSONI31-160</a> — Control Of Pets And Animals — 2021-05-19</li>
+                <li><a href="/usaf/pub/jbelmendorf-richardsoni10-2501/">JBElmendorf-RichardsonI10-2501</a> — AtHoc Operations — 2025-05-27</li>
+                <li><a href="/usaf/pub/jbelmendorf-richardsoni40-301/">JBElmendorf-RichardsonI40-301</a> — Family Advocacy Program (fap) — 2018-06-21</li>
+                <li><a href="/usaf/pub/jblangely-eustisi32-2002/">JBLANGELY-EUSTISI32-2002</a> — Joint Base Langley-eustis (jble) Support Of Fire Emergency Services Operations — 2016-06-02</li>
+                <li><a href="/usaf/pub/jblangely-eustisi48-104/">JBLANGELY-EUSTISI48-104</a> — Ionizing Radiation Protection — 2016-11-29</li>
+                <li><a href="/usaf/pub/jblangley-eustisi21-4004/">JBLANGLEY-EUSTISI21-4004</a> — Crashed, Damaged, Or Disabled Aircraft Recovery (cddar) — 2011-10-04</li>
+                <li><a href="/usaf/pub/jblangley-eustisi24-302/">JBLANGLEY-EUSTISI24-302</a> — Vehicle Accident/abuse &amp; Idling Policy/procedures — 2022-11-22</li>
+                <li><a href="/usaf/pub/jblangley-eustisi31-202/">JBLANGLEY-EUSTISI31-202</a> — Joint Base Langley-eustis Control Of Pets And Animals — 2017-01-23</li>
+                <li><a href="/usaf/pub/jblangley-eustisi31-218/">JBLANGLEY-EUSTISI31-218</a> — Joint Base Langley-eustis Traffic Code — 2017-02-23</li>
+                <li><a href="/usaf/pub/jblangley-eustisi36-101/">JBLANGLEY-EUSTISI36-101</a> — Privately Owned Weapons Range Program (fort Eustis Only) — 2020-12-10</li>
+                <li><a href="/usaf/pub/jblangley-eustisi65-101/">JBLANGLEY-EUSTISI65-101</a> — Reimbursement For Travel In The Vicinity Of Joint Base Langley-eustis — 2022-09-23</li>
+                <li><a href="/usaf/pub/jblangley-eustisi32-102/">JBLangley-EustisI32-102</a> — Hunting And Fishing Program(fort Eustis Only) — 2016-12-19</li>
+                <li><a href="/usaf/pub/jbmcguire-dix-lakehursti21-101/">JBMCGUIRE-DIX-LAKEHURSTI21-101</a> — Crashed, Damaged, Or Disabled Aircraft Recovery (cddar) Program — 2026-03-19</li>
+                <li><a href="/usaf/pub/jbmcguire-dix-lakehursti23-300/">JBMCGUIRE-DIX-LAKEHURSTI23-300</a> — Precious Metals Recovery Program (PMRP) — 2026-03-05</li>
+                <li><a href="/usaf/pub/jbmcguire-dix-lakehursti24-602/">JBMCGUIRE-DIX-LAKEHURSTI24-602</a> — Traffic Management — 2025-05-02</li>
+                <li><a href="/usaf/pub/jbmcguire-dix-lakehursti24-602v2/">JBMCGUIRE-DIX-LAKEHURSTI24-602V2</a> — Handling, Processing, Storing, And Transporting Explosives — 2023-01-10</li>
+                <li><a href="/usaf/pub/jbmcguire-dix-lakehursti32-9008/">JBMCGUIRE-DIX-LAKEHURSTI32-9008</a> — Facility Manager Program — 2015-09-16</li>
+                <li><a href="/usaf/pub/jbmcguire-dix-lakehursti48-148/">JBMCGUIRE-DIX-LAKEHURSTI48-148</a> — Ionizing Radiation Protection — 2023-08-10</li>
+                <li><a href="/usaf/pub/jbmcguire-dix-lakehurstva36-2706/">JBMCGUIRE-DIX-LAKEHURSTVA36-2706</a> — 87th Air Base Wing Equal Opportunity Office — 2021-04-19</li>
+                <li><a href="/usaf/pub/jbmcguire-dix-lakehurstva51-1201/">JBMCGUIRE-DIX-LAKEHURSTVA51-1201</a> — JB MDL Alternative Dispute Resolution Program — 2021-04-19</li>
+                <li><a href="/usaf/pub/jbpearlharbor-hickamva33-138/">JBPEARLHARBOR-HICKAMVA33-138</a> — Network Incident Reporting Aid — 2016-06-09</li>
+                <li><a href="/usaf/pub/lc-amci21-1kc46/">LC-AMCI21-1KC46</a> — Kc-46 Aircraft And Equipment Maintenance Management — 2025-03-11</li>
+                <li><a href="/usaf/pub/mcconnellafbsup33-332/">MCCONNELLAFBSUP33-332</a> — Air Force Privacy And Civil Liberties Program — 2022-02-14</li>
+                <li><a href="/usaf/pub/mcmus/">MCMUS</a> — Manual For Courts-martial United States(2008 Edition) — 2012-01-01</li>
+                <li><a href="/usaf/pub/oc-alci21-101/">OC-ALCI21-101</a> — Sran Engine Management — 2023-02-07</li>
+                <li><a href="/usaf/pub/oc-alci21-103/">OC-ALCI21-103</a> — Equipment-maintenance/inspection And Documentation — 2022-04-20</li>
+                <li><a href="/usaf/pub/oc-alci21-105/">OC-ALCI21-105</a> — Identification Of Metal Used In The Manufacturing Processes — 2026-05-22</li>
+                <li><a href="/usaf/pub/oc-alci21-143/">OC-ALCI21-143</a> — Identification Of Welding Material — 2026-06-22</li>
+                <li><a href="/usaf/pub/oc-alci23-101/">OC-ALCI23-101</a> — Precious Metals Recovery Program (pmrp) — 2025-06-11</li>
+                <li><a href="/usaf/pub/oc-alci24-300/">OC-ALCI24-300</a> — Vehicle Management And Operations — 2024-11-22</li>
+                <li><a href="/usaf/pub/oc-alci32-101/">OC-ALCI32-101</a> — Air Quality Recordkeeping Procedures — 2026-01-22</li>
+                <li><a href="/usaf/pub/oc-alci48-103/">OC-ALCI48-103</a> — Respiratory Protection Program — 2022-02-07</li>
+                <li><a href="/usaf/pub/oc-alci48-110/">OC-ALCI48-110</a> — Workplace Food And Drink — 2024-04-11</li>
+                <li><a href="/usaf/pub/oc-alci48-140/">OC-ALCI48-140</a> — Chemical Expanded Standards — 2024-09-17</li>
+                <li><a href="/usaf/pub/oc-alci63-101/">OC-ALCI63-101</a> — Advanced Manufacturing Qualification Review Oversight — 2025-07-21</li>
+                <li><a href="/usaf/pub/oc-alci90-120/">OC-ALCI90-120</a> — Corrective Action Tracking System (cats) — 2025-04-08</li>
+                <li><a href="/usaf/pub/oc-alci90-1201/">OC-ALCI90-1201</a> — Tour And Visit Procedures — 2026-05-21</li>
+                <li><a href="/usaf/pub/oc-alci91-201/">OC-ALCI91-201</a> — Mishap/incident Reporting Procedures — 2024-09-11</li>
+                <li><a href="/usaf/pub/oc-alcman36-2805/">OC-ALCMAN36-2805</a> — Awards And Recognition — 2026-03-12</li>
+                <li><a href="/usaf/pub/oc-alcva32-002/">OC-ALCVA32-002</a> — Hazmat Cabinet Operational Checklist — 2026-02-11</li>
+                <li><a href="/usaf/pub/oc-alcva32-004/">OC-ALCVA32-004</a> — Red Dot — 2026-01-15</li>
+                <li><a href="/usaf/pub/oo-alci16-1401/">OO-ALCI16-1401</a> — Information Protection — 2021-03-19</li>
+                <li><a href="/usaf/pub/oo-alci21-103/">OO-ALCI21-103</a> — Non-conforming Line-routed Assets — 2025-11-19</li>
+                <li><a href="/usaf/pub/oo-alci21-105/">OO-ALCI21-105</a> — Point Of Use (pou) — 2024-08-07</li>
+                <li><a href="/usaf/pub/oo-alci21-107/">OO-ALCI21-107</a> — Engine Management — 2024-08-07</li>
+                <li><a href="/usaf/pub/oo-alci21-110/">OO-ALCI21-110</a> — Depot Facility Management — 2024-06-25</li>
+                <li><a href="/usaf/pub/oo-alci21-112/">OO-ALCI21-112</a> — Depot Maintenance Capacity And Utilization Measurement — 2025-03-07</li>
+                <li><a href="/usaf/pub/oo-alci21-115/">OO-ALCI21-115</a> — Workload Authorizations — 2026-05-15</li>
+                <li><a href="/usaf/pub/oo-alci23-101/">OO-ALCI23-101</a> — Due-in From Maintenance Due-out To Maintenance (difm/dotm) Process — 2024-08-07</li>
+                <li><a href="/usaf/pub/oo-alci23-102/">OO-ALCI23-102</a> — Consolidated Sustainment Activity Group Maintenance Division (csag-md) Owned Material Management — 2026-01-15</li>
+                <li><a href="/usaf/pub/oo-alci23-103/">OO-ALCI23-103</a> — Precious Metal Recovery Program — 2023-12-12</li>
+                <li><a href="/usaf/pub/oo-alci23-109/">OO-ALCI23-109</a> — Managing Industrial Product-support Vendor (ipv) &amp; Indirect Consumable Material — 2024-06-21</li>
+                <li><a href="/usaf/pub/oo-alci24-302/">OO-ALCI24-302</a> — Government Motor Vehicle Operations — 2026-08-17</li>
+                <li><a href="/usaf/pub/oo-alci32-1005/">OO-ALCI32-1005</a> — Infrastructure Planning And Programming — 2025-05-15</li>
+                <li><a href="/usaf/pub/oo-alci36-103/">OO-ALCI36-103</a> — Approval of Overtime, Holiday Premium Pay and Compensatory Time — 2024-02-27</li>
+                <li><a href="/usaf/pub/oo-alci36-2601/">OO-ALCI36-2601</a> — Gated Training Process — 2025-11-20</li>
+                <li><a href="/usaf/pub/oo-alci63-101/">OO-ALCI63-101</a> — Integrated Life Cycle Management — 2025-03-07</li>
+                <li><a href="/usaf/pub/oo-alci64-101/">OO-ALCI64-101</a> — Contractor Performance Assessment Report (cpar) — 2024-06-20</li>
+                <li><a href="/usaf/pub/oo-alci64-117/">OO-ALCI64-117</a> — Government Purchase Card Use When Purchasing Items Used In The Maintenance Repair And Overhaul Of Program Office Controlled Commodities Or Weapon System Products — 2024-02-29</li>
+                <li><a href="/usaf/pub/oo-alci65-101/">OO-ALCI65-101</a> — RESOURCE COST CENTER (RCCs) REORGANIZATIONS — 2026-02-25</li>
+                <li><a href="/usaf/pub/oo-alci65-301/">OO-ALCI65-301</a> — Program Management of Air Force Audit Agency (AFAA) Projects — 2026-03-02</li>
+                <li><a href="/usaf/pub/oo-alci90-302/">OO-ALCI90-302</a> — Commander’s Inspection Program — 2026-03-19</li>
+                <li><a href="/usaf/pub/oo-alci90-801/">OO-ALCI90-801</a> — Industrial Process Control Risk Management — 2023-03-29</li>
+                <li><a href="/usaf/pub/oo-alcman21-100/">OO-ALCMAN21-100</a> — Oo-alc Corrective Action Reporting — 2026-02-17</li>
+                <li><a href="/usaf/pub/sbd1i24-302/">SBD1I24-302</a> — Space Base Delta 1 Vehicle Accident, Abuse, And Fuel/ Idling Program — 2022-10-03</li>
+                <li><a href="/usaf/pub/sbd1i24-602/">SBD1I24-602</a> — Installation Local Procedures For Cargo Movement And Passenger Movement — 2022-10-20</li>
+                <li><a href="/usaf/pub/sbd1i32-2001/">SBD1I32-2001</a> — Fire And Emergency Services — 2024-10-25</li>
+                <li><a href="/usaf/pub/sbd1va33-2/">SBD1VA33-2</a> — Mail Threat Procedures — 2022-08-23</li>
+                <li><a href="/usaf/pub/sld30i10-605/">SLD30I10-605</a> — Western Range Operational Baseline Acceptance — 2021-12-07</li>
+                <li><a href="/usaf/pub/sld30i13-202/">SLD30I13-202</a> — Operations Hazard Notice — 2022-03-09</li>
+                <li><a href="/usaf/pub/sld30i13-204/">SLD30I13-204</a> — Airfield Operations — 2026-04-09</li>
+                <li><a href="/usaf/pub/sld30i13-613/">SLD30I13-613</a> — Western Range Scheduling — 2023-08-17</li>
+                <li><a href="/usaf/pub/sld30i15-101/">SLD30I15-101</a> — Weather Support — 2023-09-14</li>
+                <li><a href="/usaf/pub/sld30i21-104/">SLD30I21-104</a> — Crash, Damage, Disabled Aircraft Recovery — 2026-01-15</li>
+                <li><a href="/usaf/pub/sld30i23-101/">SLD30I23-101</a> — Precious Metals Recovery (pmrp) — 2024-05-16</li>
+                <li><a href="/usaf/pub/sld30i31-218/">SLD30I31-218</a> — Installation Motor Vehicle Code Rules Of The Road — 2025-03-04</li>
+                <li><a href="/usaf/pub/sld30i32-1001/">SLD30I32-1001</a> — Space Launch Delta 30 Facility Manager Program — 2021-06-22</li>
+                <li><a href="/usaf/pub/sld30i32-2001/">SLD30I32-2001</a> — Fire Prevention Program — 2021-06-15</li>
+                <li><a href="/usaf/pub/sld30i36-2670/">SLD30I36-2670</a> — Conference And Event Education Center Building — 2024-01-30</li>
+                <li><a href="/usaf/pub/sld30i36-3802/">SLD30I36-3802</a> — Installation Alert Notification/recall Procedures — 2021-06-25</li>
+                <li><a href="/usaf/pub/sld30i91-106/">SLD30I91-106</a> — Toxic Hazard Assessments — 2021-06-22</li>
+                <li><a href="/usaf/pub/sld30i91-703/">SLD30I91-703</a> — Train Hold Criteria — 2021-12-13</li>
+                <li><a href="/usaf/pub/sld30pam32-6000/">SLD30PAM32-6000</a> — Unaccompanied Housing Management — 2023-07-20</li>
+                <li><a href="/usaf/pub/sld45i10-2401/">SLD45I10-2401</a> — Operations Mission Assurance - Defend The Mission — 2025-08-21</li>
+                <li><a href="/usaf/pub/sld45i10-2501/">SLD45I10-2501</a> — Installation Notification And Warning System (inws) — 2023-02-01</li>
+                <li><a href="/usaf/pub/sld45i13-201/">SLD45I13-201</a> — Eastern Range Airspace — 2022-07-12</li>
+                <li><a href="/usaf/pub/sld45i13-613/">SLD45I13-613</a> — Eastern Range Scheduling — 2023-03-22</li>
+                <li><a href="/usaf/pub/sld45i15-101/">SLD45I15-101</a> — Weather Support — 2025-07-07</li>
+                <li><a href="/usaf/pub/sld45i16-201/">SLD45I16-201</a> — Foreign Disclosure And Foreign Visitor Access To The 45th Space Wing — 2024-07-02</li>
+                <li><a href="/usaf/pub/sld45i17-213/">SLD45I17-213</a> — Communication Rooms Installation Standards — 2024-09-04</li>
+                <li><a href="/usaf/pub/sld45i21-101/">SLD45I21-101</a> — Airfield Tool Control — 2025-01-30</li>
+                <li><a href="/usaf/pub/sld45i21-103/">SLD45I21-103</a> — Foreign Object Damage (fod)/dropped Object Prevention Program (dopp) — 2024-01-11</li>
+                <li><a href="/usaf/pub/sld45i21-104/">SLD45I21-104</a> — Impoundment — 2024-01-10</li>
+                <li><a href="/usaf/pub/sld45i21-105/">SLD45I21-105</a> — Crash Damaged Or Disabled Aircraft Recovery (cddar) Program — 2026-03-05</li>
+                <li><a href="/usaf/pub/sld45i21-106/">SLD45I21-106</a> — Aircraft And Equipment Maintenance Management Responsibilities — 2024-01-16</li>
+                <li><a href="/usaf/pub/sld45i21-202/">SLD45I21-202</a> — Munitions Management — 2025-03-07</li>
+                <li><a href="/usaf/pub/sld45i24-302/">SLD45I24-302</a> — Vehicle Management — 2024-12-11</li>
+                <li><a href="/usaf/pub/sld45i25-201/">SLD45I25-201</a> — Space Launch Delta 45 Support Agreements Program — 2025-03-05</li>
+                <li><a href="/usaf/pub/sld45i31-116/">SLD45I31-116</a> — Space Launch Delta 45 Motor Vehicle Traffic Supervision — 2025-12-22</li>
+                <li><a href="/usaf/pub/sld45i32-6000/">SLD45I32-6000</a> — Unaccompanied Housing Management — 2022-11-08</li>
+                <li><a href="/usaf/pub/sld45i91-203/">SLD45I91-203</a> — Process Safety Management (psm) Plan — 2026-08-13</li>
+                <li><a href="/usaf/pub/sld45i91-204/">SLD45I91-204</a> — Launch Vehicle On-base Risk Mitigation Practices — 2024-05-07</li>
+                <li><a href="/usaf/pub/sld45i91-206/">SLD45I91-206</a> — Danger Area Information Plan — 2023-11-21</li>
+                <li><a href="/usaf/pub/sld45i91-701/">SLD45I91-701</a> — Launch Safety Software Management — 2026-02-17</li>
+                <li><a href="/usaf/pub/sld45i91-710/">SLD45I91-710</a> — Launch Shelter Certification Process — 2024-09-04</li>
+                <li><a href="/usaf/pub/sld45i99-101/">SLD45I99-101</a> — 45th Space Wing Mission Program Documents — 2023-09-15</li>
+                <li><a href="/usaf/pub/travisafb17-202/">TRAVISAFB17-202</a> — Public Address Systems — 2019-08-21</li>
+                <li><a href="/usaf/pub/tyndallafb15-101/">TYNDALLAFB15-101</a> — Weather Support — 2024-10-22</li>
+                <li><a href="/usaf/pub/tyndallafb21-462/">TYNDALLAFB21-462</a> — In-shop Handling And Maintenance Procedures For Jammed Guns And Ammunition Loading Systems — 2023-07-13</li>
+                <li><a href="/usaf/pub/usafe-afafricai10-501/">USAFE-AFAFRICAI10-501</a> — Development And Implementation Of Programming Plans And Programming Messages — 2023-03-10</li>
+                <li><a href="/usaf/pub/usafe-afafricai10-503/">USAFE-AFAFRICAI10-503</a> — Basing Actions — 2025-06-17</li>
+                <li><a href="/usaf/pub/usafe-afafricai10-505/">USAFE-AFAFRICAI10-505</a> — Support To U.s. Personnel At Nato And Specified Geographically Separated Units — 2025-05-08</li>
+                <li><a href="/usaf/pub/usafe-afafricai11-205/">USAFE-AFAFRICAI11-205</a> — Altitude Reservation Procedures — 2026-08-31</li>
+                <li><a href="/usaf/pub/usafe-afafricai16-611/">USAFE-AFAFRICAI16-611</a> — Implementation Of, And Compliance With, The Conventional Armed Forces In Europe (cfe) Treaty — 2025-04-28</li>
+                <li><a href="/usaf/pub/usafe-afafricai16-612/">USAFE-AFAFRICAI16-612</a> — Implementation Of, And Compliance With, The Vienna Document 2011 (vdoc 11) Agreement On Confidence And Security Building Measures — 2025-11-24</li>
+                <li><a href="/usaf/pub/usafe-afafricai21-105/">USAFE-AFAFRICAI21-105</a> — Fabrication Program — 2024-05-13</li>
+                <li><a href="/usaf/pub/usafe-afafricai21-105_lakenheathsup/">USAFE-AFAFRICAI21-105_LAKENHEATHSUP</a> — Fabrication Program — 2021-05-18</li>
+                <li><a href="/usaf/pub/usafe-afafricai23-104/">USAFE-AFAFRICAI23-104</a> — Usafe Command Dangerous Goods Program — 2022-03-02</li>
+                <li><a href="/usaf/pub/usafe-afafricai31-202_ip/">USAFE-AFAFRICAI31-202_IP</a> — Driver And Vehicle Requirements And The Installation Traffic Code For The U.s. Forces In Germany — 2025-08-11</li>
+                <li><a href="/usaf/pub/usafe-afafricai31-203/">USAFE-AFAFRICAI31-203</a> — Armed Forces Disciplinary Control Board, Europe, And Off-limits Procedures For Firms, Establishments, Organizations, And Areas In The United States European Command — 2025-08-11</li>
+                <li><a href="/usaf/pub/usafe-afafricai31-205_ip/">USAFE-AFAFRICAI31-205_IP</a> — Registration And Control Of Privately Owned Firearms And Other Weapons In Germany — 2025-08-26</li>
+                <li><a href="/usaf/pub/usafe-afafricai31-218/">USAFE-AFAFRICAI31-218</a> — Drivers’ Licensing And Permits Within The United Kingdom — 2021-02-03</li>
+                <li><a href="/usaf/pub/usafe-afafricai32-1007/">USAFE-AFAFRICAI32-1007</a> — Airfield And Heliport Planning And Design — 2021-10-06</li>
+                <li><a href="/usaf/pub/usafe-afafricai32-1016/">USAFE-AFAFRICAI32-1016</a> — Design And Construction Management In The Federal Republic Of Germany (abg-75 Processes) — 2020-10-06</li>
+                <li><a href="/usaf/pub/usafe-afafricai32-7068/">USAFE-AFAFRICAI32-7068</a> — Environmental Baseline Surveys For Deployed Operations — 2019-07-26</li>
+                <li><a href="/usaf/pub/usafe-afafricai32-9002/">USAFE-AFAFRICAI32-9002</a> — Documenting Installation Releases And Preparation And Use Of Usafe Form 27 — 2022-11-01</li>
+                <li><a href="/usaf/pub/usafe-afafricai32-9005_ip/">USAFE-AFAFRICAI32-9005_IP</a> — Acquiring, Managing, And Disposing Of Real Estate In Germany — 2023-06-15</li>
+                <li><a href="/usaf/pub/usafe-afafricai36-101_ip/">USAFE-AFAFRICAI36-101_IP</a> — Tri-component Directive For Italy On Personal Property, Rationed Goods, Motor Vehicles And Drivers' Licenses, Civilian Component And Technical Representative Status — 2025-09-05</li>
+                <li><a href="/usaf/pub/usafe-afafricai36-103/">USAFE-AFAFRICAI36-103</a> — Qualification Standards For Non-us Positions In Germany — 2021-05-12</li>
+                <li><a href="/usaf/pub/usafe-afafricai36-104/">USAFE-AFAFRICAI36-104</a> — Us Forces Civilian Component Determination In The United Kingdom — 2019-07-30</li>
+                <li><a href="/usaf/pub/usafe-afafricai36-105/">USAFE-AFAFRICAI36-105</a> — Benefits And Allowances For Us Employees In Usafe-afafrica — 2022-01-04</li>
+                <li><a href="/usaf/pub/usafe-afafricai36-108/">USAFE-AFAFRICAI36-108</a> — Administration Of Local National Indirect Hire Civilian Employees In The United Kingdom — 2021-04-20</li>
+                <li><a href="/usaf/pub/usafe-afafricai36-109/">USAFE-AFAFRICAI36-109</a> — Time And Attendance Reporting For Non-us Citizen Employees — 2023-03-28</li>
+                <li><a href="/usaf/pub/usafe-afafricai36-109g/">USAFE-AFAFRICAI36-109G</a> — Time And Attendance Reporting For Non-us Citizen Employees (programm Zur Erfassung, Kontrolle Und Meldung Von Zeitlistendaten Für Ortskräfte) — 2023-03-28</li>
+                <li><a href="/usaf/pub/usafe-afafricai36-110/">USAFE-AFAFRICAI36-110</a> — Administration Of Resident Non-uscitizen Personnel - Turkey — 2020-07-15</li>
+                <li><a href="/usaf/pub/usafe-afafricai36-113/">USAFE-AFAFRICAI36-113</a> — Staffing Of Non-us Positions (germany) — 2021-05-13</li>
+                <li><a href="/usaf/pub/usafe-afafricai36-113g/">USAFE-AFAFRICAI36-113G</a> — Besetzung Von Nicht-amerikanischen Stellen (deutschland) — 2021-06-01</li>
+                <li><a href="/usaf/pub/usafe-afafricai36-114/">USAFE-AFAFRICAI36-114</a> — Staffing Procedures For Non-us Positions In Italy — 2025-09-03</li>
+                <li><a href="/usaf/pub/usafe-afafricai36-116/">USAFE-AFAFRICAI36-116</a> — Probationary Period Appraisal And Performance Evaluation Non-united States Citizen Employees — 2021-04-01</li>
+                <li><a href="/usaf/pub/usafe-afafricai36-118/">USAFE-AFAFRICAI36-118</a> — Non-u.s. Position Classification Outside Germany — 2021-05-12</li>
+                <li><a href="/usaf/pub/usafe-afafricai36-121/">USAFE-AFAFRICAI36-121</a> — Non-us Citizen Employee Work Stoppages — 2021-03-29</li>
+                <li><a href="/usaf/pub/usafe-afafricai36-122/">USAFE-AFAFRICAI36-122</a> — Labor Litigation Non-us Citizen Employees (germany) — 2021-05-11</li>
+                <li><a href="/usaf/pub/usafe-afafricai36-125/">USAFE-AFAFRICAI36-125</a> — Usafe-afafrica Civilian Service Program - Germany — 2019-09-19</li>
+                <li><a href="/usaf/pub/usafe-afafricai36-128/">USAFE-AFAFRICAI36-128</a> — Non-us Citizen Personnel And Position Actions--germany — 2023-03-10</li>
+                <li><a href="/usaf/pub/usafe-afafricai36-129/">USAFE-AFAFRICAI36-129</a> — Uniform Work Clothing For Non-us Citizen Personnel, Germany — 2023-10-18</li>
+                <li><a href="/usaf/pub/usafe-afafricai36-129g/">USAFE-AFAFRICAI36-129G</a> — Uniform Work Clothing For Non-us Citizen Personnel, Germany Einheitliche Arbeitskleidung Für Nicht-amerikanische Arbeitnehmer, Deutschland — 2023-10-18</li>
+                <li><a href="/usaf/pub/usafe-afafricai36-131/">USAFE-AFAFRICAI36-131</a> — The Usafe-afafrica Non-us Recognition Program — 2020-07-23</li>
+                <li><a href="/usaf/pub/usafe-afafricai36-132/">USAFE-AFAFRICAI36-132</a> — English Language Proficiency Testing Of Ln Employees And Applicants — 2023-10-12</li>
+                <li><a href="/usaf/pub/usafe-afafricai36-151/">USAFE-AFAFRICAI36-151</a> — Works Council Participation In Management Actions (germany) — 2021-05-11</li>
+                <li><a href="/usaf/pub/usafe-afafricai36-2805/">USAFE-AFAFRICAI36-2805</a> — United Kingdom Ambassador’s Awards Program — 2026-04-15</li>
+                <li><a href="/usaf/pub/usafe-afafricai51-401/">USAFE-AFAFRICAI51-401</a> — Traffic Accident Reporting And Claims Procedures In The United Kingdom — 2019-05-08</li>
+                <li><a href="/usaf/pub/usafe-afafricai51-402/">USAFE-AFAFRICAI51-402</a> — Service Of United Kingdom Legal Process Within United States Force Installations In The United Kingdom — 2020-09-29</li>
+                <li><a href="/usaf/pub/usafe-afafricai51-404/">USAFE-AFAFRICAI51-404</a> — Disposal Of Duty-free Personal Property — 2025-09-30</li>
+                <li><a href="/usaf/pub/usafe-afafricai51-406/">USAFE-AFAFRICAI51-406</a> — Individual Tax-relief Procedures In The United Kingdom — 2018-10-19</li>
+                <li><a href="/usaf/pub/usafe-afafricai51-423/">USAFE-AFAFRICAI51-423</a> — German Law On Self-defense (notwehr) Applicable To Official Use Of Arms By Civilian Personnel — 2026-05-28</li>
+                <li><a href="/usaf/pub/usafe-afafricai51-508/">USAFE-AFAFRICAI51-508</a> — Complaints By Local Nationals In The United Kingdom Against United States Air Force Personnel — 2018-10-16</li>
+                <li><a href="/usaf/pub/usafe-afafricai51-702/">USAFE-AFAFRICAI51-702</a> — U.s. Forces Customs Controls In Germany — 2025-11-25</li>
+                <li><a href="/usaf/pub/usafe-afafricai51-705_ip/">USAFE-AFAFRICAI51-705_IP</a> — Exercise Of Jurisdiction By Germany Courts And Authorities Over U.s. Personnel — 2025-09-30</li>
+                <li><a href="/usaf/pub/usafe-afafricai51-714_ip/">USAFE-AFAFRICAI51-714_IP</a> — Status Of Forces Agreement Identification In Germany — 2025-09-30</li>
+                <li><a href="/usaf/pub/usafe-afafricai65-105/">USAFE-AFAFRICAI65-105</a> — Order For Supplies And Services From United Kingdom Government Agencies — 2019-05-08</li>
+                <li><a href="/usaf/pub/usafe-afafricai91-203/">USAFE-AFAFRICAI91-203</a> — Air Force Safety And Health For Local National Employees In Germany — 2025-11-24</li>
+                <li><a href="/usaf/pub/usafe-afafricai91-203g/">USAFE-AFAFRICAI91-203G</a> — Arbeits- Und Gesundheitsschutz Für Ortsansässige Beschäftigte Der Us Luftwaffe In Deutschland — 2025-11-24</li>
+                <li><a href="/usaf/pub/usafe-afafricapam31-206/">USAFE-AFAFRICAPAM31-206</a> — Drivers Handbook And Examination Manual For Germany — 2025-07-31</li>
+                <li><a href="/usaf/pub/usafe-afafricava90-301/">USAFE-AFAFRICAVA90-301</a> — Usafe-afafrica Inspector General — 2025-05-05</li>
+                <li><a href="/usaf/pub/usafe-afafricava91-203/">USAFE-AFAFRICAVA91-203</a> — Bei Arbeits- und Wegeunfällen ist folgendes zu beachten! — 2026-02-18</li>
+                <li><a href="/usaf/pub/usafe-afafricava91-209/">USAFE-AFAFRICAVA91-209</a> — Das Arbeitsschutzprogramm Der Us-luftstreitkräfte — 2019-03-21</li>
+                <li><a href="/usaf/pub/usafe_afafricai24-655/">USAFE_AFAFRICAI24-655</a> — Customs Management — 2023-07-05</li>
+                <li><a href="/usaf/pub/whitemanfb10-409/">WHITEMANFB10-409</a> — Installation Deployment — 2022-04-14</li>
+                <li><a href="/usaf/pub/wr-alc23-104/">WR-ALC23-104</a> — Fourth Party Logistics (4pl) Purchasing — 2023-08-11</li>
+                <li><a href="/usaf/pub/wr-alci16-1404/">WR-ALCI16-1404</a> — Security Program — 2026-08-05</li>
+                <li><a href="/usaf/pub/wr-alci17-211/">WR-ALCI17-211</a> — Personal Wireless Communication Systems Management — 2023-08-01</li>
+                <li><a href="/usaf/pub/wr-alci21-100/">WR-ALCI21-100</a> — Special Maintenance Programs — 2026-05-06</li>
+                <li><a href="/usaf/pub/wr-alci21-101/">WR-ALCI21-101</a> — Work Control Documents And Technical Data — 2024-01-24</li>
+                <li><a href="/usaf/pub/wr-alci21-106/">WR-ALCI21-106</a> — Aerospace Ground Equipment/support Equipment — 2024-12-03</li>
+                <li><a href="/usaf/pub/wr-alci21-108/">WR-ALCI21-108</a> — Technical Order System — 2025-02-26</li>
+                <li><a href="/usaf/pub/wr-alci21-109/">WR-ALCI21-109</a> — Accountability of C-17 Work Control Documents — 2025-05-15</li>
+                <li><a href="/usaf/pub/wr-alci21-111/">WR-ALCI21-111</a> — Qualification and Certification of Welder/Welder Operator/Brazer Personnel Welding Aerospace Components — 2026-01-06</li>
+                <li><a href="/usaf/pub/wr-alci21-114/">WR-ALCI21-114</a> — Transient Aircraft Repair — 2025-06-09</li>
+                <li><a href="/usaf/pub/wr-alci21-115/">WR-ALCI21-115</a> — Training And Special Skills Qualification — 2024-09-03</li>
+                <li><a href="/usaf/pub/wr-alci21-118/">WR-ALCI21-118</a> — Turn-in Of Excess And Unserviceable Materiel — 2022-09-14</li>
+                <li><a href="/usaf/pub/wr-alci21-119/">WR-ALCI21-119</a> — Rob-back And Cannibalization — 2026-05-06</li>
+                <li><a href="/usaf/pub/wr-alci21-122/">WR-ALCI21-122</a> — Maintenance, Distribution, And Control Of Product Engineering Design Data — 2026-02-18</li>
+                <li><a href="/usaf/pub/wr-alci21-127/">WR-ALCI21-127</a> — Depot Maintenance Plant Management — 2026-03-30</li>
+                <li><a href="/usaf/pub/wr-alci21-128/">WR-ALCI21-128</a> — Tools And Equipment Management Program — 2026-06-04</li>
+                <li><a href="/usaf/pub/wr-alci23-101/">WR-ALCI23-101</a> — Due-in From Maintenance/due-out To Maintenance — 2023-06-20</li>
+                <li><a href="/usaf/pub/wr-alci23-102/">WR-ALCI23-102</a> — Industrial Product Support Vendor (IVP) Program — 2024-10-28</li>
+                <li><a href="/usaf/pub/wr-alci23-103/">WR-ALCI23-103</a> — Precious Metals Recovery Program (pmrp) — 2026-07-10</li>
+                <li><a href="/usaf/pub/wr-alci24-300/">WR-ALCI24-300</a> — Management And Use Of Vehicles — 2026-06-09</li>
+                <li><a href="/usaf/pub/wr-alci36-110/">WR-ALCI36-110</a> — Management And Control Of Overtime, Holiday Work, And Compensatory Time — 2025-08-26</li>
+                <li><a href="/usaf/pub/wr-alci63-101/">WR-ALCI63-101</a> — C-130 Inspection, Crack/corrosion, And Repair Reporting (icarr-3d) — 2025-09-16</li>
+                <li><a href="/usaf/pub/wr-alci63-140/">WR-ALCI63-140</a> — F-15 Individual Aircraft Tracking (IAT) Inspections — 2026-04-13</li>
+                <li><a href="/usaf/pub/wr-alci65-605/">WR-ALCI65-605</a> — Funding Document Management Process — 2025-03-14</li>
+                <li><a href="/usaf/pub/wr-alci90-302/">WR-ALCI90-302</a> — Inspector General Evaluation Management System And Self-assessment Program Business Rules — 2026-05-06</li>
+                <li><a href="/usaf/pub/wr-alci91-202/">WR-ALCI91-202</a> — Slings And Below The Hook Lifting Devices — 2024-08-13</li>
+                <li><a href="/usaf/pub/wr-alci91-204/">WR-ALCI91-204</a> — Standardized Mishap Reporting Procedures — 2025-07-02</li>
+                <li><a href="/usaf/pub/wr-alci91-206/">WR-ALCI91-206</a> — Severe Weather Safety Procedures — 2026-03-19</li>
+                <li><a href="/usaf/pub/wr-alcman90-115/">WR-ALCMAN90-115</a> — Business And Quality Management System — 2026-03-26</li>
+                <li><a href="/usaf/pub/wr-alcva91-1/">WR-ALCVA91-1</a> — Facility Mechanical Room — 2023-03-06</li>
+                <li><a href="/usaf/pub/wr-alcva91-2/">WR-ALCVA91-2</a> — Facility and Equipment Mechanical Room — 2023-03-06</li>
+                <li><a href="/usaf/pub/wr-alcva91-204/">WR-ALCVA91-204</a> — Procedure for Incident/Mishap Reporting — 2025-07-30</li>
+            </ul>
+            <p><a href="/">Ask Reggie.Bot about OTHER publications</a></p>
+        </div>
+    </div>
+</div>
+</body>
+</html>
