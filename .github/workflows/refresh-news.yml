@@ -1,19 +1,35 @@
 name: Refresh cached news
 
-# api.army.mil sits behind Akamai, which returns 403 to any request carrying a
-# browser User-Agent and separately rejects Cloud Run's egress range. So the
-# wasm client cannot call it and neither can our /proxy. This job fetches it
-# from a GitHub runner and caches the result in Supabase, which the client
-# already reads.
+# The News tab, for all five services, daily.
 #
 # It lives in this repo rather than likeich/Reggie because this one is public,
 # and public repos get unlimited Actions minutes. The Reggie release workflow
-# is careful not to delete .github/ or tools/ when it republishes the site.
+# is careful not to delete .github/ when it republishes the site.
+#
+# Two sources, one script. The Army comes from api.army.mil, which sits behind
+# Akamai: it returns 403 to any request carrying a browser User-Agent and
+# separately rejects Cloud Run's egress, so neither the wasm client nor our
+# /proxy can reach it -- but a GitHub runner can. The other four come from
+# their DVIDS feeds, because no service but the Army publishes a leads
+# endpoint.
+#
+# Until 2026-09-02 this job was the Army alone, and sync_news.py for the other
+# four existed only as a step inside a monthly corpus crawl in likeich/Reggie
+# that had never actually run. Four of the five News tabs were empty -- not
+# stale, empty -- for as long as those services had existed.
+#
+# tools/sync_news.py is PUBLISHED here by the Reggie release, not edited here.
+# It was hand-copied once and drifted to 149 lines against 426: this copy knew
+# nothing about DVIDS, which is the half that was broken.
 on:
   schedule:
     - cron: '0 8 * * *'      # 08:00 UTC = 03:00 EST (04:00 EDT - cron is UTC only)
   workflow_dispatch:
     inputs:
+      services:
+        description: 'Space-separated slugs (default: all five)'
+        type: string
+        default: 'usa usmc uscg ussf usaf'
       dry_run:
         description: 'Fetch and report, but do not write'
         type: boolean
@@ -29,7 +45,7 @@ permissions:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 45
     defaults:
       run:
         working-directory: tools
@@ -41,35 +57,68 @@ jobs:
         with:
           python-version: '3.12'
 
-      - run: pip install requests
+      - run: pip install --quiet requests
 
-      # The whole approach rests on this runner being able to reach army.mil at
-      # all - Cloud Run cannot. Fail loudly here rather than silently caching
-      # nothing.
-      - name: Verify army.mil is reachable from this runner
-        run: |
-          code=$(curl -s -o /tmp/leads.json -w '%{http_code}' --max-time 90 \
-            -H 'accept: application/json' https://api.army.mil/api/v1/leads)
-          echo "HTTP $code, $(wc -c < /tmp/leads.json) bytes"
-          test "$code" = "200" || {
-            echo "::error::army.mil returned $code from this runner - the cached-news approach needs rethinking"
-            exit 1; }
-
-      - name: Refresh the cache
+      # Every service is attempted even when one fails, and the failures are
+      # collected and re-raised at the end. `set -e` here would mean a DVIDS
+      # outage for the Coast Guard silently costs the other four their refresh.
+      #
+      # sync_news.py refuses to touch the cache when a feed is unreachable or
+      # parses to nothing, and its prune both scopes by branch and declines to
+      # run against a short fetch -- so a bad day upstream costs freshness,
+      # never the stories already held.
+      - name: Refresh each service
         env:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
         run: |
-          if [ "${{ inputs.dry_run }}" = "true" ]; then
-            python sync_news.py
-          else
-            python sync_news.py --apply
+          test -n "$SUPABASE_SERVICE_KEY" || {
+            echo "::error::SUPABASE_SERVICE_KEY is not set"; exit 1; }
+
+          apply="--apply"
+          if [ "${{ inputs.dry_run }}" = "true" ]; then apply=""; fi
+
+          failed=""
+          for slug in ${{ inputs.services || 'usa usmc uscg ussf usaf' }}; do
+            echo "::group::$slug"
+            if python sync_news.py --branch "$slug" $apply; then
+              echo "  $slug OK"
+            else
+              echo "  $slug FAILED"
+              failed="$failed $slug"
+            fi
+            echo "::endgroup::"
+          done
+
+          if [ -n "$failed" ]; then
+            echo "::error::news refresh failed for:$failed"
+            exit 1
           fi
 
-      - name: Confirm the client can read it
+      # Per service, through the anon key and the branch header -- which is
+      # exactly what the client sends, so this checks what RLS actually shows a
+      # reader rather than what the service key can see.
+      #
+      # The old version of this check counted rows without a branch header at
+      # all, so it read the Army's stories and passed while four services were
+      # empty. A check that cannot fail the way the system fails is not a check.
+      - name: Confirm a reader can see each service's news
+        if: inputs.dry_run != true
+        env:
+          ANON: ${{ vars.SUPABASE_ANON_KEY }}
         run: |
-          n=$(curl -s --max-time 60 -H "apikey: ${{ vars.SUPABASE_ANON_KEY }}" \
-                -H "Authorization: Bearer ${{ vars.SUPABASE_ANON_KEY }}" \
-                "https://ziftzxigjayekmvvopkf.supabase.co/rest/v1/news?select=id" \
-              | grep -o '"id"' | wc -l)
-          echo "stories readable by anon: $n"
-          test "$n" -gt 0
+          set -euo pipefail
+          empty=""
+          for slug in ${{ inputs.services || 'usa usmc uscg ussf usaf' }}; do
+            n=$(curl -s -o /dev/null -D - --max-time 60 \
+                  "https://ziftzxigjayekmvvopkf.supabase.co/rest/v1/news?select=id" \
+                  -H "apikey: $ANON" -H "Authorization: Bearer $ANON" \
+                  -H "x-reggie-branch: $slug" \
+                  -H 'Prefer: count=exact' -H 'Range: 0-0' \
+                | grep -i '^content-range:' | tr -d '\r' | sed 's#.*/##')
+            echo "$slug: $n stories readable by a reader"
+            [ "${n:-0}" -gt 0 ] || empty="$empty $slug"
+          done
+          if [ -n "$empty" ]; then
+            echo "::error::news synced but nothing is visible for:$empty"
+            exit 1
+          fi
