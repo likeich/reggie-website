@@ -156,7 +156,7 @@ standards">
                 "usa": {
                     "accent": "#FFCB05",
                     "mark": "/icon_round.png",
-                    "manifest": "/manifest.webmanifest",
+                    "manifest": "/manifest-usa.webmanifest",
                     "favicon192": "/favicon-192.png",
                     "favicon96": "/favicon-96.png",
                     "appIcon": "/icon-192.png"
@@ -261,9 +261,9 @@ standards">
             // operating system, from icons it fetched for itself, so the only
             // lever we have is which URL the link names. One manifest per
             // service is written into the distribution by GenerateSeoPages,
-            // derived from the Army's; all six share an id, so switching
-            // service re-skins the installed app rather than offering a
-            // second copy of it.
+            // derived from the neutral base; all six share an id, so
+            // switching service re-skins the installed app rather than
+            // offering a second copy of it.
             function repoint(selector, href) {
                 var link = document.querySelector(selector);
                 if (link) link.href = href;

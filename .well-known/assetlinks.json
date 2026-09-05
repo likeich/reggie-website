@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "bot.reggie",
+    "sha256_cert_fingerprints": ["60:E8:94:F1:9B:8D:B6:E6:82:F7:F7:A0:AE:11:56:16:0D:85:F1:E6:15:A2:AF:E8:F9:28:59:CB:F9:9E:97:9C"]
+  }
+}]

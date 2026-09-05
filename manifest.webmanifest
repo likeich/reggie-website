@@ -1,7 +1,7 @@
 {
-  "name": "Reggie.Bot — AI Search for US Army Regulations",
+  "name": "Reggie.Bot — AI Search for US Military Regulations",
   "short_name": "Reggie.Bot",
-  "description": "Ask a question about US Army regulations and get an answer citing the governing regulation, with paragraph and page references.",
+  "description": "Ask a question about US military regulations and get an answer citing the governing publication, with paragraph and page references.",
   "id": "/",
   "start_url": "/",
   "scope": "/",
@@ -13,19 +13,19 @@
   "categories": ["reference", "education", "productivity"],
   "icons": [
     {
-      "src": "/icon-192.png",
+      "src": "/icon-192-neutral.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-512.png",
+      "src": "/icon-512-neutral.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-maskable-512.png",
+      "src": "/icon-maskable-512-neutral.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
