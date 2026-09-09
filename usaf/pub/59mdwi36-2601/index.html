@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It addresses orientation, competency assessment, in-service and continuing education, life support, licensing, affiliation agreements, and Phase II technical training. It requires training, competency, qualification, continuing education, licensing, and certification activities described in the instruction.</p>
             <p><strong>Applies to:</strong> This Medical Wing Instruction (MDWI) provides policies, procedures, and responsibilities for managing 59th Medical Wing (MDW) human resource development programs and applies to all personnel assigned, attached, or under contract to the 59 MDW with the exception of the 959th Medical Group (MDG).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Training leadership</li>
                 <li>Orientation programs</li>
@@ -728,7 +744,7 @@
                 <li>Life support programs</li>
                 <li>Licensing</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What safety orientation must staff complete before working independently?</h3>
             <blockquote>Ensure individuals are oriented to key safety content such as the provision of care, environment of care, and infection control/blood-borne pathogens prior to functioning independently. (paragraph 2)</blockquote>
             <h3>Is permission required to attend technical or professional meetings?</h3>

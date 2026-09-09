@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -707,7 +723,7 @@
             <hr>
             <p>It addresses FOD and Dropped Object Prevention, inspections, findings, training, lost tool and object procedures, and program oversight. It requires designated FOD representatives, prescribed forms, initial FOD prevention training, and compliance with FOD prevention procedures.</p>
             <p><strong>Applies to:</strong> It applies to all Spangdahlem Air Base organizations and its geographically separated units that maintain aircraft, aircraft systems, equipment, support equipment and components regardless of Air Force Specialty Code.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Foreign Object Damage Prevention</li>
                 <li>Dropped Object Prevention</li>
@@ -716,7 +732,7 @@
                 <li>Lost Tool/Object procedures</li>
                 <li>FOD reporting forms</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What additional forms does SPANGDAHLEMABI21-107 prescribe?</h3>
             <blockquote>As of the revised 2017 version it also prescribes Spangdahlem Form 5, the PAS Inspection Requirements and Discrepancy Report, Spangdahlem Form 6, PAS Daily Verification Sheet, and Spangdahlem Form 7, Foreign Object Damage/Dropped Object Prevention Incident Worksheet.</blockquote>
             <h3>What training is required for personnel working near aircraft and related equipment?</h3>

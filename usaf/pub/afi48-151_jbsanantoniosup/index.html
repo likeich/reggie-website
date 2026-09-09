@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication establishes Joint Base San Antonio responsibilities and procedures for preventing and treating adverse effects of heat stress. It requires monitoring environmental conditions, following work/rest cycles, maintaining records, and supporting heat response procedures.</p>
             <p><strong>Applies to:</strong> This supplement prescribes policies and responsibilities for all AF military and civilian personnel, Tenat Units, and Mission Partners assigned to JBSA to include all Geographically Seperated Units (GSU).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Thermal illness prevention</li>
                 <li>Heat stress treatment</li>
@@ -726,7 +742,7 @@
                 <li>Heat illness training</li>
                 <li>Ice water immersion stations</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What happens when WBGT notifications are unavailable?</h3>
             <blockquote>Where host installation Bioenvironmental Engineering (BE), PM, or Command Post staff wet bulb globe temperature (WBGT) index notifications are not available, such as at geographically separated locations, units will measure/monitor conditions with a portable WBGT unit (NSN 6665-00-159-2218), or a suitable commercially available instrument, notify unit leadership, and comply with the work/rest cycles depicted at Attachment 2, unless waived or exempted.</blockquote>
             <h3>When does JBSA Lackland take WBGT readings?</h3>

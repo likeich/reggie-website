@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It defines full-service and self-help PA support, identifies authorized and unauthorized events, and establishes support request requirements. It also covers equipment, training, event support, and priority conflicts with command and control missions.</p>
             <p><strong>Applies to:</strong> This instruction applies to all units assigned to the 319th Reconnaissance Wing (319 RW) and tenant units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Public Address support</li>
                 <li>Authorized PA events</li>
@@ -727,7 +743,7 @@
                 <li>PA support requests</li>
                 <li>Military ceremonial music</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What events are unauthorized for PA support?</h3>
             <blockquote>Unauthorized PA events are those events that are purely social in nature and not directly related to missions. Unauthorized events will not receive PA support from 319 CS/SCOT. (paragraph 2)</blockquote>
             <h3>How far in advance must PA requests be submitted?</h3>

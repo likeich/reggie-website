@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <hr>
             <p>It addresses waterways analysis, navigation safety risk assessments, waterway suitability, port access routes, marine planning entities, and ports and waterways safety assessments. It requires Coast Guard personnel covered by the instruction to comply with its policies and establishes duties for marine planning officials and participating representatives.</p>
             <p><strong>Applies to:</strong> All Coast Guard unit commanders, commanding officers, officers-in-charge, deputy/assistant commandants, and chiefs of headquarter directorates must comply with the policies contained.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Waterways Analysis and Management System</li>
                 <li>Navigation Safety Risk Assessment</li>
@@ -728,7 +744,7 @@
                 <li>Marine Planning Entities</li>
                 <li>Ports and Waterways Safety Assessments</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does a Waterways Analysis and Management System study focus on?</h3>
             <blockquote>The WAMS study focuses on the existing ATON system, channel framework, marine casualty information, port/harbor resources, changes in marine vessel usage (both recreational and commercial), user capabilities, training and carriage requirements, available technology, environmental considerations, stakeholder feedback, and planned developments. (paragraph 1)</blockquote>
             <h3>Who may coordinate, execute, and submit a Navigation Safety Risk Assessment?</h3>

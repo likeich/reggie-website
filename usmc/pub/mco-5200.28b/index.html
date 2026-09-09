@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -714,7 +730,7 @@
             <hr>
             <p>MCO 5200.28B establishes centralized oversight and coordination for acquisition, analysis, experimentation and wargaming, intelligence, and training M&amp;S communities. It requires enterprise policies, standardized data, interoperable architectures, workforce development, and synchronized science and technology efforts.</p>
             <p><strong>Applies to:</strong> The scope of this Order consists of managing, resourcing, acquiring, engineering, and operating individual components of the M&amp;S capabilities; managing integration and interoperability between components of M&amp;S capabilities; and enabling infrastructure (i.e., ranges, networks, data centers) that supports reference (a).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>M&amp;S enterprise management</li>
                 <li>M&amp;S communities</li>
@@ -725,7 +741,7 @@
                 <li>Accreditation</li>
                 <li>Validation and verification</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must Marine Corps M&amp;S communities use to improve M&amp;S management?</h3>
             <blockquote>To set conditions that are favorable for M&amp;S management, Marine Corps M&amp;S communities will use technical standards and standardized data (using common and authoritative data sources and formats); operate on interoperable, open architectures, including those in reference (n); strive to achieve on-demand network accessible capabilities; make efficient use of limited resources; deliver effective M&amp;S solutions based on documented, transparent and operationally validated concepts, conceptual models, proven development approaches; and provide realistic simulation environments that enhance Marine Corps military operations. (paragraph 2)</blockquote>
             <h3>What does the Marine Corps need to do to develop its M&amp;S workforce?</h3>

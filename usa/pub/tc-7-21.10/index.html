@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=85678">View TC 7-21.10 on armypubs.army.mil</a></p>
             <hr>
             <p>TC 7-21.10 explains TADSS types and categories, training infrastructure, the Combined Arms Training Strategy, and live-virtual-constructive training. It describes TADSS capabilities, limitations, training strategies, supporting references, and task-to-TADSS matrices for Infantry and weapons company formations.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>TADSS types and categories</li>
                 <li>Combined Arms Training Strategy</li>
@@ -729,7 +745,7 @@
                 <li>Call-for-Fire Trainer</li>
                 <li>Training Improvised Explosive Device</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How many types and categories of TADSS are there?</h3>
             <blockquote>There are four types of TADSS and two categories of TADSS. (paragraph 1-1)</blockquote>
             <h3>What are the four types of TADSS?</h3>

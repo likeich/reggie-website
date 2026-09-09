@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>AFRCMD049 describes the squadron’s role in preparing enlisted trainees for USAF military service and its partnership with the 37th Training Wing. It requires the commander to report to the 340th Flying Training Group Commander, control assigned personnel, and oversee mission execution.</p>
             <p><strong>Applies to:</strong> This Mission Directive applies to individuals assigned to HQ AFRC and subordinate units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>433rd Training Squadron mission</li>
                 <li>Basic Military Training Instructors</li>
@@ -727,7 +743,7 @@
                 <li>Commander’s responsibilities</li>
                 <li>Mission oversight and execution</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the 433rd Training Squadron associated with?</h3>
             <blockquote>The 433rd Training Squadron Basic Military Training Instructors classic association unit associated with the 737th Training Group (Active Duty) and basic training squadrons in preparing enlisted trainees for the USAF military service. (paragraph 1)</blockquote>
             <h3>Who does the 433rd Training Squadron Commander report to?</h3>

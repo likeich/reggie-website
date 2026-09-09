@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers promotion procedures for Regular Air Force commissioned officers through colonel and promotion procedures for brigadier and major general. It also addresses twice non-selected officers, selective continuation boards, special selection review boards, and special boards.</p>
             <p><strong>Applies to:</strong> This publication applies to Department of the Air Force RegAF officers, including United States Space Force (USSF) members until such time as separate service guidance is published or otherwise annotated in this publication.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Regular Air Force officer promotions</li>
                 <li>Selective continuation boards</li>
@@ -726,7 +742,7 @@
                 <li>Brigadier and major general promotions</li>
                 <li>Chaplain Corps promotion boards</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What can a special board consider?</h3>
             <blockquote>Special boards consider whether to recommend member, prospective member, or former AF member for appointment, promotion, merit-based reordering, retention, separation, retirement, or transfer to inactive status in a reserve component, for which the member should have been considered but was not considered or was improperly considered by a previously convened board, consistent with 10 U.S.C § 1558. (paragraph 2)</blockquote>
             <h3>What form is used to request special board consideration?</h3>

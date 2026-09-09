@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>ATP 2-33.4 describes the intelligence analysis process, all-source analytical tasks, structured analytic techniques, and analysis across echelons and strategic roles. It requires intelligence analysis to produce timely, accurate, relevant, and predictive intelligence for commanders and staffs.</p>
             <p><strong>Applies to:</strong> ATP 2-33.4 applies to the Active Army, Army National Guard/Army National Guard of the United States, and U.S. Army Reserve unless otherwise stated.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Intelligence analysis process</li>
                 <li>All-source analytical tasks</li>
@@ -729,7 +745,7 @@
                 <li>Analytic design</li>
                 <li>Intelligence analysis support to Army forces</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the intelligence analysis process?</h3>
             <blockquote>Intelligence analysis is the process by which collected information is evaluated and integrated with existing information to facilitate intelligence production (ADP 2-0). (paragraph 1-3)</blockquote>
             <h3>What does intelligence analysis produce?</h3>

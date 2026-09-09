@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -714,7 +730,7 @@
             <hr>
             <p>AR 27-70 implements DoDI 5100.64 and establishes guidance for effective relief from foreign taxes. It assigns duties to judge advocates, designated military commanders, and contracting officers, and includes internal control evaluation requirements.</p>
             <p><strong>Applies to:</strong> This regulation applies to appropriated and nonappropriated funds of the DoD that are subject to taxes imposed by</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Foreign tax relief</li>
                 <li>Tax relief policy</li>
@@ -723,7 +739,7 @@
                 <li>Contracting officer reporting</li>
                 <li>Internal control evaluation</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When is tax relief considered impractical?</h3>
             <blockquote>Tax relief shall be considered impractical when the total economic burden of a tax not readily identifiable in the normal course of business is so small that it may be considered a de minimis matter, or when the administrative burden of securing effective relief from a tax in a particular instance is greater than the amount of the relief likely to be obtained. (paragraph 1)</blockquote>
             <h3>Which foreign countries are covered by AR 27-70?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>NAVMC 1700.41 covers prevention levels, stakeholders, prevention systems, harmful and healthy environments, and EPBHC PPI roles. It requires scientifically informed recommendations and compliant handling of Marine data, including limits on sharing identifiable information.</p>
             <p><strong>Applies to:</strong> This NAVMC is applicable to Marine Corps commands with EPBHC and EPBHC PPis.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Integrated primary prevention</li>
                 <li>Levels of prevention</li>
@@ -729,7 +745,7 @@
                 <li>Healthy environments and behaviors</li>
                 <li>Data and evaluation practices</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does primary prevention focus on?</h3>
             <blockquote>Primary prevention focuses on increasing protective factors and decreasing risk factors in order to develop a more resilient Marine who in turn experiences balance and overall wellness. (paragraph 2)</blockquote>
             <h3>What harmful behaviors does the integrated prevention system target?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>It provides a framework for conducting training evaluations, preparing evaluators, and establishing standard methods for evaluation feedback. It addresses standards-based training, readiness evaluation, debriefs, after-action reviews, and documenting training results.</p>
             <p><strong>Applies to:</strong> This publication has been prepared for use by Marine Corps leaders at all levels.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Unit evaluations</li>
                 <li>Standards-based training</li>
@@ -728,7 +744,7 @@
                 <li>Evaluator training</li>
                 <li>Training results documentation</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is evaluation used for in unit training management?</h3>
             <blockquote>Evaluation is one of the most important steps in unit training management and the Systems Approach to Training and Education process.</blockquote>
             <h3>How does the commander use standards-based feedback?</h3>

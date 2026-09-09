@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>AFI61-301 covers technology transfer agreements, inventions, patents, licensing, royalties, payments, and annual reporting. It assigns program responsibilities, requires approved model agreements, and establishes processes for handling payments and activity data.</p>
             <p><strong>Applies to:</strong> This instruction applies to all Regular Air Force personnel and members of the Air Force Reserve and Air National Guard (ANG), except where noted otherwise.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Domestic technology transfer</li>
                 <li>Technology transfer agreements</li>
@@ -726,7 +742,7 @@
                 <li>Offices of Research and Technology Applications</li>
                 <li>Annual technology transfer reports</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who approves proposed Partnership Intermediary Agreements?</h3>
             <blockquote>Will approve of all proposed Partnership Intermediary Agreements (PIAs) for consistency with law, regulation, and policy, unless this approval authority is delegated to the Technology Executive Officer. (paragraph 2)</blockquote>
             <h3>What agreements must Air Force technology transfer activities use?</h3>

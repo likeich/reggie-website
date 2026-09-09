@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>MCDP 1-3 covers decision-making, gaining advantage, speed, adaptation, cooperation, exploitation, pursuit, reserves, education, and training. It is descriptive rather than prescriptive, providing guidance through concepts and ideas.</p>
             <p><strong>Applies to:</strong> This book pertains equally to all Marine leaders, whether their duties entail combat service support, combat support, or combat arms.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Tactical decision-making</li>
                 <li>Combined arms</li>
@@ -730,7 +746,7 @@
                 <li>Use of the reserve in combat</li>
                 <li>Tactical exercises</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does MCDP 1-3 define tactics as?</h3>
             <blockquote>Tactics is “the art and science of winning engagements and battles. It includes the use of firepower and maneuver, the integration of different arms and the immediate exploitation of success to defeat the enemy,”3 as well as the sustainment of forces during combat. (paragraph 8)</blockquote>
             <h3>How does MCDP 1-3 describe tactics in war?</h3>

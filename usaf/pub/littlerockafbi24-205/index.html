@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It establishes secure holding areas on Little Rock Air Force Base and sets explosive limits for vehicles using the Marshall Road area. It requires inspections, escorts, temporary parking controls, safety briefings, and vehicle removal deadlines.</p>
             <p><strong>Applies to:</strong> This instruction applies to 19th Airlift Wing, 189th Airlift Wing, and commercial contract transportation companies involved in the movement and staging of classified, explosives, and NBC on LRAFB.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Secure holding areas</li>
                 <li>Explosive vehicle parking</li>
@@ -727,7 +743,7 @@
                 <li>FPCON access</li>
                 <li>Transportation protective services</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When can vehicles carrying sensitive materials request secure holding at LRAFB?</h3>
             <blockquote>Government or commercial contract vehicles laden with Nuclear, Biological, Chemical (NBC), non nuclear explosives or, Arms Ammunition and Explosives (AA&amp;E) or classified materials may request access to LRAFB for secure holding in response to emergencies, contingencies, and increased FPCON events. (paragraph 1)</blockquote>
             <h3>What security is required for vehicles carrying CAT I or CAT II AA&amp;E?</h3>

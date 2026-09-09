@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>DAFI36-3202 covers DD Form 214, DD Form 214-1, DD Form 215, separation program designator codes, and post-separation actions. It requires compliance with Attachments 2 and 3 and establishes when retirement DD Form 214 documents may be issued.</p>
             <p><strong>Applies to:</strong> This publication applies to the Regular Air Force (RegAF), the United States Space Force (USSF), the Air Force Reserve (AFR), and the Air National Guard (ANG).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>DD Form 214</li>
                 <li>DD Form 214-1</li>
@@ -726,7 +742,7 @@
                 <li>DD Form 214 distribution</li>
                 <li>Retirement DD Form 214 issuance</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When is a DD Form 214-1 issued?</h3>
             <blockquote>DD Form 214-1 will be issued in conjunction with a DD Form 214 for members who are separated or released from a Reserve Component, transferred to the IRR or the inactive National Guard, transferred to the Standby Reserve or Retired Reserve, recalled retirees reverting back to retired status, or as prescribed under other circumstances as annotated in paragraph 3.3.5.4. (paragraph 3)</blockquote>
             <h3>How long must members remain on active duty to receive a retirement DD Form 214?</h3>

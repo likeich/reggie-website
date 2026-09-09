@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication sets responsibilities for FOD removal, sweeping coordination, magnetic sweeping, and airfield inspections. It defines satisfactory surface conditions, priority areas, emergency request processing, and summer operating shifts.</p>
             <p><strong>Applies to:</strong> This instruction applies to all organizations and individuals operating on, or adjacent to, the JBER airdrome.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Airdrome sweeping</li>
                 <li>Foreign object debris removal</li>
@@ -726,7 +742,7 @@
                 <li>Emergency sweeping requests</li>
                 <li>Summer sweeping hours</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who must keep aircraft parking, maintenance, and loading areas clean?</h3>
             <blockquote>Organizations using areas on the airfield for aircraft parking, maintenance, and loading will continually police and hand sweep areas clean of small amounts of foreign object debris (FOD) and damage causing material, as necessary. (paragraph 1)</blockquote>
             <h3>What must personnel operating vehicles do with FOD found on the airfield?</h3>

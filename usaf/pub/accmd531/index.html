@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It defines the group’s role in operational testing, evaluation, tactics development, and integration of advanced warfighting capabilities. It also establishes command relationships, liaison authority, and duties for managing assigned missions and supporting urgent warfighter needs.</p>
             <p><strong>Applies to:</strong> This mission directive applies to 53 TEG and subordinate Regular Air Force units and assigned civilian personnel.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>53d Test and Evaluation Group mission</li>
                 <li>Operational test and evaluation</li>
@@ -727,7 +743,7 @@
                 <li>Foreign Materiel Exploitation evaluations</li>
                 <li>Urgent Operational Need requests</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What mission does the 53d Test and Evaluation Group perform?</h3>
             <blockquote>The 53 TEG provides tactical advantage to the warfighter at the speed of relevance by operationally testing and evaluating advanced weapons, systems and tactics to maximize fighter, bomber, intelligence surveillance reconnaissance and combat search and rescue platforms’ lethality, survivability and sustainability through integration and tactics development to enable joint, all-domain combat operations. (paragraph 1)</blockquote>
             <h3>What command relationship does the 53 TEG have?</h3>

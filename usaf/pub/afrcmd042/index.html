@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>It describes the squadron's management of followon operational test and evaluation, tactics development, software management, and testing of weapons and support systems. It requires mandatory compliance, records maintenance, and waivers through the chain of command for non-tiered compliance items.</p>
             <p><strong>Applies to:</strong> This Mission Directive applies to individuals assigned to HQ AFRC. It does not apply to Regular Air Force, Space Force, or ANG units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>followon operational test and evaluation</li>
                 <li>tactics development</li>
@@ -721,7 +737,7 @@
                 <li>operational test planning and execution</li>
                 <li>data gathering, analyzing, and reporting</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the 84th Test and Evaluation Squadron responsible for?</h3>
             <blockquote>The 84th Test and Evaluation Squadron is responsible for the management of followon operational test and evaluation, tactics development and software management for all fighters and bombers in the Combat Air Forces inventory. (paragraph 1)</blockquote>
             <h3>What does squadron personnel direct?</h3>

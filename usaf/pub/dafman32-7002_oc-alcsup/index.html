@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication extends DAFMAN 32-7002 with requirements for hazardous materials, environmental training, records, storage, inventories, and reporting. It adds shelf-life verifications and assigns duties to work area supervisors and appointed monitors.</p>
             <p><strong>Applies to:</strong> This publication applies to all civilian employees, uniformed members of the Regular Air Force, and contractors within the Oklahoma City Air Logistics Complex (OC-ALC).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Hazardous materials management</li>
                 <li>Environmental training</li>
@@ -726,7 +742,7 @@
                 <li>Environmental records</li>
                 <li>HM storage locations</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How often must personnel complete Environmental Management System general awareness training?</h3>
             <blockquote>Ensure all personnel receive the training course, Environmental Management System (EMS) - General Awareness Training. This training will be accomplished once every three years and documented accordingly IAW the Department of the Air Force Instruction (DAFI) 327001, Civil Engineering Environmental Management paragraph 4.3.</blockquote>
             <h3>How long must historical hazardous materials and hazardous waste records be kept?</h3>

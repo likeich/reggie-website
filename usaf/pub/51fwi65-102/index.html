@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It specifies the authorized reporting form, daily time and attendance checks, required identification data, and certification procedures. It requires certified reports to reach the NAF Accounting Office by the stated deadline.</p>
             <p><strong>Applies to:</strong> It applies to all nonappropriated fund (NAF) personnel assigned to 51st Fighter Wing.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Korean National time and attendance reports</li>
                 <li>Timekeeper duties</li>
@@ -727,7 +743,7 @@
                 <li>T&amp;A report certification</li>
                 <li>T&amp;A report submission</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Which form is authorized for maintaining T&amp;A reports?</h3>
             <blockquote>51 FW Form 35, Korean National Time &amp; Attendance Report (NAF), will be the only report authorized, on which to maintain T&amp;A reports at no time pertain to more than one NAF activity comprised of those personnel that the certifying official can effectively supervise and the timekeepers can observe in the performance of daily duties. (paragraph 2)</blockquote>
             <h3>Are duplicate or work copies of T&amp;A reports allowed?</h3>

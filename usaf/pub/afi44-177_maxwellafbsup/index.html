@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication addresses AED placement, procurement, maintenance, training, quality assurance, documentation, mock drills, and post-use procedures. It requires site assessments, Medical Director approval, annual mock drills, event reporting, and monthly AED inspections.</p>
             <p><strong>Applies to:</strong> This publication applies to Maxwell-Gunter AFB organizations.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Public Access Defibrillation Program</li>
                 <li>AED deployment and placement</li>
@@ -727,7 +743,7 @@
                 <li>AED post-use procedures</li>
                 <li>AED inspections</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How are new AED requests submitted?</h3>
             <blockquote>All new requests for AEDs will be accomplished utilizing the Needs Risk Assessment (Attachment 6) and coordinated through the PPC, Medical Director, CLSF, BMET and Medical Logistics.</blockquote>
             <h3>How far from any point in a building should an AED be positioned?</h3>

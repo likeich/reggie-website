@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication contains aircrew briefings, mission checklists, fast rope procedures, rescue litter inspections, and rope ladder requirements. Compliance is mandatory, and specified inspection entries and records must be maintained.</p>
             <p><strong>Applies to:</strong> This supplement prescribes specific guidance for Air Force District of Washington (AFDW) commanders, AND aircrew operating UH-1N helicopters.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Aircrew briefings</li>
                 <li>Mission planning</li>
@@ -726,7 +742,7 @@
                 <li>Rope ladder inspections</li>
                 <li>Rescue equipment checklists</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does AFI11-2UH-1NV3CL-1_AFDWSUP require for the stokes sling assembly?</h3>
             <blockquote>A 5000-pound locking carabiner will be used to attach the stokes sling assembly to the hoist hook.</blockquote>
             <h3>When should a rope ladder not be used for live operations?</h3>

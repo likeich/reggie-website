@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>TC 3-57.51 presents the four-step civil preparation of the battlefield process, covering operational environment definition, civil analysis, knowledge generation, and threat template development. It describes outputs including information gaps, collection plans, civil overlays, event templates, course of action statements, and prioritized opportunities and risks.</p>
             <p><strong>Applies to:</strong> TC 3-57.51 applies to the Active Army, the Army National Guard (or Army National Guard of the United States), and the U.S. Army Reserve unless otherwise stated.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Civil preparation of the battlefield</li>
                 <li>Operational environment definition</li>
@@ -729,7 +745,7 @@
                 <li>Civil event templates</li>
                 <li>Targetable opportunities and risks</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What are the four steps of the CPB process?</h3>
             <blockquote>STEP ONE: DEFINE THE OPERATIONAL ENVIRONMENT 1-10. This step is comprised of four substeps which define the OE: Define the AO and the AOI for further analysis. Define the political, economic, and social variables in the AO. Produce prioritized lists of political, economic, and social information gaps. Develop the civil information collection plan and requests for information. (paragraph 4-1)</blockquote>
             <h3>How are political, economic, and social information gaps prioritized?</h3>

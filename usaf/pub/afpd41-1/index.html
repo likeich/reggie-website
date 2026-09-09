@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>AFPD41-1 establishes policy for using people and resources, supporting medical readiness, and delivering safe, quality, accessible health services. It assigns responsibilities for resource requirements, healthcare standards, and personnel development.</p>
             <p><strong>Applies to:</strong> This Directive applies to all Air Force Medical Service personnel who deliver healthcare program and resource support in active duty medical treatment facilities, Air Force Reserve Medical Units, Air National Guard Medical Groups, Aeromedical Evacuation Squadrons, communities, and deployed locations.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Healthcare programming and resourcing</li>
                 <li>Medical readiness</li>
@@ -726,7 +742,7 @@
                 <li>Resource requirements</li>
                 <li>Healthcare delivery standards</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who develops Air Force Medical Service policy and guidance?</h3>
             <blockquote>The Air Force Surgeon General (AF/SG). Develops all policy and guidance with the coordination and concurrence of the Assistant Secretary of the Air Force for Manpower and Reserve Affairs (SAF/MR) in accordance with Headquarters Mission Directive 1-48, paragraphs A4.1.1 and A4.1.2, concerning the Air Force Medical Service. (paragraph 2)</blockquote>
             <h3>What does AFPD41-1 require for medical resource use?</h3>

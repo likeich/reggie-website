@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -706,7 +722,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/jbcharleston/publication/jbcharlestonva33-282/jbcharlestonva33-282.pdf">View JBCHARLESTONVA33-282 on armypubs.army.mil</a></p>
             <hr>
             <p>It identifies virus and network attack symptoms, CMI response actions, phishing response steps, and points of contact. It requires scanning computers, protecting classified information, isolating external media, and following INFOCON readiness measures.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Virus and network attack symptoms</li>
                 <li>Classified Message Incident response</li>
@@ -715,7 +731,7 @@
                 <li>INFOCON readiness levels</li>
                 <li>Cybersecurity points of contact</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who should protect a computer during a CMI?</h3>
             <blockquote>The person protecting the computer should be cleared to the level of the message. (paragraph 5)</blockquote>
             <h3>What should be verified after a custom computer scan?</h3>

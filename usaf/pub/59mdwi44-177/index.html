@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers documenting patients’ past and present medical history and pertinent medical and breast health information for mammographic examinations. It requires the form to be maintained in the patient’s Mammography folder or scanned into PACS, with specified destruction and recordkeeping provisions.</p>
             <p><strong>Applies to:</strong> This instruction applies to all personnel assigned, attached or under contract to the 59th Medical Wing.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Mammography patient questionnaire</li>
                 <li>Medical history</li>
@@ -727,7 +743,7 @@
                 <li>Picture Archival Communication System</li>
                 <li>Forms submission</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is 59 MDW Form 4001 used to document?</h3>
             <blockquote>Patients, mammography technologists, and providers use 59 MDW Form 4001 to document pertinent medical and breast health information to use during the Mammographic examination. (paragraph 2)</blockquote>
             <h3>Where must 59 MDW Form 4001 be maintained?</h3>

@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -713,7 +729,7 @@
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1008963">View TC 3-09.8 on armypubs.army.mil</a></p>
             <hr>
             <p>It covers the Field Artillery Home Station Training Strategy, unit training plans, collective training proficiency, technical content, and online content. It requires certification and qualification evaluations to be conducted by a certified evaluator appointed by the appropriate commander, and identifies conditions, performance measures, and GO or NO-GO grading.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Field Artillery Home Station Training Strategy</li>
                 <li>Certification and qualification</li>
@@ -724,7 +740,7 @@
                 <li>Fire support</li>
                 <li>Online training content</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does TC 3-09.8 provide for Field Artillery units?</h3>
             <blockquote>TC 3-09.8 supports the mission of the Field Artillery by providing the means to certify and qualify Field Artillery Individuals, Teams, Crews, Sections, Platoons, Batteries and Battalions. (paragraph 1-6)</blockquote>
             <h3>What is the maximum artillery fire response time standard?</h3>

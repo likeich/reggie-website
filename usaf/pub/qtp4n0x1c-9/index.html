@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/af_sg/publication/qtp4n0x1c-9/qtp4n0x1c-9.pdf">View QTP4N0X1C-9 on armypubs.army.mil</a></p>
             <hr>
             <p>It contains a module on airway management covering cricothyroidotomy, advanced airway management, needle thoracentesis, and advanced foreign body removal. It requires performance checklists, documented task completion, and re-evaluation when objectives are not met.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Airway management</li>
                 <li>Cricothyroidotomy</li>
@@ -725,7 +741,7 @@
                 <li>Advanced foreign body removal</li>
                 <li>Third-party certification</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What are the minimum mandatory skills for all 4N0X1 personnel?</h3>
             <blockquote>Core task items are identified with the number “5” on the STS Column 2; these items are the minimum mandatory skills which are required for all 4N0X1 personnel to be proficient in performing. (paragraph 2)</blockquote>
             <h3>What checklist must be used during task evaluation?</h3>

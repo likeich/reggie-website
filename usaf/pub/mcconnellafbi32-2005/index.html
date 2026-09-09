@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>It establishes firefighting agent delivery requirements, aircraft rescue fire fighting vehicle capabilities, and emergency response levels for KC-135 and KC-46 aircraft. It addresses staffing factors, interim measures when service levels decline, and notifications about degraded or restored firefighting capability.</p>
             <p><strong>Applies to:</strong> This publication does not apply to Air National Guard (ANG) and the Air Force Reserve Command (AFRC) and their units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Firefighting agent delivery requirements</li>
                 <li>Aircraft rescue fire fighting vehicles</li>
@@ -722,7 +738,7 @@
                 <li>Interim staffing measures</li>
                 <li>Firefighting capability notifications</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How much firefighting agent is required for a KC-135 or KC-46 aircraft incident?</h3>
             <blockquote>Applying this standard to McConnell AFB, the required agent delivery for a KC-135/KC-46 is 7,780 gallons of agent to an aircraft incident occurring on the runways and overruns. (paragraph 1)</blockquote>
             <h3>How much ARFF agent is available at McConnell?</h3>

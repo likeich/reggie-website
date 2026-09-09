@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It establishes software management roles, certification and approval requirements, and thresholds for locally developed applications. It also covers COTS-based development, coordination, server access requests, infrastructure safeguards, and user documentation.</p>
             <p><strong>Applies to:</strong> It applies to software developed for unique 46 TW purposes (other than software internal to a weapon system; see AFPD 63-1).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Software application management</li>
                 <li>Certification and accreditation</li>
@@ -727,7 +743,7 @@
                 <li>Network infrastructure considerations</li>
                 <li>User’s guides</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When may TW organizations develop local computer application software?</h3>
             <blockquote>Develop local computer application software only when quality, cost, performance, schedule, or interoperability requirements cannot be met with Commercial Off-The-Shelf (COTS) or Government Off-The-Shelf (GOTS) software. (paragraph 2)</blockquote>
             <h3>What is required before developing software requiring more than six man-months or $50,000?</h3>

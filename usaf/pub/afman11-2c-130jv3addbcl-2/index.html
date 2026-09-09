@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>AFMAN11-2C-130JV3ADDBCL-2 covers normal and emergency MAFFS procedures, including pre-flight, servicing, drop, landing, de-servicing, and de-arming checklists. It requires MAFFS checklist items to be accomplished and specifies loadmaster callouts for compressor settings and hydraulic pressure.</p>
             <p><strong>Applies to:</strong> All MAFFS certified C-130J loadmasters will carry this annex.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>MAFFS pre-flight checklists</li>
                 <li>Electrical pre-flight checks</li>
@@ -728,7 +744,7 @@
                 <li>Emergency drops</li>
                 <li>Emergency shutdowns</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When are MAFFS checklist items accomplished?</h3>
             <blockquote>Items on the MAFFS BEFORE TAKEOFF, AFTER TAKEOFF, BEFORE LANDING, and AFTER LANDING CHECKLISTS will be accomplished following completion of the normal checklist items from T.O. 1C-130J-1CL-2.</blockquote>
             <h3>When are the CL-2 checklists complete for MAFFS missions?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1024699">View TC 3-04.11 on armypubs.army.mil</a></p>
             <hr>
             <p>TC 3-04.11 covers doctrinal, individual, collective, and academic aviation training, plus aviation standardization procedures. It requires training, qualification, evaluation, readiness progression, currency, certification, and flight-record management.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Aircrew training programs</li>
                 <li>Collective training simulations</li>
@@ -729,7 +745,7 @@
                 <li>Flight training records</li>
                 <li>Commanders task lists</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must aircrew members do before performing new or changed tasks on their own?</h3>
             <blockquote>When specific guidance is given, all aircrew members (ACMs) must receive training and/or evaluation on new or changed tasks before accomplishing them on their own. (paragraph 1-13)</blockquote>
             <h3>What are commanders required to do for training management?</h3>

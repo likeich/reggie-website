@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -711,7 +727,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/afrc/publication/dafman13-204v4_afrcsup/dafman13-204v4_afrcsup.pdf">View DAFMAN13-204V4_AFRCSUP on armypubs.army.mil</a></p>
             <hr>
             <p>It covers general operations, contingency locations, disaster mitigation, contracted airfields, foreign locations, and waivers. The AFRC supplement establishes requirements for quality assurance, 1C8X3 training, work center roles, and equipment certification.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Radar, Airfield, and Weather Systems</li>
                 <li>Contingency locations</li>
@@ -722,7 +738,7 @@
                 <li>1C8X3 training</li>
                 <li>Equipment certification</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What major changes does DAFMAN13-204V4_AFRCSUP make for AFRC equipment?</h3>
             <blockquote>Major changes include: (1) Quality Assurance (QA) Evaluator position and duty requirements clarification, (2) 1C8X3 training program standardization, (3) updated references and terminologies, (4) clarification of MAJCOM and work center roles/responsibilities, and (5) AFRC equipment certification requirements.</blockquote>
             <h3>How are waiver authorities identified for wing or unit requirements?</h3>

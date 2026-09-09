@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1021901">View TC 3-22.69 on armypubs.army.mil</a></p>
             <hr>
             <p>TC 3-22.69 covers the five senses, human behavior, signs left behind by people, cultural context, threat tactics, and cognitive processes. Its eight-step training model includes issuing an operation order, rehearsing, conducting an after-action review, and retraining until the standard is achieved.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Advanced situational awareness</li>
                 <li>Observation techniques</li>
@@ -729,7 +745,7 @@
                 <li>Threat analysis</li>
                 <li>Eight-step training model</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How does TC 3-22.69 describe the autonomic nervous system?</h3>
             <blockquote>The autonomic nervous system is also called the involuntary nervous system due to the role it serves in the subconscious control of functions. (paragraph 6-12)</blockquote>
             <h3>What happens when the sympathetic nervous system is activated?</h3>

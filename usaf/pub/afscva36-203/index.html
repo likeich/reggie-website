@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It addresses affirmative employment, temporary and competitive promotions, USAJOBS applications, resumes, appraisal factors, and 120-day registers. It requires selection based solely on job-related criteria and permits noncompetitive temporary promotions for up to 120 days within a 12-month period.</p>
             <p><strong>Applies to:</strong> The merit promotion principles apply to all employees and the factors that compose the promotion process are described below.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Merit promotion principles</li>
                 <li>Affirmative employment</li>
@@ -726,7 +742,7 @@
                 <li>USAJOBS applications</li>
                 <li>120-day registers</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What factors must be used to identify, evaluate, and select merit promotion candidates?</h3>
             <blockquote>The underlying principle of the Merit Promotion Program is the identification, qualification evaluation, and selection of candidates made without regard to lawful political affiliation race, color, religion, sex (including pregnancy, sexual orientation, and gender identity), national origin, age, disability, genetic information, marital status, prior EO activity, or any other non-merit factors prohibited by statute, regulation, or Executive Order, and shall be based solely on job-related criteria in accordance with legitimate position requirements.</blockquote>
             <h3>What recruitment program must Air Force actions follow when filling positions?</h3>

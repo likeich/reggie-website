@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication contains driver training and testing criteria, certification codes, operating procedures, radio frequency requirements, and runway sign rules. It requires annual refresher training and addresses vehicle access, airfield restrictions, color vision screening, and unit inspections.</p>
             <p><strong>Applies to:</strong> The contents of this instruction apply to all military and civilian personnel conducting ground vehicular traffic operations on the airfield at JB Charleston and North Auxiliary Airfield (NAAF) to include Air National Guard and Air Force Reserve.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Airfield driver training</li>
                 <li>Driver testing requirements</li>
@@ -727,7 +743,7 @@
                 <li>Mandatory signs</li>
                 <li>Color vision screening</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What happens when annual refresher training is not completed before an airfield driving license expires?</h3>
             <blockquote>Personnel who do not complete annual refresher training by the date their license expires will have their airfield driving privileges suspended until the training is complete. (paragraph 13-213)</blockquote>
             <h3>What happens if annual refresher training is not completed within 90 days after a license expires?</h3>

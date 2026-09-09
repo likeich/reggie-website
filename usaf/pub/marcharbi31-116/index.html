@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It addresses vehicle administration, driver licensing, traffic violations, rules of the road, parking, towing, impoundment, and motorcycle and off-highway vehicle operation. It establishes mandatory actions for traffic privileges, point assessments, revocations, and Incident Reports.</p>
             <p><strong>Applies to:</strong> This instruction applies to all land areas under the jurisdiction of the MARB Installation Commander (452 AMW/CC) and applies to all individuals at all levels—both military and civilian—who require access to or operate a vehicle on MARB, including Air Force Reserve and Air National Guard (ANG) personnel.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Driver licensing</li>
                 <li>Implied consent</li>
@@ -728,7 +744,7 @@
                 <li>Towing and impoundment of POVs</li>
                 <li>Motorcycle and off-highway vehicle operation</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How are points assessed for multiple violations committed on one occasion?</h3>
             <blockquote>When two or more violations are committed on a single occasion, points will be assessed for each violation. (paragraph 7)</blockquote>
             <h3>Are points assessed for revocation or suspension actions?</h3>

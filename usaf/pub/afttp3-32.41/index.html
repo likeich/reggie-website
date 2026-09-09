@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It provides Air Force Civil Engineer Fire and Emergency Services personnel with preparation information for contingency and expeditionary firefighting. Its checklists address facility spacing, inspection conditions, fire protection equipment, storage practices, and fire reporting arrangements.</p>
             <p><strong>Applies to:</strong> This publication applies to all civilian and military members of the Air and Space Force, Air National Guard, and Air Force Reserve Command F&amp;ES units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Tent city layouts</li>
                 <li>Tent city fire inspections</li>
@@ -726,7 +742,7 @@
                 <li>Munitions storage areas</li>
                 <li>Fire prevention practices</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What lighting limit applies inside tents?</h3>
             <blockquote>Ensure max 60-watt light bulbs in tent lighting to prevent pyrolysis of tent material and possible fire. (paragraph 3)</blockquote>
             <h3>How far from tents should burner refueling take place in field kitchens?</h3>

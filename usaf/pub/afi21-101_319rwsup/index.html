@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It assigns responsibilities for CDDAR coordination, aircraft incident response, recovery resources, and emergency communications. It requires designated CDDAR leadership, recall procedures, equipment checks, qualified personnel, and protective equipment for composite-material recovery.</p>
             <p><strong>Applies to:</strong> This supplement applies to all 319th Reconnaissance Wing personnel who perform aircraft or equipment maintenance, and personnel who work in the flight line area or respond to aircraft incidents, including all subordinate forward operating locations.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>CDDAR coordination</li>
                 <li>Aircraft incident response</li>
@@ -726,7 +742,7 @@
                 <li>Recovery equipment support</li>
                 <li>Core-hours and after-hours support</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who coordinates and approves on-base and off-base recovery actions?</h3>
             <blockquote>319 RW/CC will coordinate and approve on-/off-base recovery actions, IAWGFAFB IEMP 10- 2.</blockquote>
             <h3>What information must the Command Post provide when a CDDAR response is required?</h3>

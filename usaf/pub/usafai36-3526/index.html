@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/usafa/publication/usafai36-3526/usafai36-3526.pdf">View USAFAI36-3526 on armypubs.army.mil</a></p>
             <hr>
             <p>It describes the USAFA COI Handbook, Academy Programs, registration practices, recurring experiences, and governance bodies. It requires coordination and approval for education, training, and experience changes, including graduation requirements and resource expansions.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>USAFA Course of Instruction Handbook</li>
                 <li>Academy Programs</li>
@@ -727,7 +743,7 @@
                 <li>Graduation requirements</li>
                 <li>Governing boards</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does the USAFA COI Handbook include?</h3>
             <blockquote>The USAFA COI Handbook includes all scheduled courses, summer programs, military education and training, and other recurring developmental programs and experiences that purposefully develop cadets as leaders of character. (paragraph 6)</blockquote>
             <h3>Where are registration requirements and deadlines described?</h3>

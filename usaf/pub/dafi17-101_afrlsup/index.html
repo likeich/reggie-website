@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The supplement addresses authorization officials, security control assessment, information system ownership, cybersecurity management, and working groups. It requires designated appointments, documentation, software certification, and use of AFRL cybersecurity systems or DAF eMASS for specified submissions and RMF activities.</p>
             <p><strong>Applies to:</strong> This supplement applies to all AFRL military, civilian and contractor support personnel in accordance with (IAW) appropriate provisions contained in binding support agreements and AFRL contracts.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Risk Management Framework implementation</li>
                 <li>Information system authorization</li>
@@ -727,7 +743,7 @@
                 <li>DAF eMASS transition</li>
                 <li>Information system ownership</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who can make authorization decisions within the DAF S&amp;T AO Boundary?</h3>
             <blockquote>The DAF Science &amp;Technology (S&amp;T) AO is the Official with the authority to make authorization decision(s) (e.g., Authorization to Operate (ATO), Denial of Authorization to Operate (DATO), Interim Authorization to Test (IATT)) within the DAF S&amp;T AO Boundary.</blockquote>
             <h3>Who must AFRL Mission Organizations appoint as Information System Owner?</h3>

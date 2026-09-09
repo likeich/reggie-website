@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <hr>
             <p>It covers internal and external recognitions, Auxiliary and department-level awards, gifts, nomination packets, selection panels, and award presentations. It requires Sponsors to maintain programs and update eligibility requirements, processes, and procedures when needed.</p>
             <p><strong>Applies to:</strong> All Coast Guard unit commanders, commanding officers, officers-in-charge, deputy/assistant commandants, and chiefs of headquarter directorates must comply with the policies contained.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Coast Guard recognition programs</li>
                 <li>Internal and external recognitions</li>
@@ -729,7 +745,7 @@
                 <li>Engineering recognition awards</li>
                 <li>Gunnery awards</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who must approve a new Coast Guard recognition program?</h3>
             <blockquote>All Recognition Programs must be reviewed and approved by the Commandant (CCG). (paragraph 1-2)</blockquote>
             <h3>What must Sponsors do when accepting an award or gift from a nonfederal source?</h3>

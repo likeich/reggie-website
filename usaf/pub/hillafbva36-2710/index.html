@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It addresses military and civilian equal opportunity processes, protected groups, reporting, and complaint deadlines. It requires personnel to avoid participating in or tolerating unlawful discrimination and establishes filing timelines for civilian and active duty complaints.</p>
             <p><strong>Applies to:</strong> Active duty military personnel, their dependents, and military retirees shall be protected from unlawful discrimination and harassment (including hazing and bullying) based on race, color, national origin, religion, sex (to include sexual harassment), and sexual orientation.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Unlawful discrimination</li>
                 <li>Sexual harassment</li>
@@ -727,7 +743,7 @@
                 <li>Complaint filing deadlines</li>
                 <li>Reprisal and retaliation</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does zero-tolerance mean under HILLAFBVA36-2710?</h3>
             <blockquote>Equal Opportunity is a DoD and USAF mandate, and 75 ABW leadership is committed to anti-discrimination policy based on zero-tolerance, meaning personnel should not tolerate any type of unlawful discrimination and have the right to report violations without fear of reprisal. (paragraph 2)</blockquote>
             <h3>What must personnel do about discriminatory behavior?</h3>

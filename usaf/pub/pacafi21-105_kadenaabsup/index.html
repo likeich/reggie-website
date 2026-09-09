@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication covers aircraft metals technology, nondestructive inspection, structural maintenance, and corrosion control. It requires compliance with prescribed procedures and records management requirements, and defines local program responsibilities.</p>
             <p><strong>Applies to:</strong> It applies to all assigned, attached or associated units of the 18th Wing (18 WG), Kadena AB, Japan that maintain aircraft, aircraft systems, equipment, support equipment, components, and access the flightline area regardless of Air Force Specialty Code (AFSC).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Aircraft metals technology</li>
                 <li>Additive manufacturing</li>
@@ -727,7 +743,7 @@
                 <li>Paint enhancement</li>
                 <li>Aircraft markings</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who receives waivers for T-2 or non-tiered compliance items?</h3>
             <blockquote>Waivers for T-2 or non-tiered compliance items will be sent to PACAF/A4M, pacaf.a4mv3@us.af.mil.</blockquote>
             <h3>How must records generated under the publication be handled?</h3>

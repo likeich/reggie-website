@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>CFETP2T0X1 covers specialty duties, competencies, career progression, training decisions, and implementation. It identifies mandatory courses, task qualification requirements, and documentation requirements for training and skill-level upgrades.</p>
             <p><strong>Applies to:</strong> This plan outlines the training requirements individuals within the Traffic Management AFS should receive to develop and progress throughout their careers.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Traffic management operations</li>
                 <li>Cargo movement</li>
@@ -728,7 +744,7 @@
                 <li>Competency-based training</li>
                 <li>On-the-job training certification</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What mandatory training must individuals complete for upgrade training?</h3>
             <blockquote>Unit Education and Training Managers and supervisors must ensure each individual completes the mandatory training requirements (including MAJCOM supplemental requirements) for the upgrade training specified in this plan. (paragraph 2)</blockquote>
             <h3>How is five-level upgrade training completed?</h3>

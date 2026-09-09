@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/13af/publication/13afmd1/13afmd1.pdf">View 13AFMD1 on armypubs.army.mil</a></p>
             <hr>
             <p>It defines engagement with Japanese, U.S., and Government of Japan organizations and administrative control of the Air Defense Liaison Element. It assigns duties involving intelligence, exercises, contingency planning, communications, air operations, and liaison activities.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Japan bilateral operations</li>
                 <li>Air Defense Liaison Element</li>
@@ -726,7 +742,7 @@
                 <li>Aviation training relocation</li>
                 <li>Air Defense Identification Zone liaison</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What organizations does Detachment 1 engage with on operational-level Component-Numbered Air Force issues?</h3>
             <blockquote>On behalf of the Commander, Thirteenth Air Force, engage with the Japan Air Self-Defense Force (JASDF), US Forces, Japan (USFJ), 5 AF and other US and GOJ organizations in Japan regarding operational-level Component-Numbered Air Force (C-NAF) issues in A2, A3, A4, A5, A6 and Air and Space Operations Center (AOC) areas and provide Administrative Control (ADCON) of the Air Defense Liaison Element (613 AOC/OL-A). (paragraph 1)</blockquote>
             <h3>What is Detachment 1 responsible for when its expertise does not exist?</h3>

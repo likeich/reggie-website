@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/ramsteinab/publication/ramsteinabi51-901/ramsteinabi51-901.pdf">View RAMSTEINABI51-901 on armypubs.army.mil</a></p>
             <hr>
             <p>RAMSTEINABI51-901 defines covered family members, civilians, sponsors, and misconduct, and addresses employment-related protections. It sets procedures for reporting, sanction determination, notification, barment actions, and appeals.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Civilian and family member misconduct</li>
                 <li>Employment-driven special provisions</li>
@@ -726,7 +742,7 @@
                 <li>Sanction appeals</li>
                 <li>Kaiserslautern Military Community jurisdiction</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What employment protections apply before barring a civilian employee?</h3>
             <blockquote>Since both US and Local National employees are entitled to certain specific job protection rights, the installation commander and his designees must obtain the advice and assistance of the appropriate civilian personnel officer and staff judge advocate prior to taking any barment action against a civilian employee under this instruction.</blockquote>
             <h3>What behavior is defined as civilian and family member misconduct?</h3>

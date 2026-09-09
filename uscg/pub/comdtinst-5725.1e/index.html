@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <hr>
             <p>The publication addresses the Board’s membership, submissions, convening procedures, policy reviews, and reporting. It requires annual proceedings, defined membership terms, policy submissions, quarterly summaries, and an annual report.</p>
             <p><strong>Applies to:</strong> All Coast Guard unit commanders, commanding officers, officers-in-charge, deputy/assistant commandants, and chief of headquarter directorates must comply with the policies contained.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Coast Guard Reserve Policy Board</li>
                 <li>Strategic Reserve policy matters</li>
@@ -727,7 +743,7 @@
                 <li>Board convening and proceedings</li>
                 <li>Quarterly summaries and annual reports</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What matters can the Coast Guard Reserve Policy Board review?</h3>
             <blockquote>The CG RPB will only review matters of a strategic nature and must consider, recommend, and report on referred policy matters to CCG. (paragraph 1)</blockquote>
             <h3>Who must comply with COMDTINST 5725.1E?</h3>

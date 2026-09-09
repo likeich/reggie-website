@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers central lodging eligibility, reservations, payment procedures, and lodging policy for training tours. It requires eligible personnel to use designated lodging and establishes procedures for reimbursement, cancellations, and no-show violations.</p>
             <p><strong>Applies to:</strong> It applies only to Air Force Reserve Command (AFRC) members assigned to units within the 927 ARW physically located at MacDill Air Force Base (AFB), Florida.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Central funding eligibility</li>
                 <li>UTA lodging reservations</li>
@@ -726,7 +742,7 @@
                 <li>Lodging payment procedures</li>
                 <li>No-show violations</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who is eligible for centrally funded lodging during inactive duty training at MacDill AFB?</h3>
             <blockquote>927 ARW personnel living outside the established commuting distance are eligible for lodging at the expense of the 927 ARW when performing inactive duty training at MacDill AFB. (paragraph 2)</blockquote>
             <h3>Is on-base lodging required for centrally funded UTA lodging?</h3>

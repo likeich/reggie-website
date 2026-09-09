@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>ATP 6-02.75 addresses cryptographic net planning, signal operating instructions, loadset management, key distribution, accounting, and controlled cryptographic items. It states that communications security account managers and other personnel involved in planning, management, and communications security accounting adhere to the policies and procedures in AR 380-40 and TB 380-41.</p>
             <p><strong>Applies to:</strong> ATP 6-02.75 applies to the Active Army, Army National Guard/Army National Guard of the United States, United States Army Reserve unless otherwise stated.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Communications security planning</li>
                 <li>Cryptographic net planning</li>
@@ -730,7 +746,7 @@
                 <li>Controlled cryptographic items</li>
                 <li>Two-person integrity</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What training must primary and alternate account managers complete?</h3>
             <blockquote>The primary and alternate account managers must complete the COMSEC account manager course and the management client course before their appointment. (paragraph 1-33)</blockquote>
             <h3>What certification and clearance does a client platform administrator need?</h3>

@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -711,14 +727,14 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1000941">View AR 220-90 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/pam-220-90/">PAM 220-90</a></li>
             </ul>
             <hr>
             <p>AR 220-90 covers Army Music missions, command, unit structure, stationing, performances, personnel, training, evaluations, reporting, equipment, and facilities. It requires standards for performance requests, ceremonial music, proficiency assessments, training evaluations, musical instruments, and facilities.</p>
             <p><strong>Applies to:</strong> This regulation prescribes policy and assigns responsibilities within the Army Bands Career Program (ABCP) for all Army Music performance units (MPUs), musical activities, and musicians of the Active Army (AA), the Army National Guard (ARNG), and the U.S. Army Reserve (USAR).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Army Music missions</li>
                 <li>Music performance requests</li>
@@ -728,7 +744,7 @@
                 <li>Musical instruments</li>
                 <li>Army Music facilities</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What missions must Army Music performance units support?</h3>
             <blockquote>Army MPUs provide music throughout unified land operations to instill in our forces the will to fight and win, to foster the support of our citizens, and to promote our national interests at home and abroad. (paragraph 5)</blockquote>
             <h3>Who commands an Army Music performance unit?</h3>

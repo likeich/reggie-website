@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>PRSCI32-7001 covers administrative, procedural, and regulatory measures for controlling human access to and use of property. It addresses environmental restoration sites, contaminated soil and groundwater, excavations, wells, land uses, monitoring, and compliance reporting.</p>
             <p><strong>Applies to:</strong> It applies to all military and civilian organizations that occupy facilities or conduct activities on any PRSC installations.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Land use controls</li>
                 <li>Environmental restoration sites</li>
@@ -726,7 +742,7 @@
                 <li>Land use control compliance</li>
                 <li>Monitoring and compliance reports</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What are land use controls used for?</h3>
             <blockquote>Land use controls are supplementary to engineering controls for short-term and longterm management to prevent or limit human and environmental exposure to hazardous substances, pollutants, or contaminants. (paragraph 1)</blockquote>
             <h3>When must land use controls be in place?</h3>

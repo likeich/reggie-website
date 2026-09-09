@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/saf_aq/publication/dafi60-101/dafi60-101.pdf">View DAFI60-101 on armypubs.army.mil</a></p>
             <hr>
             <p>DAFI60-101 covers standardization councils, offices, activities, roles, waiver and reinstatement procedures, new standards, and international participants. It requires field activities to submit implementing publications for review before publishing and identifies tiered waiver authorities.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Defense Standardization Program management structure</li>
                 <li>Standardization councils and offices</li>
@@ -725,7 +741,7 @@
                 <li>Standardization management activities</li>
                 <li>International military standardization participants</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How must field activities handle implementing publications?</h3>
             <blockquote>Field activities must send implementing publications to the higher headquarters functional Office of Primary Responsibility for review and coordination before publishing.</blockquote>
             <h3>How are records created under DAFI60-101 maintained and disposed of?</h3>

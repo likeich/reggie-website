@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -707,7 +723,7 @@
             <hr>
             <p>The publication addresses integrated and interoperable architectures, discoverable architecture data, and interoperability for Air Force IT and NSS systems and services. It also establishes AETC guidance for documenting system interfaces, data sharing, and integration of command information systems and data platforms.</p>
             <p><strong>Applies to:</strong> It applies to owners and managers of AETC information systems, along with individuals at all levels who prepare, manage, review, certify and/or use system or solution-level architectures.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Integrated Air Force architectures</li>
                 <li>Architecture data discoverability</li>
@@ -716,7 +732,7 @@
                 <li>AETC data sharing and integration</li>
                 <li>AETC Chief Data Officer support</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must be done with records created under AFI17-140_AETCSUP?</h3>
             <blockquote>Ensure that all records created as a result of processes prescribed in this publication are maintained in accordance with AFMAN 33-363, Management of Records, and disposed of in accordance with Air Force Records Disposition Schedule in the Air Force Records Information Management System (AFRIMS).</blockquote>
             <h3>Who is the waiver authority for the AETC supplement?</h3>

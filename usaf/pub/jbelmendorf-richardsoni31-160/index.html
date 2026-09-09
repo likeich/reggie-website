@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication addresses disease prevention, humane animal care, responsible ownership, prohibited animals, housing limits, and animal removal. It requires compliance with pet-control procedures and establishes authorities for quarantine and debarment.</p>
             <p><strong>Applies to:</strong> These procedures and operations are directive in nature and apply to all personnel assigned to JBER and their guests.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Disease prevention</li>
                 <li>Humane care and use of animals</li>
@@ -726,7 +742,7 @@
                 <li>Rabies quarantine</li>
                 <li>Animal debarment</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How many household pets are allowed in privatized housing on JBER?</h3>
             <blockquote>Privatized housing occupants are limited to two household pets, which must be under control at all times. (paragraph 1)</blockquote>
             <h3>What pets are allowed in JBER dormitories?</h3>

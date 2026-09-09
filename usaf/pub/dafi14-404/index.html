@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/af_a2_6/publication/dafi14-404/dafi14-404.pdf">View DAFI14-404 on armypubs.army.mil</a></p>
             <hr>
             <p>It assigns intelligence oversight roles, establishes reporting procedures, and provides guidance on privacy, civil liberties, prior approval, and domestic imagery. The publication contains 99 tiered compliance statements, including 53 T-0, 34 T-1, and 12 T-2 statements.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Intelligence oversight reporting</li>
                 <li>Privacy and civil liberties</li>
@@ -726,7 +742,7 @@
                 <li>Manned weapon systems activities</li>
                 <li>Intelligence oversight approval authorities</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What protections for U.S. persons does DAFI14-404 require during intelligence activities?</h3>
             <blockquote>DoDM 5240.01 and DoDD 5240.1-R, Procedures Governing Activities of DoD Intelligence Components That Affect United States Persons, establish procedures to enable DoD to conduct authorized intelligence activities in a manner that protects the privacy and civil liberties of U.S. persons. (paragraph 5)</blockquote>
             <h3>When is Defense Intelligence Component Head approval required?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It contains specialty descriptions, career progression information, training decisions, skill-level requirements, and education and certification opportunities. It requires mandatory initial, upgrade, qualification, advanced, and proficiency training, and identifies available training courses and delivery methods.</p>
             <p><strong>Applies to:</strong> This plan outlines the training that individuals in AFSC 2A6X6 should receive to develop and progress throughout their career.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Aircraft Electrical and Environmental Systems</li>
                 <li>Skill-level progression</li>
@@ -727,7 +743,7 @@
                 <li>CCAF degree requirements</li>
                 <li>Wartime training requirements</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How many parts does CFETP2A6X6 have, and how are they used?</h3>
             <blockquote>The CFETP consists of two parts. Supervisors will use both parts to plan, manage, and control training. (paragraph 9)</blockquote>
             <h3>What training must each member complete under CFETP2A6X6?</h3>

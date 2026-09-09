@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>It provides information, guidance, and procedures for funding official ceremonies and social events at Marine Corps Birthday Balls. It distinguishes appropriated-fund support for official ceremonies from ticket sales, donations, fundraising, and available nonappropriated funds for social events.</p>
             <p><strong>Applies to:</strong> This Order applies to all Birthday Balls (Command, Officer, Officer/Staff Noncommissioned Officer (SNCO) and Enlisted Marine Balls), except for the Headquarters, Marine Corps (HQMC) Ball.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Marine Corps Birthday Ball funding</li>
                 <li>Official ceremony expenses</li>
@@ -728,7 +744,7 @@
                 <li>Nonappropriated funds</li>
                 <li>Guest of Honor expenses</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Can appropriated funds support the official Birthday Ball ceremony?</h3>
             <blockquote>The official ceremony may be supported with appropriated funds (APF) subject to guidance in this Order. (paragraph 4)</blockquote>
             <h3>How may the social event at a Marine Corps Birthday Ball be funded?</h3>

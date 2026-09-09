@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>The publication covers local airfield familiarization, vehicle operator requirements, runway incursion prevention, escort procedures, testing, and AF Form 483 authorization. It requires training, practical check rides, communication with the Air Traffic Control Tower, and compliance with specified attachments.</p>
             <p><strong>Applies to:</strong> The requirements set forth in this supplement applies to agencies and personnel assigned, attached or on temporary duty to VSFB, including DoD military, civil service, contractors and vendors.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Airfield driver licensing</li>
                 <li>Runway incursion prevention</li>
@@ -723,7 +739,7 @@
                 <li>Vehicle operator requirements</li>
                 <li>AF Form 483 authorization</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Which airfield driving attachments are mandatory?</h3>
             <blockquote>Compliance with the Attachments 2, 3, 4, 5, 6, 7, 8 and 9 in this instruction is mandatory.</blockquote>
             <h3>What practical airfield familiarization is required?</h3>

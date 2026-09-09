@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -707,7 +723,7 @@
             <hr>
             <p>It defines the roles of the 5 AF Security Review and Appeals Board and local security review boards, including their review and recommendation functions. It establishes security-risk criteria and requirements for case evaluation, interim controls, suspension action, legal review, and case files.</p>
             <p><strong>Applies to:</strong> It applies to all organizations serviced by the 5 AF Manpower, Personnel and Services (5 AF/A1) or an Army and Air Force Exchange Service (AAFES) Human Resources Office (HRO) in Japan using MLC or IHA employees.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Security-risk criteria</li>
                 <li>Security Review and Appeals Board</li>
@@ -716,7 +732,7 @@
                 <li>Interim control measures</li>
                 <li>Emergency suspension action</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must a local SRB do when it receives evidence of a security risk?</h3>
             <blockquote>Whenever a local SRB receives from base Security Forces or AF Office of Special Investigations evidence indicating that any of the criteria in paragraph 3 applies to an MLC or IHA employee, the SRB chairperson will convene the members for an immediate review and evaluation of the case. (paragraph 4)</blockquote>
             <h3>When can emergency suspension action be taken?</h3>

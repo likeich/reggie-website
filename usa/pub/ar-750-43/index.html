@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,13 +732,13 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1028419">View AR 750-43 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/pam-750-43/">PAM 750-43</a></li>
             </ul>
             <hr>
             <p>It covers TMDE administration, acquisition, calibration and repair support, TPS policy and management, and related embedded diagnostic and prognostic data. The publication requires acquisition approval for TMDE and makes TPS and calibration support procedures mandatory.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>TMDE administration and policy</li>
                 <li>TMDE acquisition approval</li>
@@ -732,7 +748,7 @@
                 <li>Embedded diagnostics and prognostics</li>
                 <li>Interactive electronic technical manuals</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How early must TMDE acquisition requests be submitted?</h3>
             <blockquote>Weapon system developers and system managers will forward requests to the PD TMDE at least 90 days (120 days for ATE) prior to anticipate contractual or in-house commitment to procure the TMDE. (paragraph 4-3)</blockquote>
             <h3>What form is required for TMDE acquisition requests?</h3>

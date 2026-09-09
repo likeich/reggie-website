@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <hr>
             <p>The publication addresses command climate, crisis response, mental healthcare information, postvention, reporting, and training. It defines suicide-related behaviors and sets requirements for risk assessment, outpatient management, documentation, inpatient coordination, continuity of care, and community links.</p>
             <p><strong>Applies to:</strong> This Instruction applies to all Coast Guard active duty and reserve personnel and appropriated civilian and non-appropriated fund employees and their families. It also applies to other Uniformed Services members and their families while either serving with the Coast Guard or using Coast Guard facilities.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Suicide prevention</li>
                 <li>Suicide-related behaviors</li>
@@ -729,7 +745,7 @@
                 <li>Suicide risk assessment</li>
                 <li>Continuity of care</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What components make up the Coast Guard Suicide Prevention Program?</h3>
             <blockquote>The Coast Guard Suicide Prevention Program consists of seven components including Command Climate, Crisis Response, Limit on Command Access to Mental Healthcare Information, Notification and Hand-off in Criminal Investigations, Postvention, Reporting, and Training. (paragraph 7)</blockquote>
             <h3>What must a suicide risk assessment include in its documentation?</h3>

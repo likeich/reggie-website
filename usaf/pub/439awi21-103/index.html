@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It establishes processes for reviewing AFTO Form 781 documents, entering flight data, and verifying Aircraft Utilization Reports. It requires reconciliation, auditing, filing, and monthly reporting of flying-hour information.</p>
             <p><strong>Applies to:</strong> It applies to the 439th Maintenance Group (439 MXG), 337th Airlift Squadron (337 AS) and the 439th Operations Support Squadron (439 OSS).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Aircraft flying hours</li>
                 <li>AFTO Form 781 documents</li>
@@ -726,7 +742,7 @@
                 <li>Flying hour reconciliation</li>
                 <li>Aviation Resource Tool Enterprise Mission Information System</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who must provide the completed AFTO Form 781 after sortie generation?</h3>
             <blockquote>After the completion of each sortie generation, the aircraft commander will provide accurate and completed Air Force Technical Order (AFTO) Form 781, Arms Aircrew/Mission Flight Data Document to the de-briefer. (paragraph 1)</blockquote>
             <h3>What does the maintenance de-briefer do with AFTO Form 781 errors?</h3>

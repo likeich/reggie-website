@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It establishes recovery priorities involving personnel safety, airfield reopening, prevention of secondary damage, and mishap evidence preservation. It requires serviceable recovery equipment, documented inspections and training, and coordination among supporting organizations.</p>
             <p><strong>Applies to:</strong> This publication does not apply to Air Force Reserve Command units (AFRC) or Air National Guard (ANG).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Crashed aircraft recovery</li>
                 <li>Damaged aircraft recovery</li>
@@ -727,7 +743,7 @@
                 <li>Mishap evidence preservation</li>
                 <li>Recovery equipment inspections</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What takes precedence over the CDDAR program instruction during aircraft recovery?</h3>
             <blockquote>The CDDAR program instruction is procedural and will not take precedence over aircraft-specific technical data in recovery of crashed, damaged or disabled aircraft. (paragraph 1)</blockquote>
             <h3>How often must CDDAR recovery equipment be inspected if no technical order interval exists?</h3>

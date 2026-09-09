@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,13 +732,13 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1029922">View PAM 5-11 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/ar-5-11/">AR 5-11</a></li>
             </ul>
             <hr>
             <p>PAM 5-11 addresses capability gaps, M&amp;S communities, governance bodies, standards, awards, configuration management, and data quality metadata. It requires periodic assessments, annual forums, repository reviews, and completion of the four core verification, validation, and accreditation documents.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Army Modeling and Simulation Enterprise</li>
                 <li>Modeling and simulation reuse</li>
@@ -732,7 +748,7 @@
                 <li>Army M&amp;S Awards program</li>
                 <li>Data quality metadata</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What are the goals of the Army M&amp;S Enterprise approach?</h3>
             <blockquote>The goals of the enterprise approach are identifying and mitigating enterprise-level capability gaps, minimizing redundancy, and promoting reuse. (paragraph 2-2)</blockquote>
             <h3>How often must organizations review their Army M&amp;S Repository data?</h3>

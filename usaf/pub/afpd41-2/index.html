@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers inpatient and outpatient services, health records, medical planning, resource allocation, information systems, contingency readiness, logistics, and facility operations. It requires the Air Force to use resources efficiently, maintain internal controls, and support safe, quality healthcare.</p>
             <p><strong>Applies to:</strong> This publication applies to all military and civilian Air Force personnel, members of the Air Force Reserve Command and Air National Guard, and other individuals or organizations as required by binding agreement or obligation with the Department of the Air Force.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Inpatient and outpatient services</li>
                 <li>Health records</li>
@@ -727,7 +743,7 @@
                 <li>Medical facility operations</li>
                 <li>Internal controls</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must AFPD41-2 require for inpatient and outpatient services?</h3>
             <blockquote>Develop procedures for inpatient and outpatient services including establishing and maintaining an accurate, well-documented health record for every patient. (paragraph 2)</blockquote>
             <h3>How must medical resources and manpower be allocated?</h3>

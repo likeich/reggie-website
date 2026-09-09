@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,14 +732,14 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1000498">View ARMY DIR 2016-28 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/ar-40-400/">AR 40-400</a></li>
             </ul>
             <hr>
             <p>It addresses commander and healthcare provider access to VA disability rating data in MEDPROS and the Medical Operational Data System. It requires implementation plans, medical documentation, reporting of ratings and health changes, and medical review when warranted.</p>
             <p><strong>Applies to:</strong> This directive applies to all members of the Army National Guard/Army National Guard of the United States and the U.S. Army Reserve assigned to units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>VA disability rating information</li>
                 <li>MEDPROS data access</li>
@@ -733,7 +749,7 @@
                 <li>Medical documentation</li>
                 <li>Medical evaluation boards</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the purpose of commander visibility over VA disability ratings?</h3>
             <blockquote>Commanders must have visibility over potential duty-limiting conditions to ensure Soldier readiness and avoid potentially dangerous training or duty-related assignments. (paragraph 4)</blockquote>
             <h3>Who can view the percentage of disability awarded?</h3>

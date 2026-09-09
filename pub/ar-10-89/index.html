@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>AR 10-89 covers Civilian Human Resources program assessments, evaluations, strategic analyses, command support, and CPEA relationships. It requires internal controls to be evaluated at least once every 5 years and certification on DA Form 11 2.</p>
             <p><strong>Applies to:</strong> It also prescribes the responsibilities of all Army commands (ACOMs), Army service component commands (ASCCs), direct reporting units (DRUs), and other Army organizations that have Department of the Army Civilians.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Civilian Human Resources program assessments</li>
                 <li>Program management evaluations</li>
@@ -728,7 +744,7 @@
                 <li>CPEA information systems support</li>
                 <li>Internal control evaluation</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the mission of the CPEA?</h3>
             <blockquote>The mission of the CPEA is to conduct Armywide strategic assessments of CHR program management by using evaluations, quantitative analysis, surveys, and special reviews. (paragraph 2-1)</blockquote>
             <h3>What does a program management evaluation determine?</h3>

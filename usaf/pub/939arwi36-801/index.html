@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication defines alternative work schedule terms, sets a one-year Maxiflex test period, and identifies factors for evaluating its effects. It requires quarterly comments and establishes participation limits based on mission needs, workload, and organizational contacts.</p>
             <p><strong>Applies to:</strong> This instruction applies to all Air Reserve Technicians (ARTs) and civilian employees assigned to the 939th Air Refueling Wing, located at Portland IAP, OR. (See Paragraph 4.1. for exception.)</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Alternative Work Schedule Program</li>
                 <li>Maxiflex schedule participation</li>
@@ -726,7 +742,7 @@
                 <li>Core hours and flexible hours</li>
                 <li>Employee work requirements</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How long does the Maxiflex test program last?</h3>
             <blockquote>The information provided in this instruction initiates a new test program period beginning with the date of this instruction and ending one year later, unless otherwise extended by authority of the wing commander. (paragraph 2)</blockquote>
             <h3>When are comments about the Maxiflex test due?</h3>

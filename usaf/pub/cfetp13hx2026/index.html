@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -711,7 +727,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/af_a3/publication/cfetp13hx2026/cfetp3hx226.pdf">View CFETP13HX2026 on armypubs.army.mil</a></p>
             <hr>
             <p>CFETP13HX2026 identifies minimum education and training requirements, support resources, and continuation training for the 13HX career field. It includes student management, training documentation, upgrade progression, Gyro IPT II operations, hypobaric chamber operations, and APO 101 training standards.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Aerospace Physiology Officer training</li>
                 <li>13H career progression</li>
@@ -720,7 +736,7 @@
                 <li>APO 101 course training standards</li>
                 <li>Training documentation</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What documentation methods are required for Aerospace Physiology Officer training?</h3>
             <blockquote>Training documentation will be done in accordance with AFMAN 11-403, Chapter 6. Use Air Force approved digital training documentation methods, such as TBA 2.0, to the greatest extent possible. (paragraph 2)</blockquote>
             <h3>Who maintains and certifies the CFETP?</h3>

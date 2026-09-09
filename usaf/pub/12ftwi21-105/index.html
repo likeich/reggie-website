@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/12ftw/publication/12ftwi21-105/12ftwi21-105.pdf">View 12FTWI21-105 on armypubs.army.mil</a></p>
             <hr>
             <p>It assigns responsibilities for maintenance, quality assurance, operations, and FCF pilots. It establishes procedures for aircraft preparation, documentation, HST checks, pilot training, currency, and recertification.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>functional check flights</li>
                 <li>high-speed taxi checks</li>
@@ -725,7 +741,7 @@
                 <li>FCF pilot currency</li>
                 <li>FCF pilot recertification</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When are high-speed taxi checks used?</h3>
             <blockquote>HST checks may be utilized when maintenance operational checks require the aircraft to be taxied higher-than-normal taxi speeds. (paragraph 1)</blockquote>
             <h3>What aircraft can conduct high-speed taxi checks?</h3>

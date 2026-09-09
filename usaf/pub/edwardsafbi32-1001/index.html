@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication covers FM appointments, responsibilities, guidance, fire prevention, disasters, keys, space control, construction, energy, environmental matters, recycling, contracts, and work priorities. It requires designated FMs to manage facility conditions, coordinate requests and approvals, maintain records, and address emergency and maintenance risks.</p>
             <p><strong>Applies to:</strong> This instruction is designed to help Facility Managers (FMs) understand their role and to provide the guidance required to perform FM duties.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Facility Manager appointments</li>
                 <li>Facility maintenance requests</li>
@@ -728,7 +744,7 @@
                 <li>Environmental compliance</li>
                 <li>Work priorities</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who appoints primary and alternate Facility Managers for each building?</h3>
             <blockquote>Unit/Organizational commanders/civilian leaders will designate a primary and alternate FM for each building or facility assigned to the organization or agency. (paragraph 1)</blockquote>
             <h3>What training must newly appointed Facility Managers complete before submitting a service request?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,14 +732,14 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1024280">View PAM 350-32 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/ar-350-32/">AR 350-32</a></li>
             </ul>
             <hr>
             <p>PAM 350-32 covers Army readiness, administrative procedures, training support, funding, synchronization, and resource execution reporting. It describes four pillars for building and sustaining intelligence formation readiness in support of multidomain operations.</p>
             <p><strong>Applies to:</strong> Headquarters Department of the Army agencies and unit commanders should refer to this pamphlet to successfully execute the Army Foundry Intelligence Training Program.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Army Foundry Intelligence Training Program operations</li>
                 <li>Military Intelligence Training Standards</li>
@@ -732,7 +748,7 @@
                 <li>Training and resource execution reports</li>
                 <li>Funding guidelines</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who is the Army Foundry Intelligence Training Program available to?</h3>
             <blockquote>The Army Foundry Intelligence Training Program is available to MI Soldiers and DoD Civilians of all components. (paragraph 3-1)</blockquote>
             <h3>Which components receive Army Foundry Intelligence Training Program funds?</h3>

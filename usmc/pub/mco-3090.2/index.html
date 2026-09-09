@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>MCO 3090.2 defines an integrated process for MAGTF C2 capability development, acquisition, testing, certification, fielding, and training. It addresses stakeholder synchronization, interoperable systems, capability sets, and related data and information exchange.</p>
             <p><strong>Applies to:</strong> This Order is applicable to the Marine Corps Total -Force.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>MAGTF command and control integration</li>
                 <li>MAGTF C2 interoperability</li>
@@ -728,7 +744,7 @@
                 <li>MAGTF C2 training</li>
                 <li>Data and information exchange</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What process does MCO 3090.2 establish for MAGTF C2?</h3>
             <blockquote>The purpose of this Order is to define roles and responsibilities that will support a single integrated process for implementing MAGTF C2 with the Deputy Commandant for Combat Development and Integration (DC CD&amp;I) as the integrator through the force development process to better influence capability development, investment, acquisition, testing, fielding, and training. (paragraph 3)</blockquote>
             <h3>What systems are within the scope of MCO 3090.2?</h3>

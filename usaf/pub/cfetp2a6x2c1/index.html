@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It replaces Part I paragraph 20.2 with requirements for deployment, aircraft or system SEI, and CBRN TQT competencies. It also changes 3-level proficiency codes in Part II and requires the completed change to be filed in the CFETP.</p>
             <p><strong>Applies to:</strong> This change is effective immediately and affects all 2A6X2 career fields and CFETPs.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Deployment competencies</li>
                 <li>Aircraft maintenance functional MRA competencies</li>
@@ -726,7 +742,7 @@
                 <li>MOPP Four evaluation</li>
                 <li>3-level proficiency codes</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Which deployment competencies must maintenance technicians qualify on before deployment?</h3>
             <blockquote>Maintenance technicians should be qualified on all these competencies (as applicable per airframe) prior to deployment. (paragraph 2)</blockquote>
             <h3>What training do competencies marked with a tilde require?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>HOI35-1 defines DAF office responsibilities, civic leader roles and status, appointment expectations, communications, events, and travel. It requires compliance with the publication and establishes procedures for program execution.</p>
             <p><strong>Applies to:</strong> This instruction is applicable to all personnel at the DAF who are involved with the HQ DAF Civic Leader Program across the HAF staff.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>HQ DAF Civic Leader Program</li>
                 <li>Civic leader roles</li>
@@ -727,7 +743,7 @@
                 <li>Civic leader events</li>
                 <li>Invitational travel authorizations</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must HQ DAF Civic Leaders provide to DAF leadership?</h3>
             <blockquote>Provide individual advice and information to the CSAF, CSO, and commanders at all levels on matters relating to public issues involving the DAF and its operations. (paragraph 3)</blockquote>
             <h3>What information must HQ DAF Civic Leaders disseminate to the public?</h3>

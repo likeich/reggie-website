@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It identifies prevention and detection methods, program committees, monitor duties, FOD walks, spot checks, assessments, and training. It requires incident reporting, inspection documentation, and adherence to applicable service or higher headquarters guidance.</p>
             <p><strong>Applies to:</strong> This instruction applies to all personnel working in, on, around or traveling through areas near aircraft, support equipment, engines or engine components on Joint Base Andrews.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Foreign Object Damage prevention</li>
                 <li>Dropped Object Prevention</li>
@@ -727,7 +743,7 @@
                 <li>FOD/DOP training</li>
                 <li>Incident reporting</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who must follow service or higher headquarters guidance for FOD prevention?</h3>
             <blockquote>All tenant organizations shall adhere to their specific service or higher headquarters guidance for Foreign Object Damage (FOD) prevention except where specifically noted with an “at” symbol (@).</blockquote>
             <h3>What is the primary goal of FOD prevention?</h3>

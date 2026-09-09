@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>AFSPCI13-611 covers mission areas, roles, the satellite reliability engineering process, assessment inputs, assessments, and distribution. It requires compliance, defines applicability and exclusions, and addresses waivers, supplements, and records.</p>
             <p><strong>Applies to:</strong> It applies to Headquarters, Air Force Space Command (HQ AFSPC), Space and Missile Systems Center (SMC) and supporting agencies.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Satellite reliability engineering assessments</li>
                 <li>Reliability parameter lists</li>
@@ -721,7 +737,7 @@
                 <li>Reliability Engineering Working Group</li>
                 <li>Assessment distribution</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What are Reliability Engineering Assessments used for?</h3>
             <blockquote>Reliability Engineering Assessments (REA) serve as the engineering baseline for subsequent mission resilience analyses in contested, degraded, and operationally limited environments and to support the HQ AFSPC planning, programming, budgeting and execution (PPBE) process.</blockquote>
             <h3>Which mission areas are required to produce REAs?</h3>

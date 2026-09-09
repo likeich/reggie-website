@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication establishes policies, responsibilities, and requirements for internally reviewing employee disputes involving working conditions under DoD management. It contains procedures for administrative grievances, alternative dispute resolution, coverage, processing, and final decisions.</p>
             <p><strong>Applies to:</strong> It applies to United States citizen civilian employees of the DAF who are paid from appropriated funds and who are either non-bargaining unit employees, or bargaining unit employees in a unit where no collective bargaining agreement has been negotiated, or where the negotiated procedure excludes the matters at issue.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Administrative grievance system</li>
                 <li>Civilian employee disputes</li>
@@ -726,7 +742,7 @@
                 <li>Working conditions</li>
                 <li>DoD component implementation</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must DoD Component heads do for the Administrative Grievance System?</h3>
             <blockquote>Ensure the DoD AGS is implemented in their Component. (paragraph 3)</blockquote>
             <h3>Are alternative dispute resolution techniques used in the grievance process?</h3>

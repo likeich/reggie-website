@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1001707">View AR 10-87 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/army-dir-2020-11/">ARMY DIR 2020-11</a></li>
                 <li><a href="/usa/pub/army-dir-2022-07/">ARMY DIR 2022-07</a></li>
@@ -724,7 +740,7 @@
             <hr>
             <p>AR 10-87 identifies the Army organizations in these categories and describes their missions and functions. It addresses administrative control, combatant command relationships, cyberspace operations directives, and FORSCOM readiness responsibilities.</p>
             <p><strong>Applies to:</strong> This regulation applies to the following Army organizations:</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Army command missions</li>
                 <li>Army service component commands</li>
@@ -734,7 +750,7 @@
                 <li>Cyberspace operations authority</li>
                 <li>FORSCOM readiness oversight</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is administrative control under AR 10-87?</h3>
             <blockquote>ADCON is not a command relationship. ADCON is direction or exercise of authority over subordinate or other organizations in respect to administration and support. (paragraph 1)</blockquote>
             <h3>Who normally exercises ADCON for Army forces assigned to a combatant commander?</h3>

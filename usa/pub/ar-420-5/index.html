@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>It addresses fire incident reporting and investigations, dispatch operations, community risk assessments, service delivery, staffing, apparatus, prevention, equipment, training, and military firefighters. It requires reporting specified major fires, annual risk assessment updates, written plans below reduced staffing, and standards-based protective equipment.</p>
             <p><strong>Applies to:</strong> This regulation applies to the Regular Army, ARNG, USAR, and tenants, concessionaires, and contractors on Army installations, except as noted in paragraphs 21a through 21d.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Fire incident reporting</li>
                 <li>Fire investigations</li>
@@ -728,7 +744,7 @@
                 <li>Protective equipment</li>
                 <li>Military firefighter management</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When must a major fire report be submitted?</h3>
             <blockquote>Installations will review, approve, and transmit the report to ACOMs, ASCCs, and DRUs within 24 hours of the fire incident. (paragraph 4-5)</blockquote>
             <h3>How often must installation fire risk assessments be updated?</h3>

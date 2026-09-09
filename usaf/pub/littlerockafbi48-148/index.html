@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers clinical X-ray use, radiation dosimetry, heritage program surveys, radon, inventories, and protection during contingencies. It requires written safety procedures, radiation surveys, inventory controls, dose monitoring, and risk management.</p>
             <p><strong>Applies to:</strong> It applies to all activities on Little Rock Air Force Base (LRAFB), Arkansas, to include tenant units, as well as, contractors who possess, use, handle, store, or bring radiation sources onto the installation.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Clinical X-ray use</li>
                 <li>Radiation dosimetry</li>
@@ -727,7 +743,7 @@
                 <li>Radiation-producing device inventories</li>
                 <li>Contingency radiation protection</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What procedures are required for clinical use of X-ray?</h3>
             <blockquote>Each MTF shall have and implement written operating and safety procedures. (paragraph 1)</blockquote>
             <h3>What must happen before a medical procedure involving radiation?</h3>

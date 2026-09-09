@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>EDWARDSAFBI63-100 establishes roles, management processes, event timing, and implementation guidelines for eight technical management processes. It addresses investment planning, funding proposals, capability validation, advanced planning, oversight, and project management during development and sustainment.</p>
             <p><strong>Applies to:</strong> This Instruction is applicable to all 412th Test Wing (TW) organizations executing projects intended to develop, field, and sustain test and evaluation (T&amp;E) capabilities necessary to support U.S. Air Force and other Department of Defense (DoD) T&amp;E requirements.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Lifecycle Systems Engineering processes</li>
                 <li>Test Capability and Infrastructure projects</li>
@@ -726,7 +742,7 @@
                 <li>Systems Engineering Council oversight</li>
                 <li>Critical Program Information protection</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the objective of EDWARDSAFBI63-100?</h3>
             <blockquote>The purpose of this instruction is to establish disciplined Lifecycle Systems Engineering (LSE) processes for all Test Capability and Infrastructure (TC&amp;I) projects across the 412th Test Wing.</blockquote>
             <h3>What must the Wing Commander appoint?</h3>

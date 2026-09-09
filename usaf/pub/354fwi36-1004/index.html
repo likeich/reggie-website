@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication covers civilian recognition, incentive awards, the Civilian Employee Management Board, publicizing achievements, and award nomination packages. It requires records maintenance and directs units nominating employees to print all certificates.</p>
             <p><strong>Applies to:</strong> It applies to all agencies and personnel serviced by the Eielson Air Force Base (AFB) civilian personnel office.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Civilian recognition program</li>
                 <li>Quarterly and annual wing awards</li>
@@ -727,7 +743,7 @@
                 <li>Award nomination packages</li>
                 <li>Award presentation and publicity</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the purpose of the Air Force recognition program?</h3>
             <blockquote>The Air Force recognition program is designed to improve government operations by motivating and rewarding excellence by members of the workforce.</blockquote>
             <h3>When does civilian recognition occur?</h3>

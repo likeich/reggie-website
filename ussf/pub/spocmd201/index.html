@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>It describes 20 SPSS operations, including radar systems, space object detection and tracking, Space Object Intelligence, reporting, and threat environments. It requires mission-ready operators, training and evaluation programs, security for restricted facilities and resources, and procedures for new mission requirements or system enhancements.</p>
             <p><strong>Applies to:</strong> This MD applies to all Space Delta 2 20 SPSS units and personnel.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Space domain awareness missions</li>
                 <li>AN/FPS-85 radar</li>
@@ -722,7 +738,7 @@
                 <li>Mission-ready operator training</li>
                 <li>Combatant command authority</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does 20 SPSS do for Space Delta 2?</h3>
             <blockquote>The mission of 20 SPSS is to detect, track, identify, generate narrow-band Space Object Intelligence (SOI) and provide reports on nearEarth and deep space objects for Space Delta 2 (DEL 2), in support of United States Space Command’s (USSPACECOM's) space domain awareness (SDA) mission. (paragraph 1)</blockquote>
             <h3>How continuously does 20 SPSS operate?</h3>

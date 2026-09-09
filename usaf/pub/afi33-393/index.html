@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/saf_cn/publication/afi33-393/afi33-393.pdf">View AFI33-393 on armypubs.army.mil</a></p>
             <hr>
             <p>It assigns Section 508 duties to Air Force officials, coordinators, commanders, content managers, and website developers. It requires accessibility oversight, training, compliance validation, alternative text for images, and documentation of undue burden decisions.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Section 508 implementation</li>
                 <li>Electronic and information technology accessibility</li>
@@ -725,7 +741,7 @@
                 <li>Web compliance</li>
                 <li>Accessibility training</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What access must agencies provide to people with disabilities?</h3>
             <blockquote>Under Section 508 (29 USC § 794d), agencies must give employees and members of the public with disabilities access to information that is comparable to the access available to others, unless an undue burden would be imposed on the department or agency. (paragraph 1)</blockquote>
             <h3>What does SAF/CNZA manage under AFI33-393?</h3>

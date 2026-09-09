@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>AR 601-2 covers the Total Army Involvement in Recruiting Program, senior leader and educator support, Centers of Influence events, DEP/DTP gatherings, recruiter assistance programs, and recruiting partnerships. It sets requirements for program administration, recognition items, event meals and refreshments, and participation in HRAP and SRAP.</p>
             <p><strong>Applies to:</strong> It applies to recruiting support programs and related activities in support of the Armys recruiting efforts across all three Army components.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Total Army Involvement in Recruiting Program</li>
                 <li>General Officer Recruiting Support Program</li>
@@ -730,7 +746,7 @@
                 <li>Special Recruiter Assistance Program</li>
                 <li>Recruiting and Reserve Partnership Council</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How much can a recruiting recognition item cost?</h3>
             <blockquote>Each recognition item provided under this policy will be valued at less than $50 per item, with items limited to commemorative coins, medals, trophies, badges, flags, posters, paintings, or similar things designed to recognize or commemorate service in the Armed Forces. (paragraph 1-1)</blockquote>
             <h3>Can meals and refreshments be provided at recruiting functions?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>MCTP 13-10B covers combat cargo personnel, ship-to-shore movement, LFORM, well deck and flight deck operations, and ammunition. It requires flight deck operations and training to follow appropriate NATOPS manuals and ship-specific air department SOPs, and sets manifesting responsibilities and timing.</p>
             <p><strong>Applies to:</strong> This publication is intended for staff sergeants through lieutenant colonels having military occupational specialty 04XX and assigned combat cargo duties with the Navy.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Combat cargo operations</li>
                 <li>Amphibious embarkation planning</li>
@@ -729,7 +745,7 @@
                 <li>Flight deck cargo handling</li>
                 <li>Passenger manifesting</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does MCTP 13-10B cover?</h3>
             <blockquote>Marine Corps Tactical Publication (MCTP) 13-10B, Combat Cargo Operations, addresses the tactics, techniques, and procedures for combat cargo personnel, amphibious embarkation planning and execution, ship-to-shore movement, landing force operational reserve material (LFORM), ammunition, well deck and flight deck operations, and maintenance of landing force spaces aboard amphibious warfare ships. (paragraph 2)</blockquote>
             <h3>What manuals govern flight deck operations and training?</h3>

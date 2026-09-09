@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It defines knowledge, skill, and ability criteria, key engineering leadership roles, waivers, and reporting requirements. It requires identified positions and personnel to meet Attachment 2 criteria or use an approved waiver and training plan.</p>
             <p><strong>Applies to:</strong> This instruction is mandatory for all Chief Engineer, Director of Engineering (DOE), S&amp;T Chief Engineering, Technical Director, Engineering, and select Lead Engineer positions as defined below.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Critical engineering position criteria</li>
                 <li>Knowledge, skill, and ability competencies</li>
@@ -726,7 +742,7 @@
                 <li>Position selection procedures</li>
                 <li>Bi-annual position reporting</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What criteria must individuals selected for critical engineering positions meet?</h3>
             <blockquote>Individuals selected for critical engineering positions, as defined in paragraph 2 will meet the criteria in Attachment 2, prior to going into the position or provide a waiver and training plan when nominated or management will reassign them to a position not covered by this instruction unless a waiver as described in paragraph 6 is granted. (paragraph 2)</blockquote>
             <h3>Can additional criteria be added to the Attachment 2 criteria?</h3>

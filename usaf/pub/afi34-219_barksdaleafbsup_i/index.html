@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -707,7 +723,7 @@
             <hr>
             <p>It provides base guidance for controlling, procuring, and using alcoholic beverages, including reduced-price offerings by the drink. It covers on-premises and off-premise consumption, purchasing for resale, taxation, breath analyzers, and unauthorized beverages.</p>
             <p><strong>Applies to:</strong> It applies to 2d Force Support and AAFES personnel who sell and serve alcohol on Barksdale AFB and anyone eligible to purchase and consume alcohol.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Alcoholic beverage procurement</li>
                 <li>Reduced-price drink offerings</li>
@@ -717,7 +733,7 @@
                 <li>Breath analyzers</li>
                 <li>Unauthorized beverages</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What can happen when military personnel violate mandatory alcoholic beverage provisions?</h3>
             <blockquote>Failure to observe prohibitions and mandatory provisions of this Instruction in paragraphs 1.3.1., 1.3.2., and 1.3.3. by military personnel is a violation of Article 92, Uniform Code of Military Justice (UCMJ).</blockquote>
             <h3>What disciplinary action may result from violating the alcoholic beverage instruction?</h3>

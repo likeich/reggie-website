@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>OFFUTTAFBI31-125 establishes procedures for LEOSA credentialed personnel, including firearm declarations, holster requirements, and prohibited locations. It addresses self-defense limitations, secure firearm storage, and suspension or revocation of LEOSA credentials.</p>
             <p><strong>Applies to:</strong> This instruction applies to all LEOSA-credentialed persons assigned, attached, or visiting Offutt AFB, Elkhorn and Scribner Communication Sites, Coffman Heights housing area, Capehart Chapel, and the Ehrling Bergquist Clinic.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>LEOSA conceal-carry authorization</li>
                 <li>Firearm declaration requirements</li>
@@ -727,7 +743,7 @@
                 <li>Self-defense and defense of others</li>
                 <li>LEOSA credential suspension and revocation</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must LEOSA credentialed employees declare before carrying concealed?</h3>
             <blockquote>Unit Commanders must require LEOSA credentialed employees (military, civilian, and contract) to declare their LEOSA authority and intent to carry concealed. (paragraph 2)</blockquote>
             <h3>What requirements apply to firearms carried under LEOSA?</h3>

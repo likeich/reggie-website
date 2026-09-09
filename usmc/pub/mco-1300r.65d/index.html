@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <p><a href="https://www.marines.mil/News/Publications/MCPEL/Electronic-Library-Display/Article/1294698/mco-1300r65d/">View MCO 1300R.65D on armypubs.army.mil</a></p>
             <hr>
             <p>It establishes an annual nonstatutory board, sets eligibility criteria and tour lengths, and defines board membership and slating processes. It requires written responses to command selections and sets limits for commanding officer tours.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Reserve command screening</li>
                 <li>Commanding officer billet slating</li>
@@ -727,7 +743,7 @@
                 <li>Officer selection criteria</li>
                 <li>Command selection responses</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How long is a normal RCSP commanding officer tour?</h3>
             <blockquote>The normal tour length for RCSP billets is 24 months. (paragraph 2)</blockquote>
             <h3>Can an RCSP commanding officer tour exceed 36 months?</h3>

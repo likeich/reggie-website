@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/usafe/publication/usafei36-702/usafei36-702.pdf">View USAFEI36-702 on armypubs.army.mil</a></p>
             <hr>
             <p>It establishes principles for employee conduct, work morale, labor-management relations, investigations, warnings, separation, and appeals. It requires prompt, fair, and equitable action, coordination with the Civilian Personnel Flight, and works council participation when required.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Employee conduct standards</li>
                 <li>Corrective actions</li>
@@ -727,7 +743,7 @@
                 <li>Letters of warning</li>
                 <li>Employee appeals</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When must a supervisor investigate an alleged violation before taking action?</h3>
             <blockquote>Before initiating a corrective or disciplinary action, the immediate supervisor will thoroughly and objectively investigate alleged violations or offenses. (paragraph 3)</blockquote>
             <h3>What must an investigation of an alleged offense include?</h3>

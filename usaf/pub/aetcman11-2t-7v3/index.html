@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -707,7 +723,7 @@
             <hr>
             <p>It covers mission planning, map and chart preparation, navigation data loading, fuel, formations, weather and IFR, low-altitude operations, and approaches and landings. Compliance is mandatory, and the manual identifies tiered authorities for waiving wing or unit-level requirements.</p>
             <p><strong>Applies to:</strong> This manual prescribes standard procedures used by all aircrew members operating an Air Force T-7 aircraft and applies to all Air Education and Training Command (AETC) Regular Air Force, Air Force Reserve, and Air National Guard instructors flying the T-7 but does not apply to members of the US Space Force.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Mission planning</li>
                 <li>Map and chart preparation</li>
@@ -718,7 +734,7 @@
                 <li>Low-altitude procedures</li>
                 <li>Approaches and landings</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who can waive wing or unit-level requirements in AETCMAN11-2T-7V3?</h3>
             <blockquote>The authorities to waive wing/unit level requirements in this manual are identified with a tier (“T-0, T-1, T-2, T-3”) number following the compliance statement.</blockquote>
             <h3>How are waiver requests for AETCMAN11-2T-7V3 submitted?</h3>

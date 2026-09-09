@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It describes aircraft maintenance squadron management, supervision, aircraft servicing, maintenance, launch and recovery, and mobility support. It requires commanders to fulfill specified responsibilities and provides for oversight and execution of the AMXS mission.</p>
             <p><strong>Applies to:</strong> This Mission Directive applies to individuals assigned to HQ AFRC.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Aircraft maintenance squadron mission</li>
                 <li>Aircraft maintenance activities</li>
@@ -726,7 +742,7 @@
                 <li>AMXS personnel administrative control</li>
                 <li>Mobility requirements</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What aircraft activities does the AMXS perform?</h3>
             <blockquote>The AMXS also services, inspects, maintains, launches, and recovers assigned/transient aircraft (if applicable). (paragraph 1)</blockquote>
             <h3>Where may AMXS elements be included in AFRC non-standard or associated units?</h3>

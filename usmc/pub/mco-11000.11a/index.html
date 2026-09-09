@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <p><a href="https://www.marines.mil/News/Publications/MCPEL/Electronic-Library-Display/Article/1287151/mco-1100011a/">View MCO 11000.11A on armypubs.army.mil</a></p>
             <hr>
             <p>It covers fire prevention, emergency response, aircraft rescue firefighting, staffing, physical resources, training, water supply, communications, and external support. It requires trained and certified personnel, hazard surveys, maintained fire protection systems, defined service levels, and mutual aid agreements where they enhance emergency response capabilities.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Fire risk assessment</li>
                 <li>Incident command systems</li>
@@ -729,7 +745,7 @@
                 <li>Water supply</li>
                 <li>Mutual aid agreements</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What training is required for fire and emergency service personnel?</h3>
             <blockquote>All fire and emergency service personnel shall be properly trained and certified for their assigned missions. (paragraph 2-11)</blockquote>
             <h3>What must installation facilities be surveyed for?</h3>

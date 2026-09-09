@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It establishes requirements for fire prevention visits, project plan reviews, construction, emergency evacuation, fire lanes, fire protection systems, and extinguishers. It also addresses decorations, commercial cooking, welding, and temporary occupancy changes.</p>
             <p><strong>Applies to:</strong> It applies to all military personnel, family members, civilian personnel, concessionaires, and tenant organizations assigned or attached to Tinker Air Force Base.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Fire prevention visits</li>
                 <li>Project plan reviews</li>
@@ -728,7 +744,7 @@
                 <li>Commercial cooking facilities</li>
                 <li>Welding operations</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must happen when a fire or emergency is discovered?</h3>
             <blockquote>Any person discovering a fire, potential fire or other emergency must report it immediately to the base fire department. (paragraph 9)</blockquote>
             <h3>What number must be dialed to report a fire or emergency?</h3>

@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>The publication identifies authorized locations for alcohol sales and consumption, including recreation, lodging, and training facilities. It requires Dram Shop training, liability waivers for specified private functions, and conditions for off-base transportation and off-premises sales.</p>
             <p><strong>Applies to:</strong> This publication applies to all persons eligible to purchase or consume alcoholic beverages at Maxwell AFB and Gunter Annex-controlled facilities.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Dram Shop liability training</li>
                 <li>Authorized alcohol sales locations</li>
@@ -721,7 +737,7 @@
                 <li>Off-base alcohol transportation limits</li>
                 <li>Dram Shop liability waivers</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who must receive Dram Shop training, and how often is recurring training required?</h3>
             <blockquote>All individuals involved with the control and serving of alcoholic beverages on base must receive Dram Shop training to be familiar with Air Force drinking policies and will acknowledge the reading and understanding of this supplement. Personnel whose duties include the control and/or serving of alcoholic beverages on a regular basis will receive Dram Shop training annually. (paragraph 34-219)</blockquote>
             <h3>What must be signed for private functions requesting alcohol at certain Force Support facilities?</h3>

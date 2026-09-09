@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <p><a href="https://www.marines.mil/News/Publications/MCPEL/Electronic-Library-Display/Article/899528/mcrp-3-30d2/">View MCRP 3-30D.2 on armypubs.army.mil</a></p>
             <hr>
             <p>It contains statements of faith, prayers, scriptures, hymns, songs, and meditations from multiple religious traditions. The selections were chosen by chaplains, Marines, and Sailors for guidance, encouragement, and support in time of need.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Statements of faith</li>
                 <li>Christian prayers</li>
@@ -729,7 +745,7 @@
                 <li>Scripture passages</li>
                 <li>Lyrics to hymns</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What prayers does MCRP 3-30D.2 include for service members in wartime?</h3>
             <blockquote>Almighty God, our heavenly Father, let Thy protection be upon all those who are in the Service of our country; guard them from all harm and danger of body and soul; sustain and comfort those at home, especially in their hours of loneliness, anxiety, and sorrow; prepare the dying for death and the living for thy service; give success to our arms on land and sea and in the air; and grant unto us and all nations a speedy, just and lasting peace. Amen. (paragraph 5)</blockquote>
             <h3>What does Islam require before conducting prayers?</h3>

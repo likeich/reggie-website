@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>It addresses operational training concepts, training system responsibilities and management, planning, reporting, and operational training and undergraduate aircrew training systems. It requires compliance with tiered requirements and sets processes for waiver requests, records disposition, and reporting on training systems.</p>
             <p><strong>Applies to:</strong> This publication applies to all civilian employees and uniformed members of the Regular Air Force, the Air Force Reserve Command (AFRC), the Air National Guard (ANG), and those with a contractual obligation to abide by the terms of United States Air Force (USAF) issuances.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Operational training concepts</li>
                 <li>Training system management</li>
@@ -722,7 +738,7 @@
                 <li>Threat matrix framework</li>
                 <li>Training systems reporting</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How are conflicts between AFI10-217 and Joint Program Office direction reconciled?</h3>
             <blockquote>Conflicts between this instruction and Joint Program Office (JPO) direction will be reconciled by the F-35 Integration Office (AF/IO), Air Combat Command (Lead Command), and the JPO.</blockquote>
             <h3>How are waiver authorities identified in AFI10-217?</h3>

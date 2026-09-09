@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It identifies Defense Paralegal tasks and duty requirements and provides training requirements and standards for developing training plans. Its task listings include client support, defense counsel partnership, automated reporting, and regional reports.</p>
             <p><strong>Applies to:</strong> This AFJQS must be utilized at all installations with an Area Defense Counsel Office with an authorized Defense Paralegal, and serves as a roadmap to develop the Master Training Plan (MTP) and the Individual Training Plan (ITP).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Defense Paralegal tasks</li>
                 <li>Client support</li>
@@ -728,7 +744,7 @@
                 <li>Training Business Area</li>
                 <li>Locally required tasks</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How soon must Defense Paralegals complete the prescribed training?</h3>
             <blockquote>Defense Paralegals are required to complete all prescribed training outlined in this AFJQS within 90 days of assignment. (paragraph 2)</blockquote>
             <h3>Who must conduct task qualification training?</h3>

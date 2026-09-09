@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <hr>
             <p>It establishes minimum standards for quality, healthy, and safe programs serving youth aged 5 through 18. It addresses admissions, discipline, immunizations, health checks, facility requirements, transportation, fees, and staff oversight.</p>
             <p><strong>Applies to:</strong> The standards in this Instruction are the minimum standards that must be used to plan quality, healthy, and safe programs for any youth program participant aged 5 (enrolled in kindergarten) through age 18 (if enrolled in high school).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Youth participant eligibility</li>
                 <li>Admission priorities</li>
@@ -729,7 +745,7 @@
                 <li>Transportation policy</li>
                 <li>Staff-to-child ratios</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What age range do Coast Guard Youth Program standards cover?</h3>
             <blockquote>The standards in this Instruction are the minimum standards that must be used to plan quality, healthy, and safe programs for any youth program participant aged 5 (enrolled in kindergarten) through age 18 (if enrolled in high school). (paragraph 1-1)</blockquote>
             <h3>How are youth admitted when a Youth Program has applications?</h3>

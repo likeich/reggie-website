@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers utility-location coordination, excavation requests, AF IMT 103 processing, permit validity, emergency requests, and underground utility marking codes. It requires excavation areas to be identified, requests to include specified information, markings to be maintained, and signed permits to remain on site during excavation.</p>
             <p><strong>Applies to:</strong> It applies to 90th Missile Wing, 20th Air Force, associated and tenant units assigned, attached, or supported by the 90th Missile Wing, Francis E. Warren Air Force Base.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Underground utility coordination</li>
                 <li>Excavation requests</li>
@@ -726,7 +742,7 @@
                 <li>Utility marking codes</li>
                 <li>Emergency excavation requests</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who makes Wyoming One-Call requests for digging permits?</h3>
             <blockquote>All Wyoming One- Call requests will be made by the Base Civil Engineer’s Requirements and Optimization section.</blockquote>
             <h3>How long is a signed excavation form valid?</h3>

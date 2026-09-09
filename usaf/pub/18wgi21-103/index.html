@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>18WGI21-103 establishes the CDDAR mission for returning Kadena AB to operational status after a mishap, while addressing runway reopening, aircraft protection, evidence preservation and personnel safety. It assigns program duties and specifies crash recovery vehicles, equipment, staffing and equipment sourcing.</p>
             <p><strong>Applies to:</strong> This instruction applies to maintenance activities within the 18th Wing.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>CDDAR mission objectives</li>
                 <li>Crash Recovery Team staffing</li>
@@ -727,7 +743,7 @@
                 <li>Crash trailers and PPE</li>
                 <li>Equipment sourcing from Okinawa installations</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the mission of the CDDAR Program?</h3>
             <blockquote>The Crashed, Damaged, Disabled Aircraft Recovery (CDDAR) Program is established to recover damaged or disabled aircraft in minimum time to return Kadena AB to operational status as soon as possible after a mishap. (paragraph 1)</blockquote>
             <h3>How many members must be in the Crash Recovery Team?</h3>

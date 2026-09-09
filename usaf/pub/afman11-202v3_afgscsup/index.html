@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -707,7 +723,7 @@
             <hr>
             <p>Its subject areas include international, foreign, and National Airspace System operations, waivers, violations, deviations, aviation safety reporting, and airworthiness. Compliance with the publication is mandatory, while compliance with its attachments is not mandatory.</p>
             <p><strong>Applies to:</strong> This publication is applicable to all AFGSC units including uniformed members of the Regular Air Force and to Air Force Reserve (AFRC) and Air National Guard (ANG) in active or classic associations with Air Force Global Strike Command units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>International airspace operations</li>
                 <li>Foreign airspace operations</li>
@@ -718,7 +734,7 @@
                 <li>AFGSC alert duty requirements</li>
                 <li>Electronic Flight Bags</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Are attachments to AFMAN11-202V3_AFGSCSUP mandatory?</h3>
             <blockquote>Compliance with the attachments in this publication is not mandatory.</blockquote>
             <h3>What must MDS-specific Volume 3 manuals do under AFMAN11-202V3_AFGSCSUP?</h3>

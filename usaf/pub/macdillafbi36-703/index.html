@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>It addresses prevention and awareness, reporting, threat assessment, active-event response, and post-event actions. It covers training, warning signs, employee assistance, domestic violence, and commander actions, with compliance required.</p>
             <p><strong>Applies to:</strong> This instruction implements Air Force Instruction (AFI) 36-703, Civilian Conduct and Responsibility, Chapter 5, Violence in the Workplace and applicable portions of the 6 AMW Integrated Defense Plan (IDP), and applies to all personnel assigned, attached or visiting on official orders to MacDill AFB.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Workplace violence prevention</li>
                 <li>Violence awareness training</li>
@@ -722,7 +738,7 @@
                 <li>Domestic violence</li>
                 <li>Post-event actions</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What work environment does MACDILLAFBI36-703 seek to promote?</h3>
             <blockquote>To promote a work environment free from violence, threats of violence, harassment, intimidation and other disruptive behavior.</blockquote>
             <h3>What is the purpose of the centralized violence awareness and response plan?</h3>

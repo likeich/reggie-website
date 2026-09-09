@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It defines vehicle accidents, abuse, and incidents and establishes related authority, dispositions, reporting procedures, and financial responsibilities. It includes guidance on vehicle idling and OGMVCs and requires protected information and resulting records to be maintained as specified.</p>
             <p><strong>Applies to:</strong> This instruction applies to all squadron commanders, Vehicle Control Officers (VCO), and vehicle operators assigned, attached or TDY to Altus AFB, including Air Force Reserve and Air National Guard (ANG) units, except where noted otherwise.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Vehicle accident and abuse program</li>
                 <li>Vehicle incident determinations</li>
@@ -726,7 +742,7 @@
                 <li>Accident and abuse repair costs</li>
                 <li>Vehicle operator maintenance</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How does ALTUSAFBI24-302 define a motor vehicle accident?</h3>
             <blockquote>Motor Vehicle Accident: Any collision, impact, or abrasion against a fixed or moving object with a Government Owned Vehicle (GOV) which causes damage to either the GOV or the object, whether immediately noticeable or not.</blockquote>
             <h3>Who determines whether a vehicle damage event is an accident?</h3>

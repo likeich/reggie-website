@@ -581,8 +581,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -603,6 +612,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -696,13 +712,13 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/sld30/publication/30swva10-2a/30swva10-2a.pdf">View 30SWVA10-2A on armypubs.army.mil</a></p>
             <hr>
             <p>30SWVA10-2A supersedes 30 SW VA 10-2A dated 1 October 2005 and 15 December 2006. The publication is prescribed by AFI10-245_30SWSUP and was certified current on 2 October 2019.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Force Protection Condition BRAVO</li>
                 <li>Required security measures</li>
                 <li>Releasability restrictions</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Does 30SWVA10-2A have releasability restrictions?</h3>
             <blockquote>There are no releasability restrictions on this publication.</blockquote>
             <p><a href="/">Ask Reggie.Bot a question about 30SWVA10-2A</a></p>

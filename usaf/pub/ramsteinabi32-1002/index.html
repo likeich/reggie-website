@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication sets snow and ice control priorities, coordination requirements, and responsibilities for airfield pavement operations. It also requires inspection, repair, storage, reporting, and briefing activities after the snow season, and states that compliance is mandatory.</p>
             <p><strong>Applies to:</strong> It provides civil engineer support to organizations on Ramstein Air Base and Air Force geographically separated installations in the Kaiserslautern Military Community (KMC).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Snow and ice control operations</li>
                 <li>Airfield pavement clearing</li>
@@ -726,7 +742,7 @@
                 <li>Post-season equipment actions</li>
                 <li>Airfield pavement damage inspections</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How often must the Snow and Ice Control Committee meet?</h3>
             <blockquote>The Snow and Ice Control Committee shall meet twice per year; the pre-season meeting shall occur between 1 September and 15 October and the post- season meeting shall occur between 15 April and 31 May. (paragraph 1)</blockquote>
             <h3>Who controls airfield pavement snow and ice control priorities?</h3>

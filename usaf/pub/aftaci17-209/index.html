@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>AFTACI17-209 covers the roles of commanders, CROs, SVROs, USVRs, and secure voice users. It requires training, approved user lists, inventories, continuity binders, quarterly vIPer rekeying, and incident reporting.</p>
             <p><strong>Applies to:</strong> This AFTACI applies to all personnel assigned to AFTAC, its Detachments, and individual mobilization augmentees.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Secure Voice Program</li>
                 <li>Secure voice devices</li>
@@ -728,7 +744,7 @@
                 <li>Equipment inventories</li>
                 <li>Security incidents</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who appoints the primary and alternate COMSEC Responsible Officers?</h3>
             <blockquote>AFTAC 709th Cyberspace Squadron. Will appoint a primary COMSEC Responsible Officer (CRO) and at least one alternate CRO to support AFTAC’s COMSEC mission IAW AFMAN 17-1302-O, Paragraph 2.12. (paragraph 2)</blockquote>
             <h3>How often must USVRs complete Secure Voice training?</h3>

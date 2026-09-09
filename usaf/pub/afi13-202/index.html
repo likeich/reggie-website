@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>AFI13-202 covers search and rescue services, national coordination, waivers, and the roles of Air Force and partner agencies. It requires units to process waivers with Air Force Form 679 and maintain resulting records according to applicable records requirements.</p>
             <p><strong>Applies to:</strong> It applies to all Regular Air Force (REGAF), Air National Guard and Air Force Reserve organizations (to include contracted locations) that administer procedures and/or facilities for overdue aircraft.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Search and rescue services</li>
                 <li>National Search and Rescue Plan</li>
@@ -727,7 +743,7 @@
                 <li>Waiver processing</li>
                 <li>Aircraft alerting</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What services are included in search and rescue for overdue aircraft?</h3>
             <blockquote>Services include search for missing aircraft, survival aid, rescue, and emergency medical help for the occupants after an accident site is located.</blockquote>
             <h3>How must units process waivers to AFI13-202?</h3>

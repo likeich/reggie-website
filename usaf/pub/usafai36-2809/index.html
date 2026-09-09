@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>USAFAI36-2809 establishes the Cadet Awards Council, award categories, presentation procedures, and processes for creating awards. It sets financial restrictions and assigns award-related duties to USAFA offices and activities.</p>
             <p><strong>Applies to:</strong> It governs all responsibilities and procedures pertaining to organizational, individual, and specialty awards and defines criteria for selecting award winners and applies to all USAFA organizations dealing with cadet awards.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Cadet Awards Council</li>
                 <li>Organizational awards</li>
@@ -727,7 +743,7 @@
                 <li>Award winner selection</li>
                 <li>Financial restrictions</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What types of achievement does the USAFA Cadet Awards Program recognize?</h3>
             <blockquote>The USAFA Cadet Awards Program offers incentives to USAFA cadets for higher achievements in academic, athletic, leadership, military training, and related activities; it rewards these achievements materially and through public recognition. (paragraph 1)</blockquote>
             <h3>What must be submitted to establish a cadet award?</h3>

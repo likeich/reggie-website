@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1029594">View AR 672-20 on armypubs.army.mil</a></p>
             <hr>
             <p>The publication covers military and civilian incentive awards, honorary and public service awards, invention awards, career service recognition, and award devices. It requires award nominations, establishes eligibility and approval authorities, and addresses monetary awards and payment.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Incentive awards</li>
                 <li>Invention awards</li>
@@ -729,7 +745,7 @@
                 <li>Career service recognition</li>
                 <li>Award payment</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What monetary awards are provided for inventions?</h3>
             <blockquote>Invention awards consist of Initial Awards of $200 upon filing of a patent application or requesting publication of a SIR; Final Awards of $500 ($250 per eligible co-inventor if more than one eligible inventor); and Additional Awards based upon the inventions actual value. (paragraph 2-2)</blockquote>
             <h3>Who is eligible for a Special Act or Service Award?</h3>

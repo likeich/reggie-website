@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,14 +732,14 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=63672">View AR 11-31 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/army-dir-2018-02/">ARMY DIR 2018-02</a></li>
                 <li><a href="/usa/pub/pam-11-31/">PAM 11-31</a></li>
             </ul>
             <hr>
             <p>AR 11-31 covers security cooperation planning, resources, execution, and assessments within the PPBE and assessment framework. It requires Army organizations to submit plans and resource requirements, maintain activity data, and coordinate activities with responsible commands.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Security cooperation planning</li>
                 <li>Campaign support plans</li>
@@ -732,7 +748,7 @@
                 <li>Army security cooperation execution</li>
                 <li>Security cooperation assessments</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What resources does HQDA provide for security cooperation demand?</h3>
             <blockquote>HQDA will provide Title 10, United States Code (10 USC) resources in support of SC demand. (paragraph 1-6)</blockquote>
             <h3>What information must proposed security cooperation activities include?</h3>

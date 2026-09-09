@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,14 +732,14 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=53596">View AR 380-381 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/army-dir-2012-10/">ARMY DIR 2012-10</a></li>
                 <li><a href="/usa/pub/army-dir-2015-05/">ARMY DIR 2015-05</a></li>
             </ul>
             <hr>
             <p>AR 380-381 addresses SAP establishment, maintenance, support, disestablishment, oversight, security, access control, industrial security, and international programs. It requires approvals, security protections, access validation, incident reporting, and reviews.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Special access program establishment</li>
                 <li>SAP security</li>
@@ -733,7 +749,7 @@
                 <li>International Special Access Programs</li>
                 <li>Sensitive activity oversight</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When may alternative compensatory control measures be established?</h3>
             <blockquote>ACCMs may be established only in accordance with Department of Defense Directive (DODD) 5200.1R and only for intelligence and operations and support, when information requires enforcement of strict need to know but does not rise to the level requiring SAP protection. (paragraph 1-4)</blockquote>
             <h3>Are alternative compensatory control measures authorized for acquisition programs?</h3>

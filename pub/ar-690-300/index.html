@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1030724">View AR 690-300 on armypubs.army.mil</a></p>
             <hr>
             <p>It covers employment of relatives, retired service members, experts and consultants, attorneys, mobility, probation, military duty, and separation incentives. It establishes requirements for qualifications, promotions, training, position classification, restoration rights, and personnel actions.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Employment of relatives</li>
                 <li>Employment of minors</li>
@@ -729,7 +745,7 @@
                 <li>Military duty restoration rights</li>
                 <li>Voluntary separation incentives</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What employment actions involving a relative are prohibited for a public official?</h3>
             <blockquote>A public official, as defined in 5 USC Section 3110, may not appoint, employ, promote, advance, or advocate for appointment, employment, promotion, or advancement (either orally or in writing), in or to a civilian position in the agency in which they are serving or over which they exercise jurisdiction or control any individual who is a relative (as defined in 5 USC 3110(a)(2) of the public official). (paragraph 3-1)</blockquote>
             <h3>What occupations are prohibited for workers under 18?</h3>

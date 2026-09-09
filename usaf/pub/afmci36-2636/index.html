@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication addresses Title 5 civilian appointing authority, human capital strategies, senior functional management, and manpower and organization matters. Compliance is mandatory, and it requires approval for deviations from the Center DP organizational structure and proper disposition of records.</p>
             <p><strong>Applies to:</strong> This publication applies to AFMC Centers.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Title 5 civilian appointing authority</li>
                 <li>Human capital advisory services</li>
@@ -726,7 +742,7 @@
                 <li>Workforce planning</li>
                 <li>Center manpower policies</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who administers Title 5 civilian appointing authority for the Installation Commander?</h3>
             <blockquote>The FSS/FSC Chief within the host Wing/Group is designated as the Civilian Personnel Officer responsible and accountable to administer the Title 5, U.S.C. appointing authority for the Installation Commander. (paragraph 1)</blockquote>
             <h3>Can Title 5 civilian appointing authority be delegated further?</h3>

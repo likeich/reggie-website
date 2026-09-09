@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -706,14 +722,14 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1007082">View PAM 708-2 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/ar-708-1/">AR 708-1</a></li>
             </ul>
             <hr>
             <p>PAM 708-2 describes AEMM data sources, distribution methods, and the Army Master Data File’s segments and data elements. It also covers packaging, freight, interchangeable and substitutable, equivalent item, hazardous materials, and specialized Army data.</p>
             <p><strong>Applies to:</strong> The Army master data file (AMDF) is a multi-segment file, including both current and historical management data for Army-used or -managed items.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Army Enterprise Material Master</li>
                 <li>Army Master Data File segments</li>
@@ -724,7 +740,7 @@
                 <li>Accounting requirements codes</li>
                 <li>Army logistics management data</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Which organization provides common material data for standard NSN assignment?</h3>
             <blockquote>Defense Logistics Information Service (DLIS) is the authoritative data source (ADS) provider of common material data relating to standard national stock number (NSN) assignment with the exception of packaging and freight data. (paragraph 4)</blockquote>
             <h3>What does the Army Master Data File provide to logistics activities?</h3>

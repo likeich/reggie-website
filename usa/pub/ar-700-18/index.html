@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>AR 700-18 covers provisioning planning, technical documentation, support-item selection and coding, cataloging, requirements computation, stockage, funding, and acquisition. It requires support items to maintain weapon-system or end-item readiness and establishes limits, review processes, and approval requirements.</p>
             <p><strong>Applies to:</strong> This regulation prescribes the basic principles, objectives, policies, and responsibilities for provisioning Army systems and end items (EIs).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Provisioning programs</li>
                 <li>Provisioning technical documentation</li>
@@ -729,7 +745,7 @@
                 <li>Support-item acquisition</li>
                 <li>Multi-Service provisioning</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who has final responsibility for determining the range and quantity of support items?</h3>
             <blockquote>The TLCSM assigned prime responsibility for the provisioning of an EI or system has overall responsibility, in coordination with the item manager, maintenance engineer, provisioning personnel, and other functional area support personnel, for the final determination of the range and quantity of support items required to support that EI or system. (paragraph 1)</blockquote>
             <h3>How much support-item stock and expenditure is allowed under the requirements computation policy?</h3>

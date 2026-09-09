@@ -586,8 +586,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -608,6 +617,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -702,7 +718,7 @@
             <hr>
             <p>The publication identifies signature lines for the SRB Chair, PM, and SRB Recorder and lists supporting attachments. It requires compliance with the publication and specifies that signatures denote accurate minutes and completed action items.</p>
             <p><strong>Applies to:</strong> This publication applies to all AFRL units; it does not apply to US Air Force Reserve or Air National Guard units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Signature certification</li>
                 <li>Accurate minutes</li>
@@ -712,7 +728,7 @@
                 <li>SRB Recorder signatures</li>
                 <li>Supporting documentation</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What system must AFRL safety professionals use to document training requirements?</h3>
             <blockquote>All AFRL safety professionals are required to use an Air Force Safety Automated System (AFSAS) account (with training tab) to create and document Air Force Continuing Education Unit (CEU) and mandated/recommended AFMC Safety training requirements.</blockquote>
             <h3>What training is required for personnel with access to privileged safety information?</h3>

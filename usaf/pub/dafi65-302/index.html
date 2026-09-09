@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers audit services, external audit organizations, financial audits, program reviews, evaluations, investigations, and audit reports. It establishes follow-up policies and responsibilities for resolving, monitoring, and closing findings and recommendations.</p>
             <p><strong>Applies to:</strong> This publication applies to all civilian employees and uniformed members of the Regular Air Force, the Air Force Reserve, the Air National Guard, and the United States Space Force.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>External audit services</li>
                 <li>Financial audits</li>
@@ -726,7 +742,7 @@
                 <li>Audit follow-up programs</li>
                 <li>Findings and recommendations</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What can external audit organizations provide to government organizations?</h3>
             <blockquote>External audit organizations, including the Government Accountability Office (GAO), Department of Defense Office of the Inspector General (DoD OIG), and independent public accounting firms may provide audit services for government organizations.</blockquote>
             <h3>What does the GAO conduct for the federal government?</h3>

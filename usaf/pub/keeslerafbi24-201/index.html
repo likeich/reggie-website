@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers qualification for completing Keesler AFB Form 32, duplicate-form handling, cargo categories, and form blocks for shipment information. It requires information supporting certification, identification of regulated/hazardous materiel to carriers, and form preparation for specified items and containers.</p>
             <p><strong>Applies to:</strong> It implements AFMAN 24-204 and CFR 49 and applies to all organizations assigned, attached, or supported by Keesler AFB, MS, including the Air Force Reserve Command, but does not include the Air National Guard.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Keesler AFB Form 32</li>
                 <li>Hazardous materiel qualification</li>
@@ -726,7 +742,7 @@
                 <li>Compressed gas and radioactivity data</li>
                 <li>Empty hazardous materiel containers</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who completes Keesler AFB Form 32 for hazardous materiel?</h3>
             <blockquote>Personnel most knowledgeable in properly preparing hazardous materiel for shipment or storage will complete Keesler AFB Form 32. (paragraph 3)</blockquote>
             <h3>Who certifies Keesler AFB Form 32?</h3>

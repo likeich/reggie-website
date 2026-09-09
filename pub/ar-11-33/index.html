@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,14 +732,14 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1024049">View AR 11-33 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/pam-11-33/">PAM 11-33</a></li>
             </ul>
             <hr>
             <p>AR 11-33 addresses experiential learning, lessons learned collection and sharing, organization lesson managers, and Joint Lessons Learned Information System administrators. It requires specified appointments and training and establishes internal control evaluations for lessons learned management.</p>
             <p><strong>Applies to:</strong> This regulation still applies to Army commands (ACOMs), Army service component commands (ASCCs), direct reporting units (DRUs), and force management proponents, to include corps and division headquarters.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Army Lessons Learned Program</li>
                 <li>Experiential learning</li>
@@ -732,7 +748,7 @@
                 <li>Lessons learned training</li>
                 <li>Internal control evaluation</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who must appoint a Joint Lessons Learned Information System administrator in writing?</h3>
             <blockquote>Commanders of ACOMs, ASCCs, and DRUs will appoint a JLLIS administrator in writing. (paragraph 5-1)</blockquote>
             <h3>What training must a lesson manager complete?</h3>

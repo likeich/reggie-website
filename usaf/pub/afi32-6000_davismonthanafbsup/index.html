@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The supplement identifies K&amp;E mission positions and designated housing locations, including Commanders Circle, Cullerton Circle, and Falcon Court. It requires eligible personnel to reside on the installation and establishes vacancy, waiting-list, and relocation provisions.</p>
             <p><strong>Applies to:</strong> This instruction applies to all personnel assigned and attached to the K&amp;E Program on Davis-Monthan AFB and does not apply to the Air National Guard or Air Force Reserve.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Key &amp; Essential mission positions</li>
                 <li>On-installation residency</li>
@@ -726,7 +742,7 @@
                 <li>Designated housing locations</li>
                 <li>Relocation to other housing</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who must reside on the installation under AFI32-6000_DAVISMONTHANAFBSUP?</h3>
             <blockquote>Personnel assigned to K&amp;E, command, or special command positions will be required to reside on the installation due to military necessity, operational requirements, and as a condition of employment or assuming the position.</blockquote>
             <h3>How long may K&amp;E and Command housing remain vacant?</h3>

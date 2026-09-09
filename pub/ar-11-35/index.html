@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>AR 11-35 establishes the Army Occupational and Environmental Health Risk Management Program and sets standards for OEH surveillance data and documents. It requires exposure assessment, health surveillance, risk documentation, and integration of relevant data into electronic health records.</p>
             <p><strong>Applies to:</strong> This policy applies to all phases of Army operations to include training and garrison activities.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Occupational and environmental health risks</li>
                 <li>OEH surveillance data</li>
@@ -729,7 +745,7 @@
                 <li>Electronic health records</li>
                 <li>OEH hazards</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does AR 11-35 require for deployment health assessments?</h3>
             <blockquote>Conduct deployment health assessments (DHAs) which include a DD Form 2795 (Pre-deployment Health Assessment), DD Form 2796 (Post-Deployment Health Assessment (PDHA)), and DD Form 2900 (Post-Deployment Health Reassessment (PDHRA)) for all deployments where Army personnel are expected to be exposed to an OEH hazard that could exceed an occupational or permissible exposure limit.</blockquote>
             <h3>How often must industrial hygiene surveys be performed during and after deployment?</h3>

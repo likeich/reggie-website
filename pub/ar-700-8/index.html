@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>AR 700-8 addresses logistics planning factor applications, population-based and equipment-based factors, equipment usage profiles, and approved-factor dissemination. It requires general officer approval, continuing coordination, and recurring updates for planning factors and equipment usage profiles.</p>
             <p><strong>Applies to:</strong> For the purposes of this regulation, authorized users are defined as any U.S. military service member, DoD Civilian employee, or DoD contractor with duties related to logistics planning.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Army logistics planning factors</li>
                 <li>Population-based logistics planning factors</li>
@@ -730,7 +746,7 @@
                 <li>Planning factor dissemination</li>
                 <li>Planning factor development timelines</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who is considered an authorized user of Army logistics planning factors?</h3>
             <blockquote>For the purposes of this regulation, authorized users are defined as any U.S. military service member, DoD Civilian employee, or DoD contractor with duties related to logistics planning. (paragraph 1-6)</blockquote>
             <h3>How often are Army logistics planning factors and equipment usage profiles updated?</h3>

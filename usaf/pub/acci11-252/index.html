@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers training task lists, formal operations training syllabi, syllabus-related documents, foreign military sales training, and classified document procedures. It requires compliance, controls waivers and changes, and authorizes printing and duplication of related documents.</p>
             <p><strong>Applies to:</strong> It applies to all persons who prepare, manage, review, approve or use ACC formal operations training publications.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Training task lists</li>
                 <li>Formal operations training syllabi</li>
@@ -726,7 +742,7 @@
                 <li>Classified documents procedures</li>
                 <li>Waivers and syllabus changes</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Can units modify ACCI11-252?</h3>
             <blockquote>Units may supplement this document with HQ ACC Director of Operations approval, but may not modify this document.</blockquote>
             <h3>Where should recommended changes to ACCI11-252 be sent?</h3>

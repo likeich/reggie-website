@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It defines duties for equipment control officers, cellular phone liaisons, unit accountable property officers, and property custodians. It sets requirements for cellular telephone use, unofficial call billing, and annual DD Form 428 revalidation.</p>
             <p><strong>Applies to:</strong> It applies to all 18th Wing (18 WG) and partner units, and members supported by the 18 WG.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Accountable IT asset custody</li>
                 <li>Cellular telephone use</li>
@@ -726,7 +742,7 @@
                 <li>Annual DD Form 428 revalidation</li>
                 <li>Property custodian inventories</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who serves as the Unit Accountable Property Officer?</h3>
             <blockquote>Organization commanders (or equivalent) shall serve as UAPO and are responsible for providing guidance and procedures to ensure adequate protection and oversight is afforded to safeguard IT assets under their control. (paragraph 1)</blockquote>
             <h3>Can cellular telephones be used for command and control?</h3>

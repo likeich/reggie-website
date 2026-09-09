@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It establishes and describes the Air Force Operational Reporting System and explains the purpose of operational reports. It requires specific initial and follow-up information for suspected or confirmed CBRN incidents, including hazard, victim, exposure, and response details.</p>
             <p><strong>Applies to:</strong> This supplement applies to all active duty military, Air National Guard and Air Force Reserve personnel assigned to Nellis Air Force Base, Creech Air Force Base, the Nevada Test and Training Range (NTTR), and all tenant units geographically located on or near the aforementioned installations.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Operational Reporting System</li>
                 <li>OPREP-3 reports</li>
@@ -727,7 +743,7 @@
                 <li>Cordon and evacuation zones</li>
                 <li>OPREP-3 system outages</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What information is required when a CBRN report data element is unknown?</h3>
             <blockquote>If a data element is unknown, list line identifier (A., B., C., etc.) and state “UNKNOWN”.</blockquote>
             <h3>What CBRN information belongs in the initial report?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/hillafb/publication/hillafbi10-201/hillafbi10-201.pdf">View HILLAFBI10-201 on armypubs.army.mil</a></p>
             <hr>
             <p>It defines peacetime and wartime, exercise, and contingency augmentation categories and establishes processes for requesting support, allocating taskings, and initiating augmentation. It also covers weapons qualification, readiness training, gate access programs, federal civilian participation, and civilian work hours and compensation.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Peacetime augmentation requirements</li>
                 <li>Wartime and contingency augmentation</li>
@@ -727,7 +743,7 @@
                 <li>School special access gate</li>
                 <li>Civilian augmentation work hours</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What qualifies as a peacetime augmentation requirement?</h3>
             <blockquote>Peacetime Augmentation Requirement: one-time or recurring duty that supports the 75 ABW mission, does not require specific career field skills, and can be accomplished with minimal training, i.e. Drug Demand Reduction Program, Trash Detail, etc. (paragraph 10-243)</blockquote>
             <h3>What information must an augmentee support request include?</h3>

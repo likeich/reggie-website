@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers crew selection, training, weather minimums, local FCF areas, and deployed procedures. It requires specified reviews, briefings, qualifications, coordination, and documentation.</p>
             <p><strong>Applies to:</strong> It establishes local procedures for the operation of the FCF Program (including operational check flights (OCF) and high speed taxi checks (HSTC) within the 352 Special Operations Wing (SOW) and applies to all personnel working with 352 SOW Aircraft.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>FCF crew complement selection</li>
                 <li>Aircrew training requirements</li>
@@ -727,7 +743,7 @@
                 <li>Local tilt-rotor FCF area</li>
                 <li>Deployed FCF procedures</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What crew positions are required to maintain an MC-130J FCF qualification?</h3>
             <blockquote>Crew positions required to maintain an FCF qualification are Pilot and Loadmaster; Co-Pilot and CSO, if required, must be mission qualified and current in the events to be accomplished. (paragraph 2)</blockquote>
             <h3>What training must FCF aircrew receive?</h3>

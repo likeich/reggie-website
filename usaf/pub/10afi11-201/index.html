@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers unit guidance, in-flight duty status conversions, signature requirements, and training period guidelines. It identifies UTAPSWEB as the primary tool for administering and documenting training period program management and sets requirements for AFTPs and AGTPs.</p>
             <p><strong>Applies to:</strong> It applies to all Tenth Air Force (10 AF) subordinate flying units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Unit guidance for AFTPs and AGTPs</li>
                 <li>In-flight duty status conversions</li>
@@ -726,7 +742,7 @@
                 <li>Single and dual AFTPs</li>
                 <li>Training Period guidelines</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who must approve in-flight duty status conversions?</h3>
             <blockquote>All in-flight duty status conversions must be approved, in advance, by the Operations Group Commander or designated representative and annotated on the approved flight authorization order. (paragraph 3)</blockquote>
             <h3>How many duty status conversions may aircrew personnel make in one crew duty day?</h3>

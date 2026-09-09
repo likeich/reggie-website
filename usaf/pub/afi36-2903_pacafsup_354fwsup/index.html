@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication addresses winter footwear, reflective belts, headgear, arctic clothing, cold weather gear, and no-hat and no-salute areas. It requires specific wear periods, markings, issue responsibilities, and restrictions on use.</p>
             <p><strong>Applies to:</strong> This supplement applies to all host, associate, and TDY organizations on Eielson AFB, including Air National Guard and US Air Force Reserve members.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Winter footwear</li>
                 <li>Reflective belts</li>
@@ -728,7 +744,7 @@
                 <li>Polypropylene socks</li>
                 <li>Unit-issued safety gear</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When can approved black winter footwear be worn with blues?</h3>
             <blockquote>During winter months all approved black winter footwear (e.g, Danner, Max Trax, or equivalent boots) may be worn with blues during outdoor activities to include when traversing from a vehicle to a building. (paragraph 1)</blockquote>
             <h3>What marking is authorized on a reflective belt?</h3>

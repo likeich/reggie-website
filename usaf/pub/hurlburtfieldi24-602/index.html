@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>The publication defines Transportation Officer duties and addresses cargo movement coordination, shipment exclusions, and AA&amp;E handling. It sets requirements for munitions receiving, vehicle inspections, authorized personnel lists, and shipment custody.</p>
             <p><strong>Applies to:</strong> The instructions outlined herein are applicable for all 1 SOLRS Traffic Management Office (TMO) support of 1st Special Operations Wing (1 SOW) and other Hurlburt Field agencies.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Traffic management operations</li>
                 <li>Cargo movement</li>
@@ -721,7 +737,7 @@
                 <li>Explosive vehicle inspections</li>
                 <li>Transportation Officer duties</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What are the receiving hours for explosives destined to Hurlburt Field?</h3>
             <blockquote>The published hours of operation for receiving explosives destined to Hurlburt Field, as indicated in Transportation Facility Guide (TFG), are 0800-1400 hours, Monday through Friday, except for holidays. (paragraph 2)</blockquote>
             <h3>Who keeps custody of a munitions shipment until it is accepted?</h3>

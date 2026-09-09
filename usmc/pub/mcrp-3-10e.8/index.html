@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <p><a href="https://www.marines.mil/News/Publications/MCPEL/Electronic-Library-Display/Article/900527/mcrp-3-10e8/">View MCRP 3-10E.8 on armypubs.army.mil</a></p>
             <hr>
             <p>It covers meteorological information sources, weather effects, meteorological measuring sets, visual observations, and balloon operations. It also sets out procedures for MET data collection, equipment operation, site activities, personnel, logistics, and maintenance.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Field artillery meteorology</li>
                 <li>Meteorological measuring sets</li>
@@ -727,7 +743,7 @@
                 <li>Pilot balloon observations</li>
                 <li>Meteorological data systems</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What sources can provide meteorological information when organic assets are unavailable?</h3>
             <blockquote>There are additional sources of meteorological (MET) information when MET data is not available from organic assets. (paragraph 1-6)</blockquote>
             <h3>What must commanders and operations officers check when exchanging meteorological data between countries?</h3>

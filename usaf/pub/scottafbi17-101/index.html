@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication covers IPTV and CATV service billing, EMSEC oversight, and responsibilities for commanders, monitors, and base personnel. It requires CIPS submissions, commander-endorsed justifications, installation drawings, funding validation, and controls on CATV connections.</p>
             <p><strong>Applies to:</strong> This guidance is applicable to 375th Air Mobility Wing (AMW) and tenant units residing on Scott AFB to include the 932d Airlift Wing (AW) (AFRES) and the 126th Air Refueling Wing (ARW) (ANG).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>CATV service billing</li>
                 <li>EMSEC oversight</li>
@@ -726,7 +742,7 @@
                 <li>FOUO CATV requests</li>
                 <li>CATV connection controls</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who oversees CATV requisition, validation, and installation at Scott AFB?</h3>
             <blockquote>The 375 CS/SCX will oversee guidelines for requisition, validation, and installation of CATV in government offices on Scott AFB. (paragraph 1)</blockquote>
             <h3>Who pays CATV service bills?</h3>

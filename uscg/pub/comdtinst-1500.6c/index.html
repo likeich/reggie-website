@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <hr>
             <p>The publication covers EMITP eligibility, applications, selection criteria, command endorsements, and selection panel membership. It sets requirements for ratings, pay grades, time in service, prior participation, and withdrawal or disenrollment waiting periods.</p>
             <p><strong>Applies to:</strong> All Coast Guard unit commanders, commanding officers, officers-in-charge, deputy/assistant commandants, and chief of headquarter directorates must comply with the policies contained.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Enlisted Marine Inspector Training Program</li>
                 <li>EMITP eligibility</li>
@@ -728,7 +744,7 @@
                 <li>Selection panel membership</li>
                 <li>Marine inspector competencies</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Which Coast Guard ratings are eligible for EMITP?</h3>
             <blockquote>Presently in a rating of either Marine Science Technician (MST), Boatswain’s Mate (BM), Aviation Survival Technician (AST), Machinery Technician (MK), Damage Controlman (DC), or Electrician’s Mate (EM).</blockquote>
             <h3>What pay grade must an EMITP applicant hold?</h3>

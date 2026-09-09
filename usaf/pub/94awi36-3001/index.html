@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It establishes procedures for active-duty and multiple casualty reporting, next-of-kin notification, mortuary matters, and news media information. It requires coordination with the Casualty Assistance Representative for written casualty instructions and restricts casualty information releases outside DOD channels for 24 hours after next-of-kin notification.</p>
             <p><strong>Applies to:</strong> Agencies and tenant units of Dobbins ARB who prepare written instruction pertaining to casualty matters</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Casualty reporting</li>
                 <li>Casualty notification</li>
@@ -727,7 +743,7 @@
                 <li>Mortuary matters</li>
                 <li>Media information release</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who must be called when someone has knowledge of a casualty?</h3>
             <blockquote>The first agency, organization or person having knowledge of a casualty will telephone the CAR regardless of the time of day or night. (paragraph 2)</blockquote>
             <h3>Where should next-of-kin and government agency calls be referred?</h3>

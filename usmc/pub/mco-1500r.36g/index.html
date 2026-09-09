@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>It defines the voluntary Cat P program for NPS Marine Corps Reserve applicants and describes paid IDT before reporting to the Recruit Depot. It covers participation limits, authorization timing, accountability, records, training, and administrative support.</p>
             <p><strong>Applies to:</strong> The provisions of this Order apply to all Marine Corps Reserve Non Prior Service (NPS) enlisted members who are high school graduates (Tier 1 education credential holder) or bona fide high school seniors.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Cat P program</li>
                 <li>IDT pay status</li>
@@ -729,7 +745,7 @@
                 <li>SMCR unit administration</li>
                 <li>IADT participation restrictions</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How long before IADT can NPS Reserve enlistees enter IDT pay status?</h3>
             <blockquote>The Marine Corps Reserve is authorized to place NPS Reserve enlistees in an IDT pay status up to 365 days prior to their entry on IADT. (paragraph 5)</blockquote>
             <h3>What is the Cat P program?</h3>

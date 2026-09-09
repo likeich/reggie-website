@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>ATP 3-90.5 covers CAB planning, preparation, execution, and assessment across command and control, movement and maneuver, intelligence, fires, sustainment, and protection. It addresses offensive, defensive, and stability operations and states that decisions and actions comply with applicable laws and rules of engagement.</p>
             <p><strong>Applies to:</strong> ATP 3-90.5 applies to the Active Army, Army National Guard/Army National Guard of the United States, and United States Army Reserve unless otherwise stated.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Combined arms battalion operations</li>
                 <li>Unified land operations</li>
@@ -730,7 +746,7 @@
                 <li>Sustainment functions</li>
                 <li>Fire support and targeting</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the mission of the combined arms battalion?</h3>
             <blockquote>The mission of the CAB is to close with and destroy enemy forces using fire, maneuver, and shock effect, or to repel their assault by fire and counterattack. (paragraph 3-96)</blockquote>
             <h3>What are the two options for conducting an area defense?</h3>

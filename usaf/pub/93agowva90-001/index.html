@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -706,7 +722,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/93agow/publication/93agowva90-001/93agowva90-001.pdf">View 93AGOWVA90-001 on armypubs.army.mil</a></p>
             <hr>
             <p>It covers complaints involving fraud, waste, abuse, mismanagement, violations, injustice, authority, and inappropriate conduct. It requires truthful statements and timely submission of AF Form 102 for effective resolution.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Inspector General complaint assistance</li>
                 <li>Complaint reporting</li>
@@ -714,7 +730,7 @@
                 <li>Complaint forms</li>
                 <li>Identity safeguards</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What problems can the Wing IG help resolve?</h3>
             <blockquote>The Wing IG is available when you have a complaint or problem that you &amp; your chain of command can’t solve.</blockquote>
             <h3>How should an IG complaint be filed?</h3>

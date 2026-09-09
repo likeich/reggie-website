@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It describes AF Form 813, environmental checklists, proposed action alternatives, and the determination of analysis and documentation levels. It requires environmental review before implementation and assigns duties for submitting, evaluating, and documenting proposed actions.</p>
             <p><strong>Applies to:</strong> This instruction applies to all 45 SW organizations, tenant organizations, visiting organizations, and contractors operating within the 45 SW and/or on 45 SW installations.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Environmental Impact Analysis Process</li>
                 <li>AF Form 813</li>
@@ -727,7 +743,7 @@
                 <li>Environmental Checklist</li>
                 <li>Proposed action alternatives</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does AF Form 813 document?</h3>
             <blockquote>The AF Form 813 will document whether the action is categorically excluded from the requirement of further environmental analysis, such as an Environmental Assessment (EA) or Environmental Impact Statement (EIS). (paragraph 1)</blockquote>
             <h3>When should the environmental checklist be completed?</h3>

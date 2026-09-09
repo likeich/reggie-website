@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It establishes weather service responsibilities and procedures for McChord Field and supported organizations. It covers airfield services, mission integration, staff weather integration, duty priorities, equipment, and operational limitations.</p>
             <p><strong>Applies to:</strong> It applies to 62d Airlift Wing (62 AW) and subordinate units; units assigned, attached, or associated with 62 AW; organizations supported by McChord Field, to include the 446th Airlift Wing (446 AW) Air Force Reserve Command.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Weather observations and forecasts</li>
                 <li>Weather warnings, watches, and advisories</li>
@@ -728,7 +744,7 @@
                 <li>Meteorological equipment</li>
                 <li>Weather station operations</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who provides weather services to the 62d Airlift Wing and supported units?</h3>
             <blockquote>The 62d Operations Support Squadron Weather Flight (62 OSS/OSW, hereafter WF) is the lead weather unit that will provide or arrange weather services to the 62d Airlift Wing (62 AW), the 446th Airlift Wing (446 AW), subordinate units, and units assigned, attached, or supported by McChord Field, WA.</blockquote>
             <h3>What happens when network service is interrupted?</h3>

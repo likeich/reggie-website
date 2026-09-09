@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/usafe/publication/usafei36-753/usafei36-753.pdf">View USAFEI36-753 on armypubs.army.mil</a></p>
             <hr>
             <p>USAFEI36-753 addresses managerial positions in hotels, accommodation facilities, clubs, restaurants, and recreation and entertainment facilities. It requires individual employment contracts, assigns personnel to the HM pay plan, and establishes compensation levels and pay bands.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Local national managerial positions</li>
                 <li>German accommodation and service facilities</li>
@@ -725,7 +741,7 @@
                 <li>Compensation levels</li>
                 <li>Managerial employment contracts</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When can local national managerial positions be established in German facilities?</h3>
             <blockquote>Local national (LN) managerial positions will be established in hotels and accommodation facilities, clubs, restaurants, recreation and entertainment facilities and other similar facilities in Germany only when the position requires full responsibility for the operation of the facility or major part thereof. (paragraph 1)</blockquote>
             <h3>When can a deputy manager position be established?</h3>

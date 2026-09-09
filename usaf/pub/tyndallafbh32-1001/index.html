@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/tyndallafb/publication/tyndallafbh32-1001/tyndallafbh32-1001.pdf">View TYNDALLAFBH32-1001 on armypubs.army.mil</a></p>
             <hr>
             <p>It covers facilities assignment and space utilization, work execution, real property, contract work, fire protection, energy management, disasters, safety, waste turn-in, custodial services, refuse collection, and security. FMs and FCs should be designated in writing, and they are required to create and maintain a FM continuity notebook according to Attachment 3.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Facility manager responsibilities</li>
                 <li>Facility coordinator duties</li>
@@ -727,7 +743,7 @@
                 <li>Universal waste turn-in</li>
                 <li>Custodial services and refuse collection</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How does an organization request additional facility space?</h3>
             <blockquote>Any organization requesting a change or requiring additional building space should submit a Facility Space/Use Request form signed by their squadron commander to 325 CES/CEAO.</blockquote>
             <h3>Can organizations relocate or change facility use without approval?</h3>

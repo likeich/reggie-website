@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>ADP 3-37 covers protection fundamentals, operational environments, threats and hazards, protection during Army operations, and protection cells. It requires commanders and staffs to integrate, synchronize, assess, and adjust protection capabilities throughout the operations process.</p>
             <p><strong>Applies to:</strong> ADP 3-37 is applicable to all members of the profession of arms: leaders, Soldiers, and Army civilians.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Protection warfighting function</li>
                 <li>Threats and hazards</li>
@@ -730,7 +746,7 @@
                 <li>Protection cells</li>
                 <li>Risk management</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How must commanders integrate protection capabilities?</h3>
             <blockquote>Commanders integrate, layer, and synchronize foundational and operational protection capabilities and other operations and tasks that create a protection effect to manage risk and protect capabilities, areas, and information without impeding mission accomplishment. (paragraph 1-17)</blockquote>
             <h3>What must commanders do when implementing protection during execution?</h3>

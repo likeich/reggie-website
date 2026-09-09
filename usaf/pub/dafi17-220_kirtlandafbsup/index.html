@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication defines spectrum-management responsibilities and addresses spectrum certification, frequency assignments, and system supportability. It requires reviews for local purchases, permits justified out-of-band requirements on a non-interference basis, and identifies an exemption for electromagnetic attack systems.</p>
             <p><strong>Applies to:</strong> This publication applies to all units assigned, attached, and associated to 377th Air Base Wing and all Mission partners aboard Kirtland Air Force Base (KAFB) who use radio frequencies in facilities and the Kirtland area.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Electromagnetic spectrum management</li>
                 <li>Spectrum certification</li>
@@ -727,7 +743,7 @@
                 <li>Electromagnetic attack systems</li>
                 <li>KAFB spectrum-dependent system purchases</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the electromagnetic spectrum?</h3>
             <blockquote>The electromagnetic spectrum is the range of frequencies of electromagnetic radiation extending from zero to infinity, measured in hertz (cycles per second). (paragraph 1)</blockquote>
             <h3>What must federal users do when using frequency bands?</h3>

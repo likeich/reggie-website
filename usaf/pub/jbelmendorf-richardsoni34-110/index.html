@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It identifies eligible patrons, landing permit and rental agreement requirements, aircraft limits, safety rules, and dock and shed conditions. It also sets requirements for environmental protection, hazardous materials, spill prevention, fees, abandoned property, and changes to the Rental Use Agreement.</p>
             <p><strong>Applies to:</strong> It applies to all patrons and administrators of the SML Recreational Aircraft Storage Area (RASA) as well as the Air Force Reserves and Air National Guard units and members.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Private aircraft storage</li>
                 <li>Patron eligibility</li>
@@ -728,7 +744,7 @@
                 <li>Spill prevention</li>
                 <li>Abandoned property</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who is authorized to store private aircraft at SML RASA?</h3>
             <blockquote>Active-duty military, Department of Defense (DoD) retirees, members of the National Guard or Reserves, DoD/Non-Appropriated Funds (NAF) employees, their families, and other patrons as specified in DAFI 34-101 are authorized to store private aircraft at the SML RASA. (paragraph 2)</blockquote>
             <h3>What permit is required before storing a private aircraft at SML RASA?</h3>

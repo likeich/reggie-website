@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/af_a3/publication/afmd23/afmd23.pdf">View AFMD23 on armypubs.army.mil</a></p>
             <hr>
             <p>It covers six missions, including policy development, operational awareness, engagement with other services and foreign partners, weather support, special access programs, and operations planning. Compliance with AFMD23 is mandatory, and records created through its prescribed processes must be maintained and disposed of according to specified Air Force records requirements.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Air Force Operations Group missions</li>
                 <li>Operational situational awareness</li>
@@ -727,7 +743,7 @@
                 <li>Civil Air Patrol oversight</li>
                 <li>Counter-Narcotics operations</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the Air Force Operations Group’s organizational status?</h3>
             <blockquote>The Air Force Operations Group is a Field Operating Agency directly subordinate to the Deputy Chief of Staff, Operations (AF/A3), Headquarters United States Air Force and performs six key missions. (paragraph 1)</blockquote>
             <h3>Who does the Air Force Operations Group Commander report to?</h3>

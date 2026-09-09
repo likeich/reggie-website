@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -711,7 +727,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/af_a3/publication/afman11-223(i)v3/afman11-223(i)v3.pdf">View AFMAN11-223(I)V3 on armypubs.army.mil</a></p>
             <hr>
             <p>It covers sling-load principles, classifications, certification, waivers, general rigging instructions, and detailed procedures for vehicles, trailers, generators, weapons, shelters, and containers. It requires specified materials, preparation steps, and equipment conditions for certified loads.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Helicopter sling-load certification</li>
                 <li>Dual-point rigging procedures</li>
@@ -721,7 +737,7 @@
                 <li>Howitzer and weapons-system rigging</li>
                 <li>Shelter and container rigging</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Where should services submit requests for waivers?</h3>
             <blockquote>Services should submit requests for waivers to their respective points of contact.</blockquote>
             <h3>How many people can prepare and rig the M35A2 modified cargo truck load?</h3>

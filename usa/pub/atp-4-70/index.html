@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>ATP 4-70 covers organizational relationships, command and support relationships, personnel deployment criteria, planning, coordination, systems fielding, and theater acquisition tracking. It requires coordination among forward support teams, PEOs, PMs, gaining commands, and supporting AFSBs during materiel fielding and retrograde activities.</p>
             <p><strong>Applies to:</strong> ATP 4-70 applies to the active Army, Army National Guard, and United States Army Reserve unless otherwise stated.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>ASA(ALT) forward support team operations</li>
                 <li>Command and support relationships</li>
@@ -729,7 +745,7 @@
                 <li>Systems fielding and retrograde</li>
                 <li>Theater acquisition tracking</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What authority do ASA(ALT) forward support teams have over Army PEO and PM support teams?</h3>
             <blockquote>When formed, the ASA(ALT) forward support teams exercise coordination authority and technical oversight authority over all Army PEO and PM fielding or other support teams within the area of operations (AO). (paragraph 1-6)</blockquote>
             <h3>What must Army PEO and PM teams coordinate with an ASA(ALT) forward support team?</h3>

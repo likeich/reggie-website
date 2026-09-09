@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>It covers emergency mass notification, alert types, Giant Voice integration, the AtHoc smartphone application, scenario development, and time-sensitive notifications. It requires reliable delivery of potentially life-saving alerts to assigned personnel and establishes procedures for system use.</p>
             <p><strong>Applies to:</strong> It applies to all active-duty and Department of Defense civilian personnel assigned to the 2d Bomb Wing and 307th Bomb Wing, and is informational for personnel assigned to Headquarters, Air Force Global Strike Command, Headquarters, Eighth Air Force and other mission partner units located on Barksdale AFB.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Emergency mass notification</li>
                 <li>AtHoc Installation Warning System</li>
@@ -722,7 +738,7 @@
                 <li>Tornado warnings</li>
                 <li>Active shooter procedures</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who has waiver authority for BARKSDALEAFBI10-260?</h3>
             <blockquote>Waiver authority for this instruction is the 2 BW/CC.</blockquote>
             <h3>How is the emergency mass notification information used?</h3>

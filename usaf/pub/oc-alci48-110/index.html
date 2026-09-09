@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/oc-alc/publication/oc-alci48-110/oc-alci48-110_.pdf">View OC-ALCI48-110 on armypubs.army.mil</a></p>
             <hr>
             <p>It addresses sanitation, designated consumption spaces, open-container exceptions, laboratory areas, aircraft maintenance, and regulated areas. It requires controls for drink containers, hand hygiene, storage, approved areas, and special-event waivers.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Food and drink consumption</li>
                 <li>Industrial work areas</li>
@@ -727,7 +743,7 @@
                 <li>Restroom and toxic-material restrictions</li>
                 <li>Special-event waivers</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Where is food consumption allowed in OC-ALC industrial areas?</h3>
             <blockquote>The consumption of food in OC-ALC industrial areas is permitted only within those spaces designated by the Group/Squadron Commanders or Directors, with consultation from the Bioenvironmental Engineering Flight (BEF), such as break areas, enclosed administrative areas, and enclosed shop floor modular office areas. (paragraph 2)</blockquote>
             <h3>How are open containers handled in 76 AMXG industrial work areas?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/saf_aa/publication/hqdafmd1-3/hqdafmd1-3.pdf">View HQDAFMD1-3 on armypubs.army.mil</a></p>
             <hr>
             <p>HQDAFMD1-3 establishes the Administrative Assistant as part of the Secretariat and assigns duties involving policy, programs, oversight, continuity, correspondence, and administrative services. It requires limits on redelegations involving notifications or reports to Congress and assigns specific authorities and responsibilities.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Administrative Assistant mission</li>
                 <li>Secretariat organizational relationships</li>
@@ -727,7 +743,7 @@
                 <li>Delegations of authority</li>
                 <li>Notifications to Congress</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the Administrative Assistant responsible for in the Department of the Air Force?</h3>
             <blockquote>The SAF/AA has overall responsibility for administrative continuity and maximizing efficient business operations of the Department of the Air Force (DAF). (paragraph 1)</blockquote>
             <h3>Who does the SAF/AA report to?</h3>

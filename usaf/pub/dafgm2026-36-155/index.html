@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>It sets policy to enhance mission readiness, employee engagement, and workforce productivity through healthy lifestyles and balanced work environments. It includes wellness interventions, fitness facilities, health screenings, counseling, and requirements concerning workers’ compensation and appropriated funds.</p>
             <p><strong>Applies to:</strong> It applies to all appropriated and non-appropriated funded Department of the Air Force (DAF) civilian employees to include Regular Air Force, United States Space Force (USSF), Title 5 Air Force Reserve, and Air National Guard civilian employees.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Workplace flexibilities</li>
                 <li>Work-life programs</li>
@@ -722,7 +738,7 @@
                 <li>Health screenings</li>
                 <li>Appropriated funds for health promotion services</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What can health and wellness programs include?</h3>
             <blockquote>Health and wellness programs may include onsite and virtual wellness interventions, organizational policies and benefits, fitness facilities, environmental supports, and links to the surrounding community programs designed to encourage a healthier, more engaged and productive workforce. (paragraph 2)</blockquote>
             <h3>What happens when federal employees are injured during fitness activities?</h3>

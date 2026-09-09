@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication covers 3, 5, and 7 skill-level qualifications, task standards, training documentation, and trainer identification. It defines GO performance, requires training records, and addresses maintenance competencies including inspections, servicing, troubleshooting, hazardous materials, and supply lines.</p>
             <p><strong>Applies to:</strong> This CJQS applies to all personnel with AFSC 2A5X2 and DoD Civilians performing Helicopter Aircraft Maintenance on MH-139 aircraft.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>MH-139 aircraft maintenance</li>
                 <li>Job qualification standards</li>
@@ -728,7 +744,7 @@
                 <li>Hazardous materials</li>
                 <li>Supply lines</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What qualification standard applies to all tasks in AFRCJQS2A5X2_MH139A?</h3>
             <blockquote>All personnel will be qualified to the GO/NO GO standard for all tasks listed in this CJQS.</blockquote>
             <h3>What does GO mean for a task qualification?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>AFI25-201 covers support agreement types, DD Form 1144, memoranda of agreement or understanding, Installation Support Agreement Catalogs, and special support conditions. It defines impasse procedures and requires coordination, supporting documentation, electronic forwarding, and Wing coordination.</p>
             <p><strong>Applies to:</strong> It applies to AF individuals at all levels who prepare, manage, review, certify, approve, disseminate and/or use support agreements as a Supplier or a Receiver, including the Air Force Reserve (AFR) and Air National Guard (ANG), except where noted otherwise.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Support agreement procedures</li>
                 <li>DD Form 1144</li>
@@ -727,7 +743,7 @@
                 <li>Contract-provided support</li>
                 <li>Impasse resolution</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How should additional specific provisions be documented in a support agreement?</h3>
             <blockquote>Document additional specific provisions to this support agreement using the Receiver selected verbiage from the ISAC or equivalent document or using plain bond paper for support activities not in the ISAC or equivalent document. (paragraph 8)</blockquote>
             <h3>How are reimbursement decisions made for support identified in an Installation Support Catalog?</h3>

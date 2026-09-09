@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <p><a href="https://www.marines.mil/News/Publications/MCPEL/Electronic-Library-Display/Article/900374/mco-312011a/">View MCO 3120.11A on armypubs.army.mil</a></p>
             <hr>
             <p>The publication addresses parachutist billets, qualification and refresher training, hazardous duty incentive pay, drop zones, and operational participation. It requires controls for authorized equipment, parachute packing, paraloft facilities, medical considerations, and reporting.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Parachutist hazardous duty incentive pay</li>
                 <li>Parachutist qualification requirements</li>
@@ -728,7 +744,7 @@
                 <li>Paraloft facilities</li>
                 <li>Personnel tandem parachute operations</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Which Marine Corps units may possess and maintain parachute equipment?</h3>
             <blockquote>Only Marine Corps units and activities with an authorized allowance of parachute equipment on their Table of Equipment (T/E) are authorized to possess and maintain parachute equipment or to conduct parachute operations. (paragraph 2)</blockquote>
             <h3>What parachute equipment is authorized for Marine Corps military parachuting?</h3>

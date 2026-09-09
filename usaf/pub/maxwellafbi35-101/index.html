@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>It defines special, known, and unplanned special events and addresses lodging, transportation, meeting facilities, and weather impacts. It requires advance coordination and specifies information for Wing support requests, including event details, attendees, and support needs.</p>
             <p><strong>Applies to:</strong> It applies to AU organizations and tenant units at Maxwell AFB and Maxwell AFB, Gunter Annex, to include the 908th Airlift Wing (AFRC) and 187th Fighter Wing (ANG).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Special event types</li>
                 <li>Wing support requests</li>
@@ -722,7 +738,7 @@
                 <li>Weather impacts</li>
                 <li>AUREPM event scheduling</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What counts as a special event?</h3>
             <blockquote>Special Events are non-educational events such as conferences, symposiums, band performances, Junior Reserve Officer Training Corps (JROTC) visits, the Air Show, Inspector General inspection team visits, etc. that are hosted by an AU School, 42 ABW or other Maxwell or Gunter tenant unit or visiting unit. (paragraph 3)</blockquote>
             <h3>How is a known special event defined?</h3>

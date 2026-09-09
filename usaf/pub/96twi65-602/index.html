@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/96tw/publication/96twi65-602/96twi65-602.pdf">View 96TWI65-602 on armypubs.army.mil</a></p>
             <hr>
             <p>It covers process owner responsibilities, mission billing charges, billing adjustments, fault codes, and mission cancellation costs. It requires Post Mission Reports for specified missions and establishes timelines for submissions, reviews, disagreements, and appeals.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Process owner responsibilities</li>
                 <li>Mission billing charges</li>
@@ -725,7 +741,7 @@
                 <li>Mission code billing adjustments</li>
                 <li>Fault code appeals</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When is a Post Mission Report required?</h3>
             <blockquote>A PMR is required for all 96 TW scheduled test missions. (paragraph 2)</blockquote>
             <h3>When are Post Mission Reports due?</h3>

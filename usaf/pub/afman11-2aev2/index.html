@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>It covers evaluation requirements, grading criteria, unsatisfactory performance, testing, training devices, and Flight Nurse and Aeromedical Evacuation Technician evaluations. Compliance with attachments is mandatory, and the publication is used with AFMAN 11-202V2 and the appropriate MAJCOM supplement.</p>
             <p><strong>Applies to:</strong> This AFMAN applies to all Air Force personnel conducting Aeromedical Evacuation (AE) missions including Air Force Reserve (AFR) and Air National Guard (ANG) units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Aeromedical Evacuation Crew Member evaluations</li>
                 <li>Qualification and mission evaluations</li>
@@ -723,7 +739,7 @@
                 <li>Aircrew Training Devices</li>
                 <li>Electronic Flight Bags</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What additional aircraft are included in the qualification process?</h3>
             <blockquote>Additional non-universal non-unit-assigned aircraft are included in the qualification process when applicable.</blockquote>
             <h3>Are attachments to AFMAN11-2AEV2 mandatory?</h3>

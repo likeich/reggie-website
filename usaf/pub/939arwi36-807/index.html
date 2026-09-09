@@ -604,8 +604,17 @@ program">
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -626,6 +635,13 @@ program">
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -722,7 +738,7 @@ PROGRAM</li>
             <hr>
             <p>939ARWI36-807 establishes policy and procedures for implementing and maintaining the alternate work schedule program. It addresses schedule requests, tours of duty, premium pay, and absence and leave.</p>
             <p><strong>Applies to:</strong> The 5/4-9 Compressed Work Schedule Program, an alternate work schedule (AWS), applies to all 939th Air Refueling Wing (939 ARW) organizations and its civilian employees.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Compressed work schedules</li>
                 <li>Alternate work schedules</li>
@@ -731,7 +747,7 @@ PROGRAM</li>
                 <li>Premium pay</li>
                 <li>Absence and leave</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What factors are monitored when deciding whether to maintain an alternate work schedule?</h3>
             <blockquote>The following factors will be continuously monitored in assessing whether to maintain an AWS; efficiency and productivity, impact on morale, tardiness and turnover rates, job opportunities for working spouses/parents, car pools, use of mass transportation, and utility consumption. (paragraph 1)</blockquote>
             <h3>When can supervisors restrict an employee’s alternate work schedule off day?</h3>

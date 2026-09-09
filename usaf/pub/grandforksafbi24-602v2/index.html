@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The instruction addresses DoD personnel and government shipments, including AA&amp;E, classified material, sensitive material, nuclear readiness material, and aircraft engines. It requires training, authorization, security clearance verification, shipping documentation, delivery records, and designated procedures for explosive shipments.</p>
             <p><strong>Applies to:</strong> This instruction applies to all organizations assigned or attached to Grand Forks AFB, North Dakota.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>AA&amp;E shipments</li>
                 <li>Explosives receiving requirements</li>
@@ -726,7 +742,7 @@
                 <li>DD Form 1149 shipments</li>
                 <li>Commercial vehicle inspections</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who must comply with the procedures for processing and transporting AA&amp;E and classified material?</h3>
             <blockquote>If involved with the processing, packaging, handling and transporting of AA&amp;E, Classified, Sensitive, Nuclear Readiness Material, and Aircraft Engines, these personnel will comply with the procedures contained in this wing instruction.</blockquote>
             <h3>What training is required for personnel who handle or ship sensitive cargo?</h3>

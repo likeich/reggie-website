@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication describes civil engineer tasks for establishing and operating a bare base and projecting airpower forward. It addresses BEAR asset management, water use rates, contract force multipliers, CE task standards, and planning factors for contingency tasks.</p>
             <p><strong>Applies to:</strong> This volume is of particular importance to engineers and mobility team chiefs responsible for initial beddown planning and execution at bare base and forward operating locations.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Bare base conceptual planning</li>
                 <li>Civil engineer tasks</li>
@@ -727,7 +743,7 @@
                 <li>Alternate fuel blending</li>
                 <li>Diesel engine fuel authorization</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When should JP-4 or Jet B be used?</h3>
             <blockquote>Aviation Fuel Grade JP-4 (or Jet B) should be used only when no other fuels are available. (paragraph 2)</blockquote>
             <h3>What precautions apply when JP-4 or Jet B is used inside buildings?</h3>

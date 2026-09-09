@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>It assigns responsibilities and establishes procedures for cooperating with the Office of Special Counsel. It covers whistleblower disclosure cases, prohibited personnel actions, USERRA and Hatch Act investigations, legal representation, and corrective and disciplinary actions.</p>
             <p><strong>Applies to:</strong> This publication applies to all Air Force members and employees, to Air Force Reserve Command (AFRC) personnel, and to the Air National Guard (ANG).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Office of Special Counsel cooperation</li>
                 <li>Whistleblower disclosure cases</li>
@@ -721,7 +737,7 @@
                 <li>Hatch Act investigations</li>
                 <li>Legal representation requests</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When can a disclosure be excluded?</h3>
             <blockquote>A disclosure shall not be excluded because—  Of the employee’s or applicant’s motive for making the disclosure;  Of the amount of time which has passed since the occurrence of events described; or  The disclosure  was made to a supervisor;  was made in the normal course of duties;  was made to a person who participated in the disclosed wrongdoing;  revealed information that had been previously disclosed;  was not made in writing; or  was made while the employee was off duty.</blockquote>
             <h3>What qualifies as a substantial and specific danger to public health or safety?</h3>

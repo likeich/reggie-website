@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication covers delegation of authority, T&amp;A report certification, payroll controls, timekeeper training, reviews, and supporting documentation. It requires designated officials to validate reports, maintain records, and follow prescribed reporting procedures.</p>
             <p><strong>Applies to:</strong> It applies to all units and tenant organizations under Seventh Air Force, Korea, employing KN civilian personnel paid by the 51st Comptroller Squadron (51 CPTS), Civilian Pay Section (FMFC).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Time and Attendance reporting</li>
                 <li>Korean National civilian employees</li>
@@ -726,7 +742,7 @@
                 <li>T&amp;A report reviews</li>
                 <li>Overtime and leave documentation</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What controls must 51 CPTS/FMFC establish for T&amp;A reports?</h3>
             <blockquote>The 51 CPTS/FMFC will establish controls to ensure accurate and timely receipt of T&amp;A report (7 AF IMT 34(EF), Korean National Time and Attendance Report). (paragraph 1)</blockquote>
             <h3>How long must newly assigned timekeepers be included in a training plan?</h3>

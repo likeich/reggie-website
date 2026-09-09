@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It establishes procedures for eligibility, quotas, Central Base Boards, large unit boards, selection folders, scoring, notifications, and supplemental consideration. It requires documented nomination packages, board scoring, processing of board minutes, and procedures for correcting errors.</p>
             <p><strong>Applies to:</strong> As defined within, this instruction is applicable to large and small units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Senior Airman Below-the-Zone promotions</li>
                 <li>BTZ eligibility timelines</li>
@@ -728,7 +744,7 @@
                 <li>BTZ quota distribution</li>
                 <li>Supplemental BTZ consideration</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How early can an Airman First Class be considered for Senior Airman Below-the-Zone promotion under WRIGHTPATTERSONAFBI36-2502?</h3>
             <blockquote>The SrA BTZ Program is designed to provide exceptionally wellqualified Airmen First Class (A1C) a one-time consideration for promotion to SrA six (6) months prior to the fixed fully qualified phase point. (paragraph 1)</blockquote>
             <h3>What determines an Airman First Class's normal effective promotion date for BTZ consideration?</h3>

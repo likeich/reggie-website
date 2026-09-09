@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>BARKSDALEAFBI32-7003 prescribes rules and procedures for permits, access, hunting areas, firearms, seasons, stands, blinds, fishing, boating, and outdoor recreation. It establishes requirements for hunters, anglers, boaters, guests, permits, safety, harvest reporting, and enforcement penalties.</p>
             <p><strong>Applies to:</strong> It applies to all persons entering BAFB for the purpose of hunting, fishing, using fish and wildlife habitats, or attempting to take fish and wildlife from BAFB grounds.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Hunting permits and access</li>
                 <li>Hunter safety</li>
@@ -728,7 +744,7 @@
                 <li>Fishing and boating</li>
                 <li>Outdoor recreation and gardens</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What permits must each member of a raccoon hunting party have?</h3>
             <blockquote>The BAFB Basic Hunting Permit and the BAFB Raccoon Hunting Endorsement must be obtained and in possession of each member of a raccoon hunting party. (paragraph 7)</blockquote>
             <h3>When is raccoon hunting allowed?</h3>

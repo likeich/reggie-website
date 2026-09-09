@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -707,7 +723,7 @@
             <hr>
             <p>AFI41-106 defines readiness skills and establishes Category I and Category II training requirements, including rules for authorized substitutes. It also addresses Operational Preventive Medicine training, Bioenvironmental Engineering personnel, protected information, and records disposition.</p>
             <p><strong>Applies to:</strong> This instruction applies to the United States Space Force (USSF), Regular Air Force (Reg AF), AF Reserve (AFR) and Air National Guard (ANG) and Department of the Air Force (DAF) civilian employees.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Medical readiness training</li>
                 <li>Readiness skills</li>
@@ -717,7 +733,7 @@
                 <li>Authorized UTC substitutions</li>
                 <li>Privacy Act information</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What are readiness skills?</h3>
             <blockquote>Readiness Skills are the AFSC-specific training items that allow an Airman or Guardian to perform the full scope of duties associated with their specialty in a deployed setting.</blockquote>
             <h3>What Category II training is required for authorized UTC substitutes?</h3>

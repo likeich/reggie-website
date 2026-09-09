@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1001611">View ATP 3-01.8 on armypubs.army.mil</a></p>
             <hr>
             <p>It covers air and missile threats, adversarial aerial threat employment, warnings, self-defense, passive and active air defense techniques, and unit security and intelligence planning. It requires units to implement active and passive measures within their organic capabilities and addresses countering unmanned air threats and asset protection.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Aerial threats</li>
                 <li>Air and missile defense planning</li>
@@ -729,7 +745,7 @@
                 <li>Convoy self-defense measures</li>
                 <li>Aerial aiming points</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What kinds of aerial threats does ATP 3-01.8 identify?</h3>
             <blockquote>Aerial threats may be any combination of large or small, manned or UAS, missile type platforms and rockets, artillery and mortars (RAM) used to carry out attacks or support attack functions.</blockquote>
             <h3>What must combined arms forces do against multiple aerial attacks?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers religion, social media and operational security, searches and seizures, privately owned weapons, civilian employment complaints, and civil liberties complaint dispositions. It presents scenarios and requirements concerning protected expression, vehicle searches, firearm reporting, grievance processes, and suspicious activity reporting.</p>
             <p><strong>Applies to:</strong> This supplement applies to all military, civilian and contractor personnel assigned to the 22d ARW as well as any tenant organizations with a support agreement requesting PA support.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Religion and freedom of speech</li>
                 <li>Social media operational security</li>
@@ -727,7 +743,7 @@
                 <li>Political protests and assembly</li>
                 <li>Suspicious activity reporting</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must social media expression avoid compromising?</h3>
             <blockquote>While individuals have a right to express themselves through online social media outlets, such expression must not compromise operational security.</blockquote>
             <h3>Can an active-duty service member display a political bumper sticker on a private vehicle?</h3>

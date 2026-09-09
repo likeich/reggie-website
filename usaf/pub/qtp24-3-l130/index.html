@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/af_a4/publication/qtp24-3-l130/qtp24-3-l130.pdf">View QTP24-3-L130 on armypubs.army.mil</a></p>
             <hr>
             <p>It contains lesson plans for trainee preparation, knowledge lectures, demonstrations, performance evaluation, and vehicle inspection. The package requires training hours, performance tests, safety knowledge, and documentation of total hours trained.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Pumper fire apparatus operation</li>
                 <li>Vehicle inspection</li>
@@ -726,7 +742,7 @@
                 <li>Licensing requirements</li>
                 <li>Performance testing</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What training must a pumper operator complete?</h3>
             <blockquote>Given lectures, demonstrations and hands-on operations sessions, trainees will be able to complete all Performance Tests required in Attachment 5 with zero instructor assists. (paragraph 7)</blockquote>
             <h3>What must trainees understand before operating the vehicle?</h3>

@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -707,7 +723,7 @@
             <hr>
             <p>AEDCI10-200 covers CAT membership, activation, recall, security, operating procedures, deactivation, training, and exercises. It establishes roles for CAT personnel and support organizations, and requires compliance with its attachments.</p>
             <p><strong>Applies to:</strong> This instruction is applicable to Arnold Engineering Development Complex (AEDC) personnel assigned to, and in support of, the AEDC Crisis Action Team (CAT).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Crisis Action Team organization</li>
                 <li>Crisis response policy</li>
@@ -717,7 +733,7 @@
                 <li>CAT training and exercises</li>
                 <li>Emergency Operations Center roles</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the purpose of the AEDC Crisis Action Team?</h3>
             <blockquote>The purpose of the AEDC CAT is to provide the AEDC Commander with a single focal point for expedited command and staff actions that directs AEDC forces during a crisis or contingency to ensure Continuity of Operations (COOP). (paragraph 10-245)</blockquote>
             <h3>How must records created under AEDCI10-200 be handled?</h3>

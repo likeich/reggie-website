@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/saf_ig/publication/afman71-102/afman71-102.pdf">View AFMAN71-102 on armypubs.army.mil</a></p>
             <hr>
             <p>It addresses DNA, fingerprint, CHRI, and firearm-related processes, along with disposition documentation and case reporting. The publication requires specified legal offices and commanders to report qualifying subjects and submit required forms within stated timeframes.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Air Force criminal indexing</li>
                 <li>DNA collection and submission</li>
@@ -726,7 +742,7 @@
                 <li>Commander-directed investigations</li>
                 <li>Nonjudicial punishment proceedings</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When must the servicing legal office distribute disposition documentation to AFCJIC?</h3>
             <blockquote>The servicing legal office will distribute all disposition documentation to the Air Force Criminal Justice Information Center (AFCJIC) within three duty days of completed disposition.</blockquote>
             <h3>When is the DAF Form 239 required?</h3>

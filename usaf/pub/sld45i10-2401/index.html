@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication describes Mission Assurance functions, the Mission Assurance Construct, mission partners and tenants, and information-sharing processes. It requires governance, risk elevation, classification guidance, reporting, and support for Mission Assurance Assessments.</p>
             <p><strong>Applies to:</strong> This instruction applies to all SLD 45 and Geographically Separated Units (GSU), as well as all tenant units on Patrick Space Force Base (PSFB) and Cape Canaveral Space Force Station (CCSFS), except where noted otherwise.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Mission Assurance functions</li>
                 <li>Mission Assurance Construct</li>
@@ -726,7 +742,7 @@
                 <li>Classification guidance</li>
                 <li>Governance and reporting</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the goal of Mission Assurance under SLD45I10-2401?</h3>
             <blockquote>The goal of Mission Assurance (MA) is to protect or ensure the continued function and resilience of mission capabilities and assets including personnel, equipment, facilities, networks, information and information systems, infrastructure, and supply chains critical to the performance of SLD 45 mission-essential functions (MEFs) in any operating environment or condition. (paragraph 1)</blockquote>
             <h3>How does SLD 45 use Mission Assurance?</h3>

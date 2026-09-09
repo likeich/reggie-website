@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication defines currency requirements, pilot weather categories, PWC tracking, and IMC operations. It requires specified events to be logged, sets conditions for regaining currency, and limits tactical maneuvering by non-current pilots.</p>
             <p><strong>Applies to:</strong> This publication applies to all Shaw AFB flying units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Pilot currency requirements</li>
                 <li>Pilot weather categories</li>
@@ -726,7 +742,7 @@
                 <li>Precision approach currency</li>
                 <li>Tactical IMC maneuvering</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does AFMAN11-2F-16V1_SHAWAFBSUP require for pilot currency?</h3>
             <blockquote>Table 4.1, as supplemented by the most current RTM, defines currency requirements for all pilots.</blockquote>
             <h3>What happens when a pilot loses a particular currency?</h3>

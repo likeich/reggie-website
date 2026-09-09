@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/administrative_assistant/publication/dafpd90-12/dafpd90-12.pdf">View DAFPD90-12 on armypubs.army.mil</a></p>
             <hr>
             <p>It addresses etiquette, manners, military life, official relationships, ceremonies, honors, distinguished visitors, and official-function planning. It requires compliance with specified funding authorities and assigns protocol responsibilities to senior Air Force officials and commanders.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Military protocol</li>
                 <li>Official functions</li>
@@ -725,7 +741,7 @@
                 <li>Military decorum</li>
                 <li>National flag at half-staff</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does protocol encompass in daily military life?</h3>
             <blockquote>Protocol encompasses the customs and courtesies, etiquette, and manners of daily military life, preservation of diplomatic and other official relationships, and celebratory ceremonies. (paragraph 1)</blockquote>
             <h3>What honors and courtesies are required at official functions?</h3>

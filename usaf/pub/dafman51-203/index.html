@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -711,7 +727,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/af_ja/publication/dafman51-203/dafman51-203.pdf">View DAFMAN51-203 on armypubs.army.mil</a></p>
             <hr>
             <p>It addresses court reporter certification, counsel review of transcripts, electronic record formats, and the handling of classified, sealed, and sexually explicit material. It also sets requirements for providing records of trial to accused members and victims, including different requirements for accused members in confinement.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Electronic records of trial</li>
                 <li>Transcript certification</li>
@@ -720,7 +736,7 @@
                 <li>Accused members in confinement</li>
                 <li>Victim access to records of trial</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How long does trial counsel have to examine and verify the transcript?</h3>
             <blockquote>One trial counsel must complete their examination and sign a memorandum verifying the accuracy of the transcript within 10 calendar days.</blockquote>
             <h3>How must an electronic record of trial be compiled?</h3>

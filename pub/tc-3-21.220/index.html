@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>TC 3-21.220 covers basic and advanced airborne training, parachutes, equipment, aircraft, drop zones, water operations, and emergency procedures. It establishes training standards, personnel qualifications, equipment requirements, aircraft and drop zone procedures, and malfunction reporting requirements.</p>
             <p><strong>Applies to:</strong> TC 3-21.220 applies to the Active Army, Army National Guard/Army National Guard of the United States, United States Army Reserve, Department of the Navy, Department of the Air Force, and the United States Marine Corps, unless otherwise stated.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Static line parachute training</li>
                 <li>Personal parachutes</li>
@@ -730,7 +746,7 @@
                 <li>Water drop zone operations</li>
                 <li>Emergency situation procedures</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the purpose of airborne training in TC 3-21.220?</h3>
             <blockquote>The purpose of airborne training is to qualify personnel in the use of the parachute as a means of combat deployment. (paragraph 1-1)</blockquote>
             <h3>What wind limit applies to T-11 and MC-6 parachutes?</h3>

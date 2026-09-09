@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It contains two parts covering training management, specialty training standards, core tasks, technical references, and proficiency codes. It requires initial professional education, an associate’s degree before entry, documented training records, and continued development.</p>
             <p><strong>Applies to:</strong> The AMT duty is a Development Special Duty assignment covered by DAFI 36-2110, Total Force Assignments.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Special duty qualification requirements</li>
                 <li>Core task requirements</li>
@@ -728,7 +744,7 @@
                 <li>Proficiency codes</li>
                 <li>Continued development</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What course must AMTs complete to receive the 8B200 designation?</h3>
             <blockquote>To receive the 8B200 designation, all individuals must meet requirements established in the Special Duty Assignment Category and Air Force Enlisted Classification Directory, in addition to successfully completing the 5ABO8B200 OM7A Academy Military Training NCO Course. (paragraph 1)</blockquote>
             <h3>What professional education is required for AMTs?</h3>

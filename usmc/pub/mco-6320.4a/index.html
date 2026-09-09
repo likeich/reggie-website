@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>MCO 6320.4A addresses provider qualification, credentials review, clinical privileging, QA oversight, and event outcome monitoring. It requires annual competency evaluations, written QA evaluations, credentials committees, and screening of specified medical and dental occurrences.</p>
             <p><strong>Applies to:</strong> The provisions of this instruction apply to all privileged and nonprivileged healthcare providers assigned to the operating forces of the Navy and Marine Corps as identified in enclosure (1).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Healthcare provider qualification</li>
                 <li>Clinical credentials review</li>
@@ -729,7 +745,7 @@
                 <li>Medical occurrence screening</li>
                 <li>Dental occurrence screening</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How often must non-privileged healthcare providers receive competency evaluations?</h3>
             <blockquote>The privileging authority or designee must conduct a thorough evaluation of the current competency of all non-privileged healthcare providers assigned to the operating forces annually. (paragraph 7)</blockquote>
             <h3>What must the QA program identify and prevent?</h3>

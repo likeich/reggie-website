@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>PRSCI91-212 covers wildlife exclusion zones, vegetation management zones, habitat modification, training, bird watch conditions, and wildlife strike reporting. It requires agencies operating at PRSC airfields to incorporate the instruction into their operations and establishes procedures for BASH phases, dispersal, and reporting.</p>
             <p><strong>Applies to:</strong> It applies to all host, associate, tenant, and temporary duty (TDY) organizations on Joint Base Elmendorf-Richardson (JBER) (Elmendorf Airfield side) including the Air National Guard and US Air Force Reserve members and units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Wildlife Exclusion Zones</li>
                 <li>Vegetation Management Zones</li>
@@ -727,7 +743,7 @@
                 <li>Wildlife dispersal operations</li>
                 <li>BASH phases of operation</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must agencies operating at PRSC airfields do?</h3>
             <blockquote>All agencies operating at PRSC airfields will incorporate this instruction into their operations. (paragraph 1)</blockquote>
             <h3>What does Phase I of the BASH plan cover?</h3>

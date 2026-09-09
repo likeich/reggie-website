@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -711,7 +727,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/amc/publication/dodm5100.76_afman31-101v2_amcsup/dodm_5100.76_dafman31-101v2_amcsup.pdf">View DODM5100.76_AFMAN31-101V2_AMCSUP on armypubs.army.mil</a></p>
             <hr>
             <p>It covers risk factors, inspections, access screening, storage, transportation, accountability, disposal, demilitarization, and incident reporting. The publication requires security controls for AA&amp;E facilities, shipments, contractor operations, and military terminals.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>AA&amp;E physical security</li>
                 <li>Restricted area posting</li>
@@ -721,7 +737,7 @@
                 <li>Disposal and demilitarization</li>
                 <li>Incident reporting</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How long must AA&amp;E access records be retained?</h3>
             <blockquote>The records of access shall be retained for 1 year and disposed of according to DoD Component guidance. (paragraph 31-101)</blockquote>
             <h3>How must individuals protect missiles, rockets, ammunition, or explosives in their possession?</h3>

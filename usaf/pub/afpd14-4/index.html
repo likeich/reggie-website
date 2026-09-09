@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It establishes policy for intelligence training, analysis, targeting, cryptologic missions, acquisition support, information sharing, and oversight. It requires compliance with Intelligence Community and Department of Defense standards, protection of United States persons’ rights and civil liberties, and technically and operationally sound training.</p>
             <p><strong>Applies to:</strong> This Policy Directive applies to all Air Force organizations, including the Air Force Reserve and Air National Guard, and their respective members.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Intelligence training and proficiency</li>
                 <li>Intelligence analysis and targeting</li>
@@ -727,7 +743,7 @@
                 <li>Cyber effects operations training</li>
                 <li>Information sharing across the Intelligence Community</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does AFPD14-4 require for Combatant Command intelligence and cyber effects operations training?</h3>
             <blockquote>Oversee the training and proficiency in achieving intelligence and cyber effects operations activities of Combatant Commands by assigned forces and assets based on national, service and joint missions, capabilities, priorities, requirements, and responsibilities. (paragraph 2)</blockquote>
             <h3>How must Air Force intelligence specialists conduct intelligence activities involving United States persons?</h3>

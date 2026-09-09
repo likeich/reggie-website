@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <hr>
             <p>The publication addresses shipboard launch and recovery interfaces, including inport and underway evaluation, training, logistical, and procedural requirements. It requires IT&amp;E for major interface changes or new interfaces and establishes convening, team, planning, and reporting duties.</p>
             <p><strong>Applies to:</strong> All Coast Guard (CG) unit commanders, commanding officers, officers-in-charge, deputy/assistant commandants, and chiefs of headquarters staff elements must comply with the provisions of this Instruction.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Cutter boat interface testing and evaluation</li>
                 <li>Shipboard launch and recovery systems</li>
@@ -729,7 +745,7 @@
                 <li>IT&amp;E event planning</li>
                 <li>Environmental evaluation</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When is cutter boat interface testing and evaluation required?</h3>
             <blockquote>An IT&amp;E is required each time there is a major change to an existing interface between a cutter boat and a ship, or the introduction of a new interface involving a cutter boat and a ship. (paragraph 1)</blockquote>
             <h3>What does cutter boat interface testing and evaluation assess?</h3>

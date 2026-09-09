@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication addresses TDM PACKAGE preparation, hazardous-content evaluation, source-data submission, and review and approval processes. It requires approved source data before missions or transportation and sets a minimum routine electronic review period of 10 working days.</p>
             <p><strong>Applies to:</strong> It applies to the 46th Test Group (46 TG) and to all AAC activities and tenants at Eglin Air Force Base (AFB) involved in munitions acquisition, research, development, testing, evaluation or modification.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>TDM PACKAGE preparation</li>
                 <li>Hazardous-content evaluation</li>
@@ -726,7 +742,7 @@
                 <li>Source data submission</li>
                 <li>Technical document precedence</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When can missions be placed on the operations order for new munitions?</h3>
             <blockquote>No missions will be placed on the operations order until all required source data have been reviewed and approved IAW paragraph 3 of this instruction. (paragraph 1)</blockquote>
             <h3>What happens when new munitions arrive without a required TDM PACKAGE?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,14 +735,14 @@
             <hr>
             <p>It establishes Army Personnel System records as the authoritative source for Army race and ethnic data and identifies IPPS-A for retrieval. It requires Soldiers to validate their racial and ethnic identification annually.</p>
             <p><strong>Applies to:</strong> The provisions of this directive apply to the Regular Army, Army National Guard/Army National Guard of the United States, and U.S. Army Reserve.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Soldier race and ethnicity data</li>
                 <li>Army Personnel System records</li>
                 <li>IPPS-A data retrieval</li>
                 <li>Annual racial and ethnic identification validation</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Which system is the authoritative source for Army race and ethnic data?</h3>
             <blockquote>Army race and ethnic data will be maintained in the Army Personnel System (APS) system of records.</blockquote>
             <h3>How does Army personnel retrieve Soldier race and ethnic data?</h3>

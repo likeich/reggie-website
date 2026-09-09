@@ -586,8 +586,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -608,6 +617,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -702,7 +718,7 @@
             <hr>
             <p>It directs the administration of facilities, equipment use, operations, and training, and outlines duties for Airfield Operation members assigned to Grissom ARB. It requires compliance with the publication and coordination of supplements through the Office of Primary Responsibility.</p>
             <p><strong>Applies to:</strong> This instruction is applicable to all groups within the 434th Air Refueling Wing (434 ARW), tenant units, and other agencies operating at Grissom ARB.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Airfield operations</li>
                 <li>Airspace utilization</li>
@@ -713,7 +729,7 @@
                 <li>Airfield Operations Board</li>
                 <li>Air Traffic Control Training Review Board</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How must recommended changes to GRISSOMARBI13-201 be submitted?</h3>
             <blockquote>Refer recommended changes and questions about this publication to the OPR listed above using the AF Form 847, Recommendation for Change of Publication; route AF Forms 847 from the field through the appropriate chain of command.</blockquote>
             <h3>How are waiver authorities identified in GRISSOMARBI13-201?</h3>

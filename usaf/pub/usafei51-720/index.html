@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -707,7 +723,7 @@
             <hr>
             <p>USAFEI51-720 defines off-base fuel, duty driving, eligible personnel, and fuel purchase cards. It establishes eligibility requirements, application procedures, documentation, card limits, and interpretation authority for the Off-Base Fuel Program.</p>
             <p><strong>Applies to:</strong> This instruction applies to personnel on temporary duty (TDY) to or permanently stationed within the UK.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Off-Base Fuel Program</li>
                 <li>Tax-free gasoline and diesel</li>
@@ -717,7 +733,7 @@
                 <li>Eligibility requirements</li>
                 <li>USAFE Form 435</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What driving qualifies as duty driving under USAFEI51-720?</h3>
             <blockquote>All driving in support of the US military mission by entitled personnel, as defined in paragraph 3. below, done both in the performance of normal duties and in order to serve and participate in other activities organized by, sponsored by, or beneficial to the US Force in the UK. It does not include pleasure driving. (paragraph 3)</blockquote>
             <h3>How many fuel purchase cards may each eligible person have?</h3>

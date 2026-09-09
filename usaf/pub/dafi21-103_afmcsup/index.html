@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication contains reporting rules for aerospace vehicle maintenance status, communications equipment downtime, weather equipment, and ICBM and Rocket System Launch Program assets. It requires specified information in asset change messages and makes compliance with listed attachments mandatory.</p>
             <p><strong>Applies to:</strong> This supplement prescribes guidance and procedures for the Air Force Materiel Command organizations that manage or perform maintenance on AFMC owned/possessed aircraft regardless of Air Force Specialty Code as well as the procedures for the proper disposition of rocket missile motors.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Aerospace vehicle maintenance status</li>
                 <li>Communications equipment downtime codes</li>
@@ -726,7 +742,7 @@
                 <li>Rocket System Launch Program asset reporting</li>
                 <li>Aircraft MDS and configuration changes</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Can the MESL be used to make go or no-go decisions?</h3>
             <blockquote>The MESL does not determine airworthiness or &quot;safety-of-flight&quot;: Do not use the MESL to gauge &quot;go/no-go&quot; decisions. (paragraph 2)</blockquote>
             <h3>When is an aerospace vehicle classified as NMC flyable?</h3>

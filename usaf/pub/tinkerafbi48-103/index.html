@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The instruction addresses respirator selection, breathing air sources, fit testing, medical qualification, training, and emergency-use inspections. It requires workplace-specific written procedures, documentation, and recurring testing of compressed breathing air systems.</p>
             <p><strong>Applies to:</strong> This instruction is required to be maintained and read annually by all organizations in which personnel wear respirators for protection against inhalation of potentially harmful atmospheres or for emergency escape or rescue and by organizations who use filtering face pieces.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Respirator selection and use</li>
                 <li>Breathing air sources</li>
@@ -727,7 +743,7 @@
                 <li>Emergency-use respirator inspections</li>
                 <li>Compressed breathing air testing</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Are privately procured respirators allowed?</h3>
             <blockquote>Only respirators provided by Tinker AFB and specified by BE will be used. The use of privately procured respirators is prohibited. (paragraph 48-137)</blockquote>
             <h3>Can compressed shop air be used for breathing air?</h3>

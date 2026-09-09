@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>It establishes Army doctrine and provides guidance for neuropsychiatric treatment and treatment for behavioral health disordered patients in an AO. It covers triage, stabilization, behavioral health treatment, dental services, nutrition care operations, and mild traumatic brain injury or concussion.</p>
             <p><strong>Applies to:</strong> This publication is intended for use by commanders their staffs, command surgeons, AHS planners, and Army Medical Department personnel and units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Combat and operational stress control triage</li>
                 <li>Triage algorithm</li>
@@ -729,7 +745,7 @@
                 <li>Mild traumatic brain injury and concussion</li>
                 <li>Dental services</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How does ATP 4-02.5 use combat and operational stress control triage?</h3>
             <blockquote>The triage process for combat and operational stress control is used to sort Soldiers depending upon the symptoms/needs, capabilities available, and location where they can best be managed in keeping with the combat and operational stress control principles of brevity, immediacy, contact, expectancy, proximity, and simplicity (BICEPS). (paragraph 4-1)</blockquote>
             <h3>When may chemical restraints be ordered for a Soldier?</h3>

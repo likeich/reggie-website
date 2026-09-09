@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It establishes enterprise management systems and sets policy for compliance, funding, safe workplaces, pollution control, and risk-based planning. It requires the 5-step DAF Risk Management Process, prompt reporting procedures, risk assessment codes, and Environmental, Safety, and Occupational Health Councils.</p>
             <p><strong>Applies to:</strong> This DAFPD applies to all DAF civilian employees and uniformed members of the Regular Air Force, Air Force Reserve (AFR), Air National Guard (ANG) and the United States Space Force (USSF), and those who are contractually bound to follow DAF issuances.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Environmental health</li>
                 <li>Occupational health</li>
@@ -727,7 +743,7 @@
                 <li>Workplace safety</li>
                 <li>Environmental, Safety, and Occupational Health Councils</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What risk management process does DAFPD90-8 require during DAF missions?</h3>
             <blockquote>Use the 5-step DAF Risk Management Process when preparing, developing, testing, planning, organizing, training, equipping, sustaining, and employing forces to accomplish all DAF missions. (paragraph 2)</blockquote>
             <h3>What does DAFPD90-8 require for work-related injury and hazard reporting?</h3>

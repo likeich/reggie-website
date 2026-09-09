@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/wrightpattersonafb/publication/afi48-139_wrightpattersonafbsup/afi48-139_wrightpattersonafbsup.pdf">View AFI48-139_WRIGHTPATTERSONAFBSUP on armypubs.army.mil</a></p>
             <hr>
             <p>The publication addresses hazard evaluations, laser safety officers, contractor operations, procurement, training, and accountability for specified lasers. It requires hazard evaluations before use or alignment, ILSO approval for certain procurements, contractor notifications, and documentation maintained under Air Force records requirements.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Laser hazard evaluations</li>
                 <li>Optical radiation protection</li>
@@ -726,7 +742,7 @@
                 <li>Class 3B and 4 laser accountability</li>
                 <li>Laser safety training</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When must applicable lasers receive a hazard evaluation?</h3>
             <blockquote>Applicable lasers must receive a hazard evaluation by the ULSO and ILSO prior to use (including alignment at hazardous energy/power levels).</blockquote>
             <h3>What laser classes require a hazard evaluation before use or alignment?</h3>

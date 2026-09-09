@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers specialty descriptions, progression opportunities, professional development, and training requirements for the 8S000 SDI. It requires standardized qualification training, selection criteria, documented OJT certification, and task qualification records.</p>
             <p><strong>Applies to:</strong> This STS is for use by personnel who possess SDI 8S000 and is mandatory for those performing MAFM duties.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>MAFM qualification training</li>
                 <li>8S000 duty positions</li>
@@ -727,7 +743,7 @@
                 <li>OJT certification</li>
                 <li>Task qualification records</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What training must 8S000 personnel complete to become fully qualified?</h3>
             <blockquote>Although the 8S000 SDI is awarded upon entry into MAFM special duty, certain training requirements must be met by all 8S000 personnel to be considered fully qualified. (paragraph 6)</blockquote>
             <h3>What are the two phases of the MAFM training program?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>AFSOCI10-405 covers ARRK posturing, status reporting, readiness, J-Team assignment, training, and pro-gear. It requires AFSOC-gained AFRC and ANG units to follow the instruction and addresses early beddown and initial BOS for SOF tasks.</p>
             <p><strong>Applies to:</strong> This instruction applies to Air Force Special Operations Command (AFSOC) gained Air Force Reserve Command (AFRC) and Air National Guard (ANG) units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>civil engineer unit type codes</li>
                 <li>Air Rapid Response Kits</li>
@@ -728,7 +744,7 @@
                 <li>J-Team pro-gear</li>
                 <li>early beddown and initial BOS</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What capability does JP 4-0 require USSOCOM component commands to maintain?</h3>
             <blockquote>JP 4-0 requires United States Special Operations Command (USSOCOM) component commands to maintain a capability to support SOF elements for an initial period of 15 days.</blockquote>
             <h3>When should services support special operations after SOF are employed?</h3>

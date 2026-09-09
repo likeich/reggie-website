@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It establishes requirements for Stage Manager certification, aircrew and manager sourcing, alert postures, and operation planning. It requires After Action Reports after deployment and sets a 30-day submission timeline.</p>
             <p><strong>Applies to:</strong> This publication applies to all DAF civilian employees, uniformed members of the Regular Air Force, those with a contractual obligation to abide by the terms of AMC issuances, and Air Force Reserve/Air National Guard personnel activated under Title 10 to support AMC Stage Management Operations.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Aircrew Stage Operations</li>
                 <li>Stage Manager certification</li>
@@ -726,7 +742,7 @@
                 <li>Alert postures</li>
                 <li>After Action Reports</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What training must an AMC Aircrew Stage Manager complete before deployment?</h3>
             <blockquote>Prior to deploying as an AMC Aircrew Stage Manager, each individual must complete the AMC Stage Management course, available online within the Air Mobility Command-AMC Operational Level subcategory of the Air Force My Learning web site. (paragraph 2)</blockquote>
             <h3>Can rated Stage Managers with FSC K fly on aircrew orders?</h3>

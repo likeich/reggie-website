@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication addresses experimentation and demonstrations, operational test organizations, test data, and Program Protection Plans for T&amp;E infrastructure. It requires risk assessment and documentation, protection of critical information, and defined planning timelines for infrastructure activities.</p>
             <p><strong>Applies to:</strong> This guidance applies to the Regular Air Force, United States Space Force, Air Force Reserve, and Air National Guard.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Test and evaluation infrastructure</li>
                 <li>Experimentation and demonstrations</li>
@@ -727,7 +743,7 @@
                 <li>Test data protection</li>
                 <li>Risk assessment and acceptance</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When must a Program Protection Plan be in place for DAF-funded T&amp;E infrastructure?</h3>
             <blockquote>For all DAF-funded T&amp;E infrastructure and activities supporting acquisition programs, CPI shall be identified and a Program Protection Plan (PPP) shall be in place. (paragraph 5)</blockquote>
             <h3>When must planning be completed for new infrastructure programs?</h3>

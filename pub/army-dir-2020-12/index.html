@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,14 +732,14 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1021212">View ARMY DIR 2020-12 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/ar-25-1/">AR 25-1</a></li>
             </ul>
             <hr>
             <p>The publication covers Trusted Agent nominations, appointments, revocations, recertification, legal review, search requests, and recordkeeping. It requires designated officials to manage access, approvals, notifications, and search records.</p>
             <p><strong>Applies to:</strong> This directive applies to the Regular Army, Army National Guard/Army National Guard of the United States, and U.S. Army Reserve.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Trusted Agent nominations</li>
                 <li>Trusted Agent appointments</li>
@@ -733,7 +749,7 @@
                 <li>Search request routing</li>
                 <li>Search recordkeeping</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who must appoint Trusted Agents to access Army NIPR journaled email accounts?</h3>
             <blockquote>Beginning 1 January 2020, the Army must appoint Trusted Agents (TAs) to access Army NIPR journaled email accounts. (paragraph 1)</blockquote>
             <h3>How many primary and alternate Trusted Agents must activities nominate?</h3>

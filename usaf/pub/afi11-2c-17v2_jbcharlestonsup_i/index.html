@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It establishes testing requirements, emergency procedure evaluations, special interest item evaluations, and unit-specific pilot and loadmaster evaluation areas. It also identifies waiver authority and coordination requirements for waivers to this supplement and AFMAN 11-2C-17V2.</p>
             <p><strong>Applies to:</strong> This supplement applies to Air Force Reserve Command (AFRC) units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>C-17A aircrew evaluations</li>
                 <li>Testing requirements</li>
@@ -727,7 +743,7 @@
                 <li>Loadmaster evaluation areas</li>
                 <li>Waiver authority</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must be completed before administering a C-17A evaluation?</h3>
             <blockquote>All requisite testing should be completed before administering the evaluation.</blockquote>
             <h3>Are Emergency Procedure Evaluations required for all C-17A evaluations?</h3>

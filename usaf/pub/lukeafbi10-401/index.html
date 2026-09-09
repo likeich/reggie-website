@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It establishes responsibilities for commanders, plans representatives, the Wing Plans and Programs office, and plan OPRs. It contains requirements for plan preparation, coordination, review, briefing, approval, and distribution.</p>
             <p><strong>Applies to:</strong> It applies to all units assigned to Luke Air Force Base (LUKEAFB) who are tasked by Luke Operations Plans (OPLAN’s) or who develop inputs to Luke Contingency plans.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>USAF operations planning</li>
                 <li>Contingency plans</li>
@@ -727,7 +743,7 @@
                 <li>Key personnel briefings</li>
                 <li>Wing plan distribution</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who is responsible for maintaining required unit plans?</h3>
             <blockquote>Group commanders, squadron commanders, tenant unit commanders, and associate unit commanders have overall responsibility for maintaining all required plans and carrying out tasks outlined for their respective organizations. (paragraph 2)</blockquote>
             <h3>How soon must units send a plans representative appointment letter?</h3>

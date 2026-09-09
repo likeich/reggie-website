@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It defines Air Advising, describes its role in Air Force Security Cooperation, and addresses Air Advisor force development and functional management. It requires readiness measures, inspections, planning, budgeting, reporting, and assigned responsibilities across Air Force organizations.</p>
             <p><strong>Applies to:</strong> This directive applies to all civilian and uniformed members of all components of the Department of the Air Force.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Air Advising operations</li>
                 <li>Security Force Assistance</li>
@@ -726,7 +742,7 @@
                 <li>Air Advisor functional management</li>
                 <li>Partner nation aviation capabilities</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the role of an Air Advisor?</h3>
             <blockquote>The role of an Air Advisor is to plan, execute, and evaluate operations that increase partner nation and coalition air power capabilities. (paragraph 1)</blockquote>
             <h3>What environments must Air Advisors be prepared to operate in?</h3>

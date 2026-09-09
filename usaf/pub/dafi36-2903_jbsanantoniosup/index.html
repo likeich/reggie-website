@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication addresses watch cap wear, designated “No Hat” areas, fitness center attire, and dining facility dress codes. It requires specific clothing, footwear, and uniform combinations in fitness and dining facilities and prohibits listed garments and headgear.</p>
             <p><strong>Applies to:</strong> This supplement applies to all uniformed members of the Regular Air Force assigned to JBSA-Fort Sam Houston, JBSA-Lackland, JBSA-Randolph, or JBSA Camp Bullis.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Watch cap wear</li>
                 <li>Fitness center attire</li>
@@ -727,7 +743,7 @@
                 <li>Dining facility headgear</li>
                 <li>Military uniform combinations</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When are watch caps authorized under DAFI36-2903_JBSANANTONIOSUP?</h3>
             <blockquote>Authorized from 1 November – 31 March or as extended by the installation commander.</blockquote>
             <h3>What clothing is required in JBSA fitness center activity and equipment areas?</h3>

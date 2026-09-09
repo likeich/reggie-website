@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>AR 25-51 covers official mail operations, mail distribution centers, program administration, training, and contingency procedures. It requires controls for postage, mail processing, manager appointments, employee qualifications, and recordkeeping.</p>
             <p><strong>Applies to:</strong> This regulation complies with Part 102 192, Title 41, Code of Federal Regulations (41 CFR 102 192) and establishes the policies for all elements of the Department of the Army (DA) to administer the Official Mail and Distribution Management Program (OMDMP).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Official mail carrier and postage requirements</li>
                 <li>Official Mail and Distribution Centers</li>
@@ -728,7 +744,7 @@
                 <li>Mail center employee qualifications</li>
                 <li>Official mail training requirements</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Which carrier must transport first-class official mail?</h3>
             <blockquote>The United States Postal Service (USPS) will be used as the carrier of first-class official mail in accordance with Sections 401 and 404, Title 39, United States Code (39 USC 401 and 404); 39 USC Chapter 6; 18 USC 1693 1699; and 39 CFR 310 and 320, hereinafter referred to as the Private Express Statutes. (paragraph 1-7)</blockquote>
             <h3>How must official mail postage and fees be selected?</h3>

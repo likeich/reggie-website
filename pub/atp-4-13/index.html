@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>ATP 4-13 covers intermodal operations, organizational roles, and the planning, opening, and operation of land, air, and maritime terminals. It also addresses logistics over-the-shore activities, transportation brigade expeditionary operations, marshaling yards, and terminal throughput capacity.</p>
             <p><strong>Applies to:</strong> ATP 4-13 provides the framework for commanders and staffs at all levels on the employment of Army expeditionary intermodal capability to include aerial and seaport operations.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Intermodal operations</li>
                 <li>Land terminal operations</li>
@@ -730,7 +746,7 @@
                 <li>Marshaling yards</li>
                 <li>Terminal throughput capacity</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does intermodal operations use to move troops, supplies, and equipment?</h3>
             <blockquote>Intermodal operations are the process of using multiple modes (air, sea, highway, rail,) and conveyances (truck, barge, containers, pallets) to move troops, supplies and equipment through expeditionary entry points and the network of specialized transportation nodes to sustain land forces (ADP 4-0). (paragraph 1-1)</blockquote>
             <h3>What does terminal planning normally include?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1022141">View ATP 4-02.4 on armypubs.army.mil</a></p>
             <hr>
             <p>It presents Role 1 care, tactical combat casualty care, casualty evacuation, medical evacuation, threats, command and control, sustainment, and support across operational environments. It requires established and rehearsed mass casualty plans, detailed medical planning, and training considerations for battalion-level Army Health System support.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Role 1 Army Health System support</li>
                 <li>Tactical combat casualty care</li>
@@ -729,7 +745,7 @@
                 <li>Medical supply operations</li>
                 <li>Detainee health care</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How is the medical platoon organized?</h3>
             <blockquote>The platoon is organized with a headquarters section, a treatment squad (two treatment teams), an ambulance squad, and a combat medic section. (paragraph 1-52)</blockquote>
             <h3>What must planners do for mass casualty situations during offensive operations?</h3>

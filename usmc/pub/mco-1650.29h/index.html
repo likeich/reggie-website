@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <p><a href="https://www.marines.mil/News/Publications/MCPEL/Electronic-Library-Display/Article/898871/mco-165029h/">View MCO 1650.29H on armypubs.army.mil</a></p>
             <hr>
             <p>MCO 1650.29H provides information on aviation awards sponsored by military and civilian agencies. It requires nominations to follow specified submission procedures and sets requirements for individual and unit nomination packages.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Aviation awards</li>
                 <li>Award eligibility criteria</li>
@@ -728,7 +744,7 @@
                 <li>Unit award packages</li>
                 <li>Award ceremony funding</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When must aviation award nominations be received?</h3>
             <blockquote>Nominations must be received by CMC (ASM) on or before the due date detailed in the relevant enclosures . Modifications to due dates , if required , will be indicated in the annual CMC message which solicits award nominations . (paragraph 5)</blockquote>
             <h3>Are late or incomplete aviation award nominations considered?</h3>

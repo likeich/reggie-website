@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/usafe-afafrica/publication/usafe-afafricai51-705_ip/usafe-afafricai51-705_ip.pdf">View USAFE-AFAFRICAI51-705_IP on armypubs.army.mil</a></p>
             <hr>
             <p>The publication addresses criminal jurisdiction, custody in criminal cases, release of information, and Military Extraterritorial Jurisdiction Act prosecutions. It requires procedures for custody transfers, trial observer reports, and information handling.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>German criminal jurisdiction</li>
                 <li>Custody transfers</li>
@@ -725,7 +741,7 @@
                 <li>Release of information</li>
                 <li>German confinement debriefing</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When can the USAREUR JA consider a custody-transfer request after an initial conviction?</h3>
             <blockquote>The USAREUR JA will consider custody-transfer requests made on announcement of initial conviction only if all of the following conditions are met: 1. The judgment of the court includes an unsuspended sentence to confinement. 2. A valid German arrest warrant exists for the accused. 3. German authorities present the local LLA with a request for the immediate transfer of custody, which should provide a valid reason why USF should transfer custody before final sentencing. 4. The trial observer makes an initial determination that the accused received a fair trial. (paragraph 1)</blockquote>
             <h3>What must happen before custody is transferred to German authorities?</h3>

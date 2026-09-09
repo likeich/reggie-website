@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>It defines deficiency categories, reporting roles, screening and investigation processes, corrective and preventive actions, exhibits, replies, and closure. It requires PQDRs to be reviewed, investigated, documented, and forwarded through designated points, with specified response time frames for Category I and Category II reports.</p>
             <p><strong>Applies to:</strong> This guidance applies to all new materiel, revised materiel, and the premature failure of materiel and products, regardless of value or warranty period.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Product Quality Deficiency Reports</li>
                 <li>Deficiency report categories</li>
@@ -730,7 +746,7 @@
                 <li>Screening Point procedures</li>
                 <li>Processing time frames</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What qualifies as a Category I deficiency report?</h3>
             <blockquote>A critical defect that could cause death, injury, severe occupational illness, loss or major damage to a weapon system, loss of combat readiness, or depot production-line stoppage. (paragraph 1)</blockquote>
             <h3>What is a Category II deficiency report?</h3>

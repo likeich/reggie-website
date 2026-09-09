@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>The publication covers personnel identification, training, assignment, activation, allocation, exemptions, and relief from taskings. It requires Offutt AFB, 55th Wing units to participate and provide augmentees as specified by the instruction and the Augmentation Duty Program Review Board.</p>
             <p><strong>Applies to:</strong> This publication applies to all active-duty officer, enlisted, appropriated fund (APF) civilian personnel assigned to the installation; it does not apply to Air National Guard (ANG) or Air Force Reserve (AFRES) personnel.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Augmentation Duty Program</li>
                 <li>Personnel recall</li>
@@ -722,7 +738,7 @@
                 <li>ADP exemptions</li>
                 <li>Relief from taskings</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the Augmentation Duty Program designed to do?</h3>
             <blockquote>The Augmentation Duty Program (ADP) is designed to identify, train, and assign a pool of personnel to temporarily augment units which require a surge of manpower during exercises, contingencies, wartime, or emergency situations. (paragraph 1)</blockquote>
             <h3>What must Offutt AFB, 55th Wing units provide for the ADP Program?</h3>

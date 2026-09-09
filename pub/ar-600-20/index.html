@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1032815">View AR 600-20 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/army-dir-2019-17/">ARMY DIR 2019-17</a></li>
                 <li><a href="/usa/pub/army-dir-2020-11/">ARMY DIR 2020-11</a></li>
@@ -735,7 +751,7 @@
             </ul>
             <hr>
             <p>The publication covers the Army Ready and Resilient Campaign Plan, military discipline and conduct, the Military Equal Opportunity Program, and harassment prevention and response. It also addresses command authority, family readiness, religious accommodation, political activities, and inspector general support.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Army Ready and Resilient Campaign Plan</li>
                 <li>Military discipline and conduct</li>
@@ -746,7 +762,7 @@
                 <li>Religious accommodation</li>
                 <li>Political activities</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who may exercise command authority in the Army?</h3>
             <blockquote>A commander is, therefore, a commissioned or warrant officer (WO) who, by virtue of grade and assignment, exercises primary command authority over a military organization or a prescribed territorial area that is recognized as a &quot;command&quot; under pertinent official directives. (paragraph 1-6)</blockquote>
             <h3>Can a civilian exercise command?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication covers UTAPSweb roles, UTA sign-in and sign-out, Form 40 reporting, exports to the Reserve Pay Office, training, and fiscal year closeout. It requires assigned personnel to manage participation data, complete reviews and validations, and process related transactions within specified timeframes.</p>
             <p><strong>Applies to:</strong> It applies to all units assigned to the 944th Fighter Wing (944 FW), Luke Air Force Base (LAFB) and the geographically separated units (GSU).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Unit Training Assembly participation management</li>
                 <li>UTAPSweb roles</li>
@@ -727,7 +743,7 @@
                 <li>Inactive duty status codes</li>
                 <li>Fiscal year closeout</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does the UTAPSweb process account for?</h3>
             <blockquote>UTAPSweb process is to provide the means to account for all members assigned, code member appropriately, and run a UTAPSweb export in a timely manner.</blockquote>
             <h3>Where must UTAPSweb issues be reported before contacting the Help Desk?</h3>

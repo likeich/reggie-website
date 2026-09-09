@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication addresses SARM and TARM duties, aviation service and flying incentive pay actions, mission packages, and aircrew training records. It also updates processes for Mission Essential Personnel and Orientation/Familiarization Flight requests, and requires specified reports, audits, reviews, and package submissions.</p>
             <p><strong>Applies to:</strong> It applies to all 552d Air Control Wing (552 ACW) agencies on Tinker Air Force Base (AFB), and pertains to wing and squadron aviation resource management duties.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Squadron Aviation Resource Management</li>
                 <li>Tenant Aviation Resource Management</li>
@@ -727,7 +743,7 @@
                 <li>Mission Essential Personnel requests</li>
                 <li>Orientation/Familiarization Flight approvals</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What report must the 1C0X2 Functional Manager run each month?</h3>
             <blockquote>The 1C0X2 Functional Manager will run a monthly double billet report, highlighting all discrepancies in API 5, 6, 8, B and D. (paragraph 11-40)</blockquote>
             <h3>How often must the DNIF audit be completed?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers creating, managing, reviewing, disclosing, accessing, safeguarding, and changing military personnel records, including commander’s or supervisor’s assigned personnel information files and basic identifying data. Compliance with the publication and its attachments is mandatory, and records generated as a result of processes prescribed in it must adhere to Air Force Instruction 33-322 and be disposed of in accordance with the Air Force Records Disposition Schedule.</p>
             <p><strong>Applies to:</strong> It governs the criteria and processing procedures military personnel records and applies to Department of the Air Force (DAF) civilian employees and uniformed members of the Regular Air Force (RegAF), United States Space Force (USSF), Air Force Reserve (AFR) and Air National Guard (ANG).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Military personnel records</li>
                 <li>eMPerRs access</li>
@@ -725,7 +741,7 @@
                 <li>Basic identifying data</li>
                 <li>Personnel information files</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who has final approval authority for access to eMPerRs?</h3>
             <blockquote>ARMS is the final approval/disapproval authority for access. (paragraph 113-66)</blockquote>
             <h3>When is specific justification required for an eMPerRs request?</h3>

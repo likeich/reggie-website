@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>DAFPD10-26 addresses WMD threats, CBRN environments, counterproliferation, and the Countering WMD Enterprise. It requires capability coordination, CBRN defense support, survivability programs, and related research and planning.</p>
             <p><strong>Applies to:</strong> This directive applies to all civilian employees and uniformed members of the Regular Air Force, the United States Space Force, the Air Force Reserve, the Air National Guard, and those who are contractually obligated to comply with Department of the Air Force publications.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Countering WMD planning</li>
                 <li>CBRN environments</li>
@@ -726,7 +742,7 @@
                 <li>Counterproliferation interdiction</li>
                 <li>Proliferation Security Initiative activity planning</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must the Department of the Air Force do to counter WMD threats?</h3>
             <blockquote>The Department of the Air Force will: 2.1. Organize, train, and equip its forces to support DoD and US Government efforts to: defend the homeland from WMD attack, deter WMD attacks, prevail in CBRN environments, and prevent new WMD threats. (paragraph 2)</blockquote>
             <h3>What must the Countering WMD Enterprise budget for?</h3>

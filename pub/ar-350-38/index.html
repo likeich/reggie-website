@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>AR 350-38 covers TADSS categories, live, virtual/gaming, and constructive environments, embedded training, distributed learning, and training technology integration. It requires TADSS requirements to be justified and validated before procurement and fielding and addresses acquisition, accountability, utilization reporting, maintenance, and sustainment.</p>
             <p><strong>Applies to:</strong> This regulation establishes Army policies and responsibilities for life cycle management of training aids, devices, simulators, and simulations (TADSS).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>TADSS categories</li>
                 <li>Live, virtual/gaming, and constructive training environments</li>
@@ -730,7 +746,7 @@
                 <li>TADSS maintenance and sustainment</li>
                 <li>Graphic training aids</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does AR 350-38 include in the term TADSS?</h3>
             <blockquote>TADSS is a general term that includes training instrumentation; tactical engagement simulation (TES); battle simulations; targetry; training-unique ammunition; dummy, drill, and inert munitions; casualty assessment systems; training aids; and other training support devices. (paragraph 5)</blockquote>
             <h3>Can systems be fielded without training subsystems?</h3>

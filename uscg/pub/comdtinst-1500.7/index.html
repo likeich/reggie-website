@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <p><a href="https://media.defense.gov/2021/Feb/09/2002579337/-1/-1/0/CI_1500_7.PDF">View COMDTINST 1500.7 on armypubs.army.mil</a></p>
             <hr>
             <p>It divides EBDL into command directed and non-command directed categories, addresses IDT pay and retirement points, and includes an EBDL Course Approval Request. It also sets approval and course-evaluation requirements for crediting courses and retirement points.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Electronic-Based Distributed Learning</li>
                 <li>Selected Reserve training</li>
@@ -727,7 +743,7 @@
                 <li>Inactive Duty Training pay</li>
                 <li>EBDL course approval</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is electronic-based distributed learning?</h3>
             <blockquote>Electronic-Based Distributed Learning (EBDL) is structured learning that does not require the presence of an instructor. (paragraph 4)</blockquote>
             <h3>What training qualifies as command directed EBDL?</h3>

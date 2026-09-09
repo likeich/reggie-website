@@ -586,8 +586,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -608,6 +617,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -704,7 +720,7 @@
             <hr>
             <p>It covers civil affairs fundamentals, Marine civil affairs forces, civil engagement, civil reconnaissance, civil-military operations centers, and civil-information management. It describes tactics, techniques, and procedures for civil affairs operations and civil-military operations.</p>
             <p><strong>Applies to:</strong> This publication’s key audience consists of the civil affairs group, Marine expeditionary force information group, and Marine littoral regiment commanders and staffs.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Civil affairs fundamentals</li>
                 <li>Marine civil affairs forces</li>
@@ -713,7 +729,7 @@
                 <li>Civil-military operations centers</li>
                 <li>Civil-information management</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does MCRP 3-03A.1 provide guidance for?</h3>
             <blockquote>Marine Corps Reference Publication 3-03A.1, Civil Affairs Tactics, Techniques, and Procedures, provides descriptive guidance for employing Marine civil affairs forces within the Marine air-ground task force and Fleet Marine Forces to conduct civil affairs activities, support military-government operations, and facilitate civil affairs support activities.</blockquote>
             <h3>What operations concepts does MCRP 3-03A.1 address?</h3>

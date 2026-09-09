@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -707,7 +723,7 @@
             <hr>
             <p>AFMAN11-2C-17V3 covers aircrew management, aircraft operating restrictions, required navigation performance, NOTAM requirements, and airdrop altitudes. It requires procedures for IMC, JPADS/ICDS, IFR airdrops, and night and NVG operations.</p>
             <p><strong>Applies to:</strong> It applies to individuals at all levels operating C-17 aircraft, including the Air Force Reserve Command (AFRC) and National Guard Bureau except where noted otherwise.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Aircrew complement and management</li>
                 <li>Aircraft operating restrictions</li>
@@ -717,7 +733,7 @@
                 <li>NOTAM requirements</li>
                 <li>Minimum drop altitudes</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When can the lead descend to IMC drop altitude for an IMC airdrop?</h3>
             <blockquote>Lead may descend from minimum IFR Enroute altitudes to IMC drop altitude as long as UNABLE RNP messages are not displayed.</blockquote>
             <h3>What is required for an IFR airdrop in uncontrolled airspace?</h3>

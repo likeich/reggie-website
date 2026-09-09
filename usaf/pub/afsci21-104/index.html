@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>AFSCI21-104 covers industrial process levels, process benchmarking and control, process characterization, change management, and risk management. It describes the technical engineering authority for the production machine and establishes roles for an industrial process control program.</p>
             <p><strong>Applies to:</strong> It applies to industrial processes at Ogden Air Logistics Complex, Oklahoma City Air Logistics Complex, and Warner Robins Air Logistics Complex, as well as any geographically separated units that are organizationally aligned to the air logistics complexes.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Industrial process control</li>
                 <li>Industrial process levels</li>
@@ -727,7 +743,7 @@
                 <li>Risk management</li>
                 <li>Technical engineering authority</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is industrial process control defined as?</h3>
             <blockquote>IPC is defined as the method of ensuring that an industrial process is predictable, stable, and consistently operating at the target level of performance with only normal variation.</blockquote>
             <h3>Is IPC required for level 4 processes?</h3>

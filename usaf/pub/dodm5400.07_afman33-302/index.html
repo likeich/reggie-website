@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/saf_cio_a6/publication/dodm5400.07_afman33-302/dodm5400.07_afman33-302.pdf">View DODM5400.07_AFMAN33-302 on armypubs.army.mil</a></p>
             <hr>
             <p>The publication addresses FOIA libraries, exemptions, request processing, public access, and the relationship between FOIA and the Privacy Act. It requires records in FOIA libraries to be indexed and exempt information to be redacted from posted records.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>FOIA libraries</li>
                 <li>Public access to DoD information</li>
@@ -726,7 +742,7 @@
                 <li>Commercial and financial information</li>
                 <li>Proactive releases</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When must a frequently requested FOIA record be made publicly available?</h3>
             <blockquote>FOIA RSCs will consider any requested record that has been previously partially or fully released as a frequently requested record (FOIA - processed (a)(2)(D) record) and make it publicly available electronically as outlined in paragraph 4.1.b.(4). (T1). (paragraph 5)</blockquote>
             <h3>What must DoD FOIA Program Components do with exempt information in FOIA libraries?</h3>

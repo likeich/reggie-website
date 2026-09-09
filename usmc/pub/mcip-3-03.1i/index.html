@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -714,7 +730,7 @@
             <hr>
             <p>MCIP 3-03.1i covers stability operations, the maritime environment, planning considerations, functions and tasks, training, and country team perspectives. It identifies tasks performed by naval forces and provides authoritative interim doctrine requiring liberal judgment in its application.</p>
             <p><strong>Applies to:</strong> Within this publication, the Navy, Marine Corps, and Coast Guard constitute the Naval Service and the naval forces.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Maritime stability operations</li>
                 <li>Maritime environment</li>
@@ -725,7 +741,7 @@
                 <li>Maritime rule of law</li>
                 <li>Training and education</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does MCIP 3-03.1i say must be addressed in maritime stability operations?</h3>
             <blockquote>The purpose of this publication is to highlight the unique aspects of stability operations in the maritime domain that must be addressed by the joint force commander and his planning staff. (paragraph 2)</blockquote>
             <h3>What planning guidance does MCIP 3-03.1i provide for maritime stability operations?</h3>

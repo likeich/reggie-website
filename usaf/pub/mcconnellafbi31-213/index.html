@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It addresses Board roles, composition, meetings, off-installation enforcement, and decisions placing establishments and areas off-limits. It requires quarterly meetings, advance agendas, maintained records, and coordination involving civilian guests and proprietors.</p>
             <p><strong>Applies to:</strong> It applies to all active duty personnel assigned to the 22d Air Refueling Wing (22 ARW) and to Air Force Reserve and Air National Guard members on Title 10 status, except where otherwise notified.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Disciplinary Control Board operations</li>
                 <li>Off-installation enforcement</li>
@@ -726,7 +742,7 @@
                 <li>Board meetings</li>
                 <li>Civilian guest and proprietor entry coordination</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who decides whether establishments and areas are placed off-limits?</h3>
             <blockquote>The 22 ARW/CC is the decision authority for placing establishments and areas off-limits and the proponent and exception or waiver authority for this instruction consistent with controlling law and instructions. (paragraph 31-213)</blockquote>
             <h3>How often must Disciplinary Control Board meetings be conducted?</h3>

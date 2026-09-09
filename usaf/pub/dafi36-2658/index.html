@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/af_a1/publication/dafi36-2658/dafi36-2658.pdf">View DAFI36-2658 on armypubs.army.mil</a></p>
             <hr>
             <p>DAFI36-2658 describes a three-phase program involving developmental rotation, legislative fellowship, and utilization tour assignments. It sets approval conditions, phase durations, participant assignments, and requirements for records and privacy-protected information.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Legislative Fellows Program</li>
                 <li>Developmental rotation</li>
@@ -726,7 +742,7 @@
                 <li>Congressional assignments</li>
                 <li>Fellow approval authorities</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the duration of Phase 1 of the Legislative Fellows Program?</h3>
             <blockquote>The first phase is a 6-month developmental rotation, where the Fellow will be assigned to a Headquarters office (Secretariat of the Air Force, Air Force, or Space Force) or agency, or to another relevant governmental agency within the National Capital Region, to gain a beneficial breadth of experience.</blockquote>
             <h3>What is the duration of the Capitol Hill legislative fellowship?</h3>

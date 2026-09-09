@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>MILDENHALLI21-092 defines covered tools, equipment, electronic devices, airfield areas, and aircraft maintenance facilities. It requires units to establish or demonstrate programs for accountability and control, with inventories, logs, evaluations, and lost-item reporting.</p>
             <p><strong>Applies to:</strong> The purpose of this publication is to provide all 100 ARW agencies the necessary guidance to implement a solid program to control the tools and equipment taken onto the airfield.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Tool control</li>
                 <li>Equipment accountability</li>
@@ -728,7 +744,7 @@
                 <li>Inventory logs</li>
                 <li>Composite Tool Kit evaluations</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must units establish to comply with MILDENHALLI21-092?</h3>
             <blockquote>To be in compliance with this instruction, units must establish a program, or demonstrate that existing programs meet the intent of positive tool and equipment accountability and control. (paragraph 1)</blockquote>
             <h3>What must flight chiefs and section NCOICs do for items taken to the airfield or maintenance facilities?</h3>

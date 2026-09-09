@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>AR 700-132 covers JOAP organization, oil analysis goals and objectives, laboratory operations, internal control evaluations, and associated publications. It requires standardized analysis support, qualified operators for inter-Service work, and communication of maintenance recommendations to customers.</p>
             <p><strong>Applies to:</strong> This regulation prescribes policies, responsibilities, and goals for the Joint Oil Analysis Program (JOAP) for the Army, Navy, and Air Force.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Joint Oil Analysis Program goals and objectives</li>
                 <li>Oil analysis laboratories</li>
@@ -729,7 +745,7 @@
                 <li>JOAP organization</li>
                 <li>Internal control evaluations</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What equipment and components does JOAP oil analysis evaluate?</h3>
             <blockquote>Determine the internal condition of aeronautical and nonaeronautical engines, transmissions, and gearboxes, and their oil-wetted components through the analysis of used lubricating oils, hydraulics, grease, and fluids. (paragraph 1-6)</blockquote>
             <h3>When can laboratory operators provide inter-Service support?</h3>

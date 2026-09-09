@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers compensation and benefits, special and incentive pays, and travel and transportation allowances, while assigning responsibilities for military entitlement policy. The publication requires an equitable, fiscally responsible, predictable, stable, and transparent compensation system and states that compliance is mandatory.</p>
             <p><strong>Applies to:</strong> This policy directive applies to uniformed members of the Regular Air Force, Air Force Reserve, Air National Guard and the United States Space Force (USSF).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Compensation and benefits</li>
                 <li>Special and incentive pays</li>
@@ -726,7 +742,7 @@
                 <li>Entitlement eligibility</li>
                 <li>Service credit validation</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What should military members and former members receive under the entitlement policy?</h3>
             <blockquote>All Air Force and Space Force members and former members should receive the full benefit of compensation programs to which they are entitled or for which they are eligible. (paragraph 2)</blockquote>
             <h3>What standards must the compensation system meet?</h3>

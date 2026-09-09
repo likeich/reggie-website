@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It addresses commander’s intent, mission command, trust, empowerment, risk management, data-driven decisions, and force readiness. It requires commanders to lead missions, develop personnel, and maintain a healthy command climate.</p>
             <p><strong>Applies to:</strong> This instruction applies specifically to commissioned officers holding command positions in the Regular or Reserve Components (RegAF, Air Force Reserve, and Air National Guard).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Commander conduct</li>
                 <li>Mission execution</li>
@@ -727,7 +743,7 @@
                 <li>Mission command</li>
                 <li>Command climate</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What conduct must commanding officers and others in Air Force authority demonstrate?</h3>
             <blockquote>All commanding officers and others in authority in the Air Force are required to show in themselves a good example of virtue, honor, patriotism, and subordination; to be vigilant in inspecting the conduct of all persons who are placed under their command; to guard against and suppress all dissolute and immoral practices, and to correct, according to the laws and regulations of the Air Force all persons who are guilty of them; and to take all necessary and proper measures, under the laws, regulations, and customs of the Air Force to promote and safeguard the morale, the physical well-being, and the general welfare of the officers and enlisted persons under their command or charge. (paragraph 2)</blockquote>
             <h3>What must commanders collect for every decision?</h3>

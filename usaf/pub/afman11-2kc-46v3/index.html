@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -706,7 +722,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/af_a3/publication/afman11-2kc-46v3/afman11-2kc-46v3.pdf">View AFMAN11-2KC-46V3 on armypubs.army.mil</a></p>
             <hr>
             <p>The manual addresses low visibility approach operations, extended range operations, command authorization, and cargo and passenger handling procedures. It also covers aircrew complements, qualifications, crew rest, flight duty periods, dispatch deviations, and gear-down flight operations.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Low visibility approach operations</li>
                 <li>Extended range operations</li>
@@ -717,7 +733,7 @@
                 <li>Command authorization</li>
                 <li>Gear-down flight operations</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Is compliance with the attachment in AFMAN11-2KC-46V3 mandatory?</h3>
             <blockquote>Compliance with the attachment in this publication is not mandatory.</blockquote>
             <h3>How are waiver requests for AFMAN11-2KC-46V3 submitted?</h3>

@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>It covers test report categories, standardized reporting products, report schedules, technical reports, and developmental Test and Evaluation documentation. It requires timely, factual, concise reporting, defined reporting requirements, and approval for final reports submitted more than 45 working days after receipt of the last data.</p>
             <p><strong>Applies to:</strong> This instruction applies to all 412 TW organizations and associated detachments and units (including Air Force Reserve Command units, the Air National Guard, and the Civil Air Patrol) managing, supporting, or contributing to the 412 TW test report program.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>412 TW test reports</li>
                 <li>Developmental Test and Evaluation</li>
@@ -721,7 +737,7 @@
                 <li>Standardized reporting products</li>
                 <li>Report approval timelines</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When are 412 TW technical reports required?</h3>
             <blockquote>Technical reports (TRs), one of the test reports of the 412 TW, will be accomplished for all United States Air Force (USAF) tests for which the 412 TW is the Executing Test Organization (ETO), unless specifically exempted by the 412 TW Technical Director (412 TW/CT), as documented in the Statement of Capability (SOC), or in cases where the 412 TW has no technical involvement as determined by the 412 TW/CT. (paragraph 2)</blockquote>
             <h3>When can 412 TW technical reports be issued for participating test organizations?</h3>

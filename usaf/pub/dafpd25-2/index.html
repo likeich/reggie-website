@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It addresses intragovernmental and governmental to nongovernmental support agreements, including written terms, G-Invoicing, reimbursement, and dispute resolution. It identifies authorized officials and requires written designation of approval authorities and Support Agreement Managers.</p>
             <p><strong>Applies to:</strong> This publication applies to all civilian employees and uniformed members of the United States Space Force, the Regular Air Force, Air Force Reserve, Air National Guard, and those with a contractual obligation to abide by the terms of DAF issuances, except where noted otherwise.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Intragovernmental support agreements</li>
                 <li>Governmental to nongovernmental support agreements</li>
@@ -727,7 +743,7 @@
                 <li>Support agreement approval authorities</li>
                 <li>Support agreement disputes</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must support agreements include?</h3>
             <blockquote>Intragovernmental and governmental to non-governmental support agreements must be in writing (e.g., a Fiscal Service (FS) Form 7600A, United States Government Interagency Agreement (IAA) Agreement Between Federal Agencies, General Terms &amp; Conditions (GT&amp;C) Section, memorandum of understanding (MOU), memorandum of agreement (MOA), or other document memorializing the support agreement) and the terms and conditions must be clear, concise with no possible ambiguity and meet the minimum requirements set forth in DoDI 4000.19 Table 1. (paragraph 2)</blockquote>
             <h3>When must G-Invoicing be used for support agreements?</h3>

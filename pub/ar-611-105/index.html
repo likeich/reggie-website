@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1026289">View AR 611-105 on armypubs.army.mil</a></p>
             <hr>
             <p>It details prerequisites, disqualifiers, application and assessment procedures, initial training, assignment rules, and EOD qualification validation. It also establishes requirements for maintaining proficiency and procedures for suspending or revoking EOD validations.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>EOD training prerequisites</li>
                 <li>EOD application process</li>
@@ -727,7 +743,7 @@
                 <li>EOD duty suspension and revocation</li>
                 <li>EOD badge progression</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What explosive hazards are Army EOD personnel trained to handle?</h3>
             <blockquote>Army EOD personnel are organized, trained, and equipped to detect, locate, access, identify, diagnose, render safe, recover, exploit, and dispose of explosive hazards, including military munitions, improvised, and homemade explosive devices, nuclear weapons, weapons of mass destruction, and chemical, biological, radiological, and nuclear weapons containing explosives. (paragraph 2-1)</blockquote>
             <h3>What security clearance eligibility is required before EOD training?</h3>

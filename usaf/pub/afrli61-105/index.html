@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/afrl/publication/afrli61-105/afrli61-105.pdf">View AFRLI61-105 on armypubs.army.mil</a></p>
             <hr>
             <p>It defines the roles, membership, duties, authorities, and meeting requirements of the Research Advisory Council and Technology Advisory Councils. It also requires signed charters to be stored, reviewed, updated, and maintained according to specified requirements.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Research Advisory Council</li>
                 <li>Technology Advisory Councils</li>
@@ -726,7 +742,7 @@
                 <li>Meeting requirements</li>
                 <li>Charter storage and access</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must AFRL establish for strategic guidance on research and development activities?</h3>
             <blockquote>AFRL must charter the Research Advisory Council (RAC) as the principal advisory body to the DAF Technology Executive Officer (TEO) for strategic guidance, assessments and recommendations on research and development activities involving AFRL’s science &amp; technology mission and science, technology, engineering and mathematics (STEM) workforce. (paragraph 1)</blockquote>
             <h3>Which organizations must charter a Technology Advisory Council?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication establishes procedures for worldwide operational and training missions and sets basic cargo compartment configurations, standard equipment, and equipment locations. It includes floor plans, weight and balance data, required and mission-specific equipment tables, and emergency exit and safety aisle requirements.</p>
             <p><strong>Applies to:</strong> This manual applies to civilian employees and uniformed members of the Air Force’s Regular Air Force (RegAF), Air Force Reserve (AFR), and Air National Guard (ANG) when flying the EC-130J or MC-130J.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Aircrew life support equipment</li>
                 <li>Required equipment</li>
@@ -728,7 +744,7 @@
                 <li>Emergency exits and safety aisles</li>
                 <li>Airdrop configurations</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How many EPOS are required on each aircraft?</h3>
             <blockquote>Each aircraft should have one EPOS per passenger.</blockquote>
             <h3>How close can passengers sit to palletized or strapped cargo?</h3>

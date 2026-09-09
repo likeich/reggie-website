@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It identifies recall responsibilities, recall types, alert methods, and procedures for CAT work center entry and security. Compliance with 36WGI10-201 is mandatory, including requirements for recall rosters, UCC training, and visitor control.</p>
             <p><strong>Applies to:</strong> It applies to all personnel assigned to Andersen Air Force Base (AFB), including associate units and deployed personnel.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Wing recall initiation</li>
                 <li>Wing recall responsibilities</li>
@@ -728,7 +744,7 @@
                 <li>Unit Control Centers</li>
                 <li>Visitor badging</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How does 36WGI10-201 initiate wing recalls?</h3>
             <blockquote>The 36th Wing Commander (36 WG/CC) directs recall actions through the 36th Wing Command Post (CP). (paragraph 1)</blockquote>
             <h3>What happens if an AtHoc recall notification arrives before a phone call?</h3>

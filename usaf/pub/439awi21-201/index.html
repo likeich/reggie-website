@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/439aw/publication/439awi21-201/439awi21-201.pdf">View 439AWI21-201 on armypubs.army.mil</a></p>
             <hr>
             <p>It covers turn-in requirements for residue, empty containers, and packing material, along with inspection, certification, segregation, storage, and disposal procedures. It also establishes procedures for discovering live munitions during certification and verification.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Munitions residue turn-in</li>
                 <li>Empty munitions containers</li>
@@ -725,7 +741,7 @@
                 <li>Live munitions discovery</li>
                 <li>Hazardous residue categorization</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What munitions residue must customers and users turn in?</h3>
             <blockquote>Ensure all munitions residue is turned in to the Munitions Flight to include expended brass, links, expended smoke grenades, pull-pins, empty containers/boxes, and packing material. (paragraph 2)</blockquote>
             <h3>Can live munitions be mixed with munitions residue?</h3>

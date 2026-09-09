@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication addresses F-35 maintenance concepts, prognostic inspections, support equipment, technical data, and readiness systems. It requires maintenance actions to use verified JTD and maintenance requirements to be managed through ALIS and related systems.</p>
             <p><strong>Applies to:</strong> This addendum applies to the Air National Guard (ANG) or Air Force Reserve Command (AFRC) when assigned to Classic Associate Units supporting PACAF units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>F-35 maintenance management</li>
                 <li>Prognostic maintenance inspections</li>
@@ -728,7 +744,7 @@
                 <li>Autonomic Logistics Information System</li>
                 <li>Verified Joint Technical Data</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How must maintenance units use AFI21-101_PACAFSUP_ADD_B with the PACAF supplement?</h3>
             <blockquote>Maintenance units will use this instruction in conjunction with the PACAF supplement to AFI 21-101; if a conflict exists between the PACAF supplement and this addendum the addendum will take precedence.</blockquote>
             <h3>How are F-35 Air System problems reported?</h3>

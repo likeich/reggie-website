@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It establishes special recognition awards and quarterly and annual programs for military and civilian personnel, including officers, enlisted members, civilian employees, and Key Spouses. It requires award boards, nominee packages, winner publicity, records management, and protection of personal data under the Privacy Act.</p>
             <p><strong>Applies to:</strong> It applies to all military and civilian employees paid through appropriated funds assigned to DavisMonthan Air Force Base (DMAFB) as well as associate units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Special recognition awards</li>
                 <li>Quarterly and annual award programs</li>
@@ -727,7 +743,7 @@
                 <li>Outstanding Airmen of the Year Program</li>
                 <li>Privacy Act protections</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When must the Quarterly/Annual Awards schedule be published?</h3>
             <blockquote>Publish the Quarterly/Annual Awards schedule for the upcoming year no later than 15 January. (paragraph 6)</blockquote>
             <h3>How many individuals may each organization nominate in each category for the quarterly board?</h3>

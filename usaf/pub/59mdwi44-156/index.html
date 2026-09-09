@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication addresses supplier qualification, tissue receipt and tracking, storage conditions, implantation documentation, disposition, adverse events, recalls, and training. It requires annual training, documented tissue traceability, and retention of tissue records for at least 10 years beyond the latest specified event.</p>
             <p><strong>Applies to:</strong> This instruction applies to all Military Medical Treatment Facilities (MTFs) and Clinics under the Authority, Direction, and Control of the Director, Wilford Hall Ambulatory Surgical Center, to include the 59th Medical Wing (MDW) medical staff while performing Defense Health Agency duties.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Tissue supplier qualification</li>
                 <li>Tissue procurement</li>
@@ -727,7 +743,7 @@
                 <li>Adverse tissue events and recalls</li>
                 <li>Tissue program training</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Where can tissue be procured from?</h3>
             <blockquote>Tissues will only be procured from source facilities that are validated as licensed by their respective state agencies and/or are registered as a tissue establishment by the FDA. (paragraph 1)</blockquote>
             <h3>How long must tissue records be retained?</h3>

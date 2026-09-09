@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1006653">View ARMY DIR 2019-13 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=3250">AR 405-20</a> (armypubs)</li>
                 <li><a href="/usa/pub/ar-420-1/">AR 420-1</a></li>
@@ -725,7 +741,7 @@
             <hr>
             <p>The directive defines major juvenile misconduct and juvenile problematic sexual behavior. It establishes policy for reporting, investigating, victim assistance, command actions, juvenile review boards, and civilian jurisdiction referrals.</p>
             <p><strong>Applies to:</strong> This directive applies to the Regular Army, Army National Guard/Army National Guard of the Unites States, and U.S. Army Reserve.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Major juvenile misconduct</li>
                 <li>Juvenile problematic sexual behavior</li>
@@ -734,7 +750,7 @@
                 <li>Juvenile Review Boards</li>
                 <li>Concurrent criminal jurisdiction</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How does ARMY DIR 2019-13 define major juvenile misconduct?</h3>
             <blockquote>Major juvenile misconduct is defined as any act by a person who has not attained the age of majority as defined by applicable Federal or State law, but who has attained the minimum age for juvenile delinquency as defined by applicable Federal or State law, that would be classified as a felony crime in accordance with the applicable Federal, State, or local civilian law if an adult committed the act. (paragraph 4)</blockquote>
             <h3>What is juvenile problematic sexual behavior under ARMY DIR 2019-13?</h3>

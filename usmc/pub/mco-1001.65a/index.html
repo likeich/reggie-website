@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>It covers career designation, extended and return to active duty, inter-service transfer, and redesignation of limited duty officers. It establishes application, eligibility, selection board, approval, appointment, service obligation, and separation provisions.</p>
             <p><strong>Applies to:</strong> This Order provides policy and guidelines for the administration of several programs that affect officer retention and inventory in the active and reserve components.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Career designation</li>
                 <li>Extended active duty</li>
@@ -730,7 +746,7 @@
                 <li>Separation pay</li>
                 <li>Photographs</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is career designation used to determine?</h3>
             <blockquote>CD is the selective force shaping process used to determine which company grade officers will be offered the opportunity for continued active service beyond their initial active service obligation. (paragraph 4)</blockquote>
             <h3>How long can extended active duty extend an officer’s EAS?</h3>

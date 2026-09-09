@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>DAFI36-3112 addresses statutory authority, command and personnel responsibilities, and marriages involving U.S. citizens, lawful permanent residents, and noncitizens. It requires counseling, addresses leave and travel costs, and identifies assistance with visas, entrance documentation, and related forms.</p>
             <p><strong>Applies to:</strong> Provide members stationed overseas, when marrying citizens of other countries, guidance on the restrictions of the United States (US) immigration laws.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>U.S. citizen and noncitizen marriages</li>
                 <li>Noncitizen marriage immigration limitations</li>
@@ -727,7 +743,7 @@
                 <li>Travel costs for overseas marriages</li>
                 <li>Department of Defense Form 1278</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What immigration law governs the admission of noncitizens into the United States?</h3>
             <blockquote>The admission of noncitizens into the United States is governed by the Immigration and Nationality Act (Title 8, United States Code (USC), Sections (§) 1101, Definitions, et seq.). (paragraph 2)</blockquote>
             <h3>What status is available to a foreign fiancé or fiancée of a U.S. citizen?</h3>

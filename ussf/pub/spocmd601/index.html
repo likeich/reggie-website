@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>It describes Space Delta 6’s mission, SCN units, equipment, and major components, including scheduling, communications, orbital analysis, and tracking systems. Compliance with the publication is mandatory, and the publication may not be supplemented or further implemented or extended.</p>
             <p><strong>Applies to:</strong> This MD does not apply to Air National Guard (ANG) or Air Force Reserve Command (AFRC) units and members.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Satellite Control Network mission</li>
                 <li>SCN weapon systems and equipment</li>
@@ -722,7 +738,7 @@
                 <li>Automated Remote Tracking Station</li>
                 <li>Remote Tracking Station Block Change</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What mission does the Space Delta 6 Satellite Control Network perform?</h3>
             <blockquote>Space Delta 6 Satellite Control Network (SCN) mission is to provide, through telemetry, tracking, and commanding (TT&amp;C), assured access to space systems in varying threat level environments and to distribute space system information in support of operational Department of Defense (DoD) missions, National Security Space (NSS), Research, Development, Test &amp; Evaluation (RDT&amp;E) programs, and other designated users. (paragraph 1)</blockquote>
             <h3>What does the Electronic Schedule Dissemination system do?</h3>

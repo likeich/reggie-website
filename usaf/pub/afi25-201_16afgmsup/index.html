@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/16af/publication/afi25-201_16afgmsup/afi25-201_16afsup.pdf">View AFI25-201_16AFGMSUP on armypubs.army.mil</a></p>
             <hr>
             <p>It establishes roles for 16 AF support agreement management and sets approval requirements for agreements with military, national agency, combatant command, and interagency partners. It also addresses requirement approval for agreements exceeding the Simplified Acquisition Threshold and coordination involving ANG or AFR units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Support agreement management</li>
                 <li>Signatory and approval authority</li>
@@ -726,7 +742,7 @@
                 <li>NSA coordination</li>
                 <li>ANG and AFR coordination</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who manages Sixteenth Air Force support agreements?</h3>
             <blockquote>Program management, oversight, and policy guidance of all 16 AF support agreements resides in the Directorate of Logistics, Engineering and Force Protection (16 AF/A4), Logistics Readiness Division (16 AF/A4R), Plans and Integration Branch (16 AF/A4RX).</blockquote>
             <h3>What approval is required for agreements over $250,000?</h3>

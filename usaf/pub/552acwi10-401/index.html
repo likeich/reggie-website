@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It outlines Chief of Plans, Command and Control, and Signature Management Officer functions, along with development and review of OPLANs, CONPLANs, EXPLANs, FUNCPLANs, and associated planning documents. It establishes exercise-planning roles and prescribes unit actions for Wing and Base exercises, plan briefings, security classification, OPSEC, and plan maintenance.</p>
             <p><strong>Applies to:</strong> This instruction is directive and applies to all units assigned to the 552 ACW that maintain operations plans or participate in the development of operations planning documents.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Operations plan development</li>
                 <li>Contingency plan reviews</li>
@@ -727,7 +743,7 @@
                 <li>Unclassified plan posting</li>
                 <li>Wing contingency response</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who manages 552 ACW plan creation and maintenance?</h3>
             <blockquote>The Wing Plans and Programs directorate (XP) manages the creation, construction, review and maintenance of all 552 ACW generated plans, as well as the review and local inputs of all Higher Headquarters (HHQ) and 72 ABW plans (Action Officer: XPP). (paragraph 1)</blockquote>
             <h3>How often must unit tasked plans be briefed?</h3>

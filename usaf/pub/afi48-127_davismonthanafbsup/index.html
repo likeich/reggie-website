@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It administers the Air Force Hearing Conservation Program and addresses hazardous noise exposure, hearing testing, audiology support, and HCP funding. It requires records created under the publication to be maintained and disposed of under Air Force records procedures.</p>
             <p><strong>Applies to:</strong> This supplement prescribes policies and responsibilities for all military and civilian personnel assigned to Davis-Monthan Air Force Base (AFB) and the Aerospace Maintenance and Regeneration Group (AMARG).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Flightline hazardous noise</li>
                 <li>Hearing Conservation Program</li>
@@ -726,7 +742,7 @@
                 <li>Hearing conservation diagnostic centers</li>
                 <li>Audiologist training</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When may commanders waive the supplement’s provisions?</h3>
             <blockquote>During mission essential, contingency, or emergency operations, commanders may waive the provisions of this instruction; however, when commanders waive procedures, they must ensure all supervisors exercise caution, make certain all subordinate personnel are aware of hazardous noise conditions, and take actions to protect the health of personnel.</blockquote>
             <h3>What must Air Force operations involving hazardous noise establish and maintain?</h3>

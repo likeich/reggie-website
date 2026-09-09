@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication expands and further defines operations supervision training, responsibilities, and interfaces with agencies involved in command and control of flying activities. It requires procedures for Supervisor of Flying and Operations Supervisor duties, risk management worksheets, upgrade programs, alternate duty locations, and local operational resources.</p>
             <p><strong>Applies to:</strong> This publication applies to all Shaw AFB flying units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Operations supervision training</li>
                 <li>Supervisor of Flying duties</li>
@@ -727,7 +743,7 @@
                 <li>Alternate duty locations</li>
                 <li>Functional check flights</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When does Supervisor of Flying duty start, and when must the SOF be in the tower?</h3>
             <blockquote>SOF duty starts 1+30 prior to first scheduled takeoff. NLT 1+10 prior to first takeoff, the SOF will brief the recommended opening status to the OG Brick Holder and Top 3s. NLT 1+00, the SOF will be in the tower.</blockquote>
             <h3>What must Top 3s do with Risk Management worksheets?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It establishes cyber maintenance discipline and hygiene requirements, controls for eTools and classified information, and procedures for Crash Damaged or Disabled Aircraft Recovery operations. It also identifies CDDAR training, scheduling, recovery, and unit responsibilities.</p>
             <p><strong>Applies to:</strong> This supplement clarifies existing AF and MAJCOM policies and provides guidance specific to Scott AFB and is applicable to all units that perform maintenance on/in/around aircraft or aircraft ramps/hanger.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Cyber maintenance discipline and hygiene</li>
                 <li>Aircraft USB connectivity</li>
@@ -726,7 +742,7 @@
                 <li>CDDAR training and qualifications</li>
                 <li>Runway recovery procedures</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What devices may be connected to aircraft through USB, a card reader, or a cannon plug?</h3>
             <blockquote>No device other than Common Interface Computer, test sets, Personal Computer Memory Card International Association (PCMCIA) cards, or other software storage media will be connected to aircraft via Universal Serial Bus (USB), card reader or cannon plug.</blockquote>
             <h3>How must microphones and cameras be configured on eTools?</h3>

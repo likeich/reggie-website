@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>USAFAI36-3518 addresses team rosters, scheduling, eligibility, attire, alcohol and team social functions, dining hall procedures, team captains, and training event deconfliction. It requires compliance with formation schedules, sets team participation and practice rules, and establishes procedures for meals, attire, captain selection, and training conflicts.</p>
             <p><strong>Applies to:</strong> This publication establishes policy and procedures for intercollegiate athletic programs and applies to all United States Air Force Academy (USAFA) personnel who participate or support intercollegiate athletic programs.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Athletic team rosters</li>
                 <li>Athletic scheduling</li>
@@ -728,7 +744,7 @@
                 <li>Team captain selection</li>
                 <li>Training event deconfliction</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What paperwork is required for cadets to be listed on an athletic team roster?</h3>
             <blockquote>Eligibility paperwork includes the NCAA Student-Athlete Statement, NCAA Drug Testing Consent Form and the Mountain West Conference Historical Report. (paragraph 2)</blockquote>
             <h3>Can cadets on intercollegiate athletic team rosters participate in intramurals?</h3>

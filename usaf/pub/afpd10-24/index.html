@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It establishes the Mission Assurance Forum, incorporates the Critical Asset Risk Management Program, and identifies programs supporting Mission Assurance. The directive sets requirements for prioritizing missions, managing risk to critical assets and defense critical infrastructure, and coordinating Air Force responsibilities.</p>
             <p><strong>Applies to:</strong> This publication applies to all civilian employees and uniformed members of the Regular Air Force, Air Force Reserve, Air National Guard, contractors and consultants, and non-DoD U.S. Government Agencies whose personnel, by mutual agreement, require support from or conduct operational activity with the Air Force.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Mission Assurance</li>
                 <li>Critical Asset Risk Management</li>
@@ -727,7 +743,7 @@
                 <li>Critical asset risk management</li>
                 <li>Installation Mission Assurance structures</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does AFPD10-24 require the Air Force to protect?</h3>
             <blockquote>Establish policy and implement MA as a process to protect or ensure the continued function and resilience of capabilities and assets by refining, integrating, and synchronizing the aspects of the Air Force Mission Assurance-Related Programs and Activities (MARPA) in accordance with DoDD 3020.40. (paragraph 1)</blockquote>
             <h3>What is the purpose of the Mission Assurance Forum?</h3>

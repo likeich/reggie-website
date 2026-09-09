@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication assigns information protection roles and establishes security oversight activities at Air Force Test Center sites. It requires submissions for security incidents, exception requests, waivers, designations, and annual reports.</p>
             <p><strong>Applies to:</strong> Compliance with this Memorandum is mandatory and applies to all activities and associate organizations per host/tenant support agreements with the Air Force Test Center and is effective immediately.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Information protection roles</li>
                 <li>Security incident reporting</li>
@@ -727,7 +743,7 @@
                 <li>Exception requests</li>
                 <li>Information protection visits</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who is the AFTC Information Protection Center Senior Functional?</h3>
             <blockquote>The Air Force Test Center (AFTC) Information Protection Center Senior Functional is the AFTC Chief, Information Protection (CIP).</blockquote>
             <h3>When must Site CIPs submit security incident data?</h3>

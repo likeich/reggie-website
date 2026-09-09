@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -708,7 +724,7 @@
             <p><a href="https://www.marines.mil/News/Publications/MCPEL/Electronic-Library-Display/Article/1676185/mctp-3-03c/">View MCTP 3-03C on armypubs.army.mil</a></p>
             <hr>
             <p>MCTP 3-03C covers unified action, civil-military operations, domestic and foreign considerations, authorities, assessment, transitions, and planning challenges. It addresses mission essential tasks requiring interorganizational coordination and emphasizes unity of effort and interoperability.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Unified action and unity of effort</li>
                 <li>Civil-military operations</li>
@@ -718,7 +734,7 @@
                 <li>Information sharing</li>
                 <li>Mission essential tasks requiring interorganizational coordination</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who is MCTP 3-03C designed to assist with interorganizational coordination?</h3>
             <blockquote>Marine Corps Reference Publication 3-36B, MAGTF Interorganizational Coordination, is designed to assist Marines at every level in coordinating with United States governmental agencies, intergovernmental organizations, and nongovernmental organizations, as well as commercial entities that may be required to achieve national objectives in today’s complex operational environments.</blockquote>
             <h3>What is the intent of MCTP 3-03C?</h3>

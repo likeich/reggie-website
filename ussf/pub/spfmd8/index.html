@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/ussf_coo/publication/spfmd8/spfmd8.pdf">View SPFMD8 on armypubs.army.mil</a></p>
             <hr>
             <p>It describes space-force capabilities, security, regional stability, and U.S. interests in the USINDOPACOM area of responsibility. Compliance with SPFMD8 is mandatory, and its responsibilities include space operations, situational awareness, subordinate echelons, training, and readiness.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>USINDOPACOM support</li>
                 <li>Space operations</li>
@@ -726,7 +742,7 @@
                 <li>Training and readiness</li>
                 <li>Subordinate echelons</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is USSPACEFOR-INDOPAC's role in USINDOPACOM?</h3>
             <blockquote>USSPACEFOR-INDOPAC is the United States Space Force (USSF) Service component to USINDOPACOM. (paragraph 1)</blockquote>
             <h3>What capabilities does USSPACEFOR-INDOPAC provide to USINDOPACOM?</h3>

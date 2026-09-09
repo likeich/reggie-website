@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -711,7 +727,7 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1031261">View AR 638-8 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1021401">ARMY DIR 2020-16</a> (armypubs)</li>
                 <li><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1021698">ARMY DIR 2021-04</a> (armypubs)</li>
@@ -720,7 +736,7 @@
             </ul>
             <hr>
             <p>AR 638-8 covers casualty reporting, notification, assistance, missing-person cases, bedside travel, letters, insurance, and mortuary affairs. It requires prompt reporting, trained and certified notification officers, timely family communications, and specific casualty investigations and notifications.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Casualty reporting</li>
                 <li>Casualty notification officers</li>
@@ -731,7 +747,7 @@
                 <li>Military family insurance programs</li>
                 <li>Army National Guard casualty processes</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How quickly must an initial casualty report be submitted?</h3>
             <blockquote>Personnel from the reporting Casualty Assistance Centers (CACs) and Theater Casualty Information Centers (T CIC) will submit the initial casualty report (INIT) to CMAOD as soon as they receive key casualty information, within 12 hours from the time of the incident. (paragraph 9-8)</blockquote>
             <h3>When can casualty information be released to the public?</h3>

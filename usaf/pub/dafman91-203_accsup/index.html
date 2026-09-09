@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>DAFMAN91-203_ACCSUP contains requirements for wire rope terminations, fall protection, machinery shutdown, hazardous energy control, and equipment restoration. It requires specified procedures for clip placement, fall protection, energy isolation, PPE, testing, and notification.</p>
             <p><strong>Applies to:</strong> It applies to commanders, functional managers, supervisors, and all other ACC personnel. It applies to ACC gained Air Force Reserve Command and Air National Guard units or members.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Wire rope clip spacing</li>
                 <li>Wire rope terminations</li>
@@ -723,7 +739,7 @@
                 <li>Equipment testing and positioning</li>
                 <li>Machinery restoration</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How are angles measured in DAFMAN91-203_ACCSUP?</h3>
             <blockquote>All angles shown are measured from the vertical. (paragraph 9)</blockquote>
             <h3>When is fall protection required for general industry?</h3>

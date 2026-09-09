@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It establishes policies for career-long development, retention, competency-based development, training, education, and experiential programs. It requires valid requirements and priorities, appropriate resources, developmental opportunities, and performance-based measures to address development gaps.</p>
             <p><strong>Applies to:</strong> This publication applies to uniformed members of the United States Space Force (USSF), Regular Air Force, the Air Force Reserve, and the Air National Guard and Department of the Air Force (DAF) civilians.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Total force development</li>
                 <li>Personnel retention</li>
@@ -727,7 +743,7 @@
                 <li>Workforce planning</li>
                 <li>Career paths</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the DAF's priority for personnel?</h3>
             <blockquote>Developing and retaining quality personnel is a top priority in educating, training, organizing, and equipping the total force to deliver airpower and space capabilities to the joint force in defense of the nation, and in support of the United States’ national security and military objectives. (paragraph 1)</blockquote>
             <h3>What must the comprehensive retention and force development program do?</h3>

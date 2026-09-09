@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/smc/publication/smci63-105/smci63-105.pdf">View SMCI63-105 on armypubs.army.mil</a></p>
             <hr>
             <p>SMCI63-105 addresses exceptions for national security systems, legacy systems and contracts, and AFSPC and SMC web sites. It requires applicable procurements to be certified for Section 508 compliance and sets requirements for certain exceptions.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Section 508 implementation</li>
                 <li>Electronic and information technology</li>
@@ -726,7 +742,7 @@
                 <li>AFSPC and SMC web sites</li>
                 <li>EIT certification</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does SMCI63-105 require AFSPC to do with electronic and information technology?</h3>
             <blockquote>AFSPC will develop, procure, maintain, and use EIT in accordance with Section 508. (paragraph 2)</blockquote>
             <h3>How does SMCI63-105 define an undue burden?</h3>

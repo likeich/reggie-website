@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It addresses tool marking, long-term storage of tool kits, and procedures for lost tools and items. It requires specific identification markings, inventory documentation, storage controls, and actions when tools may be lost on aircraft or aerospace ground equipment.</p>
             <p><strong>Applies to:</strong> This instruction applies to all Warner Robins Air Logistics Complex (WR-ALC) groups and applicable staff offices.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Tool marking for identification</li>
                 <li>Tool kit long-term storage</li>
@@ -726,7 +742,7 @@
                 <li>Aerospace ground equipment impoundment</li>
                 <li>Tool kit inventory documentation</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How must Complex tool kits be identified?</h3>
             <blockquote>All Complex TKs will be identified externally with one-half inch or larger lettering with the individual’s name or satellite tool crib assigned, “Robins Air Force Base Georgia”, and TK ID number. (paragraph 1)</blockquote>
             <h3>How must new and replacement tools be marked?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It implements AFPD 36-1 and requires use of the Eglin AFB Form 16 for civilians terminating employment. It also addresses voluntary disclosure, delayed processing, and the handling of records created by prescribed processes.</p>
             <p><strong>Applies to:</strong> This instruction implements AFPD 36-1, General Civilian Personnel Provisions and Authorities, and applies to all civilian personnel assigned, attached or associated with the Eglin AFB complex.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>civilian clearance records</li>
                 <li>departing employee material and equipment turn-in</li>
@@ -726,7 +742,7 @@
                 <li>Eglin AFB Form 16</li>
                 <li>clearance processing disclosure</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What form is required when a civilian terminates employment from Eglin AFB?</h3>
             <blockquote>The Eglin AFB Form 16 , Civilian Clearance Record, is required for civilians terminating employment from Eglin AFB. (paragraph 1)</blockquote>
             <h3>What is the purpose of the civilian clearance process?</h3>

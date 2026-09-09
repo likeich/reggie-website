@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <p><a href="https://www.marines.mil/News/Publications/MCPEL/Electronic-Library-Display/Article/1114634/mcwp-3-40/">View MCWP 3-40 on armypubs.army.mil</a></p>
             <hr>
             <p>MCWP 3-40 covers logistics organization, capabilities, command relationships, expeditionary logistics, deployment, entry, decisive actions, redeployment, and withdrawal. It describes planning and execution processes that support forces across levels of warfare.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Expeditionary logistics</li>
                 <li>Strategic logistics</li>
@@ -729,7 +745,7 @@
                 <li>Decisive actions</li>
                 <li>Redeployment operations</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must a commander plan for a deployment organization?</h3>
             <blockquote>The commander must plan a deployment organization to ensure that forces arrive in the objective area in a logical sequence, at the right time, with the correct equipment, and with enough sustainment capability to support the CONOPS. (paragraph 3)</blockquote>
             <h3>What is deployment in Marine Corps logistics?</h3>

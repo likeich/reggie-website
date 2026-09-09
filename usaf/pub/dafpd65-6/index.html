@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>DAFPD65-6 establishes policies for budget formulation, justification, execution, and funding flexibility, and addresses Anti-deficiency Act violations. It assigns financial management, budget, and funding responsibilities across the Department of the Air Force.</p>
             <p><strong>Applies to:</strong> This directive applies to the Regular Air Force, the United States Space Force, Air Force Reserve, and Air National Guard.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Budget formulation and execution</li>
                 <li>Appropriated funds</li>
@@ -726,7 +742,7 @@
                 <li>Funding priorities</li>
                 <li>Air Force Working Capital Fund accounts</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must appropriated funds be used for?</h3>
             <blockquote>The Department of the Air Force ensures appropriated funds, including expired funds and Air Force Working Capital Fund accounts, are used only for authorized purposes, as enacted by Congress, as required by Title 31 United States Code Section 1301, Application, and implemented under Department of Defense and Department of the Air Force directives and instructions. (paragraph 1)</blockquote>
             <h3>What must budget documents issued to subordinate activities avoid?</h3>

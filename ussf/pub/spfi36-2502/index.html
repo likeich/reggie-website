@@ -586,8 +586,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -608,6 +617,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -702,7 +718,7 @@
             <hr>
             <p>It covers promotion authority, dates of rank, eligibility, acceptance or decline of promotion, ceremonies, education, degrees, boards, and grade-specific promotion programs. It requires compliance with Privacy Act information practices and records management requirements, and sets rules for supplements and waivers.</p>
             <p><strong>Applies to:</strong> This instruction applies to the uniformed members of the United States Space Force (USSF).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Guardian promotion authority</li>
                 <li>Promotion dates and sequence numbers</li>
@@ -713,7 +729,7 @@
                 <li>Promotion skill level waivers</li>
                 <li>Demotion programs</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Can field agencies publish supplements that change basic policies and procedures?</h3>
             <blockquote>Field agencies will not publish supplements that change basic policies and procedures or merely duplicate the text of these instructions, and field agencies must obtain SF/S1PP, AFPC/DP3SP, and Air Force Departmental Publication Office, Product Development Branch (AFDPO/PPP) approval before using locally created versions of the DAF, Space Force (SPF), and Air Force (AF) Forms prescribed by this instruction.</blockquote>
             <h3>How are waiver requests submitted under SPFI36-2502?</h3>

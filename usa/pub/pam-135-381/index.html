@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,14 +732,14 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1020635">View PAM 135-381 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/ar-135-381/">AR 135-381</a></li>
             </ul>
             <hr>
             <p>PAM 135-381 defines incapacitation and distinguishes Tier 1 and Tier 2 pay based on military duty capacity and nonmilitary income loss. It covers claim initiation, eMMPS processing, review board procedures, validation, payment limits, and appeals.</p>
             <p><strong>Applies to:</strong> This pamphlet provides procedures regarding incapacitation (INCAP) pay and allowances for Reserve Component (RC) members.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Incapacitation pay eligibility</li>
                 <li>Tier 1 incapacitation pay</li>
@@ -734,7 +750,7 @@
                 <li>Payment limitations</li>
                 <li>Denied claim appeals</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What system records and tracks INCAP claims?</h3>
             <blockquote>The Electronic Medical Management Processing System (eMMPS) is the standard system of record in the Medical Electronic Data Care History and Readiness Tracking (MEDCHART) platform for processing, monitoring, and tracking all INCAP claims. (paragraph 5)</blockquote>
             <h3>Are INCAP pay claims retroactive?</h3>

@@ -604,8 +604,17 @@ airmen">
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -626,6 +635,13 @@ airmen">
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -722,7 +738,7 @@ AIRMEN</li>
             <hr>
             <p>It sets quarterly and annual award periods, award categories, nominee qualifications, selection board structures, presentation ceremonies, and award benefits. Nominees must meet eligibility criteria, and nomination packages must follow the prescribed schedule and format.</p>
             <p><strong>Applies to:</strong> It applies to all category &quot;A&quot; Air Force Reserve enlisted personnel assigned to the 939 ARW.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Quarterly and annual award periods</li>
                 <li>Award categories</li>
@@ -732,7 +748,7 @@ AIRMEN</li>
                 <li>Presentation ceremonies</li>
                 <li>Award benefits</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What are the requirements for an initial nomination package?</h3>
             <blockquote>Submission of the attached template (Attachment 2) and letter of endorsement from the unit commander are the only requirements for the initial nomination package.</blockquote>
             <h3>What grade must a senior NCO hold for the award?</h3>

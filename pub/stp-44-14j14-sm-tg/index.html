@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -713,7 +729,7 @@
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=80463">View STP 44-14J14-SM-TG on armypubs.army.mil</a></p>
             <hr>
             <p>It contains training tasks across communications, AMDPCS, SINCGARS, MSE, generators, vehicle operations, GPS, emplacement, and other subject areas. The tasks specify performance standards, measures, required equipment, and evaluation guidance using GO or NO-GO results.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>EPLRS radio operations</li>
                 <li>SATCOM radio operations</li>
@@ -724,7 +740,7 @@
                 <li>PLGR GPS operations</li>
                 <li>C4I equipment emplacement</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What checks are required before correcting radio set faults?</h3>
             <blockquote>1. Checked radio set for loose or broken knobs or switches. 2. Checked radio set jacks for bent or broken pins. 3. Checked radio set pressure port for obstructions or damage to rain shield. 4. Checked selectable power adapter for bent or broken pins on connectors. 5. Checked power, RF, and URO extension cables for cracked insulation, bent or distorted connectors, or damaged pins. 6. Checked memory battery (KAB-Keep Alive Battery). 7. Performed self-test to identify any faults. 8. Performed corrective actions for any operator correctable faults. (paragraph 8)</blockquote>
             <h3>What does operating the EPLRS radio set require?</h3>

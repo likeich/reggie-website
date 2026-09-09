@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,13 +732,13 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1001674">View AR 195-6 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/army-dir-2022-08/">ARMY DIR 2022-08</a></li>
             </ul>
             <hr>
             <p>It addresses criminal investigation polygraphs, examination requests, examiner conduct, rooms, reports, records, equipment, research, waivers, and certification. It requires approval before examinations, certified examiners, written consent in criminal investigations, and controlled release of results.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Department of the Army polygraph programs</li>
                 <li>Criminal investigation polygraphs</li>
@@ -732,7 +748,7 @@
                 <li>Polygraph equipment</li>
                 <li>Polygraph examiner certification</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Can someone face adverse action for refusing a criminal investigation polygraph?</h3>
             <blockquote>For criminal investigations, no adverse action will be taken against persons refusing or unwilling to be examined by polygraph. Other investigation, as appropriate, may continue following the person's refusal to be examined by polygraph. (paragraph 1-6)</blockquote>
             <h3>What form is required to request a polygraph examination?</h3>

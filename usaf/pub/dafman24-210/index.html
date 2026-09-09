@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>The publication covers HAZMAT packaging, container usage, exceptions, special approvals, and performance-oriented packaging identification codes. It also sets procedures for submitting DOT-SP, CAA, and COE requests and requires packaging to prevent HAZMAT releases.</p>
             <p><strong>Applies to:</strong> This regulation is applicable to the Military Services and the Defense Logistics Agency (DLA), referred to as Department of War (DoW) components in this regulation.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>HAZMAT packaging standards</li>
                 <li>Container usage</li>
@@ -723,7 +739,7 @@
                 <li>Certificate of Equivalency requests</li>
                 <li>HAZMAT training classes</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What authority does DoW have for certifying transport packagings?</h3>
             <blockquote>In accordance with Title 49 Code of Federal Regulations (CFR), §173.7(a), DoW has the authority to certify for transport packagings equal to or greater in strength and efficiency than packagings meeting Title 49 CFR requirements. (paragraph 7)</blockquote>
             <h3>When can DoW reship a shipper’s certified shipment?</h3>

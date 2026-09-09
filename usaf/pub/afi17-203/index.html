@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -707,7 +723,7 @@
             <hr>
             <p>The publication covers incident handling processes, event detection and reporting, analysis, response and recovery, exercises, and coordination with Defensive Cyberspace Operations and DoD Information Networks Operations. It requires compliance with the publication and maintenance of records created by its prescribed processes.</p>
             <p><strong>Applies to:</strong> It applies to all military and civilian AF personnel, members of the AF Reserve, Air National Guard, DoD contractors, and individuals or activities under legal agreements or obligations with the Department of the AF.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Cyber incident handling</li>
                 <li>Event detection and reporting</li>
@@ -718,7 +734,7 @@
                 <li>Cyber exercises</li>
                 <li>Air Force cyberspace weapon systems</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What are Defensive Cyberspace Operations?</h3>
             <blockquote>DCO are passive and active cyberspace operations intended to preserve the ability to utilize friendly cyberspace capabilities and protect data, networks, and net-centric capabilities.</blockquote>
             <h3>What records must be maintained under AFI17-203?</h3>

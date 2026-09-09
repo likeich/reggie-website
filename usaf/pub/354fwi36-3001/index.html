@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>It identifies reportable casualty categories, including DUSTWUN, serious illness or injury, retiree deaths, and military member deaths. It assigns actions to the Command Post and Casualty Assistance Representative, including immediate reporting and next-of-kin assistance.</p>
             <p><strong>Applies to:</strong> It applies to all agencies and personnel serviced by the Eielson AFB military and civilian personnel offices.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Casualty notification</li>
                 <li>Reportable casualty categories</li>
@@ -721,7 +737,7 @@
                 <li>Next-of-kin notification</li>
                 <li>Invitational Travel Order Program</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who must report a casualty occurring on or near Eielson Air Force Base?</h3>
             <blockquote>Any person or organization having knowledge of a reportable casualty occurring on or near EAFB, whether or not assigned to the base, is responsible for immediately notifying the Command Post at extension 377-1500. (paragraph 1)</blockquote>
             <h3>Why is immediate casualty notification required?</h3>

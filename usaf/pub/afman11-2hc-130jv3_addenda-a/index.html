@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It addresses tie-down equipment, ground loading ramps, seating, cargo spacing, parachutes, life support equipment, and mission equipment. It requires equipment quantities and configurations to support emergency securing, mission requirements, and specific aircraft missions.</p>
             <p><strong>Applies to:</strong> It applies to all Regular Air Force, Air Force Reserve, and Air National Guard units and personnel operating HC-130J aircraft.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Tie-down equipment</li>
                 <li>Ground loading ramps</li>
@@ -728,7 +744,7 @@
                 <li>Life support equipment</li>
                 <li>Mission equipment</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How much tie-down equipment does AFMAN11-2HC-130JV3_ADDENDA-A require?</h3>
             <blockquote>At all times, the amount of tie down equipment required will include enough equipment to secure the landing gear in an emergency as well as secure all cargo and loose equipment. (paragraph 9)</blockquote>
             <h3>What type of ground loading ramps is authorized for an Infil/Exfil configuration?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication addresses mandatory grounding items, one-time training events, and secondary training methods that may incur additional cost to the government. It requires compliance with the publication and establishes requirements for flying and conversion training.</p>
             <p><strong>Applies to:</strong> This manual applies to all civilian employees and uniformed members of the Regular Air Force, Air Force Reserve, and Air National Guard.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Mandatory grounding items</li>
                 <li>One-time training events</li>
@@ -726,7 +742,7 @@
                 <li>Secondary training methods</li>
                 <li>Training costs</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What happens when a crewmember is non-current for Hazardous Cargo Ground Training?</h3>
             <blockquote>An individual N-MR for failure to complete Hazardous Cargo Ground Training (GD39Y) may fly unsupervised on local training missions only with Sq/CC (AFRC Sq/CC or Sq/DO) approval until training is completed.</blockquote>
             <h3>Does AFMAN11-2C-17V1 allow make-up training to count toward a new training period?</h3>

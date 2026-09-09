@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers the Order of the Bayonet’s history, nomination procedures, representative ceremony, and award description. It specifies nominee classes, submission requirements, approval authority, ceremonial formations, and uniforms.</p>
             <p><strong>Applies to:</strong> It applies to all Air Mobility Command (AMC) active duty, gained Air National Guard (ANG), and Associate Air Force Reserve units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Order of the Bayonet history</li>
                 <li>Nominee classes</li>
@@ -728,7 +744,7 @@
                 <li>Ceremonial uniforms</li>
                 <li>Award citation</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What contributions does the Order of the Bayonet recognize?</h3>
             <blockquote>The AMC Order of the Bayonet was established in 1981 to recognize those who have made significant contributions to security, training and both the air and ground defense of AMC Installations. (paragraph 1)</blockquote>
             <h3>What are the requirements for Commander Class nominees?</h3>

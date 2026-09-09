@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It establishes policy and procedures for test plan categories, technical reviews, safety reviews, and amendments. It requires technical and safety reviews to be completed before testing begins.</p>
             <p><strong>Applies to:</strong> It applies to all test plans where 412TW resources will be used or are at-risk, even when the 412TW has no technical analysis and reporting responsibility.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Test plan development</li>
                 <li>Independent technical review</li>
@@ -726,7 +742,7 @@
                 <li>Reasonable Use of Government Resources statements</li>
                 <li>Technical risk levels</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When are test plans required for 412TW tests?</h3>
             <blockquote>Test plans are required for all tests in which 412TW resources (personnel, aircraft, equipment, facilities, etc.) will be utilized or are at risk. (paragraph 1)</blockquote>
             <h3>What review must test plans involving 412TW resources receive?</h3>

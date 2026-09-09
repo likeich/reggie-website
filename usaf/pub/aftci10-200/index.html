@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/aftc/publication/aftci10-200/aftci10-200.pdf">View AFTCI10-200 on armypubs.army.mil</a></p>
             <hr>
             <p>It establishes the AFTC Crisis Action Team organization and defines organizational responsibilities during crisis or contingency response operations. It covers CAT operating procedures, Installation CATs, CAT training, and optional members, while requiring compliance with the publication.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Crisis Action Teams</li>
                 <li>CAT activation procedures</li>
@@ -726,7 +742,7 @@
                 <li>Crisis response operations</li>
                 <li>Command and control policy</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How many qualified people must be on standby for each CAT position?</h3>
             <blockquote>Each CAT position will maintain at least one qualified person on standby at all times. (paragraph 2)</blockquote>
             <h3>How quickly must CAT members report during normal duty hours?</h3>

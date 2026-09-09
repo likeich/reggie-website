@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>It distinguishes modification table of organization and equipment units from table of distribution and allowances units. It addresses significant status changes, approving authorities, orders, reporting, records, and coordination requirements.</p>
             <p><strong>Applies to:</strong> The actions listed in table 21 are significant changes in the status of units of the Regular Army, USAR, and ARNG while in Federal service.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Army unit designation</li>
                 <li>Unit classification</li>
@@ -729,7 +745,7 @@
                 <li>Unit status change orders</li>
                 <li>Historical continuity and honors</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What counts as a change in the status of a military unit?</h3>
             <blockquote>Any action that changes the organizational structure, designation, assignment, or location of a military unit is a change in the status of that unit. (paragraph 2-2)</blockquote>
             <h3>Why are unit status changes recorded?</h3>

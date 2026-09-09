@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>MCTP 11-10C covers LOAC principles, hostilities, civilians, detainees, prisoners of war, the wounded and sick, occupation, belligerent relations, and war crimes. It requires feasible precautions, humane treatment, protection of civilians, and reporting of LOAC violations.</p>
             <p><strong>Applies to:</strong> This field manual provides a general description of the law of land warfare for Soldiers and Marines, delineated as statements ofdoctrine and practice, to guide the land forces in conducting disciplined military operations in accordance with the rule oflaw.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Law of armed conflict principles</li>
                 <li>Conduct of hostilities</li>
@@ -730,7 +746,7 @@
                 <li>Non-hostile relations between belligerents</li>
                 <li>War crimes enforcement</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What are the two principal sources of the law of armed conflict?</h3>
             <blockquote>LOAC is derived from two principal sources:  Treaties (or Conventions), such as the Hague and Geneva Conventions. (See Appendix for a nonexhaustive list of treaties binding on the United States, and other treaties not binding on the United States.)  Customary International Law. (paragraph 1-95)</blockquote>
             <h3>Are the means and methods of warfare the same under LOAC?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers the turn-in of precious metal-bearing scrap, waste, excess, and condemned items, along with documentation requirements. It also addresses the availability of recovered refined metals for authorized internal Air Force programs and Government-Furnished Material.</p>
             <p><strong>Applies to:</strong> This publication applies to all Active Duty and other Armed Forces, Department of Defense (DoD) Civilians who deal with Precious Metals (PM).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Precious metal-bearing scrap turn-in</li>
                 <li>DD Form 1348-1A documentation</li>
@@ -726,7 +742,7 @@
                 <li>PM recovery program</li>
                 <li>Precious metals use logs</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How must turn-in materiel be documented?</h3>
             <blockquote>All turn in materiel will be documented on DD Form 1348-1A. (paragraph 4)</blockquote>
             <h3>How long must the turn-in document suspense copy be kept?</h3>

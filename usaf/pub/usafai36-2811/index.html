@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The instruction defines award eligibility, award periods, selection criteria, selecting officials, and recognition for outstanding educators. It requires award funding to comply with current applicable financial regulations.</p>
             <p><strong>Applies to:</strong> It applies to all military and civilian instructors assigned to HQ USAFA/AD, HQ USAFA/PL, HQ USAFA/CW, and HQ USAFA/DF who meet the criteria for teaching duties defined in USAFAI 36-150, Appointment and Promotion to Academic Ranks, and to the individuals selecting the award winners.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Outstanding Academy Educator Awards</li>
                 <li>Award eligibility</li>
@@ -727,7 +743,7 @@
                 <li>Teaching Awards ceremonies</li>
                 <li>Award funding</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who is eligible for the Outstanding Academy Educator Awards?</h3>
             <blockquote>All military and civilian educators assigned to HQ USAFA/DF, HQ USAFA/AD, HQ USAFA/PL, and HQ USAFA/CW, whose duties include teaching courses or programs at USAFA or the USAFA prep school, are eligible. (paragraph 2)</blockquote>
             <h3>What period does the Outstanding Academy Educator Award cover?</h3>

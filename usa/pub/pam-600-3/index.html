@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1025462">View PAM 600-3 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/ar-350-1/">AR 350-1</a></li>
                 <li><a href="/usa/pub/ar-600-3/">AR 600-3</a></li>
@@ -724,7 +740,7 @@
             <hr>
             <p>PAM 600-3 describes the Army Personnel Development System, the Officer Talent Management System, talent attributes, career paths, education, promotions, competitive categories, and evaluation. It requires officers to understand their talents and take an active role in managing their careers.</p>
             <p><strong>Applies to:</strong> The overarching focus of this pamphlet is the development and TM of all officers of the U.S. Army.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Officer talent management</li>
                 <li>Army Talent Attribute Framework</li>
@@ -734,7 +750,7 @@
                 <li>Competitive categories</li>
                 <li>Reserve Component officer development</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does PAM 600-3 require officers to do in talent management?</h3>
             <blockquote>Within a TM system, officers must take an active role in managing their careers. (paragraph 1-1)</blockquote>
             <h3>What is the Army Talent Attribute Framework used for?</h3>

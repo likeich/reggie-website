@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>The publication addresses housing programs, housing assignment priorities, command and key/mission essential positions, bedroom requirements, eligible tenants, and furnishings allowances. Compliance with the publication is mandatory, and it defines personal preference options for housing applicants.</p>
             <p><strong>Applies to:</strong> It applies to all 341st Missile Wing and subordinate units assigned, attached to, or supported by the 341st Missile Wing, Malmstrom Air Force Base.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Family housing</li>
                 <li>Unaccompanied housing</li>
@@ -722,7 +738,7 @@
                 <li>Eligible tenants</li>
                 <li>Government-provided furnishings allowances</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How many bedrooms are available to CCMs and approved K&amp;E E-9 positions?</h3>
             <blockquote>CCMs and other E-9 positions approved as K&amp;E are entitled to a four-bedroom unit. (paragraph 5)</blockquote>
             <h3>How is housing determined for other E-9s?</h3>

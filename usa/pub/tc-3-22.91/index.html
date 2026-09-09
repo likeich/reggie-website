@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>It covers fire direction, tabular firing tables, fire planning, target analysis, aiming circles, plotting boards, ballistic computers, mortar fire control systems, and fire missions. It requires FDC certification for all units with mortars and describes safety procedures, field-expedient survey techniques, and mortar qualification DA forms.</p>
             <p><strong>Applies to:</strong> FDC certification is required for all units with mortars;</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Mortar fire direction</li>
                 <li>Tabular firing tables</li>
@@ -730,7 +746,7 @@
                 <li>Mortar fire control systems</li>
                 <li>FDC certification</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does fire direction include?</h3>
             <blockquote>Fire direction is the tactical and technical employment of firepower, the exercise of tactical command of one or more units in the selection of targets, the massing or distribution of fire, and the allocation of ammunition for each mission. (paragraph 2-1)</blockquote>
             <h3>What data does a firing table provide?</h3>

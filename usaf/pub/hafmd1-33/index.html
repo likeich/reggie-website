@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/af_a2/publication/hafmd1-33/hafmd1-33.pdf">View HAFMD1-33 on armypubs.army.mil</a></p>
             <hr>
             <p>It establishes AF/A2’s role in supporting the Secretary of the Air Force and Chief of Staff in carrying out the Department of the Air Force ISR mission. It assigns duties involving intelligence policy, oversight, security, information systems, GEOINT, HUMINT, and civil aviation intelligence.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Air Force intelligence, surveillance, and reconnaissance</li>
                 <li>AF/A2 organizational relationships</li>
@@ -727,7 +743,7 @@
                 <li>Civil aviation intelligence</li>
                 <li>Intelligence information systems</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is AF/A2 responsible for across the Department of Defense and other government agencies?</h3>
             <blockquote>Serving as the AF ISR focal point across the Department of Defense (DoD) and other government agencies. (paragraph 3)</blockquote>
             <h3>What does AF/A2 oversee for the Air Force intelligence functional community?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication covers explosive clear zones, aircraft parking, traffic controls, munitions facilities, and explosive operations. It requires specific separation distances, limits, closures, and restrictions for hazardous materials and activities.</p>
             <p><strong>Applies to:</strong> This publication applies to USAF, USA, USN, USMC, and other organizations handling explosives on Eielson Air Force Base.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Explosive clear zones</li>
                 <li>Hazard class/division 1.1 operations</li>
@@ -726,7 +742,7 @@
                 <li>Explosives operating locations</li>
                 <li>Net explosive weight limits</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who must follow AFMAN91-201_PACAFSUP_354FWSUP while on Eielson AFB?</h3>
             <blockquote>Reserve, Air National Guard, Civil Air Patrol, contractors, personnel on Eielson AFB, and other areas under jurisdiction of the 354th Fighter Wing Commander must follow this instruction while on Eielson AFB.</blockquote>
             <h3>What traffic restriction applies during Railhead explosives operations?</h3>

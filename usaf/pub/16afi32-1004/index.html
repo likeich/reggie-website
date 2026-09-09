@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It establishes procedures for assigning, managing, and scheduling facility escort program requirements. It sets requirements for escort duties, badge access, visitor surveillance, escort limits, and duty hours.</p>
             <p><strong>Applies to:</strong> It applies to all 16 AF units/staff and organizations located in buildings 2000 and 2007.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Facility escort program</li>
                 <li>SCIF escort duties</li>
@@ -726,7 +742,7 @@
                 <li>Visitor surveillance</li>
                 <li>Escort duty hours</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How many people can one facility escort accompany at a time?</h3>
             <blockquote>The number of individuals a facility escort can escort at one time is based on the known trustworthiness of the visitors and the ability of the facility escort to reasonably control, but the number escorted will not exceed five persons per escort official at any time.</blockquote>
             <h3>What must facility escorts do while uncleared personnel are inside the SCIF?</h3>

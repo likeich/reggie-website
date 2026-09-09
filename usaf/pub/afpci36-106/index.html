@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/afpc/publication/afpci36-106/afpci36-106.pdf">View AFPCI36-106 on armypubs.army.mil</a></p>
             <hr>
             <p>It covers officer appointments, next of kin rights, notification, board procedures, counsel, findings, legal review, and final action. It requires relevant evidence, closed-session deliberation, reports, and status determinations.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Board officer composition</li>
                 <li>Next of kin rights</li>
@@ -727,7 +743,7 @@
                 <li>Verbatim proceedings records</li>
                 <li>Final status determinations</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who appoints boards of inquiry under AFPCI36-106?</h3>
             <blockquote>The Commander, Air Force Personnel Center (AFPC/CC), having been delegated authority to act on behalf of the Secretary of the Air Force, appoints boards of inquiry and subsequent boards of inquiry for the purpose of determination of status of missing and deceased personnel in accordance with Title 10, U.S.C., Sections 1503 – 1505, Chapter 76; reviews board findings; and makes status determinations. (paragraph 1)</blockquote>
             <h3>How many colonels must serve on a board for military personnel?</h3>

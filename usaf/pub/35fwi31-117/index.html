@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers dye-marking cartridges, conversion kits, blank-ammunition training, protective equipment, training, personnel, safety, and medical mishap response. The instruction requires emergency notification procedures and coordination before exercises using blank rounds.</p>
             <p><strong>Applies to:</strong> This instruction applies to all members of the wing and any personnel that receive training using DMC or blank ammunition.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Dye-marking cartridges</li>
                 <li>Conversion kits</li>
@@ -726,7 +742,7 @@
                 <li>Training-area safety inspections</li>
                 <li>Medical mishap response</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does the 9mm MMR conversion kit prevent?</h3>
             <blockquote>The conversion kit for the 9mm MMR utilizes the pistol’s own firing pin but does not permit the chambering of live 9mm ammunition due to insufficient headspace (See Attachment 5). (paragraph 2)</blockquote>
             <h3>Where must UTM ammunition be stored?</h3>

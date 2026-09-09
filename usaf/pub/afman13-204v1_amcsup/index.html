@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It addresses airfield operations compliance verification inspections, air traffic control and airspace facility closures, and uncontrolled airfield operations for AMC aircraft. It also establishes tier waiver authorities and requirements for supplements and records.</p>
             <p><strong>Applies to:</strong> This publication applies to all AMC Regular Air Force.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Airfield operations management</li>
                 <li>Airfield Operations Compliance Verification inspections</li>
@@ -727,7 +743,7 @@
                 <li>Tier waiver authorities</li>
                 <li>ATC Certification and Withdrawal Documentation</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What major inspection procedure was added to AFMAN13-204V1_AMCSUP?</h3>
             <blockquote>Major changes include changing the publication from an Air Force Manual (AFMAN) to DAFMAN, added Airfield Operations Compliance Verification inspection procedures, adjusted Air Traffic Control (ATC)/Airspace facility closure requirements, allowing the Wing Commander (WG/CC) to approve uncontrolled airfield operations for AMC aircraft, and updated tier waiver authorities.</blockquote>
             <h3>Who must coordinate supplements to AFMAN13-204V1_AMCSUP before approval?</h3>

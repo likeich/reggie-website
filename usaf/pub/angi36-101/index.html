@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>It covers AGR eligibility, selection and accession, utilization, retention, separation, retirement, resources, controlled grades, and waivers. It also addresses AGR benefits, equal opportunity, conduct, military discipline, off-duty employment, substance abuse, and USERRA restoration rights.</p>
             <p><strong>Applies to:</strong> It applies to Air National Guard (ANG) Airmen serving in Active Guard and Reserve (AGR) status under Title 32 United States Code (USC) Section 502(f), Required Drills and Field Exercises.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>AGR eligibility criteria</li>
                 <li>Selection and accession processes</li>
@@ -723,7 +739,7 @@
                 <li>Standards of conduct and political activity</li>
                 <li>USERRA restoration rights</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does ANGI36-101 require for AGR program administration?</h3>
             <blockquote>The primary purpose of this instruction is to identify responsibilities for the Active Guard and Reserve (AGR) program and prescribe policy and procedures for administering and managing AGR personnel including eligibility criteria, selection and accession processes, utilization, retention, separation and retirement processes, resources, controlled grades, and waiver processes.</blockquote>
             <h3>What policy applies to Airmen serving in AGR status under 10 USC 12310?</h3>

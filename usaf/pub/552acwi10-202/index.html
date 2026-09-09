@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The instruction covers recall initiation, telephone pyramid notifications, reporting status, accountability objectives, and GCC/UCC training. It also defines procedures for line three telephone standby recalls and RP-1, RP-3, and RP-15 alerts.</p>
             <p><strong>Applies to:</strong> It applies to all military personnel or key civilian personnel assigned to 552 ACW and its subordinate units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Telephone pyramid recalls</li>
                 <li>Telephone standby recalls</li>
@@ -726,7 +742,7 @@
                 <li>GCC/UCC training</li>
                 <li>Readiness posture alerts</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Are messages left with other people enough for recall purposes?</h3>
             <blockquote>Messages left with other people or on answering machines are not sufficient for recall purposes. (paragraph 4)</blockquote>
             <h3>What must recalled personnel do after notification?</h3>

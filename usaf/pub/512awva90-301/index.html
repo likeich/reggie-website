@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -711,7 +727,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/512aw/publication/512awva90-301/512awva90-301.pdf">View 512AWVA90-301 on armypubs.army.mil</a></p>
             <hr>
             <p>The publication identifies the Inspector General as a representative for resolving problems and lists contact information for Lt Col Sean A. Saylor. It also provides Fraud, Waste &amp; Abuse hotline contacts for the Air Force, AFRC and DOD.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Inspector General assistance</li>
                 <li>Problem resolution</li>
@@ -719,7 +735,7 @@
                 <li>Inspector General contact information</li>
                 <li>Fraud, Waste &amp; Abuse hotlines</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who is the Inspector General representative named in 512AWVA90-301?</h3>
             <blockquote>Lt Col Sean A. Saylor, Inspector General is your representative.</blockquote>
             <h3>What is the Inspector General available to help resolve?</h3>

@@ -586,8 +586,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -608,6 +617,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -702,7 +718,7 @@
             <hr>
             <p>It covers major defense acquisition programs, ACAT I and II programs, automated information systems, and other capabilities in the pathway. It provides DAF guidance, requires records to follow Air Force records management rules, and requires supplements to receive review and approval before publication.</p>
             <p><strong>Applies to:</strong> This publication applies to Regular Air Force, United States Space Force, the Air Force Reserve, the Air National Guard except where otherwise noted, all DAF civilian employees, and those with a contractual obligation to abide by the terms of DAF issuances.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Major capability acquisition procedures</li>
                 <li>Program planning</li>
@@ -712,7 +728,7 @@
                 <li>Milestone A reviews</li>
                 <li>TMRR phase</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What programs does DoDI5000.85_DAFI63-151 guide through the major capability acquisition pathway?</h3>
             <blockquote>In accordance with DoD Directive (DoDD) 5135.02, this issuance establishes policy and prescribes procedures that guide the acquisition of major capability acquisition programs, including major defense acquisition programs (MDAPs); other programs categorized as acquisition category (ACAT) I; major systems, usually categorized as ACAT II; automated information systems (AIS) (not managed by other acquisition pathways); and other capabilities developed via the major capability acquisition pathway.</blockquote>
             <h3>What requirements in DoDI5000.85_DAFI63-151 have waiver authority identified by tier?</h3>

@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -711,7 +727,7 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=2165">View AR 140-50 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=106045">ARMY DIR 2016-01</a> (armypubs)</li>
                 <li><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1020835">ARMY DIR 2020-09</a> (armypubs)</li>
@@ -719,7 +735,7 @@
             <hr>
             <p>It covers OCS and OCRC courses, application processing, quotas, funding, candidate status, and commissioning graduates as USAR officers. It also sets eligibility requirements involving age, citizenship, training, education, medical fitness, body weight, and the APFT.</p>
             <p><strong>Applies to:</strong> This does not apply to USAR personnel in the Active Guard Reserve (AGR) Program.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Officer Candidate School applications</li>
                 <li>OCS eligibility requirements</li>
@@ -729,7 +745,7 @@
                 <li>OCS funding</li>
                 <li>Medical and physical requirements</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who may apply to attend a USAR Officer Candidate School course?</h3>
             <blockquote>USAR warrant officers (WOs) and enlisted soldiers, not in the AGR program, who meet the eligibility requirements in table 2-1, may apply to attend one of the courses listed in table 1-1. (paragraph 2-1)</blockquote>
             <h3>How are USAR candidates ordered to OCS at Fort Benning?</h3>

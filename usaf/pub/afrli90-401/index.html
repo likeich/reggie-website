@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It sets roles for AFRL organizations and legislative liaison points of contact, and covers formal congressional correspondence and direct engagement. It requires accurate, timely responses, approval of specified responses, and reporting for congressional visits.</p>
             <p><strong>Applies to:</strong> This publication remains applicable to AFRL organizations aligned under USSF.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Congressional inquiries</li>
                 <li>Congressional visits</li>
@@ -726,7 +742,7 @@
                 <li>Legislative liaison points of contact</li>
                 <li>Congressional response approvals</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must AFRL personnel provide in response to congressional inquiries?</h3>
             <blockquote>All AFRL personnel will support Congress by working with the AFRL/CCX-LL to provide full, accurate, and timely responses to congressional inquiries. (paragraph 3)</blockquote>
             <h3>What must AFRL organizations designate for congressional coordination?</h3>

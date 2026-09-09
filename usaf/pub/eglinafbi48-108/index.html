@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -707,7 +723,7 @@
             <hr>
             <p>It addresses indoor air quality, water damage, mold growth, ventilation, HVAC systems, building-related health complaints, and facility evaluations. It requires coordination among medical, civil engineering, bioenvironmental engineering, facility management, and other appropriate personnel.</p>
             <p><strong>Applies to:</strong> This instruction applies to military and federal civilian employees assigned to Eglin Air Force Base (EAFB) and associate units on the reservation (except Hurlburt Field) including Air Force Reserve, Air National Guard, and Civil Air Patrol.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Indoor air quality surveys</li>
                 <li>Water damage</li>
@@ -718,7 +734,7 @@
                 <li>Health risk assessments</li>
                 <li>Indoor air quality parameters</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How can mold growth in a facility be decreased?</h3>
             <blockquote>Effectively decreasing mold growth in a facility is accomplished by controlling moisture, implementing adequate and frequent housekeeping practices, and active participation of facility managers and residents by inspecting and responding promptly to initial signs of mold. (paragraph 1)</blockquote>
             <h3>When does the Civil Engineer Squadron conduct facility evaluations?</h3>

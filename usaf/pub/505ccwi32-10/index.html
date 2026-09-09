@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It addresses wing space requirements, facility design, MILCON construction issues, and coordination of facilities-related requirements. The publication requires correspondence and facilities-related issues to be coordinated with and routed through 505 CCW/CE.</p>
             <p><strong>Applies to:</strong> All wing facility managers are required to have access to this instruction and abide by its content.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Space allocation coordination</li>
                 <li>Wing space requirements</li>
@@ -725,7 +741,7 @@
                 <li>MILCON construction issues</li>
                 <li>Facilities-related requirements</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How are proposed changes in the use of space coordinated?</h3>
             <blockquote>All proposed changes in the use of space (to include any remodeling that requires changes in heating and ventilation, power, and/or communications systems such as telephone or network connections will be coordinated with this office. (paragraph 1)</blockquote>
             <h3>What factors impact wing space requirements?</h3>

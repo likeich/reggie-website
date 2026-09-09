@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It addresses contractor visits, procurement integrity, post-government employment, safeguarding government information, and workplace relationships with contractor personnel. It requires compliance and sets procedures for interactions with contractor personnel.</p>
             <p><strong>Applies to:</strong> This publication applies to all ACC military and civilian personnel, including Air Force Reserve Command Units, Air National Guard Units, individual Reservists and United States Space Force personnel assigned to ACC.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Contractor visits</li>
                 <li>Procurement integrity restrictions</li>
@@ -726,7 +742,7 @@
                 <li>Workplace relationships with contractor personnel</li>
                 <li>Contractor gifts</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How should similarly situated contractors be treated?</h3>
             <blockquote>All similarly situated contractors should receive equal treatment. (paragraph 7)</blockquote>
             <h3>What should happen after a significant exchange of information with a contractor?</h3>

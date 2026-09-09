@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>TC 3-21.5 covers drill instruction, teaching techniques, individual and unit drill, and the manual of arms for Infantry weapons. It also addresses military music, commands, formations, reviews, parades, funerals, colors, and other ceremonies.</p>
             <p><strong>Applies to:</strong> TC 3-21.5 applies to the Active Army, Army National Guard/Army National Guard of the United States and United State Army Reserve unless otherwise stated.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Military music</li>
                 <li>Bugle calls</li>
@@ -730,7 +746,7 @@
                 <li>Military ceremonies</li>
                 <li>Colors</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the purpose of drill according to TC 3-21.5?</h3>
             <blockquote>The purpose of drill is to enable commanders or noncommissioned officers (NCOs) to move their unit from one place to another in an orderly manner, to aid in disciplinary training by instilling habits of precision and response to the leaders orders, and to provide for the development of all Soldiers in the practice of commanding troops. (paragraph 9)</blockquote>
             <h3>What can Soldiers do during Route Step March?</h3>

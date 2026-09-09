@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/acc/publication/accman17-2afincv1/accman17-2afincv1.pdf">View ACCMAN17-2AFINCV1 on armypubs.army.mil</a></p>
             <hr>
             <p>The manual covers general training guidance, initial qualification training, mission qualification and certification training, and continuation training. It requires syllabus-based timelines, reporting, waivers, and specified documentation for local initial qualification training.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>AFINC crewmember training</li>
                 <li>Initial qualification training</li>
@@ -727,7 +743,7 @@
                 <li>Mission-related training</li>
                 <li>Training time limitations</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When can local initial qualification training be performed?</h3>
             <blockquote>In circumstances when FTU IQT is not available within 45-days, and an appropriate waiver has been issued IAW paragraph 1.4 of this manual, local IQT may be performed at the unit IAW the provisions of this chapter and ACCI 17-202, Volume 1. (paragraph 3)</blockquote>
             <h3>What must a request for local IQT include about the training dates?</h3>

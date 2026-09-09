@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>The publication covers load crew readiness, munitions policy, committed and test and training munitions lists, and weapons section functions. It extends AFMAN 21-206 with processes unique to Air Force Global Strike Command, and compliance with its attachments is mandatory.</p>
             <p><strong>Applies to:</strong> This supplement applies to AFGSC Aircraft Armament Systems organizations and personnel that develop, test, and maintain aerospace platforms and associated equipment.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Load crew readiness</li>
                 <li>Air Force munitions policy</li>
@@ -721,7 +737,7 @@
                 <li>Minimum certified load crews</li>
                 <li>Weapons section</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Are the attachments in AFMAN21-206_AFGSCSUP mandatory?</h3>
             <blockquote>Compliance with attachments in this publication are mandatory.</blockquote>
             <h3>How are waiver requests for AFMAN21-206_AFGSCSUP submitted?</h3>

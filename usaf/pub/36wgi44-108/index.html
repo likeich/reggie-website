@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>36WGI44-108 assigns duties for protecting personnel at risk from potentially infectious materials and covers training, personal protective equipment, and decontamination. It requires exposure control plans, Hepatitis B vaccination provisions, and documented training and plan reviews.</p>
             <p><strong>Applies to:</strong> This instruction applies to, but may not be limited to, the following personnel: Medical personnel whose duties include exposure to blood and body fluids; Fire Department personnel; Law Enforcement (SFS) personnel; Life Guard personnel (FSS); and the Office of Special Investigations personnel (OSI).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Bloodborne pathogens exposure control</li>
                 <li>Occupational exposure training</li>
@@ -726,7 +742,7 @@
                 <li>Exposure Control Plans</li>
                 <li>Decontamination procedures</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must unit commanders do for personnel at risk of occupational exposure?</h3>
             <blockquote>Unit Commanders will ensure all personnel at risk for occupational exposure to potentially infectious material are adequately protected, receive initial orientation and annual training, and comply with established guidelines and requirements defined in this plan and OSHA 29 CFR part 1910.1030. (paragraph 1)</blockquote>
             <h3>What must organizations with personnel at risk designate?</h3>

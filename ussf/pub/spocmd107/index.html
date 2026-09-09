@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>SPOCMD107 describes Combat Training Squadron missions, training programs, equipment, threat environments, and organizational structures. It requires mandatory compliance, records management, and waivers through the chain of command for nontiered compliance items.</p>
             <p><strong>Applies to:</strong> This mission directive applies to HQ SpOC and subordinate units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Combat Training Squadron missions</li>
                 <li>Combat Mission Ready spacecrew training</li>
@@ -726,7 +742,7 @@
                 <li>Spacecrew evaluations</li>
                 <li>Total force integration</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What training does SPOCMD107 require Combat Training Squadrons to provide?</h3>
             <blockquote>CTS/CTS Dets are located on various Space Force Bases (SFB) with a mission to prepare Combat Mission Ready (CMR) U.S., Allied, and Coalition Spacecrew professionals through Initial Qualification Training (IQT)/Mission Qualification Training (MQT), Continuation Training (CT), Advanced Training (AT), Exercise support and coordination, and crew position Evaluations IAW DAFGM 2023-13-602V1, Ready Spacecrew Program Training, AFI 13-602V2, Spacecrew Standardization and Evaluation Program, associated SPOCMAN 13-6 Mission Design Series Volumes, and DAFH 36-2675, Information for Designers of Instructional Systems. (paragraph 1)</blockquote>
             <h3>What operations training does SPOCMD107 include?</h3>

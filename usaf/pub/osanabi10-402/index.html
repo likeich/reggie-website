@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication addresses transient unit reception requests, RWG approval, sponsoring units, support coordination, and meeting membership. It requires designated sponsors, OSANAB Form 21 submissions, and coordination of reception requirements through the RWG process.</p>
             <p><strong>Applies to:</strong> It applies to all units assigned to 51st Fighter Wing (51 FW), Seventh Air Force (7 AF), and Tenant units at Osan Air Base (AB), Korea.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Reception Working Group approval</li>
                 <li>Transient unit missions</li>
@@ -726,7 +742,7 @@
                 <li>Reception support coordination</li>
                 <li>RWG meeting membership</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When does a visiting unit need RWG chairperson approval?</h3>
             <blockquote>During armistice, any visiting unit arriving with fighter type aircraft, one or more heavy aircraft, and/or a group of personnel and/or cargo equipment that intend to remain overnight, and use Osan AB facilities beyond lodging (e.g. airfield, ramp, ops facilities, DFAC, etc.) and/or resources (e.g. EAL, vehicles, maintenance, etc.) must have approval from the RWG chairperson. (paragraph 2)</blockquote>
             <h3>What is the approval authority for transient units during armistice?</h3>

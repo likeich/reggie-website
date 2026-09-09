@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>CFETP6C0X1 covers specialty training standards, support materials, course indexes, CCO training, CBRN training, rotation plans, and APDP requirements. It identifies mandatory training, task qualifications, proficiency training, and training resources for Contracting career progression.</p>
             <p><strong>Applies to:</strong> The plan will be used by MFMs and supervisors at all levels to ensure comprehensive and cohesive training programs are available for each individual in the specialty across all work centers.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Contingency Contracting Officer training</li>
                 <li>CBRN environment training</li>
@@ -726,7 +742,7 @@
                 <li>Continuous learning</li>
                 <li>Contracting career progression</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What training must 6C0X1 Contracting members complete?</h3>
             <blockquote>Members within the 6C0X1 Contracting AFSC are required to complete the training identified within this CFETP. (paragraph 1)</blockquote>
             <h3>What mandatory training does CFETP6C0X1 require?</h3>

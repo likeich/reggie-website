@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It assigns Decentralized Materiel Support as the focal point for local manufacture actions and lists the required coordination steps. The checklist covers requests, technical data, materials, approvals, back-shop processing, and parts pickup.</p>
             <p><strong>Applies to:</strong> This AMWI is applicable to all maintenance personnel assigned to the 452d Air Mobility Wing.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Local manufacture requests</li>
                 <li>Locally developed maintenance forms</li>
@@ -727,7 +743,7 @@
                 <li>Back-shop coordination</li>
                 <li>Aircraft parts pickup</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who is the focal point for local manufacture actions?</h3>
             <blockquote>Decentralized Materiel Support (DMS) will be the focal point for all local manufacture actions and will provide guidance in the accomplishment of these actions in accordance with applicable AFIs. (paragraph 1)</blockquote>
             <h3>What must a requester submit for local manufacture coordination?</h3>

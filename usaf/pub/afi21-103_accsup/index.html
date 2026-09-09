@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers aerospace vehicle maintenance status and capability, asset movements, configuration changes, weather equipment status, and ICBM and Rocket System Launch Program reporting. Compliance with Attachment 3 and Attachment 17 is mandatory, and required reports include specified identifiers, organizations, condition codes, dates, and AVDO contact information.</p>
             <p><strong>Applies to:</strong> It applies to these organizations and personnel maintaining aircraft, aircraft systems, equipment, support equipment, and components regardless of Air Force Specialty Code (AFSC).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Aerospace vehicle maintenance status</li>
                 <li>Asset possession change reporting</li>
@@ -727,7 +743,7 @@
                 <li>Condition code messages</li>
                 <li>Aircraft availability standard calculation</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When is an aerospace vehicle classified as NMC flyable?</h3>
             <blockquote>The maintenance status NMC flyable (Condition status codes K, L, M, N, P) will be used when an aerospace vehicle cannot accomplish the units wartime, training or test mission, but is still flyable (safe for flight). (paragraph 4)</blockquote>
             <h3>Can an NMC flyable aerospace vehicle be deployed?</h3>

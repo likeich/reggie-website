@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It defines peacetime and wartime, exercise, and contingency augmentation requirements and establishes methods for identifying available personnel. It requires validated requests, equitable tasking allocations, activation approvals, reporting, and operational control.</p>
             <p><strong>Applies to:</strong> It applies to all personnel assigned to Osan Air Force Base, including tenant units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Peacetime augmentation requirements</li>
                 <li>Wartime and contingency augmentation</li>
@@ -726,7 +742,7 @@
                 <li>Augmentation request validation</li>
                 <li>Augmentation program activation</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does augmentation mean under 51FWI10-243?</h3>
             <blockquote>Augmentation means using people to perform duties outside their assigned Control Air Force Specialty Code (CAFSC). (paragraph 1)</blockquote>
             <h3>What information must an augmentation request include?</h3>

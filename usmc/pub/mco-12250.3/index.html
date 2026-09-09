@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <p><a href="https://www.marines.mil/News/Publications/MCPEL/Electronic-Library-Display/Article/1530436/mco-122503/">View MCO 12250.3 on armypubs.army.mil</a></p>
             <hr>
             <p>It covers strategic planning, workforce shaping, equal employment opportunity support, organizational management, workforce analysis, human capital assessment, recruiting programs, on-boarding, and staffing. It requires commanders, commanding officers, and Headquarters Marine Corps Staff Agency Heads to implement the Order, while managers and supervisors must ensure adherence to its policies and procedures.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>civilian APF workforce</li>
                 <li>civilian HR IT systems</li>
@@ -728,7 +744,7 @@
                 <li>on-boarding</li>
                 <li>staffing</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the DCHR responsible for in Marine Corps civilian HR?</h3>
             <blockquote>As the Technical Authority, the DCHR is responsible for the interpretation and application of HR regulations, policies, programs, and processes on behalf of the Marine Corps. (paragraph 1)</blockquote>
             <h3>Who must implement MCO 12250.3?</h3>

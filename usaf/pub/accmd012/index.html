@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It defines authorities for air, space, cyber, information, and all-domain operations in the USSOUTHCOM area of responsibility. Compliance with ACCMD012 is mandatory, and records created through prescribed processes must be maintained and disposed of under specified Air Force requirements.</p>
             <p><strong>Applies to:</strong> This MD applies to 12 AF (AFSOUTH) and subordinate active duty units and personnel, those assigned or attached Air Force Reserve Command (AFRC) and Air National Guard (ANG) units, and personnel or mobilized members performing federal missions.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>All-domain operations</li>
                 <li>Air component command</li>
@@ -728,7 +744,7 @@
                 <li>Air Tasking Order</li>
                 <li>Air domain awareness</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the mission of 12 AF (AFSOUTH)?</h3>
             <blockquote>The 12 AF (AFSOUTH) mission is to plan, prioritize, execute, assess, and support joint all-domain operations, activities, and investments to influence relevant actors in order to mitigate risk to global U.S. interests, strengthen our regional partners, and counter threats in the United States Southern Command (USSOUTHCOM) area of responsibility (AOR). (paragraph 1)</blockquote>
             <h3>Who does 12 AF (AFSOUTH)/CC report to?</h3>

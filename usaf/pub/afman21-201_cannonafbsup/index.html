@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication addresses explosive-hazard material, off-station munitions transportation, range turn-in, safing gear, shipment documentation, and transport equipment. It also sets requirements for records, reconciliation, custody, and notification of AF Form 68 signatories.</p>
             <p><strong>Applies to:</strong> These procedures apply to anyone engaged in any form of munitions activity and assigned to the 27th Special Operations Wing.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Munitions account procedures</li>
                 <li>Material Potentially Presenting an Explosive Hazard</li>
@@ -727,7 +743,7 @@
                 <li>Munitions transport equipment</li>
                 <li>AF Form 68 signatories</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How must MPPEH be handled before inspection?</h3>
             <blockquote>All MPPEH will be treated as containing the original Net Explosive Weight and hazards until inspected by the competent authority.</blockquote>
             <h3>What chain-of-custody requirement applies when transporting munitions off-station?</h3>

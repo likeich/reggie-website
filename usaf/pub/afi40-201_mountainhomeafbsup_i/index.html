@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/mountainhomeafb/publication/afi40-201_mountainhomeafbsup_i/afi40-201_mountainhomeafbsup.pdf">View AFI40-201_MOUNTAINHOMEAFBSUP_I on armypubs.army.mil</a></p>
             <hr>
             <p>The publication establishes procedures for acquiring, receiving, storing, distributing, using, transferring, and disposing of radioactive materials at Mountain Home AFB. It also addresses non-Air Force approval, radiation safety training, shipping requirements, audits, and incident reporting.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Radioactive materials acquisition and disposal</li>
                 <li>Non-Air Force RAM approval</li>
@@ -725,7 +741,7 @@
                 <li>Radiation incident reporting</li>
                 <li>Radioactive material permits</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does AFI40-201_MOUNTAINHOMEAFBSUP_I establish for radioactive materials at MHAFB?</h3>
             <blockquote>A copy of AFI 40-201, along with this supplement, establishes procedures on how to acquire, receive, store, distribute, use, transfer or dispose RAM on MHAFB, and prescribes how non-Air Force (AF) organizations get approval to use RAM on MHAFB.</blockquote>
             <h3>Can waivers be granted under AFI40-201_MOUNTAINHOMEAFBSUP_I?</h3>

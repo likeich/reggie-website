@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>SBD1I24-302 covers vehicle accident reporting, accident and abuse repair funding, and alternative fuel and idling requirements based on local and state laws. It assigns responsibilities for accident and abuse cases and establishes operator procedures after a vehicle accident.</p>
             <p><strong>Applies to:</strong> This instruction applies to all personnel assigned to units (including tenant units) and activities physically located within Peterson SFB, Schriever SFB, Cheyenne Mountain SFS, and the Colorado Springs Metro Area.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Vehicle accident reporting</li>
                 <li>Vehicle abuse determinations</li>
@@ -726,7 +742,7 @@
                 <li>Vehicle idling policies</li>
                 <li>Post-accident operator procedures</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How long does an owning or using commander have to respond to an accident or abuse letter?</h3>
             <blockquote>Has five duty days to respond once the accident or abuse letter has been received.</blockquote>
             <h3>Who pays for government vehicle abuse and accident damage?</h3>

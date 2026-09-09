@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>ADP 4-0 covers sustainment across unified action, joint and multinational operations, multidomain operations, and Army strategic roles. It establishes principles for sustainment activities and requires their integration and synchronization to support operations.</p>
             <p><strong>Applies to:</strong> The principal audience for ADP 4-0 is all Army Soldiers and civilians who provide sustainment support and those members of the Army profession who depend on and receive that support.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Sustainment warfighting function</li>
                 <li>Financial management principles</li>
@@ -730,7 +746,7 @@
                 <li>Multidomain operations</li>
                 <li>Army strategic roles</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does the sustainment warfighting function provide?</h3>
             <blockquote>The sustainment warfighting function is the related tasks and systems that provide support and services to enable freedom of action, extend operational reach, and prolong endurance (ADP 3-0). (paragraph 1-1)</blockquote>
             <h3>What are the six financial management principles?</h3>

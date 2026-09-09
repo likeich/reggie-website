@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/af_sg/publication/cfetp4a1x1/cfetp4a1x1.pdf">View CFETP4A1X1 on armypubs.army.mil</a></p>
             <hr>
             <p>It covers specialty progression, training strategies, resource constraints, work center plans, and the Total Force Training Record. It requires mandatory training, defines qualification and proficiency training, and identifies forms used to document training actions.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Career field education and training</li>
                 <li>Qualification and proficiency training</li>
@@ -725,7 +741,7 @@
                 <li>Total Force Training Record</li>
                 <li>Training documentation</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is CFETP4A1X1 used for?</h3>
             <blockquote>MFMs and supervisors at all levels will use the plan to ensure comprehensive and cohesive training programs are available for everyone in the specialty. (paragraph 2)</blockquote>
             <h3>What mandatory training does CFETP4A1X1 require?</h3>

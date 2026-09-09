@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1023430">View AR 600-8-24 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/army-dir-2018-22/">ARMY DIR 2018-22</a></li>
                 <li><a href="/usa/pub/army-dir-2021-05/">ARMY DIR 2021-05</a></li>
@@ -725,7 +741,7 @@
             <hr>
             <p>It addresses voluntary and involuntary release from active duty, administrative and judicial discharge, elimination proceedings, and retirement programs. It establishes processing requirements, approval authorities, notification timelines, and Board of Inquiry procedures.</p>
             <p><strong>Applies to:</strong> This regulation prescribes policies and procedures governing officer transfers from Regular Army (RA) to the Reserve Component (RC) and discharge functions for all officers on active duty (AD) exceeding 30 days.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Officer transfers</li>
                 <li>Discharge functions</li>
@@ -736,7 +752,7 @@
                 <li>Board of Inquiry proceedings</li>
                 <li>Officer retirements</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How quickly must an officer acknowledge Department of the Army Active Duty Board notification?</h3>
             <blockquote>Upon receipt of DAADB notification memorandum from either HQDA or the GOSCA, completes and forwards the acknowledgment of notification within 24 hours (see fig 2 4). (paragraph 1-20)</blockquote>
             <h3>How long does an officer have to submit a rebuttal to Department of the Army Active Duty Board notification?</h3>

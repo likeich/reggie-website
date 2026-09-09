@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers waiver roles, approval tiers, workflow routing, repository use, and the handling of approved, temporary, and disapproved waivers. It requires ANG wings to use the ANG Tier Waiver Workflow and Process Guide and maintain waiver information in the repository.</p>
             <p><strong>Applies to:</strong> This publication applies to all ANG military, civilians, and personnel contracted with the DoD who initiate and/or approve any ANG Tier waivers in their area of responsibility (AOR).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Tier waivers</li>
                 <li>Waiver authority</li>
@@ -727,7 +743,7 @@
                 <li>ETMS2 routing</li>
                 <li>Waiver naming conventions</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the ANG repository used for?</h3>
             <blockquote>The ANG repository is the authoritative source for ANG “MAJCOM” waivers and also copies of field waivers consolidated         into         one        visible         environment,          located          at https://intelshare.intelink.gov/sites/angcc/SitePages/ANGWaivers.aspx. (paragraph 1)</blockquote>
             <h3>What types of publication items can be waived?</h3>

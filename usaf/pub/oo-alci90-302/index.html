@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers inspection exercises, deficiency validation and management, MICT, and the Unit Self-Assessment Program. It requires corrective action plans, team leads for deficiencies, and MICT checklists as part of USAP.</p>
             <p><strong>Applies to:</strong> This instruction applies to all personnel assigned to the OO-ALC, to include Geographically Separated Units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Commander’s Inspection Program</li>
                 <li>IG exercises</li>
@@ -727,7 +743,7 @@
                 <li>Management Internal Control Toolset</li>
                 <li>Unit Self-Assessment Program</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How are OO-ALC IG exercises conducted?</h3>
             <blockquote>All IG exercises will be accomplished IAW OO-ALC Readiness/Exercise Program Concept of Operations (CONOPS) located on OO-ALC Inspector General SharePoint home page (click on &lt;Documents&gt; then &lt;Shared Documents&gt;). (paragraph 3)</blockquote>
             <h3>How can a unit challenge a potential deficiency?</h3>

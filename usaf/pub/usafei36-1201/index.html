@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/usafe/publication/usafei36-1201/usafei36-1201.pdf">View USAFEI36-1201 on armypubs.army.mil</a></p>
             <hr>
             <p>It covers exclusions, filing time limits, representation, works council participation in Germany, and remedial action. The instruction requires fair and impartial review and establishes procedures for internal USAFE processing.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Grievance and appeal exclusions</li>
                 <li>Grievance and appeal time limits</li>
@@ -724,7 +740,7 @@
                 <li>Works council participation in Germany</li>
                 <li>Remedial action</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How long does an employee have to present a grievance about a particular act or occurrence?</h3>
             <blockquote>Employees may present a grievance concerning a continuing practice or condition at any time, but must present a grievance concerning a particular act or occurrence within 15 calendar days of the date they became aware of it. (paragraph 8)</blockquote>
             <h3>How long does an employee have to file an appeal from an adverse action?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>MCO 5090.4A addresses enforcement protecting natural and cultural resources, stewardship for sustained military land use, and program coordination. It requires alignment under Environmental Directorates, specified training and credentials, adherence to use-of-force policy, and defined firearms and personnel standards.</p>
             <p><strong>Applies to:</strong> This Order is applicable to the Marine Corps Total Force installations, commands, detachments, and units that are required to have an Integrated Natural and/or Cultural Resource Management Plan in accordance with reference (e).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Natural and cultural resource protection</li>
                 <li>Conservation law enforcement programs</li>
@@ -729,7 +745,7 @@
                 <li>Firearms and ammunition</li>
                 <li>Civilian conservation officer standards</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What laws does MCO 5090.4A require the Marine Corps to enforce?</h3>
             <blockquote>References (a) through (g) require the Marine Corps to enforce laws primarily aimed a protecting natural and cultural resources as an integral part of a natural resources program. (paragraph 3)</blockquote>
             <h3>Where must conservation law enforcement programs be aligned?</h3>

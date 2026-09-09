@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/af_a3/publication/qtp1h0x1/qtp1h0x1.pdf">View QTP1H0X1 on armypubs.army.mil</a></p>
             <hr>
             <p>QTP1H0X1 covers qualification timelines, capstone instruction, performance checklists, and aerospace physiology subjects including breathing systems, altitude, vision, and spatial disorientation. It requires documented performance feedback, references in instructional briefings, and capstone lectures that adequately cover the content.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Respiration and circulation</li>
                 <li>Human factors in aviation</li>
@@ -727,7 +743,7 @@
                 <li>Cabin pressurization and decompression</li>
                 <li>Spatial disorientation</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How often is QTP1H0X1 reviewed for currency and accuracy?</h3>
             <blockquote>The AFCFM will initiate an annual review of this document and coordinate with AETC Training Pipeline Manager and AFPC and designated members of the Specialty Training Requirements Team (STRT) to ensure currency and accuracy.</blockquote>
             <h3>Where should discrepancies or improvement suggestions for QTP1H0X1 be sent?</h3>

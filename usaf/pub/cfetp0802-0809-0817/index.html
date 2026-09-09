@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -707,7 +723,7 @@
             <hr>
             <p>It covers career progression, duties, competencies, resource constraints, professional training, education, leadership, mentorship, and development planning. It identifies recommended training, education, professional development, and experience for Engineering Technical, Construction Control, and Survey Technical personnel.</p>
             <p><strong>Applies to:</strong> This Career Field Education and Training Plan (CFETP) identifies and describes recommended training, education, professional development, and experience to empower the Department of the Air Force (DAF) Engineering Technical (0802) Construction Control (0809) and Survey Technical (0817) personnel.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Career progression</li>
                 <li>Engineering technical duties</li>
@@ -718,7 +734,7 @@
                 <li>Competencies</li>
                 <li>Individual development planning</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What leadership levels can these technical personnel reach?</h3>
             <blockquote>Engineering Technical, Construction Control, and Survey Technical may ascend to a Activity Management Plan Manager, Construction Manager, or Section Chief leadership level within the Civil Engineer (CE) organization.</blockquote>
             <h3>What does a Survey Technician do?</h3>

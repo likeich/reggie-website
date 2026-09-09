@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers mission weather products, mission watch, low-level instrument route closures, TAWS support, airfield weather services, cooperative weather watch, and TAF support. It sets criteria for FMQ-19 backup and special observations and describes weather monitoring and dissemination duties.</p>
             <p><strong>Applies to:</strong> It applies to units assigned to the 7th Bomb Wing (7 BW), 317th Airlift Wing (317 AW), subordinate units and units assigned to, attached to, or supported by Dyess Air Force Base (AFB).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Mission weather products</li>
                 <li>Mission watch</li>
@@ -728,7 +744,7 @@
                 <li>Surface weather observations</li>
                 <li>TAF support</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is back-up for the FMQ-19 automated observation system?</h3>
             <blockquote>Back-up is the method of manually providing meteorological data and/or dissemination to an AMOS observation when the primary automated method is not operational or unavailable due to sensor and/or communication failure.</blockquote>
             <h3>When are 7 OSS/OSW personnel responsible for backing up the FMQ-19?</h3>

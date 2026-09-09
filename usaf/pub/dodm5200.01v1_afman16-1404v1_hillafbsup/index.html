@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/hillafb/publication/dodm5200.01v1_afman16-1404v1_hillafbsup/dodm5200.01v1_afman16-1404v1_hillafbsup.pdf">View DoDM5200.01V1_AFMAN16-1404V1_HILLAFBSUP on armypubs.army.mil</a></p>
             <hr>
             <p>It addresses classification authorities, classification levels, security classification guides, declassification, public release, foreign disclosure, and Internet publication. It requires immediate changes when classification guidance requires them and sets controls for challenged, classified, and potentially compilable information.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Classification levels</li>
                 <li>Original classification authority</li>
@@ -727,7 +743,7 @@
                 <li>Foreign disclosure</li>
                 <li>Internet data compilation</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who is personally responsible for protecting classified information and CUI?</h3>
             <blockquote>All personnel of the Department of Defense are personally and individually responsible for properly protecting classified information and CUI under their custody and control.</blockquote>
             <h3>What classification levels may be used for U.S. classified information?</h3>

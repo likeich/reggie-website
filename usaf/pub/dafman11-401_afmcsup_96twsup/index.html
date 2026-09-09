@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication covers orientation flight approvals, pre-approved orientation flights, spouse orientation flights, taxi rides, and contractor requests. It requires flight requests and approvals to be submitted or tracked through the 96 OG/OGV SharePoint and establishes related approval, briefing, scheduling, and safety requirements.</p>
             <p><strong>Applies to:</strong> this supplement applies to all units which fall under 96 TW Flight Operations Authority per DAFMAN 11- 401 AFMC Sup Table A8.1.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Flight authorization policies</li>
                 <li>Orientation flight approvals</li>
@@ -727,7 +743,7 @@
                 <li>Contractor aircrew and MEP requests</li>
                 <li>Flight request tracking</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does DAFMAN11-401_AFMCSUP_96TWSUP require for flight requests approved by the Wing/CC or below?</h3>
             <blockquote>All flight requests approved by the Wing/CC or below will be tracked via the 96 OG/OGV SharePoint.</blockquote>
             <h3>How are orientation flight requests requiring AFMC/A3 approval submitted?</h3>

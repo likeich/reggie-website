@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=106191">View ATP 3-21.21 on armypubs.army.mil</a></p>
             <hr>
             <p>It covers battalion organization, mission command, reconnaissance and security, offense, defense, stability, sustainment, aviation, fires, and enabling tasks. It identifies staff responsibilities and requires information management, planning, preparation, execution, and assessment activities.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>SBCT Infantry Battalion organization</li>
                 <li>Battalion-level mission command</li>
@@ -729,7 +745,7 @@
                 <li>Aviation operations</li>
                 <li>Fire support planning</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the S-2 responsible for in an SBCT Infantry battalion?</h3>
             <blockquote>The S-2 is responsible for providing timely, tailored, predictive and accurate intelligence analyses and products in support of the commander, staff, and subordinate units. (paragraph 1-112)</blockquote>
             <h3>What does the S-2 supervise and coordinate?</h3>

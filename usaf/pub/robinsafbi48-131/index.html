@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It addresses pet limits, prohibited animals, registration, immunizations, identification, animal care, abandonment, removal, and transient animals. It requires owners to maintain animal health, shelter, water, shade, containment, and sanitary conditions.</p>
             <p><strong>Applies to:</strong> It applies to all persons transporting or having an animal under their control on Robins AFB and establishes responsibilities for Privatized Housing (PH) residents, 78th Security Forces Squadron (78 SFS), US Army Veterinary Services, and 78th Civil Engineer Group (78 CEG).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Pet limits and prohibited animals</li>
                 <li>Pet registration and immunizations</li>
@@ -728,7 +744,7 @@
                 <li>Transient animal entry</li>
                 <li>Outdoor animal care</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How many pets may be kept per household in Robins AFB privatized housing?</h3>
             <blockquote>No more than two pets per household (or family) may be kept in the PH areas of Robins AFB. (paragraph 1)</blockquote>
             <h3>Which dog breeds are prohibited on Robins AFB?</h3>

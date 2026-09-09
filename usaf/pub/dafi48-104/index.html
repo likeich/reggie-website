@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It defines tobacco products, assigns tobacco policy duties, and addresses tobacco-free environments, designated tobacco use areas, and cessation programs. It requires compliance with restrictions on tobacco use, sales, advertising, and tobacco-related events.</p>
             <p><strong>Applies to:</strong> This publication applies to the Regular Air Force, United States Space Force (USSF), the Air Force Reserve (AFR), and the Air National Guard (ANG) unless otherwise noted.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Tobacco product definitions</li>
                 <li>Tobacco-free environments</li>
@@ -726,7 +742,7 @@
                 <li>Tobacco advertising</li>
                 <li>Tobacco cessation programs</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does DAFI48-104 discourage regarding tobacco products?</h3>
             <blockquote>The Department of the Air Force discourages the use of all tobacco products.</blockquote>
             <h3>What products are included in the definition of tobacco products?</h3>

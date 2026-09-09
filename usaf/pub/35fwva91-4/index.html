@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>35FWVA91-4 identifies the Misawa Mishap Prevention Team and its flight, weapons, occupational, and administrative safety contacts. The publication and forms are available through the Air Force e-publishing website, with no releasability restrictions.</p>
             <p><strong>Applies to:</strong> We are here to address the safety concerns of every member of the Misawa military community.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Mishap prevention</li>
                 <li>Flight safety</li>
@@ -720,7 +736,7 @@
                 <li>Occupational safety</li>
                 <li>Safety administration</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Where is the Misawa Mishap Prevention Team located?</h3>
             <blockquote>We are in Bldg 507, Room 121, in the Wing Headquarters Building.</blockquote>
             <h3>Who does the Misawa Mishap Prevention Team address safety concerns for?</h3>

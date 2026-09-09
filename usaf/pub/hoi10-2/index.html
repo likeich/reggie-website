@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -707,7 +723,7 @@
             <hr>
             <p>It covers AFCAT leadership, functional desk, support, and advanced operational node positions, along with crisis action operations and briefing procedures. It includes activation and deactivation considerations, reporting requirements, training, exercises, and mandatory compliance.</p>
             <p><strong>Applies to:</strong> It applies to individuals at all levels who participate in or support AFCAT operations at the Secretariat (SAF) or Air Staff level.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Crisis Action Team organization</li>
                 <li>AFCAT manning</li>
@@ -717,7 +733,7 @@
                 <li>Reporting requirements</li>
                 <li>Training and exercises</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How are changes and questions about HOI10-2 submitted?</h3>
             <blockquote>Send recommended changes and questions about this publication to the Office of Primary Responsibility (OPR) using the DAF Form 847, Recommendation for Change of Publication.</blockquote>
             <h3>Who has waiver authority for HOI10-2?</h3>

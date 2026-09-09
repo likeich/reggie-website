@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers CPA support utilization, authorized and unauthorized functions, available systems, responsibilities, and support expectations. It requires organizations to submit requests, provide interface devices for testing, and follow procedures for fixed and portable systems.</p>
             <p><strong>Applies to:</strong> It applies to all MacDill Air Force Base (MAFB) agencies and tenants.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Ceremonial Public Address support</li>
                 <li>CPA support utilization</li>
@@ -726,7 +742,7 @@
                 <li>Fixed Public Address systems</li>
                 <li>CPA support requests</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who gives final approval for CPA support requests?</h3>
             <blockquote>The Commander, 6th Communications Squadron (6 CS/CC) will act as the final approval authority on all CPA support requests. (paragraph 2)</blockquote>
             <h3>How far in advance must a CPA support request be submitted?</h3>

@@ -586,8 +586,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -608,6 +617,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -702,7 +718,7 @@
             <hr>
             <p>It covers wing commander and demonstration pilot duties, proposed profile changes, pilot training and certification, and standard demonstration profiles. It requires specified pilot certification levels and limits changes to approved maneuvers, sequences, altitudes, and airspace boundaries.</p>
             <p><strong>Applies to:</strong> This publication applies to all Regular Air Force and federal civilian employees conducting sailplane demonstrations.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Sailplane demonstration duties</li>
                 <li>Profile change proposals</li>
@@ -711,7 +727,7 @@
                 <li>Final glide distance</li>
                 <li>Aerobatic airspace boundaries</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must an off-station demonstration pilot complete before a demonstration?</h3>
             <blockquote>For off-station demonstration sites, accomplish either a practice demonstration or aerial survey prior to the demonstration. Demonstration pilots may delegate this responsibility to another equivalently certified demonstration pilot. (paragraph 2)</blockquote>
             <h3>What does each sailplane demonstration profile include?</h3>

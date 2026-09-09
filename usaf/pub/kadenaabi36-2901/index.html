@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/kadenaab/publication/kadenaabi36-2901/kadenaabi36-2901.pdf">View KADENAABI36-2901 on armypubs.army.mil</a></p>
             <hr>
             <p>It covers applications, supervisor and legal reviews, approval authorities, training, and restrictions on activities involving food, housing, and public health. The publication requires DAF Form 3902 applications, annual reapproval, and notification of changes or termination of approved employment.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Off-duty employment approval</li>
                 <li>DAF Form 3902 applications</li>
@@ -726,7 +742,7 @@
                 <li>DoW family housing prohibitions</li>
                 <li>Food establishment requirements</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What form is required for off-duty employment approval?</h3>
             <blockquote>DAF financial disclosure statement filers must request approval of off-duty employment using the DAF Form 3902, Application and Approval for Off-Duty Employment. (paragraph 1)</blockquote>
             <h3>What does a supervisor review when evaluating an employment application?</h3>

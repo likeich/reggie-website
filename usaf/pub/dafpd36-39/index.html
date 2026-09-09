@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It addresses benefits that offset commuting costs for qualified uniformed members and civilian employees, along with eligibility for reserve component members. It assigns program authorities and requires internal management controls to support program integrity and accountability.</p>
             <p><strong>Applies to:</strong> This publication applies to all civilian employees, to include non-appropriated fund (NAF) employees, and uniformed members of the Regular Air Force, the Air Force Reserve (AFR), the Air National Guard (ANG), and the United States Space Force (USSF).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Mass transportation benefits</li>
                 <li>Commuting costs</li>
@@ -726,7 +742,7 @@
                 <li>Program abuse investigations</li>
                 <li>Internal management controls</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Where are individuals eligible for mass transportation benefits?</h3>
             <blockquote>Eligibility is restricted to individuals who are assigned to the continental United States, Alaska, Hawaii, and the various territories of the United States. (paragraph 1)</blockquote>
             <h3>When are reserve component members eligible for the MTBP?</h3>

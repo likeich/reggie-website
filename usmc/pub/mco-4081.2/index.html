@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>It defines PBL product support, its performance and cost objectives, and the metrics used to measure them. It requires User Performance Based Agreements, a default PBL strategy unless a comprehensive BCA proves otherwise, and continuous and periodic assessment of User and PSI PBAs.</p>
             <p><strong>Applies to:</strong> This order provides Marine Corps policy for the development, implementation, and assessment of PBL strategies for new and selected legacy weapon systems/equipment.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Performance Based Logistics strategies</li>
                 <li>PBL product support</li>
@@ -729,7 +745,7 @@
                 <li>PBL Business Case Analysis</li>
                 <li>Public-Private Partnerships</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is PBL product support?</h3>
             <blockquote>PBL product support is defined as the support functions necessary to maintain and improve readiness; sustainment and operational capabilities of a system or its subsystems based upon performance and cost objectives. (paragraph 1)</blockquote>
             <h3>When is PBL the default product support strategy?</h3>

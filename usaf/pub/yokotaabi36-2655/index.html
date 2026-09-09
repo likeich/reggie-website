@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>It authorizes Yokota Air Base personnel to use approved dye-marking cartridges and Close Combat Mission Capability Kits for force-on-force and Shoot, Move, and Communicate training. The instruction requires specified training-area documents, personnel training, safety equipment, inspections, weapon clearing, and post-exercise cleanup.</p>
             <p><strong>Applies to:</strong> This instruction applies to all personal assigned to YAB who utilize dye marking cartridges for training and exercises.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>CCMCK training and exercises</li>
                 <li>Dye-marking cartridges</li>
@@ -723,7 +739,7 @@
                 <li>Weapon clearing and inspections</li>
                 <li>CCMCK cleaning procedures</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What training does YOKOTAABI36-2655 authorize at Yokota Air Base?</h3>
             <blockquote>Authorize Yokota Air Base (YAB) personnel to use AF Non-Nuclear Munitions Safety Board (NNMSB)-approved small arms dye-marking cartridges and Close Combat Mission Capability Kits (CCMCK) to conduct force-on-force and Shoot, Move, and Communicate (SMC) training.</blockquote>
             <h3>What training must the Range Safety Officer and Training Support Official complete?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>It addresses the philosophy of tactics and offensive and defensive tactics specifically throughout the competition continuum. It provides the basics of offensive and defensive tactics from the squad level to the Marine division and points to additional references for further study.</p>
             <p><strong>Applies to:</strong> This publication is intended for the Marines, leaders, commanders, and staffs from the squad level to the Marine division as a foundational document to assist in preparing and executing offensive and defensive tactics in any given operational environment.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Offensive tactics</li>
                 <li>Defensive tactics</li>
@@ -730,7 +746,7 @@
                 <li>Enemy obstacles</li>
                 <li>Ground linkup and air reposition</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Which MAGTF elements contribute to an air assault force?</h3>
             <blockquote>All MAGTF elements contribute to the creation of the MAATF. (paragraph 8)</blockquote>
             <h3>What does the ACE provide during air assault operations?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>MCO 8300.1D covers the Marine Corps Serialized Small Arms/Light Weapons Accountability Program, including registry data, transaction reporting, recovered weapons, and file retention. It requires reporting accountability changes, maintaining serial-number records, and retaining specified documentation for three years.</p>
             <p><strong>Applies to:</strong> This Order is applicable to the Marine Corps Total Force.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Serialized small arms and light weapons accountability</li>
                 <li>Marine Corps Registry</li>
@@ -728,7 +744,7 @@
                 <li>Domestic or U.S. origin weapons disposition</li>
                 <li>Annual verification reports</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When must small arms or light weapons be reported by serial number?</h3>
             <blockquote>Commanders wi11 report the movement of smal1 arms/1ight weapons by serial number to Naval Surface Warfare Center (NSWC), Crane Division, whenever there is a change in the accountable unit against which small arms/Iight weapons are being reported, from one DOD Activity Address Code (DODAAC) to another DODAAC, (ex. , M203 61 to M20460), in accordance with the references. (paragraph 4)</blockquote>
             <h3>Must weapons without an NSN or MCN be registered?</h3>

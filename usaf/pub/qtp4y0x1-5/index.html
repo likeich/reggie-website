@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It contains modules on documenting treatment data, managing Service Treatment Records, managing dental health records, and the Air Force Dental Assurance and Readiness Program. It requires use of QTPs for upgrade training, performance evaluation, task certification, and recertification.</p>
             <p><strong>Applies to:</strong> Trainees, trainers, supervisors, and task certifiers must use all QTPs to conduct upgrade training.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Treatment data documentation</li>
                 <li>Service Treatment Records</li>
@@ -726,7 +742,7 @@
                 <li>Patient appointment scheduling</li>
                 <li>Dental assistant upgrade training</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does QTP4Y0X1-5 include?</h3>
             <blockquote>Volume 5, Patient Administration-Procedures and Programs, Qualification Training Package (QTP) contains modules on patient administration functions such as documenting treatment data, management of Service Treatment Records and Air Force Dental Assurance and Readiness Program. (paragraph 1)</blockquote>
             <h3>What are QTPs designed to do?</h3>

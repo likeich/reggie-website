@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>The manual describes Civil Affairs missions, authorities, core competencies, principles, operations, and support across the competition continuum. It requires civil knowledge integration into planning and compliance with applicable laws, the law of war, and rules of engagement.</p>
             <p><strong>Applies to:</strong> FM 3-57 applies to the Active Army, the Army National Guard (or Army National Guard of the United States), and the United States Army Reserve unless otherwise stated.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Civil Affairs missions</li>
                 <li>Civil Affairs operations</li>
@@ -730,7 +746,7 @@
                 <li>Civil-military integration</li>
                 <li>Mission command</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the purpose of Civil Affairs operations?</h3>
             <blockquote>Civil affairs operations are actions planned, coordinated, executed, and assessed to enhance awareness of, and manage the interaction with, the civil component of the operational environment; identify and mitigate underlying causes of instability within civil society; and/or involve the application of functional specialty skills normally the responsibility of civil government (JP 3-57). (paragraph 2-1)</blockquote>
             <h3>What is the strategic objective of Army Civil Affairs forces?</h3>

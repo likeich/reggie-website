@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>It describes the squadron’s space threat areas, mission partnerships, reporting relationship, and administrative control over assigned personnel. Compliance is mandatory, and records created under its processes must be maintained and disposed of under specified Air Force records requirements.</p>
             <p><strong>Applies to:</strong> This Mission Directive applies to individuals assigned to HQ AFRC and subordinate units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Space threat analysis</li>
                 <li>Satellite communication electronic warfare</li>
@@ -721,7 +737,7 @@
                 <li>Space related cyber operations</li>
                 <li>Mission partnerships</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the mission of the 26th Space Aggressor Squadron?</h3>
             <blockquote>The 26th Space Aggressor Squadron provides expert citizen airmen to prepare, educate and train joint forces and coalition partners for combat effectiveness to fight in and through contested, degraded, and operationally limited environments. (paragraph 1)</blockquote>
             <h3>Which units does the 26th Space Aggressor Squadron partner with?</h3>

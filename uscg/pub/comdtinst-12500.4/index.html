@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -713,7 +729,7 @@
             <hr>
             <p>It addresses eligibility for cyber designated positions and civilian employees, incentive limits, payment conditions, termination, agreements, and funding. It requires written requests, specified documentation, approval, and tracking for individual and group incentives.</p>
             <p><strong>Applies to:</strong> This policy applies to appropriated fund permanent civilian employees in cyber designated positions including Senior Level, Scientific or Professional positions, and Senior Executive Service.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Cybersecurity retention incentives</li>
                 <li>Cyber designated position eligibility</li>
@@ -723,7 +739,7 @@
                 <li>Incentive termination</li>
                 <li>Retention incentive agreements</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What documentation is required for a cybersecurity retention incentive request?</h3>
             <blockquote>The request must be documented using (1) Cybersecurity Retention Incentive Request, Form CG-5305E, and (2) should include documentation that the employee is likely to leave Federal Service (a written job offer from an employer outside of the Federal government, justification letter from a supervisor, (3) or a component or office-level business case addressing market analysis and/or attrition rates supporting the need to pay a retention incentive, etc.). (paragraph 8)</blockquote>
             <h3>How long can cybersecurity retention incentive payments continue?</h3>

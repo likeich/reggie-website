@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/saf_aq/publication/afpd64-1/afpd64-1.pdf">View AFPD64-1 on armypubs.army.mil</a></p>
             <hr>
             <p>It covers the contracting system’s mission, acquisition processes, applicable regulations, business arrangements, and responsibilities of senior contracting officials. It requires fair treatment of offerors and contractors, qualified acquisition personnel, competition, performance-based acquisition methods, and compliance with contract terms.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Acquisition planning</li>
                 <li>Solicitation and source selection</li>
@@ -727,7 +743,7 @@
                 <li>Nonappropriated fund contracting</li>
                 <li>Contracting officer authority</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What regulations does the Air Force use for supplies and services contracting?</h3>
             <blockquote>The Air Force will contract for supplies and services using the FAR, DFARS, AFFARS, and implementing publications and guidance. (paragraph 2)</blockquote>
             <h3>How must Air Force contracting activities treat offerors and contractors?</h3>

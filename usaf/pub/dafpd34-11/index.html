@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It establishes programs for recovery coordination, caregiver compensation, service dogs, casualty emergency family member travel, and family notification. It assigns oversight, certification, housing inspection, guidance, and reporting duties to specified Air Force offices.</p>
             <p><strong>Applies to:</strong> This DAFPD establishes policy for Department of the Air Force Wounded Warrior Support and applies to military members of the Regular Air Force, United States Space Force, Air National Guard and Air Force Reserve.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Recovery Coordination Program</li>
                 <li>Special Compensation for Assistance with Activities of Daily Living</li>
@@ -726,7 +742,7 @@
                 <li>Family notification</li>
                 <li>Base housing accommodations</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What support does the Recovery Coordination Program provide?</h3>
             <blockquote>A Department of the Air Force Recovery Coordination Program for wounded, ill, and injured Airmen and Guardians to ensure support to affected Airmen and Guardians and their families through recovery, rehabilitation, reintegration and, where necessary, to assist Airmen and Guardians’ transition for separation from the Air Force or Space Force. (paragraph 1)</blockquote>
             <h3>What does SCAADL provide to eligible Airmen and Guardians?</h3>

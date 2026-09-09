@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>CFETP43HXX covers public health specialty duties, skill levels, training decisions, qualification requirements, documentation, and course resources. It establishes mandatory entry, upgrade, and proficiency training requirements and identifies requirements for awarding and retaining skill levels.</p>
             <p><strong>Applies to:</strong> The plan outlines the training individuals in this Air Force Specialty (AFS) should receive to develop and progress throughout their careers.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Public health specialty duties</li>
                 <li>Communicable disease prevention</li>
@@ -728,7 +744,7 @@
                 <li>Deployment medicine programs</li>
                 <li>Specialty qualification requirements</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What training does CFETP43HXX require for the qualified level?</h3>
             <blockquote>For award of 43H3, completion of upgrade training IAW the current CFETP, the PHO Course and the in-person Contingency Preventive Medicine (CPM) course is required. (paragraph 1)</blockquote>
             <h3>What knowledge is mandatory for entry-level 43HXX qualification?</h3>

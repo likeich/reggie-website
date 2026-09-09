@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>ATP 3-01.50 covers ADAM cell missions, roles, equipment, communications architecture, operations, airspace command and control, and system initialization. It describes ADAM cell structure, training, tactical employment, and operations, including requirements for communications, battle rosters, shift changes, and common operational picture management.</p>
             <p><strong>Applies to:</strong> There is ADAM cells in the corps, division, brigade combat teams (BCTs) (Heavy, Infantry, and Stryker) and the five support brigades (Aviation, Fires, Battlefield Surveillance Brigade [BfSB], Combat Support Brigade [CSB], Maneuver Enhanced [ME], and Sustainment).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>ADAM cell equipment</li>
                 <li>Air defense and airspace management</li>
@@ -730,7 +746,7 @@
                 <li>Airspace command and control</li>
                 <li>System initialization</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What doctrinal requirements does ATP 3-01.50 identify for integrating operational processes?</h3>
             <blockquote>Better describing how to integrate several integrating processes (the military decision-making process [MDMP]; targeting, intelligence preparation of the operational environment; intelligence synchronization; and composite risk management) with each other and throughout the operations process. (paragraph 5-0)</blockquote>
             <h3>What equipment comprises the ADAM cell?</h3>

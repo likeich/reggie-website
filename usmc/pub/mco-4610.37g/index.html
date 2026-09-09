@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -709,7 +725,7 @@
             <hr>
             <p>It publishes updated TAC policy and provides guidance for First Destination Transportation, Second Destination Transportation, overseas contingency operations, Navy-funded shipments, and locally funded transportation. It requires shipping activities to cite only the applicable TAC on shipping documentation and provide TAC funding information in transportation clauses for centrally funded and locally funded purchases.</p>
             <p><strong>Applies to:</strong> This Order is applicable to the Marine Corps Total Force.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Transportation Account Codes</li>
                 <li>First Destination Transportation</li>
@@ -720,7 +736,7 @@
                 <li>Personal property transportation</li>
                 <li>TAC decision support</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What TAC information must contracts include?</h3>
             <blockquote>The TAC information, specifically the appropriate TAC funding the transportation movement, must be provided in the transportation clause of all contracts pertaining to both centrally funded and locally funded purchases. (paragraph 4)</blockquote>
             <h3>When may Special TACs be used?</h3>

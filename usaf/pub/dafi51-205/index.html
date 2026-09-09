@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/af_ja/publication/dafi51-205/dafi51-205.pdf">View DAFI51-205 on armypubs.army.mil</a></p>
             <hr>
             <p>DAFI51-205 covers court-order delivery, MEJA notice and training, temporary detention, initial proceedings, and Article 2(a)(10) UCMJ jurisdiction. It requires notification before disciplinary action and addresses command authority, law enforcement, and courts-martial rights.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Delivery to civilian authorities</li>
                 <li>Military Extraterritorial Jurisdiction Act</li>
@@ -727,7 +743,7 @@
                 <li>Notification procedures</li>
                 <li>Courts-martial rights</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When can DAF military members be delivered to civilian authorities for trial?</h3>
             <blockquote>Pursuant to Article 14, UCMJ, a member of the armed forces accused of an offense in violation of U.S. federal, tribal, state, or local civilian statutes or regulations, may be delivered to federal, tribal, state, or local civilian authorities for trial upon their request. (paragraph 1)</blockquote>
             <h3>Can commanders compel civilian employees or dependents to comply with court orders?</h3>

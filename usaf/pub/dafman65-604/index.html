@@ -586,8 +586,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -608,6 +617,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -702,13 +718,13 @@
             <hr>
             <p>The manual updates special working symbols used by the Department of the Air Force within the Department of Defense. It includes changes to existing codes, new projects within appropriations, and new appropriations.</p>
             <p><strong>Applies to:</strong> This manual applies to the Regular Air Force (RegAF), the United States Space Force (USSF), Air Force Reserve (AFR), Air National Guard (ANG) and the Civil Air Patrol (CAP) when performing Department of the Air Force (DAF) assigned missions in its role as a volunteer civilian auxiliary of the DAF.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Credit repayment of advance to this project</li>
                 <li>Appropriation symbols</li>
                 <li>Budget codes</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does DAFMAN65-604 provide guidance on?</h3>
             <blockquote>The purpose of this manual is to provide guidance on using current (Fiscal Year [FY] 2026 Appropriations Acts) symbols and budget codes and their descriptions.</blockquote>
             <h3>What changes does the FY 2026 edition include?</h3>

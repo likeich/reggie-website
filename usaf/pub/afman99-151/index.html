@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers ALMAG membership, convening authorities, investigation procedures, reporting requirements, and report formats. It requires factual narratives, property and cost data, findings and causes, hazard identification, risk assessment, and preventive actions.</p>
             <p><strong>Applies to:</strong> This manual applies only to units and organizations, including Air Force Reserve, Air National Guard and combat air forces (CAF), who are involved in the testing of guided weapons or use of aerial targets.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Air Launched Munition Analysis Group procedures</li>
                 <li>Guided munition mishap investigations</li>
@@ -727,7 +743,7 @@
                 <li>Findings and causes</li>
                 <li>Hazard identification and risk assessment</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Can GPS coordinates be used to report a remote mishap location?</h3>
             <blockquote>Global Positioning System (GPS) coordinates (DDD-MM.MM) may be used in place of street and highway references for remote locations. (paragraph 4)</blockquote>
             <h3>How should the mishap narrative be written?</h3>

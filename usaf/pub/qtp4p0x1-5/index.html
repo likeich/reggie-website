@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/af_sg/publication/qtp4p0x1-5/qtp4p0x1-5.pdf">View QTP4P0X1-5 on armypubs.army.mil</a></p>
             <hr>
             <p>It covers controlled pharmacy areas, visitor identification, vault and safe security, access codes, keys, and controlled-substance storage. It requires security checks, access controls, documentation, and protection of pharmacy resources.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Pharmacy access control</li>
                 <li>Controlled substance security</li>
@@ -725,7 +741,7 @@
                 <li>Security codes and combinations</li>
                 <li>Pharmacy security forms</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What areas are designated as controlled areas in a pharmacy?</h3>
             <blockquote>All pharmacy dispensing areas are designated as controlled areas IAW AFI 31-101. (paragraph 1)</blockquote>
             <h3>What identification is required for pharmacy access?</h3>

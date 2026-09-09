@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>AR 40-657 addresses sanitation audits, procurement approvals, food inspections, laboratory services, and food safety sampling programs. It requires approved sources, certified sanitation-audit personnel, laboratory testing, and actions for nonconforming results.</p>
             <p><strong>Applies to:</strong> The provisions of this regulation and this chapter are applicable to commercial and Government food establishments providing subsistence to the Armed Forces; DeCA; MWR; Air Force services; Military Exchange service operated facilities; and dining facilities receiving PV items.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Food procurement inspections</li>
                 <li>Commercial food establishment sanitation audits</li>
@@ -730,7 +746,7 @@
                 <li>Food safety sampling programs</li>
                 <li>Nonconforming laboratory results</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who must be certified before performing sanitation audits on commercial food establishments?</h3>
             <blockquote>Veterinary personnel in the ranks of captain or below, warrant officer, and staff sergeant (SSG) through sergeant major (SGM) must be certified in sanitation audit techniques prior to performing sanitation audits on commercial food establishments. (paragraph 2-1)</blockquote>
             <h3>What establishments may Armed Forces purchasing activities buy food from?</h3>

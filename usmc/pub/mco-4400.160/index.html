@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>It covers analyses of supply, maintenance, maintenance management, arms, ammunition, explosives, and distribution. The publication requires inventories, procedure reviews, corrective actions, reporting, and scheduled analysis cycles.</p>
             <p><strong>Applies to:</strong> This Order applies to all commands/activities that account for and maintain General Property, Plant &amp; Equipment (GPP&amp;E) or Operating Materials and Supplies Inventory (OM&amp;S) or perform distribution functions.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Supply and maintenance analyses</li>
                 <li>Equipment accountability and readiness</li>
@@ -729,7 +745,7 @@
                 <li>Analysis schedules</li>
                 <li>Corrective action plans</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does an FSMAO analysis include?</h3>
             <blockquote>A FSMAO analysis will include a 100% physical inventory of all Readiness Reportable Ground Equipment and Naval Surface Warfare Center (NSWC) Crane reportable assets, a random sample physical inventory of other GPP&amp;E and OM&amp;S items, a review of supply, maintenance, maintenance management, and AA&amp;E procedures to gauge overall equipment accountability and readiness.</blockquote>
             <h3>How often are Marine Forces Reserve units analyzed?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <hr>
             <p>The publication addresses Life Cycle Support Strategies, ILS management, life cycle support planning, and sustaining engineering. It specifies a single standard ILS plan applicable to all assets and defines requirements for maintaining support performance, records, and configuration control.</p>
             <p><strong>Applies to:</strong> All Coast Guard unit commanders, commanding officers, officers-in-charge, deputy/assistant commandants, and chiefs of headquarters staff elements must comply with the provisions of this Manual.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Integrated Logistics Support process</li>
                 <li>Life Cycle Support Strategies</li>
@@ -729,7 +745,7 @@
                 <li>Configuration Management</li>
                 <li>Transition Planning</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must the ILS process provide?</h3>
             <blockquote>The ILS process provides a management framework and technical activities needed to define and maintain Life Cycle Support Strategies to deliver the right support to the right place at the right time, at a cost the Coast Guard can afford, despite changing environments, mission requirements, and emergent national needs. (paragraph 1-1)</blockquote>
             <h3>What does the ILS process need to maintain for ILSMT-managed data?</h3>

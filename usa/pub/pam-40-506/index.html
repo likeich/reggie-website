@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,14 +732,14 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=78813">View PAM 40-506 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/ar-40-5/">AR 40-5</a></li>
             </ul>
             <hr>
             <p>PAM 40-506 covers vision screening, readiness classification, worksite evaluation, optical devices, ocular hazards, protective equipment, and emergency care. It requires vision readiness screening at least annually and addresses controls, training, eye protection, and environmental conditions affecting visual performance.</p>
             <p><strong>Applies to:</strong> The purpose of this pamphlet is to ensure military, civilian, and contract employees of the Department of the Army (DA), U.S. Army Reserve (USAR), and Army National Guard (ARNG) have the visual performance, optical devices, and ocular health necessary to perform their assigned activities in a safe and efficient manner.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Occupational vision screening</li>
                 <li>Vision readiness classification</li>
@@ -733,7 +749,7 @@
                 <li>Environmental vision</li>
                 <li>Vision conservation site surveys</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How often is vision readiness screening required?</h3>
             <blockquote>Vision readiness screening is required at least annually. (paragraph 3)</blockquote>
             <h3>How often must employees in eye-hazardous work receive vision screening?</h3>

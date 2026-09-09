@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -707,7 +723,7 @@
             <hr>
             <p>It covers control measures, classification, safekeeping and storage, account management, document handling, changes, destruction, audits, and inventories. It also addresses Top Secret messages received through telecommunications, GASNT, SACCS, AMHS, or successor systems and requires strict compliance with control procedures.</p>
             <p><strong>Applies to:</strong> This instruction applies to all HQ Air Mobility Command (AMC), AMC Bases, and AMC Units within AMC which contain a Top Secret Control Account (TSCA) and is designed to help manage the organization’s TSCA.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Top Secret information safeguarding</li>
                 <li>Top Secret Control Accounts</li>
@@ -716,7 +732,7 @@
                 <li>Top Secret material destruction</li>
                 <li>Top Secret audits and inventories</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What takes precedence over administrative convenience for Top Secret control?</h3>
             <blockquote>Strict compliance with TS control procedures takes precedence over administrative convenience.</blockquote>
             <h3>Who must contribute to safeguarding Top Secret material?</h3>

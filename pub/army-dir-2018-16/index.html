@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1005864">View ARMY DIR 2018-16 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/ar-190-45/">AR 190-45</a></li>
                 <li><a href="/usa/pub/ar-614-200/">AR 614-200</a></li>
@@ -724,7 +740,7 @@
             <hr>
             <p>ARMY DIR 2018-16 establishes screening requirements for training cadre, recruiting cadre, SHARP professionals, and officer commissioning sources. It addresses disqualifying offenses, suspension and removal, reassignment, approval and appeal procedures, and reporting requirements.</p>
             <p><strong>Applies to:</strong> This directive applies to the Regular Army (RA), Army National Guard (ARNG)/ Army National Guard of the United States (ARNGUS), and U.S. Army Reserve (USAR).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Suitability screening</li>
                 <li>Training cadre</li>
@@ -734,7 +750,7 @@
                 <li>Suspension and removal</li>
                 <li>Approval and appeal process</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What screening requirements must be completed before assignment to a designated position?</h3>
             <blockquote>All screening requirements for personnel outlined in this directive must be met before assignment to a designated position. (paragraph 3)</blockquote>
             <h3>Is an NACLC required for SHARP credentialing?</h3>

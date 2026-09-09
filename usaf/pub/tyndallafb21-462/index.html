@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>TYNDALLAFB21-462 establishes policies for operating locations, personnel limits, equipment safety, and emergency procedures. It requires safety briefings, grounding of equipment when electrically primed ammunition is present, ammunition control, and specified maintenance actions.</p>
             <p><strong>Applies to:</strong> This instruction is applicable all units and/or personnel assigned to the to the 325th Maintenance Group as well as visiting units attached to 53d Weapons Evaluation Group who are qualified to perform maintenance on jammed aircraft gun/loading systems.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Jammed aircraft guns</li>
                 <li>Ammunition loading systems</li>
@@ -727,7 +743,7 @@
                 <li>Ammunition identification</li>
                 <li>Damaged rounds</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How many personnel must be present during live ammunition operations?</h3>
             <blockquote>A minimum of two personnel will be present during any operation involving live ammunition (one supervisor and one worker). (paragraph 3)</blockquote>
             <h3>Where may gun systems and ammunition loading systems with live ammunition be cleared?</h3>

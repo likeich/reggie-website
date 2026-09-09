@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication defines augmentation, establishes the Augmentation Review Board, and assigns duties to wing, group, unit, and program officials. It specifies call-up requests, approved augmentation requirements, annual revalidation, eligibility, training, and availability provisions.</p>
             <p><strong>Applies to:</strong> The 375th Air Mobility Wing Commander (375 AMW/CC) directs the implementation of an Augmentation Program at Scott AFB, and applies exclusively to the 375th Air Mobility Wing.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Augmentation Program</li>
                 <li>Augmentation Review Board</li>
@@ -727,7 +743,7 @@
                 <li>Augmentee eligibility and training</li>
                 <li>Wartime contingency support</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How is augmentation defined?</h3>
             <blockquote>Augmentation is defined as base-level realignment of personnel in duties typically outside of their assigned Air Force specialty code (AFSC), and typically outside their unit of assignment, in order to meet the installation’s exercise, contingency, wartime, emergency or special mission requirements. (paragraph 1)</blockquote>
             <h3>How often does the Augmentation Review Board meet?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication assigns duties to the Central Collection Point, Owning Work Centers, TMDE monitors, and maintenance squadrons. It requires coordination of calibrations through the CCP and sets TMDE delivery, pickup, handling, and assistance requirements.</p>
             <p><strong>Applies to:</strong> This AMWI is applicable to all assigned personnel in the 452d Air Mobility Wing.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>TMDE calibration</li>
                 <li>Central Collection Point operations</li>
@@ -726,7 +742,7 @@
                 <li>TMDE monitor requirements</li>
                 <li>AFTO Form 350 tags</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who provides calibration and repair support for 452 AMW aircraft, missiles, and ground systems?</h3>
             <blockquote>412th Maintenance Squadron (MXS) Test Measurement &amp; Diagnostic Equipment Flight (TMDE) Edwards Air Force Base (AFB) is a Type IIC Laboratory that provides general calibration and repair support to aircraft, missiles, and/or ground systems for the 452 AMW. (paragraph 1)</blockquote>
             <h3>When must TMDE monitors turn in equipment for calibration?</h3>

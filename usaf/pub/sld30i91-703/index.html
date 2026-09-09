@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>SLD30I91-703 covers railroad coordination, train locations and schedules, hazard analysis, countdown decisions, and launch timing. It requires procedures for holding trains, clearing tracks, and responding to debris and toxic hazards.</p>
             <p><strong>Applies to:</strong> It applies to all Space Launch Delta 30 (SLD30) units involved in launch operations.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Railroad train protection</li>
                 <li>Train protection areas</li>
@@ -726,7 +742,7 @@
                 <li>Railroad track clearance</li>
                 <li>Train traffic coordination</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How must train locations and schedules be reported during launch operations?</h3>
             <blockquote>The ASO will ensure the current location, movement, and schedules for all trains in the Vandenberg SFB area are documented and reported to the ROC and MFCO/RSM as defined in 30SWI13-207, Range Surveillance. (paragraph 3)</blockquote>
             <h3>How is the train protection area determined?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It addresses command safety investigations and reports, including events involving multiple commands, multiple services, and Air Reserve Component assets. Compliance with the publication’s attachments is mandatory, and its requirements include written delegation of certain convening authority.</p>
             <p><strong>Applies to:</strong> It applies to commanders, functional managers, supervisors, and all other Air Combat Command (ACC) personnel.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Command safety investigations</li>
                 <li>Mishap convening authority</li>
@@ -727,7 +743,7 @@
                 <li>Air Reserve Component events</li>
                 <li>Safety reports</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who is the convening authority for off-duty ground safety reportable mishaps?</h3>
             <blockquote>The Convening Authority for Ground Safety reportable mishaps falling under the off-duty category (as defined by Para 19.2) will be the nearest ACC unit with a full time qualified occupational safety 1S0 or 0018. (paragraph 2)</blockquote>
             <h3>Who is the convening authority for on-duty Class A and specified nuclear mishaps?</h3>

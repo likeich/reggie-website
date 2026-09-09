@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication establishes requirements for inactive equipment, operator training, qualification listings, inspections, maintenance, and historical records. It also requires unit training plans and participation in the Beale Overhead Crane &amp; Hoist Working Group.</p>
             <p><strong>Applies to:</strong> This supplement applies to all personnel assigned or attached to the 9 RW.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Permanently mounted cranes</li>
                 <li>Hoist operator training</li>
@@ -727,7 +743,7 @@
                 <li>Unit training plans</li>
                 <li>Overhead crane working group</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When can an inactive crane, hoist, or derrick be administratively locked?</h3>
             <blockquote>Any permanently mounted crane, hoist or derrick that is inactive for a period of more than 6 months or not inspected in accordance with AFI 91-203 may be administratively locked and placed into an inactive status.</blockquote>
             <h3>What is required before an inactive crane, hoist, or derrick is reactivated?</h3>

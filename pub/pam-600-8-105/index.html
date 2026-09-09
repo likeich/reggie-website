@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,14 +732,14 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1026013">View PAM 600-8-105 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/ar-600-8-105/">AR 600-8-105</a></li>
             </ul>
             <hr>
             <p>The publication covers movement designator codes, order formats, personnel actions, temporary duty, Reserve Component training, and mobilization. It requires specific rules for order modification, numbering, page size, continuation sheets, and DD Form 1610 abbreviations.</p>
             <p><strong>Applies to:</strong> This pamphlet provides procedural guidance for completing mandated operating tasks for the orders program of the Military Personnel (MILPER) System.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Movement designator codes</li>
                 <li>Orders formats</li>
@@ -733,7 +749,7 @@
                 <li>Mobilization orders</li>
                 <li>Order numbering</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Which work centers produce orders for strength management and personnel reassignment?</h3>
             <blockquote>Table 1  1 lists which work center performs the various functions or program within the orders production process. (paragraph 1-4)</blockquote>
             <h3>What areas do movement designator codes cover?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It identifies command, key, and essential positions and addresses privatized housing assignments, reserved homes, waiting lists, rent, and occupancy approval. It requires waiver requests to go through the chain of command and prohibits supplementation at any level.</p>
             <p><strong>Applies to:</strong> It applies to all persons designated as key and essential and establishes responsibilities for Hunt Military Family Housing as the Privatized Owner, 78th Civil Engineer Group (CEG), and the Housing Management Office (HMO).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Key and essential positions</li>
                 <li>Command housing positions</li>
@@ -727,7 +743,7 @@
                 <li>General Officer Homes</li>
                 <li>Waiver requests</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who must live in specific privatized homes as a matter of military necessity or as a condition of employment?</h3>
             <blockquote>Incumbents of certain key and essential positions known as Command Positions are required to reside in specific privatized homes as a matter of military necessity or as a condition of employment.</blockquote>
             <h3>How long can homes reserved for key and essential positions be held vacant?</h3>

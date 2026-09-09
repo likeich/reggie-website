@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers weather watches, warnings, advisories, observations, forecasts, mission weather products, flight briefings, and emergency operations. Compliance with Attachments 2, 3, 5, 6, and 7 is mandatory, and waivers are not authorized.</p>
             <p><strong>Applies to:</strong> It applies to all agencies described herein, to include the 908th Flying Training Wing (AF Res); it does not apply to the ANG.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Weather watches and warnings</li>
                 <li>Mission weather products</li>
@@ -727,7 +743,7 @@
                 <li>Aircraft and equipment protection</li>
                 <li>Weather-sensitive flight criteria</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When must the Maxwell Weather office be notified during a watch or warning?</h3>
             <blockquote>Notify appropriate agencies of the issuance of Watches/Warnings. (paragraph 15-129)</blockquote>
             <h3>How quickly must the SWAP Standby Member or Team Chief report?</h3>

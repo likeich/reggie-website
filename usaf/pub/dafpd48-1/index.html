@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>DAFPD48-1 covers aerospace, occupational, environmental, operational, and public health functions, along with force health readiness and protection. It requires activities that promote medical readiness, prevent illness and injury, address medical fitness, and mitigate health risks.</p>
             <p><strong>Applies to:</strong> This publication applies to all civilian employees of the Department of Air Force (DAF) and uniformed members of the Regular Air Force, United States Space Force, Air Force Reserve, and Air National Guard, and those who are contractually obligated to abide by the terms of DAF publications.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Aerospace and Operational Medicine Enterprise</li>
                 <li>Aviation and space medicine</li>
@@ -727,7 +743,7 @@
                 <li>Human performance sustainment</li>
                 <li>Chemical, biological, radiological, or nuclear events</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What capabilities are included in the Aerospace and Operational Medicine Enterprise?</h3>
             <blockquote>The AOME consists of all health capabilities and activities that directly support execution of the DAF missions for Air and Space Forces. (paragraph 1)</blockquote>
             <h3>What does operational medicine address?</h3>

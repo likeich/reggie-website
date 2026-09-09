@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <p><a href="https://www.marines.mil/News/Publications/MCPEL/Electronic-Library-Display/Article/900355/mco-30581/">View MCO 3058.1 on armypubs.army.mil</a></p>
             <hr>
             <p>MCO 3058.1 covers risk assessment, risk reduction courses of action, emergency response, utility restoration, security response, continuity, and reconstitution planning. It requires risk reduction plans, cost-benefit analysis, annual risk assessment, and use of specified processes and tools.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Mission assurance policy</li>
                 <li>All-threats/all-hazards risk management</li>
@@ -729,7 +745,7 @@
                 <li>Continuity of operations plans</li>
                 <li>Reconstitution plans</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Does a proposed risk reduction course of action need a cost-benefit analysis?</h3>
             <blockquote>Proposed risk reduction courses of action identified as part of any risk reduction plan should include a cost-benefit analysis. (paragraph 6)</blockquote>
             <h3>What must an executive-level planning group include when balancing risk and resources?</h3>

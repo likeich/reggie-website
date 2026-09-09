@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>It includes career-field information on experience, competencies, resource constraints, professional training, education, and leadership development. It describes duties, responsibilities, career progression, training strategies, and opportunities for civilian development, professional military education, and advanced education.</p>
             <p><strong>Applies to:</strong> In addition to the Biologists/Physical Scientists, this CFETP can also be used to help guide the career path of other persons in all the series listed in Table 1 plus the Environmental Engineering Series (0819), the Architect (0808), and the Archeologist Series (0193).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Natural resource management</li>
                 <li>Biologist and physical science careers</li>
@@ -723,7 +739,7 @@
                 <li>Civilian development</li>
                 <li>Career field competencies</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What are the two career paths for Biologists and Physical Scientists?</h3>
             <blockquote>Typically, there are two career paths Biologists/Physical Scientists can follow. (paragraph 1)</blockquote>
             <h3>What does the functional leader and technical expert track emphasize?</h3>

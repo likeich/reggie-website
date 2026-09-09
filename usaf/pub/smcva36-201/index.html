@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -711,7 +727,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/smc/publication/smcva36-201/smcva36-201.pdf">View SMCVA36-201 on armypubs.army.mil</a></p>
             <hr>
             <p>It covers military and civilian complaint processes, alternative dispute resolution, climate assessments, briefings, referrals, and human relations education. It sets filing periods for formal complaints and describes protections involving race, color, national origin, religion, sexual orientation, sex, age, disability, equal pay, GINA, and retaliation for civilian employees.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Unlawful discrimination</li>
                 <li>Sexual harassment</li>
@@ -721,7 +737,7 @@
                 <li>Human relations climate</li>
                 <li>Equal opportunity services</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does the equal opportunity program promote?</h3>
             <blockquote>The equal opportunity program promotes a positive human relations climate, free from sexual harassment and unlawful discrimination based on race, color, national origin, religion, sexual orientation or sex (also age, disability (mental or physical), equal pay, GINA, and retaliation for civilian employees).</blockquote>
             <h3>What alternative dispute resolution options are available?</h3>

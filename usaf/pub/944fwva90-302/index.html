@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -706,7 +722,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/944fw/publication/944fwva90-302/944fwva90-302.pdf">View 944FWVA90-302 on armypubs.army.mil</a></p>
             <hr>
             <p>944FWVA90-302 identifies DAFI 90-301 as its prescribing publication and 944 FW/IG as its OPR. It also states how to obtain publications and forms and that the publication has no releasability restrictions.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Complaint resolution</li>
                 <li>Chain of command</li>
@@ -714,7 +730,7 @@
                 <li>Publication accessibility</li>
                 <li>Releasability restrictions</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What happens when problems cannot be resolved within the chain of command?</h3>
             <blockquote>IF PROBLEMS CAN’T BE RESOLVED WITHIN YOUR CHAIN OF COMMAND, GO TO THE WING INSPECTOR GENERAL.</blockquote>
             <h3>Where are publications and forms available?</h3>

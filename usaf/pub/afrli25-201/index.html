@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication defines alliance types, agreement formats, approval roles, and procedures for assessment, coordination, execution, annual review, and closeout. It requires written agreements for arrangements outside AFRL and establishes requirements for maintaining alliance information in the enterprise agreements database.</p>
             <p><strong>Applies to:</strong> This instruction applies to all AFRL personnel.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Domestic support agreements</li>
                 <li>Strategic alliances</li>
@@ -727,7 +743,7 @@
                 <li>Alliance execution and closeout</li>
                 <li>Enterprise agreements database</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When is a written agreement required for an AFRL arrangement?</h3>
             <blockquote>Whenever an AFRL organization enters an arrangement with an organization outside AFRL, there must be a written agreement that describes what the arrangement will be and how resources will be exchanged and protected. (paragraph 1)</blockquote>
             <h3>What checklist supports the alliance creation process?</h3>

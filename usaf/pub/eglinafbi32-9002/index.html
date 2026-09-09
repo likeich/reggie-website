@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>EGLINAFBI32-9002 covers facility manager appointments and training, space requests, inspections, reallocation, family housing, dormitory space, and transient quarters. It requires written requests, designated facility managers, reporting of changes, and approval of certain contract actions.</p>
             <p><strong>Applies to:</strong> It applies to all activities assigned, attached, or an associate to Eglin Air Force Base, Florida.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Building and facility assignments</li>
                 <li>Facility manager appointments</li>
@@ -727,7 +743,7 @@
                 <li>Dormitory space</li>
                 <li>Transient quarters</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How must buildings and structures be used under EGLINAFBI32-9002?</h3>
             <blockquote>All buildings or structures will be utilized as allocated and indicated on the Installations Inventory of Existing Facilities Report (RP - RCS: SAF-MIL (A) 7115). (paragraph 1)</blockquote>
             <h3>What facility managers must commanders appoint?</h3>

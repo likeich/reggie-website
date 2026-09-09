@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>It defines worldwide E-3 Airborne Warning and Control System mission support, including surveillance, early warning, control, and airborne management roles. It also identifies commander reporting, administrative control, and oversight duties for strategic, tactical, and special missions.</p>
             <p><strong>Applies to:</strong> This Mission Directive applies to individuals assigned to HQ AFRC.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>970th Airborne Air Control Squadron mission</li>
                 <li>E-3 Airborne Warning and Control System operations</li>
@@ -721,7 +737,7 @@
                 <li>Surveillance, warning and control</li>
                 <li>Strategic, tactical and special missions</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What mission does the 970th Airborne Air Control Squadron provide?</h3>
             <blockquote>Provide worldwide response with the E-3 Airborne Warning and Control System aircraft by providing mission-ready aircrews to support the E-3's all-altitude &quot;deep look&quot; surveillance, early warning, control and airborne management roles in a variety of tactical, strategic and special missions. (paragraph 1)</blockquote>
             <h3>What responsibilities does the squadron have for strategic, tactical and special missions?</h3>

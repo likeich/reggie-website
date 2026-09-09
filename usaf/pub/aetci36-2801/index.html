@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It describes the program’s purpose, identifies award programs and offices of primary responsibility, and defines nomination and board processes. It requires award packages and supporting documents to be submitted by established suspense dates.</p>
             <p><strong>Applies to:</strong> This instruction applies to all Air Education and Training Command (AETC) civilian employees and uniformed members of the Regular Air Force and the Regular Space Force.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>HQ AETC recognition program</li>
                 <li>Special Trophies and Awards Program</li>
@@ -727,7 +743,7 @@
                 <li>Functional award creation</li>
                 <li>Award submission suspense dates</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the purpose of the HQ AETC Recognition Program?</h3>
             <blockquote>The purpose of this program is to recognize individual and group outstanding performance, stimulate competition, increase mission effectiveness, emphasize individual and organizational teamwork award programs, improve morale, and sustain AETC's commitment to excellence. (paragraph 1)</blockquote>
             <h3>Where are HQ AETC award programs identified?</h3>

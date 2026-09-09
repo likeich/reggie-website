@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It sets minimum ages for purchasing, possessing, drinking, serving, and selling alcoholic beverages and identifies authorized sales facilities. It requires Dram Shop training, operating instructions, and written approval for certain events and locations.</p>
             <p><strong>Applies to:</strong> It applies to 56th Fighter Wing (FW) and also applies to the U. S. Air Force Reserve (AFRC) and to Air National Guard (ANG) units and members attached or assigned to Luke AFB.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Minimum drinking and serving ages</li>
                 <li>Alcoholic beverage sales facilities</li>
@@ -726,7 +742,7 @@
                 <li>Operating instructions for alcohol-serving activities</li>
                 <li>Written authorization for alcohol events</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the minimum drinking age at Luke Air Force Base?</h3>
             <blockquote>The minimum drinking age for purchasing, possessing, or drinking alcoholic beverages on Luke Air Force Base (AFB) is 21 years of age. (paragraph 34-107)</blockquote>
             <h3>What alcoholic beverage activities are prohibited on Luke Air Force Base?</h3>

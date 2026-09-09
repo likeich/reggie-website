@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -706,14 +722,14 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=103979">View ARMY DIR 2014-02 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/ar-420-1/">AR 420-1</a></li>
             </ul>
             <hr>
             <p>It addresses sustainable management of energy, water, and solid waste through existing programs, improved management practices, and renewable energy. It requires implementation, cost analysis, progress reporting, and written approval for policy exceptions.</p>
             <p><strong>Applies to:</strong> This policy applies to all permanent Active Army, Army National Guard and U.S. Army Reserve installations, sites and facilities operated and/or maintained by Federal funds in the continental United States (CONUS) and outside the continental United States (OCONUS), hereafter referred to as &quot;installations.&quot;</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Net Zero energy</li>
                 <li>Net Zero water</li>
@@ -722,7 +738,7 @@
                 <li>Life-cycle cost analysis</li>
                 <li>Installation progress reporting</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must Commands do with life-cycle cost analyses?</h3>
             <blockquote>Commands are expected to review and validate all life-cycle cost analyses that installations develop to ensure that the recommended project or initiative is fiscally responsible and cost-effective. (paragraph 5)</blockquote>
             <h3>How often must installations report progress on energy, water, and solid waste?</h3>

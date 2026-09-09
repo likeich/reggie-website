@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It addresses protected shipments, aircraft engines and built-up propellers, expedited and after-hours cargo, and test measurement equipment. It also covers leave-in-conjunction with TDY, radioactive shipping procedures, and TOP-V mission requests, including appointment, coordination, documentation, and timing requirements.</p>
             <p><strong>Applies to:</strong> This instruction applies to Little Rock AFB host and tenant units IAW applicable guidance’s including valid Memorandum of Agreement/Understanding documents.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Transportation Protected Service shipments</li>
                 <li>Aircraft engines and built-up propellers</li>
@@ -727,7 +743,7 @@
                 <li>Radioactive shipping procedures</li>
                 <li>TOP-V mission requests</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who must be appointed to handle AA&amp;E and classified shipments?</h3>
             <blockquote>Unit commanders will appoint in writing, persons trained and authorized to coordinate, ship, package, transport, and receive AA&amp;E, classified, and protected and sensitive material shipments. (paragraph 3)</blockquote>
             <h3>What form controls classified and protected shipments?</h3>

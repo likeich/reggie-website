@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -707,7 +723,7 @@
             <hr>
             <p>It covers airfield information, flying areas, flight planning, and ground operations, including runways, taxiways, restricted areas, and aircraft parking. Compliance is mandatory, and its procedures supplement identified Air Force, FAA, UK, and Royal Air Force publications.</p>
             <p><strong>Applies to:</strong> It is applicable to all organizations, permanent or transient, operating aircraft at RAF Mildenhall (RAFM).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Airfield facilities and operations</li>
                 <li>Runway and taxiway procedures</li>
@@ -718,7 +734,7 @@
                 <li>Airfield restrictions and closures</li>
                 <li>Aircraft parking and hangar allocation</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What publications does MILDENHALLI13-204 supplement?</h3>
             <blockquote>The procedures contained herein are supplemental to AFMAN 13-204v1, Management of Airfield Operations, AFMAN 13-204v2, Airfield Management, AFMAN 13-204v3, Air Traffic Control, AFMAN 13-204v4, Radar, Airfield and Weather Systems, AFMAN 11-202V3, Flight Operations, Federal Aviation Administration (FAA) Joint Order (JO) 7110.65, Air Traffic Control, UK Civil Aviation Pamphlet (CAP) 774, UK Flight Information Services, Regulatory Articles – Manual of Air Traffic Management, MAA 3000, Military Flying Regulations, Royal Air Force Military Radar and Military Air Traffic Operation (MATO) Procedures and Patterns for East Anglia.</blockquote>
             <h3>When is deviation from MILDENHALLI13-204 authorized?</h3>

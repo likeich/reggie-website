@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -713,7 +729,7 @@
             <hr>
             <p>The publication addresses basic pay, prior service, housing and family allowances, clothing allowances, sea duty pay, and hostile fire or imminent danger pay. It includes requirements for dependency approval, housing allowance validation, creditable service claims, and payment eligibility.</p>
             <p><strong>Applies to:</strong> It is intended to provide guidance for Coast Guard personnel and is not intended to nor does it impose legally-binding requirements on any party outside the Coast Guard.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Basic pay computation</li>
                 <li>Creditable prior service</li>
@@ -722,7 +738,7 @@
                 <li>Career sea duty pay</li>
                 <li>Hostile fire and imminent danger pay</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Does COMDTINST M7220.29D replace a Coast Guard pay manual?</h3>
             <blockquote>Coast Guard Pay Manual, COMDTINST M7220.29C is hereby cancelled. (paragraph 8)</blockquote>
             <h3>Can retired-list service count toward longevity pay?</h3>

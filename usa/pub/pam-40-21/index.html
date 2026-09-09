@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,14 +732,14 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1004974">View PAM 40-21 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/ar-40-5/">AR 40-5</a></li>
             </ul>
             <hr>
             <p>PAM 40-21 covers worksite analysis, hazard prevention and control, education and training, and program evaluation. It requires a written plan with goals and objectives and assistance with ergonomic design criteria in procurement initiatives.</p>
             <p><strong>Applies to:</strong> This section applies to all DA commands and should not be construed as to preclude non-installation commands (such as tenant organizations) from use of this pamphlet in implementing ergonomics programs specific to the needs of their organization in collaboration with installation-level ergonomic programs.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Worksite analysis</li>
                 <li>WMSD risk factors</li>
@@ -732,7 +748,7 @@
                 <li>Ergonomics program evaluation</li>
                 <li>Safe Patient Handling and Mobility</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How often should trained ergonomics personnel perform active surveillance?</h3>
             <blockquote>Trained ergonomics personnel should perform systematic active surveillance at all worksites at least once per year. (paragraph 1)</blockquote>
             <h3>Can job rotation be used in response to WMSD symptoms?</h3>

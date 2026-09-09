@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>It covers tactical, prime, and utility electrical power, alternative sources, storage, power planning, electrical safety, and international interoperability. It states that power managers should be appointed at each echelon from the battalion level and up to assist commanders with effective and efficient power management.</p>
             <p><strong>Applies to:</strong> ATP 3-34.45/MCRP 3-40D.17 is suitable for Army and Marine Corps commanders/leaders and staffs at all echelons.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Tactical electrical power</li>
                 <li>Prime power generation</li>
@@ -730,7 +746,7 @@
                 <li>Electrical inspection process</li>
                 <li>International interoperability</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What are the output ranges for individual, tactical, prime, and utility power?</h3>
             <blockquote>Electrical power sources range from batteries and tactical generator sets to large prime power systems and complex national utility grids. (paragraph 1-12)</blockquote>
             <h3>When is utility power typically used at a contingency base?</h3>

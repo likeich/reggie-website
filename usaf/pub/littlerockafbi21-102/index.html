@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It specifies approved fluids for C-130J aircraft and establishes routine, non-routine, runway, and Hammerhead procedures. It requires assigned personnel to monitor operations, maintain equipment, conduct training, and communicate de-icing details to aircrews.</p>
             <p><strong>Applies to:</strong> This instruction implements AFPD 21-1, Maintenance of Military Material and applies to all 19th Airlift Wing (19 AW), and Air Force Reserve (AFRES) units assigned to Little Rock AFB, AR.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>C-130J de-icing and anti-icing fluids</li>
                 <li>Routine de-icing procedures</li>
@@ -726,7 +742,7 @@
                 <li>De-icing operations training</li>
                 <li>Aircraft snow removal</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What aircraft contamination prevents takeoff under LITTLEROCKAFBI21-102?</h3>
             <blockquote>Aircraft are not permitted to take off with ice, snow, frost, or other contamination adhering to the wings, control surfaces, engine inlets, or other surfaces of the aircraft other than the underside of tank region. (paragraph 6)</blockquote>
             <h3>Who has final authority over de-icing adequacy before flight?</h3>

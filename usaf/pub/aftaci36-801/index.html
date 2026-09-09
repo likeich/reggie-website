@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>AFTACI36-801 defines flexible and compressed work schedule options and establishes procedures for recording, approving, correcting, and certifying time and attendance. It also sets requirements for credit-hour carryover, premium-pay requests, physical fitness activities, volunteer hours, and advanced leave.</p>
             <p><strong>Applies to:</strong> This Air Force Technical Applications Center Instruction (AFTACI) establishes uniform procedures for the processing of Civilian Employees' Time and Attendance records and associated time and attendance reporting requirements for Air Force Technical Applications Center civilian employees.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Alternate work schedules</li>
                 <li>Flexible work schedules</li>
@@ -728,7 +744,7 @@
                 <li>On-call compensation</li>
                 <li>Volunteer hours</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Are alternate work schedules voluntary under AFTACI36-801?</h3>
             <blockquote>AWS are voluntary and must not interfere with mission requirements. (paragraph 1)</blockquote>
             <h3>What are the core hours for civilian employees?</h3>

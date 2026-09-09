@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -709,7 +725,7 @@
             <hr>
             <p>MCRP 3-20F.9 covers Stinger weapons, missile procedures, air defense employment, target description, and operational communications. It specifies how gunners adjust fire, request fire for effect, and return damage assessments.</p>
             <p><strong>Applies to:</strong> This MCRP is primarily a reference guide for the LAAD section leader, the LAAD firing team leader, and the LAAD gunner (military occupational specialty 7212).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Stinger weapon system</li>
                 <li>Missile firing procedures</li>
@@ -718,7 +734,7 @@
                 <li>Adjusting fire</li>
                 <li>Operational communications</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When should gunners request fire for effect?</h3>
             <blockquote>Continue to adjust fire until effect on target is achieved then request “fire for effect.” (paragraph 4)</blockquote>
             <h3>Why are communications important for LAAD gunners?</h3>

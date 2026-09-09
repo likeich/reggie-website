@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>It covers mission planning, mission execution, C2 responsibilities, aircrew and stage management, launch and alert procedures, and flight plan and departure papers. It requires records created through its prescribed processes to be maintained and disposed of according to specified Air Force records requirements.</p>
             <p><strong>Applies to:</strong> This publication applies to Air Force Reserve Command (AFRC) MAF units and to the Air National Guard (ANG) when operating missions for Air Mobility Command (AMC), or when operating missions that are flight managed by AMC.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Mobility Air Force mission planning</li>
                 <li>Mission execution</li>
@@ -721,7 +737,7 @@
                 <li>Secure launch and positive alert procedures</li>
                 <li>Computer flight plans and aircrew departure papers</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who performs the mission planning and C2 duties covered by AMCI10-2102V6?</h3>
             <blockquote>The principal audiences of this instruction are personnel performing mission planning and/or Command and Control (C2) duties in the 618th Air Operations Center (618 AOC), AMC Command Posts (CP), Air Mobility Control Centers (AMCC) and mobile C2 facilities.</blockquote>
             <h3>How must records created under AMCI10-2102V6 be handled?</h3>

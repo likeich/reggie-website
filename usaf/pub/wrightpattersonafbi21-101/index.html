@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication establishes the program’s objectives, command and unit roles, incident reporting, investigation procedures, and requirements for transient aircraft. It requires FOD/DOP reports, follow-up reporting, final reports, and retention of reports for a minimum of 24 months.</p>
             <p><strong>Applies to:</strong> This instruction explains responsibilities pertaining to all personnel (military, civilian and contractors) working in, around or traveling through areas near aircraft, support equipment, engines or engine components on Wright-Patterson AFB.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Foreign Object Damage prevention</li>
                 <li>Dropped Object Prevention</li>
@@ -727,7 +743,7 @@
                 <li>Unit FOD Monitors</li>
                 <li>Quarterly FOD/DOP Committee Meetings</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who must appoint a Unit FOD Monitor under WRIGHTPATTERSONAFBI21-101?</h3>
             <blockquote>Unit Commanders (or equivalents) of personnel who work in, around, or travel through operational areas of the flight line will appoint a Unit FOD Monitor in writing and provide a copy to the 88 ABW FOD/DOP Program Manager.</blockquote>
             <h3>What exception applies to units involved only with Distinguished Visitor movement?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/saf_sb/publication/afi90-1801/afi90-1801.pdf">View AFI90-1801 on armypubs.army.mil</a></p>
             <hr>
             <p>It defines responsibilities for SAF/SB and other Air Force small business officials, including policy, oversight, goals, performance measurement, and program management. It also incorporates waiver and tier classification throughout the publication.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Air Force Small Business Programs</li>
                 <li>Small business policy</li>
@@ -725,7 +741,7 @@
                 <li>Air Force Small Business Awards Program</li>
                 <li>Mentor-Protégé Program</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does SAF/SB do for Air Force Small Business Programs?</h3>
             <blockquote>Develops, implements, and oversees small business policy, processes, and management of the Air Force Small Business Programs to ensure maximum practicable prime- and sub-contracting opportunities for small businesses, including developing strategic goals and objectives for all Air Force Small Business Programs and monitoring and communicating performance through appropriate metrics. (paragraph 1)</blockquote>
             <h3>How are Air Force Small Business Programs goals developed?</h3>

@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>The publication covers airfield driving procedures, training standards, runway incursion prevention, color vision testing, vehicle passes, escorts, and AF Form 483 certification. It requires training, testing, approval for controlled movement area and runway access, and procedures for reporting violations and managing driving privileges.</p>
             <p><strong>Applies to:</strong> The requirements set forth in this instruction apply to all units and personnel assigned, attached, or temporary duty to WARB, including all military, civil service, contractor and vendor personnel.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Airfield vehicle operations</li>
                 <li>Runway incursion prevention</li>
@@ -722,7 +738,7 @@
                 <li>Escort procedures</li>
                 <li>AF Form 483 certification</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who does AFI13-213_AFRCSUP_439AWSUP apply to at Westover Air Reserve Base?</h3>
             <blockquote>The requirements set forth in this instruction apply to all units and personnel assigned, attached, or temporary duty to WARB, including all military, civil service, contractor and vendor personnel.</blockquote>
             <h3>What approval is required before entering a runway or controlled movement area?</h3>

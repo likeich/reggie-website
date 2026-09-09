@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,14 +732,14 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/sheppardafb/publication/sheppardafbva16-1404-3/sheppardafbva16-1404-3.pdf">View SHEPPARDAFBVA16-1404-3 on armypubs.army.mil</a></p>
             <hr>
             <p>The publication identifies OPR: 82 TRW/IP and states that it supersedes the 18 May 2018 publication. It also identifies its prescribing directive and states its releasability status.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Classified information destruction</li>
                 <li>Prescribing directive</li>
                 <li>Publication supersession</li>
                 <li>Releasability status</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the releasability status of SHEPPARDAFBVA16-1404-3?</h3>
             <blockquote>RELEASABILITY: No releasability restrictions on this publication.</blockquote>
             <h3>Does SHEPPARDAFBVA16-1404-3 have releasability restrictions?</h3>

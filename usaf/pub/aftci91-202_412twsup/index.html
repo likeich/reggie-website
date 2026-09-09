@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers annotation and clarity of changes, major and minor amendments, approval procedures, control numbers, and technical review documentation. It requires concurrence that a safety plan change is minor and involves no risk level change before certain changes are made.</p>
             <p><strong>Applies to:</strong> This guidance applies to the activities specified in AFTCI 91-202, Section 1.6 in which the 412 TW is a participant.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Minor safety plan changes</li>
                 <li>Test package change annotation</li>
@@ -727,7 +743,7 @@
                 <li>Test package control numbers</li>
                 <li>Technical review memoranda</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How must changes be marked in the test package?</h3>
             <blockquote>Changes will be made directly to the existing documentation and will be clearly identified within the test package. (paragraph 99-103)</blockquote>
             <h3>What must be clear to reviewers and the TEA about recent changes?</h3>

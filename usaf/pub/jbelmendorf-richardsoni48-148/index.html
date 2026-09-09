@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -707,7 +723,7 @@
             <hr>
             <p>It covers radioactive materials, radiation-producing devices, laser systems, and electromagnetic field radiation emitters. The publication establishes safety programs, approval processes, incident response, warning signs, and requirements for laser areas.</p>
             <p><strong>Applies to:</strong> This instruction applies to all military, civilian, contractor, and other personnel supported by Joint Base Elmendorf-Richardson (JBER) who possess, use, or handle sources of RAM, ionizing radiation producing devices (RPD), lasers, and Electromagnetic Field Radiation (EMFR) emitters within the confines of JBER.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Radioactive materials</li>
                 <li>Radiation-producing devices</li>
@@ -717,7 +733,7 @@
                 <li>Laser area requirements</li>
                 <li>Radiation warning signs</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What standards apply to the laser and optical radiation safety program?</h3>
             <blockquote>The Laser and Optical Radiation Safety Program incorporates guidance and criteria for the safe use of lasers and laser systems as defined in the American National Standards Institute (ANSI) Z136.1, For Safe Use of Lasers, and implements the provisions of the Department of Defense Instruction (DoDI) 6055.15, Department of Defense (DoD) Laser Protection Program for Military Lasers. (paragraph 2)</blockquote>
             <h3>What standards must the EMFR Safety Program comply with?</h3>

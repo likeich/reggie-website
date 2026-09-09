@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It defines accidents, abuse, fair wear and tear, and incidents, and assigns vehicle management authority to evaluate events. It requires responsible organizations to fund accident and abuse damage and addresses investigations, reimbursement, and privately owned vehicle accidents.</p>
             <p><strong>Applies to:</strong> This instruction is applicable to all persons operating government owned, commercially leased and rented Government Motor Vehicle, assigned to Kadena Air Base, which are loaded in the Basing &amp; Logistics Analytics Data Environment (BLADE).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Government motor vehicle accidents</li>
                 <li>Vehicle abuse</li>
@@ -726,7 +742,7 @@
                 <li>Privately Owned Vehicle accidents</li>
                 <li>GSA vehicle guidance</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the goal of the Government Motor Vehicle Accident and Abuse Program?</h3>
             <blockquote>The goal of a Government Motor Vehicle (GMV) Accident and Abuse Program is to (1) reduce mishaps; (2) avert personal injury or death to Department of Defense (DoD) personnel; and (3) reduce the wing cost of vehicle accident and abuse repairs. (paragraph 24-302)</blockquote>
             <h3>How does KADENAABI24-302 define vehicle abuse?</h3>

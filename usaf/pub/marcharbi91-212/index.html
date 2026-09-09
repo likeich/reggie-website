@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -707,7 +723,7 @@
             <hr>
             <p>The publication covers BASH execution, wildlife hazard working groups, organizational roles, bird hazard warnings, communications, reporting, assessments, and wildlife remains. It requires compliance, annual review, prescribed reporting, and maintenance of records created by its processes.</p>
             <p><strong>Applies to:</strong> This Instruction applies to all host, associate, and temporary duty organizations on March ARB units, tenants, and the Air National Guard (ANG) units who prepare, manage, review, certify, approve, disseminate and/or use official Air Force Instructions.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>BASH program execution</li>
                 <li>Wildlife Hazard Working Group</li>
@@ -718,7 +734,7 @@
                 <li>Migratory bird policy</li>
                 <li>Birdstrike evidence collection</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must a Wildlife Hazard Management Plan identify?</h3>
             <blockquote>The WHMP must identify hazardous wildlife attractants on or near the airport and the appropriate wildlife damage management techniques to minimize the wildlife hazard. (paragraph 3-5)</blockquote>
             <h3>When may the FAA require a Wildlife Hazard Management Plan?</h3>

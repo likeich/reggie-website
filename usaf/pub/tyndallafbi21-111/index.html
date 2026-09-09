@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers CDDAR responsibilities, recovery operations, transient aircraft emergencies, equipment, and in-flight and ground emergency procedures. It requires coordinated responses, protection of evidence and classified components, and safe aircraft removal.</p>
             <p><strong>Applies to:</strong> The CDDAR program applies to all USAF host (i.e. 325 FW, Checker Flag), tenant/contract (i.e. 53rd Weapons Evaluation Group (53 WEG)) organizations and considers transient aircraft.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Crashed aircraft recovery</li>
                 <li>Disabled aircraft removal</li>
@@ -727,7 +743,7 @@
                 <li>Ground emergency procedures</li>
                 <li>Special Access Program component protection</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What factors determine the manpower and equipment needed for aircraft recovery?</h3>
             <blockquote>The manpower and equipment required to remove/recover a crashed/disabled aircraft will vary with each given situation. (paragraph 2)</blockquote>
             <h3>When can recovery operations proceed during a safety investigation?</h3>

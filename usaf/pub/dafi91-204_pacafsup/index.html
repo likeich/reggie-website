@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -707,7 +723,7 @@
             <hr>
             <p>It covers investigation types, mishaps, nuclear surety, incidents, hazards, safety studies, and reporting changes in AFSAS. It requires compliance with waiver, records, supplementation, and privileged-report controls.</p>
             <p><strong>Applies to:</strong> This supplement applies to all PACAF Regular Air Force, Civilians, and those with a contractual obligation to abide by the terms of PACAF issuances.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Safety investigations and reports</li>
                 <li>PACAF safety policies and procedures</li>
@@ -717,7 +733,7 @@
                 <li>AFSAS reporting</li>
                 <li>Privileged safety reports</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does DAFI91-204_PACAFSUP require for records?</h3>
             <blockquote>Ensure that all records created as a result of processes prescribed in this publication are maintained in accordance with (IAW) AFI 33-322, Records Management and Information Governance Program, and disposed of IAW Air Force Records Information Management System (AFRIMS) Records Disposition Schedule (RDS).</blockquote>
             <h3>How are waiver authorities identified in DAFI91-204_PACAFSUP?</h3>

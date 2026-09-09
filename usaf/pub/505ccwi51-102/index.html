@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/505ccw/publication/505ccwi51-102/505ccwi51-102.pdf">View 505CCWI51-102 on armypubs.army.mil</a></p>
             <hr>
             <p>It covers legal services, military justice, investigations, contracting, fiscal law, ethics, training, exercises, and operational legal support. It requires protected information collection and maintenance and mandates compliance with records management, Privacy Act, and FOIA requirements.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Staff judge advocate duties</li>
                 <li>Military justice advice</li>
@@ -726,7 +742,7 @@
                 <li>Rules of Engagement</li>
                 <li>Air Operations Center legal support</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who serves as the commander’s staff judge advocate?</h3>
             <blockquote>Unless otherwise specified by The Judge Advocate General, in units of the active duty force, Air Force Reserve and Air National Guard in Federal service, the senior judge advocate on the commander’s staff will serve as the commander’s staff judge advocate (SJA). (paragraph 1)</blockquote>
             <h3>What legal services does an SJA provide?</h3>

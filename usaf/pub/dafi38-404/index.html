@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -707,7 +723,7 @@
             <hr>
             <p>DAFI38-404 covers program overviews, roles and responsibilities, guidance and procedures, entrance criteria, and development tools. It identifies phase-based PAD processes and tiered waiver authorities, and requires compliance with the publication.</p>
             <p><strong>Applies to:</strong> This instruction applies to all civilian employees and uniformed members of the Regular Air Force (RegAF), the United States Space Force (USSF), the Air National Guard (ANG), the Air Force Reserve (AFR), and those with a contractual obligation to abide by the terms of DAF issuances.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Program Action Directives</li>
                 <li>Program Guidance Letters</li>
@@ -717,7 +733,7 @@
                 <li>PAD planning and execution phases</li>
                 <li>Tiered waiver authorities</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How do PADs, PGLs, PPlans, and PMsgs align Air Force initiatives?</h3>
             <blockquote>PADs, PGLs, PPlans, and PMsgs enable the alignment of Department of the Air Force (DAF) strategic objectives and Secretary of the Air Force (SecAF), Under Secretary of the Air Force (USecAF), Chief of Staff of the Air Force (CSAF), Chief of Space Operations (CSO), Vice Chief of Staff of the Air Force (VCSAF), and/or Vice Chief of Space Operations (VCSO) approved initiatives with joint and national priorities.</blockquote>
             <h3>How must records created under DAFI38-404 be handled?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <hr>
             <p>It addresses natural resources across land, water, marine, aquatic, and aerial environments, including habitat, wildlife, fisheries, invasive species, and protected areas. It sets requirements for evaluating actions, avoiding or mitigating environmental harm, maintaining natural resource areas, and completing compliance documentation.</p>
             <p><strong>Applies to:</strong> This Instruction applies to all federal actions that the Coast Guard carries out, authorizes, or funds, in full or in part and to the management of all Coast Guard owned or controlled property.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Land management</li>
                 <li>Coral reef conservation</li>
@@ -729,7 +745,7 @@
                 <li>Marine protected areas</li>
                 <li>Migratory birds</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must the Coast Guard do for actions and operations at home and abroad?</h3>
             <blockquote>The Coast Guard must conduct all actions and operations, both at home and abroad, in compliance with applicable NRM requirements. (paragraph 5)</blockquote>
             <h3>What must Coast Guard commands do about feral cats and dogs?</h3>

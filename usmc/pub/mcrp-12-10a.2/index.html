@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>The publication covers snowshoe and ski mobility, movement techniques, firing positions, avalanche hazards, ice reconnaissance, frozen waterways, snow tracking, ski-borne patrolling, and over-the-snow vehicles. It requires ice thickness determination before crossing frozen waterways and reconnaissance for hazards beneath the ice before cutting it.</p>
             <p><strong>Applies to:</strong> Marine Corps Reference Publication (MCRP) 12-10A.2, Winter Mountain Leader’s Guide to Mountain Warfare, is a reference for winter mountain leaders to use during operations in snow-covered terrain or a cold-weather environment.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Avalanche-prone terrain</li>
                 <li>Snow tracking and antitracking</li>
@@ -729,7 +745,7 @@
                 <li>Ski-borne patrolling</li>
                 <li>Over-the-snow vehicle employment</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is MCRP 12-10A.2 used for?</h3>
             <blockquote>Marine Corps Reference Publication (MCRP) 12-10A.2, Winter Mountain Leader’s Guide to Mountain Warfare, is a reference for winter mountain leaders to use during operations in snow-covered terrain or a cold-weather environment.</blockquote>
             <h3>Why is ice reconnaissance necessary before crossing a frozen waterway?</h3>

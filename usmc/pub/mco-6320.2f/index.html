@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <p><a href="https://www.marines.mil/News/Publications/MCPEL/Electronic-Library-Display/Article/1849776/mco-63202f/">View MCO 6320.2F on armypubs.army.mil</a></p>
             <hr>
             <p>MCO 6320.2F addresses recovery coordination, medical facility support, casualty reporting, line of duty determinations, and care referrals. It requires administrative processing, command support, hospital liaison, patient contact, and approval for deviations from its procedures.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Wounded, ill, and injured Marines</li>
                 <li>Hospitalized Marines</li>
@@ -729,7 +745,7 @@
                 <li>Complex care coordination</li>
                 <li>Medical evacuation</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What support must a parent command provide to a hospitalized Marine?</h3>
             <blockquote>When a Marine will be receiving continuous care or is hospitalized at a local military or civilian Medical Treatment Facility (MTF), the Marine’s parent command will provide support to said Marine. (paragraph 4)</blockquote>
             <h3>How quickly must a Marine Corps representative contact a Marine admitted away from the permanent duty station?</h3>

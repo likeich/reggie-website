@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/af_cc/publication/hafmd1-4/hafmd1-4.pdf">View HAFMD1-4 on armypubs.army.mil</a></p>
             <hr>
             <p>It describes how the Chief of Staff assists the Secretary of the Air Force and how the Air Staff and supporting offices are organized. Compliance with HAFMD1-4 is mandatory, and the directive identifies duties, authorities, and reporting relationships.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Chief of Staff mission</li>
                 <li>Department of the Air Force authority</li>
@@ -724,7 +740,7 @@
                 <li>Direct Reporting Units</li>
                 <li>Vice Chief delegated authority</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the Chief of Staff of the Air Force’s mission?</h3>
             <blockquote>The Chief of Staff of the Air Force (CSAF) assists the Secretary of the Air Force (SecAF) in conducting the affairs of the Department of the Air Force as set forth in Title 10 of the United States Code (10 USC) and relevant Department of Defense (DoD) issuances. (paragraph 1)</blockquote>
             <h3>Who has legal authority to conduct the affairs of the Department of the Air Force?</h3>

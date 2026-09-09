@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>It contains lesson plans on stability and support activities, organizations, rules of engagement, intelligence, convoy operations, media strategy, and related missions. Its training materials include situational training exercises and training and evaluation outlines with task standards for activities such as searches, detainee processing, negotiations, and checkpoints.</p>
             <p><strong>Applies to:</strong> This publication helps infantry brigade task force level units and below prepare for stability and support contingency missions.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Stability and support operations</li>
                 <li>Noncombatant evacuation operations</li>
@@ -730,7 +746,7 @@
                 <li>Checkpoints</li>
                 <li>Civil disturbance</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must be verified before a convoy moves?</h3>
             <blockquote>Identification of drivers verified and cargo inspected. (paragraph 7)</blockquote>
             <h3>What rules apply during a civil disturbance?</h3>

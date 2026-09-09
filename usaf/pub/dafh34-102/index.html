@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>DAFH34-102 addresses team composition, notifications, terrain-specific searches, medical examiner coordination, investigation support, personal protective equipment, and stress management. It describes requirements for trained search and recovery teams, specialized equipment, remains documentation, and critical incident stress support.</p>
             <p><strong>Applies to:</strong> This publication applies to the United States Space Force, Regular Air Force, the Air Force Reserve, and the Air National Guard.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Mortuary affairs search and recovery</li>
                 <li>Search and recovery team composition</li>
@@ -727,7 +743,7 @@
                 <li>Personal protective equipment</li>
                 <li>Critical incident stress support</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How many personnel should operate on a search and recovery team?</h3>
             <blockquote>Functions as the S&amp;R Team Chief, maintaining a competent, trained S&amp;R team and ensuring the team is appropriately staffed to conduct continuous S&amp;R operations with 26 personnel operating at any given time (2 teams of 13-persons each). (paragraph 4)</blockquote>
             <h3>What training should search and recovery team members receive?</h3>

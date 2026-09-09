@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The supplement establishes policies and procedures to validate sorties and hours flown daily. It requires AFTO Forms 781 data to be entered, reviewed, reconciled, and verified across GTIMS, IMDS, and MIS.</p>
             <p><strong>Applies to:</strong> These procedures apply to all 14 OG and 14 MX personnel who document, record or report aircraft utilization.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Aircraft utilization reporting</li>
                 <li>Sortie validation</li>
@@ -726,7 +742,7 @@
                 <li>GTIMS data entry</li>
                 <li>MIS Debriefing Sortie Recap</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When must Operations Squadron personnel enter AFTO Forms 781 for home station sorties?</h3>
             <blockquote>Operations Squadron (OS) personnel will input AFTO Forms 781 into GTIMS prior to the start of the next “go” for home station sorties.</blockquote>
             <h3>Who reviews AFTO Form 781 entries in GTIMS for errors?</h3>

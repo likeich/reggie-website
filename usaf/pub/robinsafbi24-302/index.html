@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It contains chapters on accident and abuse, vehicle idling, OGMVC, non-vehicular trailers and equipment items, including safety, procurement, and turn-in procedures. It requires accident reimbursement, reporting of specified vehicle accidents, and chain-of-command submission of waiver requests.</p>
             <p><strong>Applies to:</strong> This instruction is applicable to all persons operating and/or managing government owned vehicles/equipment (GOV/E) that are assigned to Robins Air Force Base and its geographically separated units (GSUs),</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Accident and abuse programs</li>
                 <li>Vehicle idling policy</li>
@@ -726,7 +742,7 @@
                 <li>Vehicle and equipment determination</li>
                 <li>Asset identification numbers</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who pays for accident and abuse-related vehicle damage?</h3>
             <blockquote>In accordance with AFI 24-302, Vehicle Management, the owning organization or the organization responsible for damage to vehicles and equipment will reimburse the 78th Logistics Readiness Squadron Vehicle Management Flight (78 LRS/LGRV) for all Operation and Maintenance (O&amp;M) funds expended to repair accident and abuse-related damage, to include contract maintenance costs. (paragraph 24-302)</blockquote>
             <h3>Are accidents involving commercial rental, lease, and GSA vehicles reportable?</h3>

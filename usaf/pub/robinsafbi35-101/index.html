@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication establishes program goals for community awareness and relationships, and sets eligibility standards for civilian participants and nominees. It requires procedures for candidate review, pairing, two-year terms, program events, commander contact, and ethical conduct.</p>
             <p><strong>Applies to:</strong> This RAFBI applies to all base participants in the Robins AFB Honorary Commanders Program.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Honorary Commander nominees</li>
                 <li>Candidate selection and pairing</li>
@@ -726,7 +742,7 @@
                 <li>Ethical conduct and outside gifts</li>
                 <li>Honorary Commander Advisory Council</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who can be selected as a civilian Honorary Commander?</h3>
             <blockquote>Civilian participants will be selected among non-federal appointed or elected officials, mayors, chamber of commerce members, principals of local schools, Military Affairs Committee members and others who, because of their position or influence in the community, have a positive impact on public support for the base. (paragraph 3)</blockquote>
             <h3>Can a newspaper, TV, or radio reporter be an Honorary Commander?</h3>

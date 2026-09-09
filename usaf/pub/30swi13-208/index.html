@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication covers ACC responsibilities, operational positions, certification criteria, evaluations, and controller duties during aerospace and missile operations. It requires training programs, certification and currency compliance, and timely certification or decertification documentation.</p>
             <p><strong>Applies to:</strong> This instruction applies to Range Operations and Maintenance personnel to the extent specified in the current contract, which will in the event of conflict, take precedence over this publication.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Area Control Center personnel training</li>
                 <li>Operational position certification</li>
@@ -726,7 +742,7 @@
                 <li>Radar and communications equipment</li>
                 <li>Surface contact detection and plotting</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who is the final reviewing authority for ACC personnel evaluations?</h3>
             <blockquote>The Commander, 30th Operations Group (30 OG/CC) is the final reviewing authority for Military Radar Unit (MRU) initial certification and annual evaluations of Area Control Center (ACC) and Aerospace Surveillance Officer (ASO) personnel for all operational positions. (paragraph 1)</blockquote>
             <h3>When can an ASO suspend or cancel controller certification?</h3>

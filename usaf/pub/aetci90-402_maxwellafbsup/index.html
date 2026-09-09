@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It requires immediate Inspector General notification, acknowledgment of congressional inquiries within 24 hours, and response coordination and tracking. It also addresses response packages, sensitive information, congressional visits, and required staff summary documentation.</p>
             <p><strong>Applies to:</strong> It applies to all Air University organizations assigned to Maxwell AFB and to all 42d Air Base Wing units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Congressional inquiries</li>
                 <li>High-level inquiries</li>
@@ -727,7 +743,7 @@
                 <li>Sensitive information</li>
                 <li>AF Form 1768 staff summaries</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must the responsible Inspector General do when an inquiry is received?</h3>
             <blockquote>Upon receipt, the responsible IG will immediately coordinate with the appropriate agency to determine the OPR and establish a suspense date for the response.</blockquote>
             <h3>How quickly must a congressional inquiry be acknowledged?</h3>

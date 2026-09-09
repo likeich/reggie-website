@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>CFETP4R0X1ABCC2 contains the Diagnostic Imaging Specialty Training Standard, proficiency codes, core-task designations, and on-the-job training certification fields. It includes medical readiness and contingency operations training requirements, along with rules for documenting and evaluating training.</p>
             <p><strong>Applies to:</strong> This change is applicable to the electronically published 4R0X1/A/B/C CFETP, dated 18 March 2024, and is effective immediately.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Diagnostic Imaging specialty training</li>
                 <li>Medical readiness training</li>
@@ -726,7 +742,7 @@
                 <li>Proficiency codes</li>
                 <li>On-the-job training certification</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What tasks count as core tasks for 5- or 7-level upgrade training?</h3>
             <blockquote>Tasks designated with a &quot;5&quot; or a &quot;7&quot; in Column 2 are core tasks for 5- or 7-level UGT respectively. (paragraph 3)</blockquote>
             <h3>How are tasks marked when they are core tasks for both skill levels?</h3>

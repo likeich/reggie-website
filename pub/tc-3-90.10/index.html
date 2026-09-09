@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1033298">View TC 3-90.10 on armypubs.army.mil</a></p>
             <hr>
             <p>TC 3-90.10 addresses detection, signatures, survivability operations, electromagnetic warfare, and planning considerations. It also describes C3 applications in woodland, jungle, desert, arctic, maritime-land littoral, air-land littoral, and urban environments.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Cover, concealment, and camouflage</li>
                 <li>Detection fundamentals</li>
@@ -728,7 +744,7 @@
                 <li>Signature management</li>
                 <li>Operating environments</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How does thorough decontamination support force reconstitution?</h3>
             <blockquote>Thorough decontamination allows for a complete reconstitution of a contaminated force, and units should conduct it outside the range of enemy indirect fire and away from major avenues of approach. (paragraph 1-78)</blockquote>
             <h3>What does planning for decontamination require?</h3>

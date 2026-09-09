@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -714,7 +730,7 @@
             <hr>
             <p>It covers real property maintenance, repair, minor construction, demolition, energy investment, project prioritization, and funding approval levels. It establishes requirements for project justification, technical solutions, cost estimates, economic analysis, and contract modifications.</p>
             <p><strong>Applies to:</strong> Service Level Training Installations (SLTIs) under Marine Corps Training and Education Command (TECOM), per reference (d), are included under the term installations and are supported by their respective Marine Corps Installations Command (MCICOM) Regional Command for all FSRM requirements and coordination.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Facilities Sustainment, Restoration and Modernization</li>
                 <li>Real property inventory</li>
@@ -725,7 +741,7 @@
                 <li>Technical solutions</li>
                 <li>Contract modifications</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What requirements are included in the FSRM program?</h3>
             <blockquote>FSRM requirements include maintenance, repair, minor construction, and demolition of all real property and are funded annually. (paragraph 1)</blockquote>
             <h3>What does real property exclude?</h3>

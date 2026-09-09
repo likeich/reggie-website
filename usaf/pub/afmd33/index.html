@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/saf_ig/publication/afmd33/afmd33.pdf">View AFMD33 on armypubs.army.mil</a></p>
             <hr>
             <p>AFMD33 describes DC3 as a Field Operating Agency activated to provide digital and multimedia forensic services, cyber training, threat analysis, and information sharing. It requires written re-delegations and re-assignments of authority or responsibility.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Digital and multimedia forensics</li>
                 <li>Cyber threat information sharing</li>
@@ -725,7 +741,7 @@
                 <li>Cyber and investigative training</li>
                 <li>DOMEX services</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What mission areas does DC3 support?</h3>
             <blockquote>DC3 is a DoD law enforcement (LE) and counterintelligence (CI) support activity delivering superior digital and multimedia (D/MM) forensic services, cyber technical and specialized training, vulnerability and cyber threat information sharing, technical solutions development, and cyber threat analysis in support of the following DoD mission areas: LE and CI investigations and operations; Cybersecurity (CS); Counterterrorism; Defense Critical Infrastructure Program (DCIP); Document and Media Exploitation (DOMEX); safety inquiries, and the full range of military operations. (paragraph 1)</blockquote>
             <h3>Who is DC3 subordinate to, and what authority does it retain?</h3>

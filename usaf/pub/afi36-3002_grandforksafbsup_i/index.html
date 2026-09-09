@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication addresses casualty definitions, next-of-kin notification, casualty assistance, Emergency Family Member Travel, Pay and Allowances Continuation, and Servicemembers’ Group Life Insurance procedures. It assigns duties to the Casualty Assistance Representative, Installation Command Post, unit commanders, and other personnel, and requires specified training, notifications, and documentation.</p>
             <p><strong>Applies to:</strong> It applies to all personnel assigned to Grand Forks Air Force Base (GFAFB).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Casualty reporting</li>
                 <li>Next-of-kin notification</li>
@@ -727,7 +743,7 @@
                 <li>Servicemembers’ Group Life Insurance</li>
                 <li>Casualty Assistance Representative training</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who coordinates casualty reporting, notification, and assistance actions at Grand Forks Air Force Base?</h3>
             <blockquote>The CAR is the base Office of Primary Responsibility (OPR) for initiating and coordinating all casualty reporting, notification, and assistance actions as outlined in AFI 36-3002. (paragraph 36-30)</blockquote>
             <h3>When should casualty assistance be provided to the next of kin?</h3>

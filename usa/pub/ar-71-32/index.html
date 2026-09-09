@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1005524">View AR 71-32 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=76707">PAM 700-60</a> (armypubs)</li>
                 <li><a href="/usa/pub/pam-71-32/">PAM 71-32</a></li>
@@ -724,7 +740,7 @@
             <hr>
             <p>It describes the Army Organizational Life Cycle Model, force management and integration, and the five phases of force development. It also establishes processes for organizational models, authorization documents, basis of issue plans, total Army analysis, and line item numbers.</p>
             <p><strong>Applies to:</strong> This regulation complies with Army Directive 2012 08 as it applies to all Army components (COMPOs) both operating force (OF) and generating force (GF).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Army Organizational Life Cycle Model</li>
                 <li>Force integration</li>
@@ -735,7 +751,7 @@
                 <li>Authorization documents</li>
                 <li>Line item numbers</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the Army Organizational Life Cycle Model used to understand?</h3>
             <blockquote>The AOLCM can be used to understand how the Army generates, prepares, sustains, and manages the Army to meet its mission requirements. (paragraph 1-6)</blockquote>
             <h3>What does force management establish?</h3>

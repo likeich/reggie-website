@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1004688">View AR 40-501 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/ar-40-502/">AR 40-502</a></li>
                 <li><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1020835">ARMY DIR 2020-09</a> (armypubs)</li>
@@ -728,7 +744,7 @@
             </ul>
             <hr>
             <p>AR 40-501 addresses accession, retention and separation, aviation, specialized training, geographical assignments, and medical examinations. It establishes disqualifying conditions, waiver authorities, review procedures, and standards for specific personnel categories.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Medical fitness standards for enlistment and induction</li>
                 <li>Medical fitness standards for retention and separation</li>
@@ -739,7 +755,7 @@
                 <li>Geographical area assignments</li>
                 <li>Medical waivers and review authorities</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Can a medical examiner waive an Army medical fitness standard?</h3>
             <blockquote>Medical fitness standards for accession, retention, or special training cannot be waived by medical examiners or by the examinee. (paragraph 1-6)</blockquote>
             <h3>Who is the waiver authority for Army accession medical standards?</h3>

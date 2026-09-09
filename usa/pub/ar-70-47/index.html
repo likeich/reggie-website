@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1027553">View AR 70-47 on armypubs.army.mil</a></p>
             <hr>
             <p>AR 70-47 addresses transportability requirements in the materiel acquisition process, including design, coordination, testing, and approval actions. It requires applicable materiel to meet transportation, highway, payload, lifting, tiedown, slinging, and airdrop criteria.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Transportability requirements</li>
                 <li>Transportability problem items</li>
@@ -729,7 +745,7 @@
                 <li>Slinging and tiedown criteria</li>
                 <li>Airdrop criteria</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What makes materiel a transportability problem item?</h3>
             <blockquote>TPIs are materiel in its shipping configuration which, because of its size, weight, fragile, or hazardous characteristics or lack of adequate means for lifting and tiedown, will be denied movement, will require special permits or waivers and special equipment or handling, or will be unacceptably delayed when moving within existing or newly designed transportation systems. (paragraph 1-1)</blockquote>
             <h3>What must transportable materiel meet for public highways?</h3>

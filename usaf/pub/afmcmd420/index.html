@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It defines AFRL’s role in developing and integrating warfighting technologies, managing Science and Technology activities, and supporting the Air Force and Space Force. It also sets duties for the AFRL Commander, including talent management, technology transition, technical information protection, and medical training activities.</p>
             <p><strong>Applies to:</strong> This mission directive applies to AFMC Regular Air Force, AFMC civilian employees, United States Space Force and those with a contractual obligation to abide by the terms of its issuance.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Warfighting technology development</li>
                 <li>Science and Technology investment strategy</li>
@@ -726,7 +742,7 @@
                 <li>Critical technical information</li>
                 <li>Aerospace and Operational Medicine training</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does AFRL lead and develop?</h3>
             <blockquote>AFRL leads the discovery, development and integration of warfighting technologies for the DAF’s air, space and cyberspace forces; executes the DAF Science and Technology (S&amp;T) budget and orchestrates the investment strategy for DAF S&amp;T activities; and manages external funds received from other government and industry customers. (paragraph 1)</blockquote>
             <h3>What is AFRL’s relationship to Air Force Materiel Command?</h3>

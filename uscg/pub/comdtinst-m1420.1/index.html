@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <p><a href="https://media.defense.gov/2025/Feb/03/2003636603/-1/-1/0/CIM_1420_1.PDF">View COMDTINST M1420.1 on armypubs.army.mil</a></p>
             <hr>
             <p>It addresses eligibility, specialty requirements, appointment boards, selection, frocking, and appointment procedures. It requires applicants and Coast Guard commands to comply with specified standards and procedures.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Warrant officer eligibility</li>
                 <li>Specialty requirements</li>
@@ -726,7 +742,7 @@
                 <li>Frocking</li>
                 <li>Appointment procedures</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How many specialties can an applicant compete for in one promotion year?</h3>
             <blockquote>Applicants must not compete for more than one specialty during each promotion year. (paragraph 2)</blockquote>
             <h3>What pay grades are eligible to apply for warrant officer appointment?</h3>

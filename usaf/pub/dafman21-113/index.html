@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -711,7 +727,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/af_a4/publication/dafman21-113/dafman21-113.pdf">View DAFMAN21-113 on armypubs.army.mil</a></p>
             <hr>
             <p>DAFMAN21-113 covers calibration and support concepts, TMDE limitations, cybersecurity discipline, acquisition requirements, and aircraft maintenance policy. It establishes roles across the metrology and calibration program and includes requirements for sustainment of organic capability, TMDE availability, and Product Quality Deficiency Reports.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Calibration and support concepts</li>
                 <li>TMDE limitations</li>
@@ -720,7 +736,7 @@
                 <li>Aircraft maintenance policy</li>
                 <li>Metrology and calibration program management</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How are waiver authorities identified in DAFMAN21-113?</h3>
             <blockquote>The authorities to waive wing/unit level requirements in this publication are identified with a tier (“T-0, T-1, T-2, T-3”) number following the compliance statement.</blockquote>
             <h3>How must records created under DAFMAN21-113 be handled?</h3>

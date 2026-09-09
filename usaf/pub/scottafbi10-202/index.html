@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It requires organizations to establish notification responsibilities and maintain current duty-roster information. It also defines the form’s use for contacting authorized personnel during non-duty hours and requires significant events affecting wing or base operations to be reported to the Scott Command Post.</p>
             <p><strong>Applies to:</strong> This instruction is applicable to all 375th Air Mobility Wing units and tenant units to include the 932d Airlift Wing (AFRES) with a 24-hour operation.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>staff notification responsibilities</li>
                 <li>After Hours Notification Roster</li>
@@ -726,7 +742,7 @@
                 <li>Scott AFB Command Post reporting</li>
                 <li>significant events affecting wing/base operations</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When must a monthly review of Scott AFB Form 30 be conducted?</h3>
             <blockquote>A monthly review (NLT 25th of each month) of Scott AFB Form 30 will be conducted to ensure information is current. (paragraph 2)</blockquote>
             <h3>When must offices update and submit Scott AFB Form 30?</h3>

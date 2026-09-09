@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -707,7 +723,7 @@
             <hr>
             <p>AFI11-200 establishes roles for Air Force offices and commands, defines publication sets for MDS and aircrew-specific activities, and addresses supplements and waivers. It requires lead commands and applicable organizations to coordinate, approve, and develop implementing guidance and procedures.</p>
             <p><strong>Applies to:</strong> It applies to Regular Air Force, Air Force Reserve and Air National Guard commanders, operations supervisors, and aircrews assigned or attached to any flying activity or operation, as well as to all units assigned to, or gained by, major commands (MAJCOM) and Headquarters (HQ) USAF direct reporting units (DRU).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Aircrew training publication structure</li>
                 <li>Aircrew standardization and evaluation</li>
@@ -717,7 +733,7 @@
                 <li>Publication supplements</li>
                 <li>Waiver authority</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What publication set does AFI11-200 require for MDS or aircrew-specific activities?</h3>
             <blockquote>The standard publication set includes, 1) this publication, 2), a three-volume set of lead departmental publications, and 3), a three-volume set for each MDS or aircrew-specific activity. (paragraph 3)</blockquote>
             <h3>When are MAJCOMs not required to create an 11-2 MDS-specific publication set?</h3>

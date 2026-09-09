@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>MCTP 3-30D covers religious needs assessments, supply systems, religious offering funds, and material readiness and accountability. It requires funded programs to be implemented, expenses and effectiveness to be recorded, and program results to be evaluated.</p>
             <p><strong>Applies to:</strong> It applies to any religious ministry team serving with Marines, including operational units at sea or on land, and those providing ministry on installations.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Religious needs assessments</li>
                 <li>Command supply systems</li>
@@ -728,7 +744,7 @@
                 <li>Community relations projects</li>
                 <li>Program funding and evaluation</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How is the religious requirements assessment used?</h3>
             <blockquote>A comprehensive needs analysis or assessment is conducted to identify the religious requirements of assigned personnel and serves as the basis for determining the commander’s priorities for the CRP (see Appendix C). (paragraph 6)</blockquote>
             <h3>What is the S-4 responsible for in the command supply system?</h3>

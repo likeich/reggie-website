@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication addresses MTBP eligibility, qualified means of transportation, commuting costs, funding, and program administration. It requires compliance with eligibility criteria and provides procedures for implementing and managing the program.</p>
             <p><strong>Applies to:</strong> This publication applies to all DAF civilian employees including civilian employees of the United States Space Force (USSF) and to non-appropriated fund (NAF) civilian employees, and to uniformed members of the Regular Air Force, the Air Force Reserve (AFR), the Air National Guard (ANG), and the USSF.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Mass Transportation Benefit Program</li>
                 <li>Participant eligibility</li>
@@ -727,7 +743,7 @@
                 <li>Subsidized parking</li>
                 <li>Program management and oversight</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who can receive mass transportation benefits under DODI1000.27_DAFI36-3901?</h3>
             <blockquote>The Department of Defense shall provide mass transportation benefits (MTBs) to offset commuting costs to its active duty military members and employees, including nonappropriated fund (NAF) employees, to the extent authorized by law and regulation, to reduce pollution and traffic congestion, preserve the environment, and expand transportation alternatives inside the National Capital Region (NCR) and outside the NCR (ONCR). (paragraph 4)</blockquote>
             <h3>Who is eligible to participate in the MTBP?</h3>

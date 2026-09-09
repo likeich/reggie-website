@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -707,7 +723,7 @@
             <hr>
             <p>It covers personnel, industrial, and information security programs, including training, classification, safeguarding, investigations, access, and security incidents. It requires covered personnel and tenant organizations to follow the listed policies and supports continuous evaluation of trustworthiness and reliability.</p>
             <p><strong>Applies to:</strong> This publication outlines the internal security programs for the 70 ISR Wing and applies to all 70 ISRW units, assigned personnel to include civilians, contractors, attached ANG and Reserve units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Personnel security actions</li>
                 <li>Industrial security</li>
@@ -716,7 +732,7 @@
                 <li>Security incidents</li>
                 <li>Security education, training and awareness</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who must follow the information protection policies in 70ISRWI16-1404?</h3>
             <blockquote>All 70 ISRW personnel, to include Active Duty military, Reservists, civilians and contractors, must be familiar with and adhere to the policies listed in this instruction.</blockquote>
             <h3>Do tenant Air Force units have to follow 70ISRWI16-1404?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It assigns crash recovery duties to commanders, maintenance organizations, emergency responders, and supporting agencies. It requires coordinated recovery actions, safety practices, exercises, risk management, and completion of incident checklists.</p>
             <p><strong>Applies to:</strong> This MAFBI is applicable to all organizations that may be tasked to support aircraft recovery operations.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Crash recovery operations</li>
                 <li>Incident command</li>
@@ -727,7 +743,7 @@
                 <li>Runway reopening</li>
                 <li>Mishap evidence preservation</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How much can the aircraft and crash site be disturbed during recovery?</h3>
             <blockquote>The aircraft and crash site will be disturbed only to the extent required to eliminate any potentially dangerous situation to the aircraft, support equipment, or personnel, and will remain in an undisturbed state until the aircraft is released to maintenance by the Incident Commander (IC). (paragraph 2)</blockquote>
             <h3>How are aircraft recovery actions coordinated?</h3>

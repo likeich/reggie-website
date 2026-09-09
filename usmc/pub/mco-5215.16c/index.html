@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -709,7 +725,7 @@
             <hr>
             <p>It addresses acquisition, sustainment, rescission, transfer, security assistance support, and exchange of technical manuals. It also sets requirements for supplements, waiver requests, records, and publication changes.</p>
             <p><strong>Applies to:</strong> This publication applies to all civilian employees and uniformed members of the Regular Air Force, United States Space Force, Air Force Reserve, and Air National Guard, except where noted otherwise, as well as other military departments (MILDEPs) and organizations based on binding agreement or obligation with the DAF.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Joint-use technical manual acquisition</li>
                 <li>Technical manual sustainment</li>
@@ -718,7 +734,7 @@
                 <li>Security assistance programs</li>
                 <li>Single-use technical manual exchange</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How are recommended changes or comments submitted for MCO 5215.16C?</h3>
             <blockquote>Refer recommended changes (RCs) or comments to this publication to the office of primary responsibility (OPR) using Department of the Air Force (DAF) Form 847, Recommendation for Change of Publication, with an information copy to Headquarters (HQ) AFMC/A4UE, Building 262, Room N146, 4375 Chidlaw Road, Wright-Patterson Air Force Base (AFB) OH 45433-5006, afmc.a4UE@us.af.mil.</blockquote>
             <h3>How must records generated under MCO 5215.16C be handled?</h3>

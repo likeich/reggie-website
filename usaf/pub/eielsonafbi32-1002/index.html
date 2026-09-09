@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>It provides guidelines and procedures for snow and ice control and incorporates AFI 32-1002 and the AFCEC Snow and Ice Control Handbook. It establishes waiver requirements, snow removal priorities, operator readiness, materials and parts, equipment preparation, and records management requirements.</p>
             <p><strong>Applies to:</strong> This publication applies to all Air Force, Air Force Reserve Command (AFRC), and Air National Guard (ANG) units and personnel.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Snow and ice control</li>
                 <li>Snow removal priorities</li>
@@ -722,7 +738,7 @@
                 <li>S&amp;ICC committee members</li>
                 <li>Waiver authority requirements</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How are waiver authorities identified in EIELSONAFBI32-1002?</h3>
             <blockquote>The authorities to waive wing/unit level requirement in this publication are identified with a Tier (“T-0, T-1, T-2, and T-3”) number following the compliance statement. (paragraph 1-6)</blockquote>
             <h3>How should waiver requests for EIELSONAFBI32-1002 be submitted?</h3>

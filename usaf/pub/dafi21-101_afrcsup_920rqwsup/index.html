@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/920rqw/publication/dafi21-101_afrcsup_920rqwsup/dafi21-101_afrcsup_920rqwsup.pdf">View DAFI21-101_AFRCSUP_920RQWSUP on armypubs.army.mil</a></p>
             <hr>
             <p>The publication covers wing maintenance operations, material management, crash recovery, foreign object damage prevention, transient alert, weather procedures, and maintenance documentation. It requires completed maintenance actions to be documented in aircraft forms and MIS by the end of the shift and establishes waiver and records-management requirements.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Aircraft and equipment maintenance management</li>
                 <li>Crash Damaged, Disabled, and Recovery program</li>
@@ -726,7 +742,7 @@
                 <li>Transient Alert</li>
                 <li>Adverse weather procedures</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How often does the Wing/CC determine Wing Standup meetings?</h3>
             <blockquote>Wing/CC will determine Wing Standup meeting frequency.</blockquote>
             <h3>When must completed maintenance actions be documented?</h3>

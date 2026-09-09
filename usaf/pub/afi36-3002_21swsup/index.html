@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication establishes requirements for maintaining notification-officer lists and providing a standby roster to the Colorado Springs Regional Command Post. It addresses casualty coordination involving commanders, security forces, medical personnel, chaplains, mortuary affairs, transportation, public affairs, disaster preparedness, and Air Force Reserve personnel.</p>
             <p><strong>Applies to:</strong> It applies to all activities supported by the Casualty Assistance Office (FSHT), 21st Force Support Squadron, to include geographically separated units (GSU) and tenant units receiving host support at Peterson AFB.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Casualty notification procedures</li>
                 <li>Notification officer standby rosters</li>
@@ -726,7 +742,7 @@
                 <li>Medical attendants for casualty notifications</li>
                 <li>Emergency Family Member Travel Program</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must the Colorado Springs Regional Command Post do when an active duty casualty is assigned to Peterson AFB?</h3>
             <blockquote>Will immediately notify the CAR or the individual on standby of any active duty casualty assigned to Peterson AFB.</blockquote>
             <h3>What must unit commanders do before making a casualty notification?</h3>

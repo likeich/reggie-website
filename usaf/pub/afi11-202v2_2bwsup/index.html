@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>It amends grading, trend tracking, Stan Eval organization, SELO duties, temporary AF Form 8 processing, FEF procedures, and supplementary evaluations. The publication requires trend monitoring, electronic information-file management, no-notice evaluations, and deployment coordination.</p>
             <p><strong>Applies to:</strong> It applies to all 2d Bomb Wing (2 BW) assigned/attached aircrew performing flying duties on 2 BW assigned aircraft.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Aircrew standardization and evaluation</li>
                 <li>Trend monitoring criteria</li>
@@ -721,7 +737,7 @@
                 <li>Flight Crew Information File management</li>
                 <li>Deployed Chief of OGV duties</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How are waivers to AFI11-202V2_2BWSUP requested?</h3>
             <blockquote>Waivers to this supplement will be requested through the applicable Operations Group Standardization and Evaluation (OG/OGV) section for OG/CC approval, and considered Tier-3 unless otherwise specified in this instruction.</blockquote>
             <h3>What annual no-notice evaluation goal applies to CMR and BMC crewmembers?</h3>

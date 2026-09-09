@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>MINOTAFBI31-116 establishes standardized procedures for the safe and efficient movement of vehicles, materials, and personnel. It addresses traffic enforcement, driver requirements, vehicle operations, parking, and protected information.</p>
             <p><strong>Applies to:</strong> The provisions of this instruction apply to all personnel assigned, attached or associated with Minot AFB, to include tenant units and all other individuals, whether military or civilian operating a vehicle on base or any of its property, including Minot AFB government leased housing area.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Traffic supervision</li>
                 <li>Parking restrictions</li>
@@ -728,7 +744,7 @@
                 <li>Emergency vehicle operations</li>
                 <li>Traffic control devices</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who does MINOTAFBI31-116 apply to?</h3>
             <blockquote>The provisions of this instruction apply to all personnel assigned, attached or associated with Minot AFB, to include tenant units and all other individuals, whether military or civilian operating a vehicle on base or any of its property, including Minot AFB government leased housing area.</blockquote>
             <h3>What procedures does MINOTAFBI31-116 establish for traffic supervision?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication addresses Group 1 and Group 2 UAS expenditures, AFMC test mishap reporting exemptions, and exemption applicability determinations. It requires initial mishap actions, written exemption determinations, and continued safety engagement for exempt test mishaps.</p>
             <p><strong>Applies to:</strong> This guidance applies to all AFMC organizations.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Group 1 and Group 2 UAS mishaps</li>
                 <li>AFMC test mishap reporting exemptions</li>
@@ -726,7 +742,7 @@
                 <li>Authorized testing damage</li>
                 <li>Subsequent safety engagement</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must an installation do before a test mishap reporting exemption is determined?</h3>
             <blockquote>The installation will accomplish all actions specified by the DAFI 91-204, discipline specific DAFMANs, and associated supplements regardless of the potential for reporting exemption for the mishap until the applicable Convening Authority has been determined, they have investigated in accordance with the procedures below, and they have determined the exemption applies.</blockquote>
             <h3>How should a unit handle uncertainty about the dollar amount when requesting a test mishap exemption?</h3>

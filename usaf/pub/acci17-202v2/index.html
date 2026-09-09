@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers Stan/Eval functions and organization, examiner selection and currency, crew evaluations, grading, requisites, and qualification evaluations. It requires compliance with the publication and addresses waiver authorities, protected information, and records disposition.</p>
             <p><strong>Applies to:</strong> This publication applies to all Air Combat Command (ACC), AF Reserve (AFR), Air National Guard (ANG), and third-party governmental and contract support agencies serving as crewmembers in accordance with (IAW) appropriate provisions contained in memoranda, support agreements, and AF contracts.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Stan/Eval functions and organization</li>
                 <li>Crew Stan/Eval examiners</li>
@@ -727,7 +743,7 @@
                 <li>Evaluation standardization assessment program</li>
                 <li>Waiver authorities</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How long should a CIF item be?</h3>
             <blockquote>The CIF item should be limited to one or two pages in length. (paragraph 3)</blockquote>
             <h3>Where should additional supporting background documentation for a CIF item go?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers commander and flight chief duties, inventory procedures, TCMax® and alternate accountability records, and aircrew equipment control. It requires positive equipment accountability, cyber safeguards, removable-media scanning, incident reporting, and documented training.</p>
             <p><strong>Applies to:</strong> All tools/equipment/electronic devices that are dispatchable to the airfield/maintenance facilities that are used for aircraft maintenance will follow this instruction.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Flightline tool control</li>
                 <li>Tool and equipment accountability</li>
@@ -727,7 +743,7 @@
                 <li>Removable media scanning</li>
                 <li>Cyber discipline training</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must a flightline tool control program include?</h3>
             <blockquote>Program must include an inventory process for items leaving/returning from jobs out on the airfield/maintenance facilities (e.g., 19MXG Form 232 or TCMax®). (paragraph 2)</blockquote>
             <h3>What should units use when TCMax® is unavailable?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers trainer appointments, runway incursion prevention, color vision testing, escort procedures, vehicle operator requirements, and airfield familiarization. It requires training, testing, certification, practical check rides, vehicle authorization, and airfield program quality checks.</p>
             <p><strong>Applies to:</strong> The requirements set forth in this supplement applies to agencies and personnel assigned, attached, or on temporary duty to AAAF, including all Ministry Of Defense (MOD) and DoD military (to include active duty and reserve components), civil service, contractor, and vendor personnel.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Unit trainer appointments</li>
                 <li>Runway incursion prevention</li>
@@ -728,7 +744,7 @@
                 <li>AF Form 483 authorization</li>
                 <li>Airfield program quality checks</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who does DAFI13-213_SLD45SUP apply to at AAAF?</h3>
             <blockquote>The requirements set forth in this supplement applies to agencies and personnel assigned, attached, or on temporary duty to AAAF, including all Ministry Of Defense (MOD) and DoD military (to include active duty and reserve components), civil service, contractor, and vendor personnel.</blockquote>
             <h3>What must trainees demonstrate before entering or exiting the CMA?</h3>

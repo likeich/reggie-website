@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/arnoldafb/publication/aedci21-111/aedci21-111.pdf">View AEDCI21-111 on armypubs.army.mil</a></p>
             <hr>
             <p>AEDCI21-111 covers FOD prevention responsibilities, FO Critical Areas, reporting, audits, training, and program oversight. It requires defined personnel and organizations to conduct prevention activities, maintain information, and report FOD and DOD investigation results.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Foreign Object Damage prevention</li>
                 <li>FO Critical Areas</li>
@@ -725,7 +741,7 @@
                 <li>FOD prevention audits</li>
                 <li>FOD awareness practices</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who is responsible for preventing FOD?</h3>
             <blockquote>Prevention of FOD is the responsibility of everyone; therefore, this instruction applies to all Government, contractor, and test customer personnel working in, around, or traveling through Foreign Object (FO) Critical Areas and FO Awareness Areas at all locations of the Arnold Engineering Development Complex including the Geographically Separated Units (GSUs).</blockquote>
             <h3>What must the AEDC Commander do for the FOD Prevention Program?</h3>

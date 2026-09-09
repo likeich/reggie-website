@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It describes DEL 4's missile warning, nuclear detonation detection, space warfighting, and support missions. It requires records maintenance and routing waiver requests through the chain of command.</p>
             <p><strong>Applies to:</strong> This Mission Directive applies to DEL 4 and subordinate USSF units and personnel, and the Air National Guard.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Missile warning</li>
                 <li>Nuclear detonation detection</li>
@@ -727,7 +743,7 @@
                 <li>Space Domain Awareness</li>
                 <li>Missile defense</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What mission does DEL 4 perform for missile warning and nuclear detonation detection?</h3>
             <blockquote>DEL 4 provides ready forces for reliable, unambiguous, timely, continuous, and accurate Missile Warning (MW) and Nuclear Detonation (NUDET) Detection sensor information as part of the Integrated Tactical Warning and Attack Assessment (ITW/AA) system to the USSPACECOM Missile Warning Centers and the North American Aerospace Defense Command (NORAD) command center, who in turn provide processed missile warning information and threat assessments to the President of the United States (POTUS), Secretary of Defense (SecDef), Prime Minister of Canada, Canadian Chief of Defense Staff, Combatant Commanders (CCDRs), and other users of ITW/AA data. (paragraph 1)</blockquote>
             <h3>What must all DEL 4 units be able to do?</h3>

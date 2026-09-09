@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -707,7 +723,7 @@
             <hr>
             <p>It covers integrated weather support for Air Force and Army research, development, test, evaluation, and acquisition efforts. It requires support requirements, concepts, methodology, and responsibilities to be determined, documented, and coordinated from concept through system retirement.</p>
             <p><strong>Applies to:</strong> This instruction applies to all AF personnel, including Air Force Reserve and Air National Guard, supporting AF RDT&amp;E.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Terrestrial and space weather support</li>
                 <li>Acquisition weather support</li>
@@ -717,7 +733,7 @@
                 <li>Weapon system life cycle management</li>
                 <li>Program/project/work unit briefs</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must RDT&amp;E Mets do for acquisition programs?</h3>
             <blockquote>RDT&amp;E Mets perform or support research, development, acquisition, and testing of AF weapon systems and capabilities by identifying, documenting, and providing assistance to resolve environmental sensitivity issues to support acquisition programs. (paragraph 1)</blockquote>
             <h3>What weather support must RDT&amp;E Mets provide during RDT&amp;E and RDA?</h3>

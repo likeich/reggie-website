@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers Family Member Relocation Clearance, command sponsorship, travel recommendations, special housing, and coordination with schools and other EFMP services. It requires specific forms, reviews, clearances, roster updates, and protected-record maintenance for applicable processes.</p>
             <p><strong>Applies to:</strong> Thus, this supplement describes the procedures for managing EFMP to support the AF personnel assigned/attached to Joint Base Pearl Harbor Hickam (JBPHH).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Family Member Relocation Clearance</li>
                 <li>Command sponsorship</li>
@@ -726,7 +742,7 @@
                 <li>Special medical and educational needs</li>
                 <li>Family Advocacy Program screening</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When must the Family Member Relocation Clearance process be completed?</h3>
             <blockquote>Ensures the FMRC process is completed BEFORE orders are issued.</blockquote>
             <h3>What documents indicate that the Family Member Relocation Clearance process is complete?</h3>

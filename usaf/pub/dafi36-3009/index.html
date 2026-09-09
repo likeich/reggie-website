@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>DAFI36-3009 addresses family support, personal and work life services, volunteer Key Support Liaisons, and mandatory financial training. It requires unit commanders to establish and support the Commander’s Key Support Program and requires Key Support Liaisons to complete initial training before volunteer duties.</p>
             <p><strong>Applies to:</strong> Unless otherwise stated, this guidance memorandum is applicable to the Regular Air Force, United States Space Force (USSF), Air Force Reserve, and Air National Guard.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Personal financial readiness</li>
                 <li>Commander’s Key Support Program</li>
@@ -726,7 +742,7 @@
                 <li>Personal and work life services</li>
                 <li>Family support resources</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must unit commanders do for mandatory touchpoint training?</h3>
             <blockquote>In accordance with DoDI 1322.34, paragraph 2.9.c, and paragraph 2.6 of this DAFI, unit commanders will ensure assigned unit members complete mandatory touchpoint training when notified of a requirement to complete a specific mandatory touchpoint and within time limits prescribed.</blockquote>
             <h3>What is the purpose of the Commander’s Key Support Program?</h3>

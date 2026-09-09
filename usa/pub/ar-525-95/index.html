@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1021303">View AR 525-95 on armypubs.army.mil</a></p>
             <hr>
             <p>AR 525-95 addresses governance and interoperability, collection and production, information assurance, safeguarding, dissemination, and certification. It requires geospatial information certification for Army materiel systems before fielding unless a waiver or Not Certified status is provided, and requires renewal every 4 years or after certain system changes.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>GEOINT governance</li>
                 <li>GI&amp;S interoperability</li>
@@ -729,7 +745,7 @@
                 <li>Target Coordinate Mensuration certification</li>
                 <li>DoD GEOINT professional certification</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What certification is required before an Army materiel system using geospatial information is fielded?</h3>
             <blockquote>All Army materiel systems that produce, consume, or share geospatial information are required to attain geospatial information certification prior to fielding unless a waiver or status of Not Certified is provided by the Army GIO. (paragraph 2-2)</blockquote>
             <h3>How often must geospatial information certification be renewed?</h3>

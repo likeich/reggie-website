@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>It addresses individually and centrally billed accounts, applications, charges, reconciliation, disputes, billing, training, delinquency, and performance metrics. It requires supporting authorization, timely reconciliation, payment certification, management controls, and retention of payment records.</p>
             <p><strong>Applies to:</strong> The Department of Defense (DoD) policy is that the Government Travel Charge Card (GTCC) will be used by all DoD personnel (military and civilian) to pay for all costs related to official government travel.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Government travel charge cards</li>
                 <li>Mandatory travel expense use</li>
@@ -730,7 +746,7 @@
                 <li>Credit thresholds</li>
                 <li>Payment records</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What official travel expenses must be charged to the individually billed account?</h3>
             <blockquote>Unless otherwise exempted, all official travel related expenses will be charged to the IBA unless the card is not accepted by the merchant. (paragraph 4)</blockquote>
             <h3>What expenses are charged to the Government Travel Charge Card?</h3>

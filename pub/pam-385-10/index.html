@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -711,14 +727,14 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1020470">View PAM 385-10 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/ar-385-10/">AR 385-10</a></li>
             </ul>
             <hr>
             <p>PAM 385-10 covers the Army Safety and Occupational Health Management System, hazard identification, hazardous-operation SOPs, radionuclide security, and contract safety. It requires investigations, inspections, risk controls, written procedures, and safety provisions in certain contracts.</p>
             <p><strong>Applies to:</strong> This chapter applies to all Army hazardous operations, except for administrative tasks, involved in execution of missions and processes.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Army Safety and Occupational Health Management System</li>
                 <li>Hazard identification</li>
@@ -727,7 +743,7 @@
                 <li>Radiation safety</li>
                 <li>Contract safety</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does PAM 385-10 require for hazardous-operation SOPs?</h3>
             <blockquote>An SOP is required when tasks are complex or involve hazardous materials. (paragraph 8-1)</blockquote>
             <h3>What must safety procedures in an SOP protect?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>AFRCMAN36-2004 covers professional conduct, recruiter management, basic eligibility, medical standards, education credentials, family care, drugs, and required forms. It requires specified documentation, physical profiles, waiver processing, retesting limits, and enlistment conditions.</p>
             <p><strong>Applies to:</strong> This instruction is applicable to all of Air Force Reserve Command.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Professional conduct</li>
                 <li>Recruiter management</li>
@@ -728,7 +744,7 @@
                 <li>Drug and alcohol eligibility</li>
                 <li>Enlistment documentation</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What orthodontic documentation is required before military training?</h3>
             <blockquote>Applicants may be scheduled for physical examination and enlistment only if they provide a letter from their orthodontist stating active treatment is complete and all orthodontic appliances (except retainers) will be removed at the applicant's expense before IADT. (paragraph 3)</blockquote>
             <h3>How many ASVAB retests are allowed before a six-month wait?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>AR 210-22 covers approval requests, documentation, access, funding, space, support services, restrictions, insurance, audits, and legal compliance. It requires written senior commander permission, self-sustaining operations, appropriate insurance, and periodic audits for qualifying entities.</p>
             <p><strong>Applies to:</strong> This regulation addresses only NFEs that operate on Army installations with the express consent of the senior commander (SC) or designated authority.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Non-Federal entity approval</li>
                 <li>Home-based businesses</li>
@@ -730,7 +746,7 @@
                 <li>Membership and employment practices</li>
                 <li>Veterans service organizations</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What permission is required for a non-Federal entity to operate on an Army installation?</h3>
             <blockquote>NFEs must request and receive written permission from the SC before operating on Army installations. (paragraph 2-1)</blockquote>
             <h3>How long can approval to operate on an Army installation last?</h3>

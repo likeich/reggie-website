@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=273">View AR 10-47 on armypubs.army.mil</a></p>
             <hr>
             <p>It describes USACCSA divisions, information technology support, command and control communications, network security, and data services. It sets out functions for Army operations, readiness, mobilization, emergency communications, and continuity of operations.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>USACCSA organization</li>
                 <li>Command and staff relationships</li>
@@ -728,7 +744,7 @@
                 <li>Emergency communications</li>
                 <li>Continuity of operations</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What information technology and command and control support does USACCSA provide?</h3>
             <blockquote>Provide information technology (IT) support to the Deputy Chief of Staff, G3/5/7 (DCS, G3/5/7); command and control (C2) communications support to Army Senior Leadership; and C2 information systems support to HQDA and Army activities with Armywide responsibilities. (paragraph 1-4)</blockquote>
             <h3>What divisions make up USACCSA C2 operations?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication establishes AFGSC Commander’s Critical Interest Requirements, reporting matrices, notification processes, and command center responsibilities. It requires timely and accurate reports, proper content and classification, message acknowledgment, and procedures for report upgrades and closures.</p>
             <p><strong>Applies to:</strong> It applies to all AFGSC organizations and personnel, including those in the AFGSC Command Center, CP, and Specialized Command and Control Elements (SC2E).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>AFGSC Commander’s Critical Interest Requirements</li>
                 <li>OPREP-3 reporting procedures</li>
@@ -727,7 +743,7 @@
                 <li>Report classification</li>
                 <li>Synchronous and asynchronous reporting</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When do real-world AFGSC CCIR reports take priority?</h3>
             <blockquote>Real-world AFGSC CCIR reports take priority over exercise events (T-2). (paragraph 33-360)</blockquote>
             <h3>How do AFGSC CCIRs follow OPREP-3 procedures?</h3>

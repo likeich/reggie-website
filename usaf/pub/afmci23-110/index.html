@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>AFMCI23-110 covers first article testing, production part approval, specialized testing, and form, fit, and function testing. It defines pre-solicitation, solicitation, and post-contract-award phases and requires process tracking and monthly status reports.</p>
             <p><strong>Applies to:</strong> This instruction applies to Regular Air Force and United States Space Force units utilizing first article testing, production part approval, specialized inspection and testing, FFF and other testing requirements for post award verification, including foreign military sales.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>First article testing</li>
                 <li>Production part approval</li>
@@ -726,7 +742,7 @@
                 <li>Post-award verification phases</li>
                 <li>Test status reporting</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When can the expedited post-award verification process be used?</h3>
             <blockquote>An expedited 30 calendar day process will be established at each field activity for high priority procurements. (paragraph 1)</blockquote>
             <h3>What must a first article solicitation or purchase document contain?</h3>

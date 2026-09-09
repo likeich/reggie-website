@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication addresses wash crew supervisor training, aircraft washing, corrosion inspections, paint scoring, cleaning supplies, and wash rack safety. It requires approved cleaning supplies, training documentation, safety briefing approval, and post-wash inspections when required.</p>
             <p><strong>Applies to:</strong> This supplement applies to the 23d Maintenance Group.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Aircraft corrosion prevention</li>
                 <li>Local unit markings</li>
@@ -727,7 +743,7 @@
                 <li>Paint scores</li>
                 <li>Wash rack safety briefings</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How often is wash crew supervisor training offered?</h3>
             <blockquote>Wash crew supervisor training will be offered by the Wing Corrosion Program Manager quarterly and may be coordinated or scheduled at any time through the Wing Corrosion Manger to meet demand. (paragraph 3)</blockquote>
             <h3>What documentation proves wash crew supervisor training?</h3>

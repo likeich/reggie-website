@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/saf_mr/publication/afmd10/afmd10.pdf">View AFMD10 on armypubs.army.mil</a></p>
             <hr>
             <p>AFMD10 covers the National Guard Bureau mission, charter, legal basis, relationships, organization, and appointments. It requires specified programs, coordination, assistance, reporting, and governing regulations for the National Guard.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>National Guard Bureau mission</li>
                 <li>National Guard Bureau charter</li>
@@ -726,7 +742,7 @@
                 <li>Army and Air National Guard directors</li>
                 <li>Legal basis of the National Guard Bureau</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the National Guard Bureau mission?</h3>
             <blockquote>The mission of the National Guard Bureau is to— a. Participate with the Army and the Air Force staffs in the formulation, development, and coordination of all programs, policies, concepts, and plans pertaining to or affecting the National Guard, the Army National Guard of the United States, and the Air National Guard of the United States. (paragraph 2–1)</blockquote>
             <h3>What must the National Guard Bureau develop and administer?</h3>

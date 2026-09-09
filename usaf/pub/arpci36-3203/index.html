@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/arpc/publication/arpci36-3203/arpci36-3203.pdf">View ARPCI36-3203 on armypubs.army.mil</a></p>
             <hr>
             <p>It covers creditable and noncreditable service, appointments and enlistments, procedures, disposition, and source documents for verifying service and points. It requires records created through its processes to be maintained and disposed of according to AFMAN 33-363 and AFRIMS Records Disposition Schedule.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Creditable service</li>
                 <li>Noncreditable service</li>
@@ -725,7 +741,7 @@
                 <li>Service history computation</li>
                 <li>Verification source documents</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How many points are required for satisfactory retirement service?</h3>
             <blockquote>After 1 July 1949, all service in an active status in any Federally recognized organization is creditable toward longevity service. However, to be credited with satisfactory service for retirement purposes, the member must earn a minimum of 50 points per retention/retirement (R/R) year, of which 15 may be membership points. (paragraph 2)</blockquote>
             <h3>What active military service counts as creditable service?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/robinsafb/publication/robinsafbi48-101/robinsafbi48-101.pdf">View ROBINSAFBI48-101 on armypubs.army.mil</a></p>
             <hr>
             <p>The publication covers radiation-producing devices, radioactive material permits, exposure mitigation measures, and radiation safety. Compliance is mandatory, and it requires records created by prescribed processes to be maintained and disposed of under specified Air Force records rules.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Ionizing radiation protection</li>
                 <li>Radiation-producing devices</li>
@@ -726,7 +742,7 @@
                 <li>RAM control and security</li>
                 <li>Personnel ionizing radiation dosimetry</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What happens if personnel subject to the UCMJ fail to comply with ROBINSAFBI48-101?</h3>
             <blockquote>Persons subject to the Uniform Code of Military Justice (UCMJ), note that failure to comply with this publication is punishable as a violation of Article 92, of the UMCJ.</blockquote>
             <h3>How must waiver requests for ROBINSAFBI48-101 be submitted?</h3>

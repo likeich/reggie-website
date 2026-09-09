@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -707,7 +723,7 @@
             <hr>
             <p>It addresses nuclear and non-nuclear inspections, remote assessment methodology, Headquarters Inspections, IG Sensing Sessions, and IG continuation training. It requires coordination of supplements, routing of waiver requests, and proper maintenance and disposition of records.</p>
             <p><strong>Applies to:</strong> It applies to all units within AFGSC to include Air Force Reserve Command (AFRC) and Air National Guard (ANG) units in Title 10 status performing duties in direct support of AFGSC assets, units, or missions.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Nuclear inspections</li>
                 <li>Non-nuclear inspections</li>
@@ -717,7 +733,7 @@
                 <li>Nuclear surety inspections</li>
                 <li>IG continuation training</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who may establish Department-wide Inspector General inspection requirements?</h3>
             <blockquote>Only this instruction may establish Department-wide Inspector General (IG) inspection requirements.</blockquote>
             <h3>How are waiver authorities identified in DAFI90-302_AFGSCSUP?</h3>

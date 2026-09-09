@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>DAFI48-116 assigns food protection duties to the Air Force Surgeon General, Defense Center Public Health–Dayton, installation commanders, and public health personnel. It sets requirements for installation food events, approved food sources, sanitation oversight, cottage food operations, and Farmers Markets.</p>
             <p><strong>Applies to:</strong> This publication applies to the entire Department of the Air Force (DAF), including the United States Air Force, the United States Space Force, the Air Force Reserve, and the Air National Guard.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Food protection programs</li>
                 <li>Food safety and sanitation oversight</li>
@@ -727,7 +743,7 @@
                 <li>Farmers Markets</li>
                 <li>Food and bottled water life cycle</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What regulations must installation commanders follow for food protection?</h3>
             <blockquote>Establish and support an effective food protection and quality assurance program and ensure familiarity with and adherence to additional DoD, DAF, Federal, State, local/tribal regulations (e.g., State/local guidelines for child care centers, cottage food production, etc.). (T-0). (paragraph 2)</blockquote>
             <h3>What food and water safety information must be included in deployment briefings?</h3>

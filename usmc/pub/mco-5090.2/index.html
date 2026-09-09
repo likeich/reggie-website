@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <p><a href="https://www.marines.mil/News/Publications/MCPEL/Electronic-Library-Display/Article/1552941/mco-50902/">View MCO 5090.2 on armypubs.army.mil</a></p>
             <hr>
             <p>It addresses environmental training, emergency response planning, hazardous waste, natural resources, public participation, and overseas environmental review. The publication requires planning, documentation, coordination, training, and compliance with applicable environmental requirements.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Environmental training requirements</li>
                 <li>Oil discharge response planning</li>
@@ -727,7 +743,7 @@
                 <li>Natural resource restoration</li>
                 <li>Overseas environmental review</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What environmental training details must installation plans include?</h3>
             <blockquote>Quantified environmental training requirements shall include a list of the number of positions/billets or total populations subject to each of the identified federal, state, local and Marine Corps environmental training requirements referenced in Table 2-1 and applicable volumes of this Order. (paragraph 7)</blockquote>
             <h3>When must facilities prepare and revise facility response plans?</h3>

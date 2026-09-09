@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers malfunction officer qualifications and duties, investigation priorities, disposition of air items, reporting requirements, and Air Forces Joint Airdrop Inspectors. It requires inspection records, timely and accurate reporting, and review of reported malfunction and incident activity.</p>
             <p><strong>Applies to:</strong> for all Department of Defense (DOD) components engaged in premeditated airdrop operations.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Airdrop malfunction reporting</li>
                 <li>Joint airdrop inspections</li>
@@ -727,7 +743,7 @@
                 <li>Aerial delivery review panels</li>
                 <li>Air Forces Joint Airdrop Inspectors</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When is a Joint airdrop inspection performed?</h3>
             <blockquote>The JAI will be performed in preparation for each cargo airdrop by representatives of each of the Services participating in the airdrop mission. (paragraph 2–1)</blockquote>
             <h3>How many times must airdrop loads be inspected before airdrop?</h3>

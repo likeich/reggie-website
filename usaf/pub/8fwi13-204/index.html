@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>8FWI13-204 covers aircraft arresting systems, flight planning, flying areas, VFR and IFR procedures, emergency operations, transient aircraft support, landing zones, and alternate departure and landing surfaces. It also includes procedures for unmanned aircraft systems, Wolf Pack Airspace, airfield operations, and related operational information.</p>
             <p><strong>Applies to:</strong> This instruction applies to all units and personnel (permanently assigned or temporary duty) operating at 8th Fighter Wing (8 FW), Kunsan AB, airspace, airfield and airfield facilities.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Air traffic control procedures</li>
                 <li>Unmanned Aircraft Systems operations</li>
@@ -728,7 +744,7 @@
                 <li>Emergency operations</li>
                 <li>Flight planning procedures</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who is responsible for implementing the procedures in 8FWI13-204?</h3>
             <blockquote>Commanders and supervisors are responsible for implementing the procedures of this instruction as they pertain to their assigned function. (paragraph 1-2)</blockquote>
             <h3>Can procedures not specifically addressed in 8FWI13-204 be accomplished?</h3>

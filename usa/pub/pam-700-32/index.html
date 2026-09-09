@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,14 +732,14 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1027082">View PAM 700-32 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/ar-700-15/">AR 700-15</a></li>
             </ul>
             <hr>
             <p>It addresses packaging preparation and documentation, life cycle support, control and evaluation, training, asset protection, phytosanitary measures, and reusable containers. It requires military packaging technical data, approved packaging methods, proper marking, and protection throughout distribution and storage.</p>
             <p><strong>Applies to:</strong> Packaging for the Army will conform to this pamphlet regardless of where performed.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Packaging requirements</li>
                 <li>Military packaging technical data</li>
@@ -734,7 +750,7 @@
                 <li>Long-life reusable containers</li>
                 <li>DA Form 7635</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must expendable and recoverable item packaging provide?</h3>
             <blockquote>Expendable and recoverable item packaging will preserve and protect to military level and provide for all distribution and any necessary field handling. (paragraph 2-1)</blockquote>
             <h3>When are reusable containers required for depot-level reparable items?</h3>

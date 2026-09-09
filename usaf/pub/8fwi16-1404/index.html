@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>It addresses program management, information security, personnel security, industrial security, and insider threat matters. It requires background checks for Korean Foreign Nationals and vetting for contractors who require a CAC ID.</p>
             <p><strong>Applies to:</strong> It applies to all assigned, attached, and associated units to the 8 FW, Kunsan Air Base (AB), Republic of Korea.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Information security</li>
                 <li>Personnel security</li>
@@ -721,7 +737,7 @@
                 <li>Classified material storage</li>
                 <li>Contractor CAC identification</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Where is transient classified material stored overnight at Kunsan AB?</h3>
             <blockquote>The 8 FW Command Post is designated as the overnight storage repository for United States (US) and North Atlantic Treaty Organization (NATO) classified material in the possession of transient personnel. (paragraph 1)</blockquote>
             <h3>What background check is required for Korean Foreign Nationals employed by the 8 FW?</h3>

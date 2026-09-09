@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It addresses vehicle accidents and abuse, corrosion prevention, idle limits, priority recalls, and annual vehicle assessment inspections. It requires reporting suspected accidents or abuse, washing and waxing vehicles at specified intervals, and inspecting at least 25 percent of each unit’s fleet each calendar year.</p>
             <p><strong>Applies to:</strong> It applies to all personnel (military, Department of Defense civilians and contractors) assigned to the Space Launch Delta 45 (SLD 45) including tenant units, Cape Canaveral Space Force Station (CCSFS) and Ascension Auxiliary Air Field (AAAF).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Vehicle accident and abuse maintenance</li>
                 <li>Vehicle corrosion control</li>
@@ -726,7 +742,7 @@
                 <li>Vehicle assessment inspections</li>
                 <li>Accident reporting procedures</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How soon must suspected vehicle accidents, abuse, or incidents be reported?</h3>
             <blockquote>All government owned/leased vehicles suspected of a vehicle accident, abuse or incident must be reported to 45 LRS/LGRV within one (1) duty day of the occurrence. (paragraph 3)</blockquote>
             <h3>What must happen before an accident-damaged vehicle is moved?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/usafe-afafrica/publication/dodi5200.48_dafi16-1403_usafe-afafricasup/dodi5200.48_dafi16-1403_usafe-afafricasup.pdf">View DoDI5200.48_DAFI16-1403_USAFE-AFAFRICASUP on armypubs.army.mil</a></p>
             <hr>
             <p>The publication establishes Department of the Air Force requirements supporting the DoD Information Security Program. It addresses sharing CUI with foreign entities, including lawful-purpose, NOFORN, and applicable-law conditions.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Controlled Unclassified Information</li>
                 <li>Foreign-entity CUI sharing</li>
@@ -726,7 +742,7 @@
                 <li>Privacy information</li>
                 <li>NATO information</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When may CUI be shared with a foreign recipient?</h3>
             <blockquote>CUI designated information may be shared with a foreign recipient, without further coordination, provided the recipient has a lawful government purpose to receive the information, the information is not marked as NOFORN or NF, and the information is being disseminated in accordance with applicable laws and policies. (paragraph 1)</blockquote>
             <h3>What controls apply to Controlled Technical Information?</h3>

@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -709,7 +725,7 @@
             <hr>
             <p>It presents the doctrinal foundation and technical information needed for accurate and timely sensor support. It covers target acquisition, sensor sections, geospatial information, field artillery survey and meteorology, acoustic sensors, datums, and map projections.</p>
             <p><strong>Applies to:</strong> This publication applies to Marine air-ground task force artillery commanders, their staffs, and personnel in the 0844/48 military occupational specialty (fire direction control Marine), and field artillery operations chief billets, from battery through regiment, including infantry mortar Marines.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Target acquisition platoons</li>
                 <li>Geospatial information centers</li>
@@ -718,7 +734,7 @@
                 <li>Datums</li>
                 <li>Map projections</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What information does MCRP 3-10E.6 provide for artillery sensor support?</h3>
             <blockquote>Marine Corps Reference Publication (MCRP) 3-10E.6, Tactics, Techniques, and Procedures for Marine Artillery Sensor Operations, sets forth the doctrinal foundation and technical information that Marines need to provide accurate and timely sensor support.</blockquote>
             <h3>Why is sensor support critical to artillery?</h3>

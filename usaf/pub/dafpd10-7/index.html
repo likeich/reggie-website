@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>DAFPD10-7 addresses IO governance, management, planning, execution, and organizational roles for the covered capabilities. It requires IO integration across military strategy, operations, training, communications, systems development, and education, and limits information operations to the appropriate approval authority.</p>
             <p><strong>Applies to:</strong> This publication applies to civilian employees of the Department of the Air Force (DAF) and uniformed members of the United States Space Force, Regular Air Force, the Air Force Reserve, the Air National Guard, and contractor personnel except where noted otherwise.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Information Operations</li>
                 <li>Deception Activities</li>
@@ -726,7 +742,7 @@
                 <li>COMSEC monitoring governance and management</li>
                 <li>Information operations approval authority</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who can conduct COMSEC monitoring missions?</h3>
             <blockquote>COMSEC monitoring will be conducted only by organizations authorized to execute COMSEC monitoring missions. (paragraph 1)</blockquote>
             <h3>Where do IO and its included capabilities reside in an organization?</h3>

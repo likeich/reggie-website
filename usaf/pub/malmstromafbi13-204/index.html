@@ -586,8 +586,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -608,6 +617,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -702,7 +718,7 @@
             <hr>
             <p>It addresses airfield information, helipads, taxiways, runway procedures, weather, lighting, inspections, snow removal, and aircraft movement. The instruction requires compliance and prescribes policy, responsibilities, and procedures for aircraft control and motor vehicle traffic on the airfield.</p>
             <p><strong>Applies to:</strong> It implements policy guidance in AFPD 11- 2, Aircrew Operations, and AFPD 13-2, Air Traffic, Airfield, Airspace, and Range Management, and applies to all personnel conducting flying and airfield operations at Malmstrom.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Helipad operations</li>
                 <li>Runway selection procedures</li>
@@ -713,7 +729,7 @@
                 <li>Snow removal operations</li>
                 <li>Airfield safety inspections</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who is the waiver authority for MALMSTROMAFBI13-204?</h3>
             <blockquote>The 341st Missile Wing Commander (341 MW/CC) is the waiver authority for this instruction.</blockquote>
             <h3>How must records generated under MALMSTROMAFBI13-204 be handled?</h3>

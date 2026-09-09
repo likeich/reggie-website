@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It establishes medical command relationships and assigns duties for commanders, aerospace medicine personnel, and deployed medical personnel. It covers medical care, emergency response, mass casualty planning, evacuation, training, equipment, credentials, and facility use.</p>
             <p><strong>Applies to:</strong> It applies to all 36 Wing personnel and Air Reserve Component personnel on active duty orders deployed to AAFB.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Deployed medical asset integration</li>
                 <li>Base medical services</li>
@@ -727,7 +743,7 @@
                 <li>Medical care facilities</li>
                 <li>Emergency medical events</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who has responsibility for meeting the medical requirements of DoD units on Andersen Air Force Base?</h3>
             <blockquote>By direction of the 36 WG/CC, the 36 MDG/CC assumes the role of DBMS for AAFB with responsibility for meeting the medical requirements of all DoD units on Andersen AFB. (paragraph 1)</blockquote>
             <h3>What does the comprehensive medical plan for Andersen Air Force Base include?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>DAFPAM90-803 covers RM integration, acceptability of risk, the 5-Step RM Process, hazard identification and assessment, and developing controls. It provides definitions, guidelines, procedures, and tools for integrating and executing RM as a risk reduction process.</p>
             <p><strong>Applies to:</strong> This pamphlet applies to individuals at all levels who are uniformed military members or civilian employees of the Regular Air Force, Air Force Reserve, the Air National Guard, the US Space Force (USSF), and those who are contractually obligated to comply with Department of the Air Force (DAF) publications.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Risk management process</li>
                 <li>RM integration</li>
@@ -727,7 +743,7 @@
                 <li>Risk controls and decisions</li>
                 <li>Real-Time Risk Management</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Where are DAFPAM90-803 publications and forms available?</h3>
             <blockquote>Publications and forms are available for downloading or ordering on the ePublishing website at www.e-Publishing.af.mil.</blockquote>
             <h3>Does DAFPAM90-803 have releasability restrictions?</h3>

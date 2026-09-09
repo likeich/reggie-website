@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/usafe-afafrica/publication/usafe-afafricapam31-206/aep190-34_usafepam31-206.pdf">View USAFE-AFAFRICAPAM31-206 on armypubs.army.mil</a></p>
             <hr>
             <p>The publication covers U.S. Forces licensing, vehicle classification, traffic laws, accidents, road guidance, vehicle equipment, POV registration, and motorcycles. It requires compliance with German laws, police directions, and traffic regulations on U.S. Forces property.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>U.S. Forces certificates of license</li>
                 <li>POV registration</li>
@@ -727,7 +743,7 @@
                 <li>Motorcycle licensing</li>
                 <li>Driving on the autobahn</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What happens if a driver leaves the scene of an accident in Germany?</h3>
             <blockquote>Leaving the scene of an accident (hit and run) is a serious criminal offense under both German law and the Uniform Code of Military Justice (UCMJ).</blockquote>
             <h3>How far behind a POV must a warning triangle be placed after an accident?</h3>

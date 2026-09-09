@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>It covers OPSEC fundamentals, the staff OPSEC process, threat and vulnerability analysis, risk assessment, countermeasures, and the military decisionmaking process. It also addresses reviews, assessments, surveys, documentation, and tips for developing an operations security appendix.</p>
             <p><strong>Applies to:</strong> the primary users of this publication are tactical unit commanders, operations security planners, and staffs.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Operations security fundamentals</li>
                 <li>Essential elements of friendly information</li>
@@ -730,7 +746,7 @@
                 <li>Military decisionmaking process</li>
                 <li>Operations security reviews and surveys</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What information does OPSEC protect?</h3>
             <blockquote>Army security programs focus on classified information, but OPSEC focuses on protecting unclassified information, which includes denying essential elements of friendly information to our enemies and adversaries. (paragraph 1-3)</blockquote>
             <h3>What is the overarching goal of OPSEC?</h3>

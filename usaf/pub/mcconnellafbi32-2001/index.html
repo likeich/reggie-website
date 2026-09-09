@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>MCCONNELLAFBI32-2001 addresses inspections, evacuation procedures, emergency vehicle access, fire protection systems, extinguishers, storage, public assemblies, and construction projects. It requires compliance with specified fire safety standards and establishes rules for drills, hazards, equipment, and facility conditions.</p>
             <p><strong>Applies to:</strong> It applies to all military personnel, family members, civilian personnel, concessionaires, and tenant organizations assigned or attached to MAFB.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Fire evacuation drills</li>
                 <li>Emergency vehicle yielding</li>
@@ -728,7 +744,7 @@
                 <li>Public assembly facilities</li>
                 <li>Self-help construction projects</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How often are fire evacuation drills required at munitions storage areas?</h3>
             <blockquote>Fire evacuation drills will be conducted semiannually for munitions storage areas. (paragraph 1)</blockquote>
             <h3>Can fire alarm systems be used for fire evacuation drills?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It defines academic standards, identifies decision authorities, and addresses penalty proportions and severe penalties. It establishes the preponderance-of-credible-evidence standard and procedures for notification, determinations, and documenting penalties.</p>
             <p><strong>Applies to:</strong> This instruction applies to all United States Air Force Academy (USAFA) personnel involved with cadet or cadet candidate graded work.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Academic integrity standards</li>
                 <li>Academic penalty proportions</li>
@@ -728,7 +744,7 @@
                 <li>Course grade of “F”</li>
                 <li>Academic penalty comment cards</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What standard of proof is required for an academic standards violation?</h3>
             <blockquote>The decision authority's determination that an individual violated academic standards must be based on a preponderance of credible evidence, meaning that the weight of that evidence is sufficient to incline a fair and impartial mind to find it more likely than not that a violation occurred. (paragraph 3)</blockquote>
             <h3>Is proof beyond a reasonable doubt required for an academic standards violation?</h3>

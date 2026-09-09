@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The manual addresses overseas recruitment and placement, selection and extension, rotation, and return placement. It requires compliance and establishes conditions for placement assistance, registration, valid position offers, and return assignments.</p>
             <p><strong>Applies to:</strong> This manual applies to all Department of the Air Force personnel, to include United States Space Force (USSF), Appropriated Fund Title 5, and Title 10 civilian employees.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Overseas recruitment and placement</li>
                 <li>Rotation and return placement</li>
@@ -726,7 +742,7 @@
                 <li>Foreign area assignments</li>
                 <li>Return assignment agreements</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What happens if a valid DoD PPP position offer is declined?</h3>
             <blockquote>Declination of a valid offer or failure to comply with DoD, DAF, or PPP requirements shall result in forfeiture of PPP eligibility and may be subject to separation. (paragraph 5)</blockquote>
             <h3>How long must an employee be registered in one U.S. region when initially enrolled in the PPP?</h3>

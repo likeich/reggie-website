@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It establishes policies and procedures for Air Force-owned and GSA-leased vehicles and the wing's Vehicle Abuse/Accident Program. It sets accident reporting, repair, reimbursement, and official-use requirements for government vehicles.</p>
             <p><strong>Applies to:</strong> This publication governs all government purchased, leased, or rented vehicles or vehicular equipment and applies to all personnel operating vehicles or equipment assigned to Hurlburt Field except ANG, AFRC and RED HORSE personnel.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Vehicle accident and abuse</li>
                 <li>GSA-leased vehicle procedures</li>
@@ -726,7 +742,7 @@
                 <li>Vehicle repair reimbursement</li>
                 <li>Report of Survey procedures</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How does HURLBURTFIELDI24-302 define a vehicle accident?</h3>
             <blockquote>A vehicle accident is defined as an unintentional occurrence that causes damage to a vehicle or property while it is operated under authorized parameters. (paragraph 3)</blockquote>
             <h3>When can vehicle operators be held financially liable for property loss?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It addresses contracted aircraft washing, wash rack facility management, scheduling, safety training, inspections, preparation, and Hangar 233 functions. It requires aircraft preparation, qualified and trained personnel, documented checklists and forms, facility cleanup, and coordination for delays and inspections.</p>
             <p><strong>Applies to:</strong> This instruction applies to 19 Maintenance Group, 314th Maintenance Group and 189th Maintenance Group.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Aircraft wash scheduling</li>
                 <li>Wash rack safety training</li>
@@ -726,7 +742,7 @@
                 <li>ISO wash coordination</li>
                 <li>Hangar 233 facility use</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When must an aircraft be prepared and positioned for a scheduled wash?</h3>
             <blockquote>AMUs will tow their own aircraft to and from the wash rack. Aircraft must be prepped and in place by 0700 of the scheduled wash. (paragraph 4)</blockquote>
             <h3>What must initial safety training for wash personnel include?</h3>

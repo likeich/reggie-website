@@ -586,8 +586,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -608,6 +617,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -702,7 +718,7 @@
             <hr>
             <p>It provides supporting guidance for commanders, supervisors, medical personnel, and individuals at every level, and includes guidance charts and thermal stress education. Compliance is mandatory, and the instruction addresses records, supplements, waivers, and Privacy Act information.</p>
             <p><strong>Applies to:</strong> This publication applies to the entire Department of Air Force (DAF), including all civilian employees and uniformed members of the Regular Air Force, the Air Force Reserve, the Air National Guard, and the United States Space Force.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Thermal stress education</li>
                 <li>Environmental monitoring</li>
@@ -711,7 +727,7 @@
                 <li>Thermal stress prevention during training</li>
                 <li>Fighter Index of Thermal Stress Chart</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What records requirements does DAFI48-151 establish?</h3>
             <blockquote>Ensure all records generated as a result of processes prescribed in this publication adhere to Air Force Instruction (AFI) 33-322, Records Management and Information Governance Program.</blockquote>
             <h3>Can requirements in DAFI48-151 be waived?</h3>

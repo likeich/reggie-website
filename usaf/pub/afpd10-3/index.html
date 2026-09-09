@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>AFPD10-3 defines operational utilization, categorizes requirements, and establishes policies for balancing mission demands with strategic depth. It describes concurrent equipment fielding and a six-step cycle covering requirements, resourcing, sourcing, execution, assessment, and forecasting.</p>
             <p><strong>Applies to:</strong> This directive applies to the Total Force, which includes all Air Force military personnel, in the Regular Air Force and in the Air Reserve Components, as well as Air Force civilian personnel.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Air Reserve Component operational utilization</li>
                 <li>Concurrent fielding of equipment</li>
@@ -727,7 +743,7 @@
                 <li>Military Personnel Appropriation days</li>
                 <li>Air Reserve Component readiness</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does Air Reserve Component operational utilization include?</h3>
             <blockquote>Air Reserve Component operational utilization includes any authorized use of the Air Reserve Component allowed by statute, regulation and policy, including operational missions assigned in whole or part to the Air Reserve Component. (paragraph 1)</blockquote>
             <h3>How must Air Reserve Component operational utilization requirements be categorized?</h3>

@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -711,7 +727,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/saf_gc/publication/hafmd1-14/hafmd1-14.pdf">View HAFMD1-14 on armypubs.army.mil</a></p>
             <hr>
             <p>It establishes the roles of SAF/GC and TJAG in providing legal services and describes their authority, coordination, and reporting relationships. It requires compliance with the publication and addresses standard operating procedures, civil litigation, and legal positions.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>General Counsel mission</li>
                 <li>Judge Advocate General mission</li>
@@ -721,7 +737,7 @@
                 <li>Air Force legal positions</li>
                 <li>Standard operating procedures</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who has legal authority to conduct the affairs of the Department of the Air Force?</h3>
             <blockquote>The SECAF is responsible for, and has all legal authority necessary to conduct, the affairs of the Department of the Air Force. (paragraph 2)</blockquote>
             <h3>What is the SAF/GC responsible for within assigned policy and program domains?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication covers clearance for resignation, retirement, removal, termination, transfer, permanent change of station, or death. It requires use of LAFB Form 51, visits to listed sections, and filing the completed form with the Civilian Personnel Section.</p>
             <p><strong>Applies to:</strong> This instruction applies to all Air Force appropriated fund civilian employees on or attached to Laughlin AFB.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Civilian employee clearance</li>
                 <li>Installation separation procedures</li>
@@ -726,7 +742,7 @@
                 <li>Supervisor clearance responsibilities</li>
                 <li>Appropriated fund civilian personnel</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When does the Civilian Personnel Section prepare the clearance form?</h3>
             <blockquote>Upon notice of separation, the Civilian Personnel Section (CPS) prepares the LAFB Form 51 for pick up by the separating employee.</blockquote>
             <h3>When does the separating employee pick up the completed clearance form?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1026265">View AR 614-200 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/army-dir-2018-16/">ARMY DIR 2018-16</a></li>
                 <li><a href="/usa/pub/army-dir-2018-22/">ARMY DIR 2018-22</a></li>
@@ -727,7 +743,7 @@
             <hr>
             <p>AR 614-200 covers enlisted assignments, Service school attendance, optional and soldier-initiated assignments, career development, senior enlisted leaders, and specialized duty positions. It establishes requirements for selection, training, security clearances, time-on-station, and assignment eligibility.</p>
             <p><strong>Applies to:</strong> This regulation prescribes the reporting, selection, assignment, and utilization of Regular Army (RA) and the United States (U.S.) Army Reserve (USAR) enlisted personnel, excluding initial entry training (IET) Soldiers who are governed by AR 612201.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Enlisted assignment system</li>
                 <li>Service school attendance</li>
@@ -738,7 +754,7 @@
                 <li>Special Operations Forces assignments</li>
                 <li>Time-on-station requirements</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must be in place for Soldiers with military Family members?</h3>
             <blockquote>Family care plans to cover military Family members must be in place to ensure that all Soldiers (regardless of grade) can deploy promptly and perform their military duties when not deployed. (paragraph 1-6)</blockquote>
             <h3>What is the minimum time-on-station requirement for Soldiers assigned from or within CONUS?</h3>

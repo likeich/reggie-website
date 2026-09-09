@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers leave applications, donations, timecards, leave accrual, medical emergencies, holidays, case closure, and prescribed forms. It requires mandatory compliance, medical documentation, approval procedures, and timely reporting and recordkeeping.</p>
             <p><strong>Applies to:</strong> This publication establishes processing procedures &amp; guidance regarding the Voluntary Leave Transfer Program, of all civilian personnel employees serviced by the Civilian Personnel Flight.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Leave solicitation and donations</li>
                 <li>Medical emergency eligibility</li>
@@ -727,7 +743,7 @@
                 <li>Holiday pay</li>
                 <li>Prescribed leave forms</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What qualifies as a medical emergency for the Voluntary Leave Transfer Program?</h3>
             <blockquote>A medical emergency is defined as a medical condition of an employee or an immediate family member of such employee that is likely to require an employee’s absence from duty for a prolonged period of time, and will result in a substantial loss of income to the employee because of the unavailability of paid leave for a minimum of 24 work hours; or 30% of the biweekly work hours scheduled for part-time employees. (paragraph 2)</blockquote>
             <h3>What leave must an applicant use before qualifying for transferred leave?</h3>

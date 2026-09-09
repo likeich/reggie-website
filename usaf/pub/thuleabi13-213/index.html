@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/thuleab/publication/thuleabi13-213/thuleabi13-213.pdf">View THULEABI13-213 on armypubs.army.mil</a></p>
             <hr>
             <p>It establishes training, certification, operating procedures, standards, testing, vehicle passes, and quality control for airfield operations. The instruction requires personnel to complete training and testing before receiving an AF Form 483 and restricts entry into the Controlled Movement Area without approval.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Airfield driver training</li>
                 <li>AF Form 483 certification</li>
@@ -727,7 +743,7 @@
                 <li>Radio communications</li>
                 <li>Pedestrian movement</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What training and certification are required before driving on the Thule airfield?</h3>
             <blockquote>Base assigned personnel (i.e. military, DoD civilian or contractor) required to operate a vehicle on the airfield must be licensed or certified either to operate a GOV, GLV or POV and complete the airfield driver’s training course and pass all required tests prior to issuance of an AF Form 483, prior to operating the vehicle on the airfield. (paragraph 1)</blockquote>
             <h3>Who administers the airfield driving tests?</h3>

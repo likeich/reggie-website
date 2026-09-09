@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -707,7 +723,7 @@
             <hr>
             <p>AFMCMAN20-101 covers Source of Supply Assignment, Logistics Reassignment, Inter-Service Supply Support, Support Equipment Recommendation Data, and related inventory control activities. It requires mandatory compliance and requires publication waiver requests to receive approval before implementation.</p>
             <p><strong>Applies to:</strong> This manual applies to all AFMC and United States Space Force (USSF) military, civilian, and contractor personnel responsible for all aspects of IMM Source of Supply Assignment (SOSA) and Change Management responsibilities.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Source of Supply Assignment</li>
                 <li>Logistics Reassignment</li>
@@ -717,7 +733,7 @@
                 <li>Contractor Inventory Control Points</li>
                 <li>IMM assignment</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How must waiver requests under AFMCMAN20-101 be handled?</h3>
             <blockquote>All requests for waivers must be approved by the publication OPR prior to implementation.</blockquote>
             <h3>How should recommended changes and questions about AFMCMAN20-101 be submitted?</h3>

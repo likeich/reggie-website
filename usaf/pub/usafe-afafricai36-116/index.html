@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication establishes performance requirements, annual and continuous evaluations, measurable standards, and performance recognition. It also addresses informal resolution, formal complaints, and limits on appeals involving recognition awards.</p>
             <p><strong>Applies to:</strong> This instruction applies to all USAFE-AFAFRICA Regular Air Force, and USAFE-AFAFRICA civilian employees.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Probationary period appraisals</li>
                 <li>Performance requirements</li>
@@ -726,7 +742,7 @@
                 <li>Performance recognition</li>
                 <li>Appeals and grievances</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How often must employee performance be evaluated?</h3>
             <blockquote>An employee’s performance is evaluated during the probationary period and continuously thereafter. As a minimum, conduct an evaluation once per year on or about 15 May (see details in paragraph 4.4.1). (paragraph 1)</blockquote>
             <h3>What must employees be told about their performance requirements?</h3>

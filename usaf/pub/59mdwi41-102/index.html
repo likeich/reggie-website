@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>59MDWI41-102 covers standing boards, committees, councils, subordinate functions, charters, meetings, and minutes. It requires safety-focused meetings, committee oversight, charter development, communication, and timely completion of minutes.</p>
             <p><strong>Applies to:</strong> The provisions of this Instruction are applicable to all standing boards, committees, councils, and other such bodies established at 59 MDW.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Chartered committees</li>
                 <li>Committee goals</li>
@@ -727,7 +743,7 @@
                 <li>Meeting minutes</li>
                 <li>Subordinate functions</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must committee chairs do at the start of each meeting?</h3>
             <blockquote>Committee chairs will start each meeting with a &quot;patient safety moment&quot; as an enabler in communicating a culture of safety across the enterprise, to reinforce that safety is leader’s top priority, and a core value that cannot be compromised. (paragraph 3)</blockquote>
             <h3>How does the 59 MDW use TeamSTEPPS?</h3>

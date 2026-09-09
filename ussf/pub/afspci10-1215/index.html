@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It assigns responsibilities for headquarters, Air Force, and space wing organizations involved in launch support. It requires support agreements, environmental coordination, and policy for pricing, costing, safety, and commercial space operations.</p>
             <p><strong>Applies to:</strong> It applies to all activities that support the commercial space launch industry at Headquarters Air Force Space Command (HQ AFSPC), 14th Air Force, 30th Space Wing and 45th Space Wing.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>FAA-licensed space launch support</li>
                 <li>Commercial Space Operations Support Agreements</li>
@@ -726,7 +742,7 @@
                 <li>Commercial space pricing and costing</li>
                 <li>Commercial space launch safety</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Does AFSPCI10-1215 cover return-to-flight activities or launch scheduling?</h3>
             <blockquote>Activities, procedures, and requirements pertaining to return to flight or launch scheduling are not addressed in this instruction. (paragraph 2)</blockquote>
             <h3>How extensively must commercial space launch activities be supported?</h3>

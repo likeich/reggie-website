@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <hr>
             <p>The publication covers Coast Guard Clemency Board jurisdiction, confined-member reviews, board administration, decision factors, and processing timelines. It requires petitions within 60 days and establishes review and recommendation procedures.</p>
             <p><strong>Applies to:</strong> It is intended to provide administrative guidance for Coast Guard personnel and is not intended nor does it impose legally binding requirements on any party outside the Coast Guard.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Residual clemency petitions</li>
                 <li>Coast Guard Clemency Board jurisdiction</li>
@@ -727,7 +743,7 @@
                 <li>Clemency decision factors</li>
                 <li>Clemency processing timelines</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is clemency under COMDTINST 5814.1A?</h3>
             <blockquote>Clemency is action taken under the authority of Reference (a) by duly constituted authority to reduce the amount or severity of a Court-Martial sentence when in the best interest of the Coast Guard and the member. (paragraph 5)</blockquote>
             <h3>Is clemency a legal right?</h3>

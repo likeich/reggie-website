@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>AFTTP3-10.26 covers threat estimation, planning factors, fielded equipment, air screening networks, dry filter unit collection and transport, and biological event reporting. It also addresses medical capability, warning and notification, isolation and quarantine preparation, and response to biological agent spills.</p>
             <p><strong>Applies to:</strong> This publication applies to all Air Force active duty, Air National Guard, and Air Force Reserve Command units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Biological threat estimation</li>
                 <li>Air screening biological detection networks</li>
@@ -727,7 +743,7 @@
                 <li>Biological event reporting</li>
                 <li>Biological agent spill response</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How are biological events reported under AFTTP3-10.26?</h3>
             <blockquote>Warning and reporting for biological events will be accomplished In Accordance With Air Force Instruction 10-206, Operational Reporting, and Allied Tactical Publication 45, Reporting Nuclear Detonations, Biological and Chemical Attacks and Predicting and Warning of Associated Hazards and Hazard Areas.</blockquote>
             <h3>When do Air Force Commanders use Operational Reporting-3 reports?</h3>

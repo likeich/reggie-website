@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It addresses airfield administration, airfield information, airfield lighting, navigational aids, hazardous cargo areas, and airfield closures. It requires compliance, records management, and adherence to the publication's authority when directives conflict.</p>
             <p><strong>Applies to:</strong> This instruction applies to all assigned, attached, and hosted aircrew members, Air Force Reserve (AFRC), Air National Guard (ANG), 502d Air Base Wing (502 ABW), and 37th Training Wing (37 TRW) personnel involved in base flying activities.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Airfield administration</li>
                 <li>Airfield information</li>
@@ -727,7 +743,7 @@
                 <li>Drop Zone procedures</li>
                 <li>Runway separation</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Which directive controls when related local regulations conflict with JBSANANTONIOI13-204?</h3>
             <blockquote>When conflicting directives exist between this and other related, locally published regulations (not to include Federal Aviation Administration (FAA) Letters of Agreement), this regulation shall be considered as final authority.</blockquote>
             <h3>What guidance does JBSANANTONIOI13-204 provide for Unmanned Aircraft Systems?</h3>

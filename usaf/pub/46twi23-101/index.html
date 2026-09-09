@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The instruction covers supply support units, requirements processing, repair cycle processing, non-MICAP requirements, inoperative IMDS procedures, and removal of bits and pieces from condemned assets. It requires processing, tracking, documentation, repair-cycle timelines, approvals, tagging, and turn-in actions.</p>
             <p><strong>Applies to:</strong> It applies to all personnel assigned to the 46 TW and to all agencies involved with maintenance on aircraft/equipment maintained by the 46 TW on Eglin AFB, to include TDY locations that utilize IMDS (Test, Measurement, and Diagnostic Equipment (TMDE) will use PMEL Automated Management System (PAMS).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Parts ordering and backordering</li>
                 <li>Supply Control Logs</li>
@@ -728,7 +744,7 @@
                 <li>Economic repair criteria</li>
                 <li>Material tagging and turn-in</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What records must supply support units maintain for parts ordered from 96 LRS?</h3>
             <blockquote>Maintain AF Form 2413, Supply Control Log; AF Form 2005, Issue/Turn-In Request, or a locally developed computer log (i.e., automated log in PAMS), recording all parts ordered from 96 LRS; verify status with the Daily Document Register (D04), Priority Monitor Report (D18), and the Monthly Due-out Validation Listing (M30) or use printouts of requests made via the supply interface in lieu of AF Form 2413 and AF Form 2005. (paragraph 2)</blockquote>
             <h3>How quickly must MICAP, 2LM, and agile logistics reparable assets reach the repair shop?</h3>

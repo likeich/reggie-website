@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>934AWI21-202 covers safety limits, residue turn-in, live-munitions discovery, inspection procedures, and key control. It requires timely turn-in, residue segregation, complete inspection before certification, and secure key storage.</p>
             <p><strong>Applies to:</strong> It applies to all units, users, and individuals that are customers of the 934th Munitions Flight, Minneapolis IAP-ARS.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Munitions residue turn-in</li>
                 <li>Explosive safety limits</li>
@@ -727,7 +743,7 @@
                 <li>High security key control</li>
                 <li>Munitions transportation on base</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How long does a generator have to turn in munitions residue?</h3>
             <blockquote>The generator has 5 working days to turn-in all munitions residue, containers, and packaging material to the Munitions Section after the item has been expended. (paragraph 2)</blockquote>
             <h3>How must munitions residue be separated?</h3>

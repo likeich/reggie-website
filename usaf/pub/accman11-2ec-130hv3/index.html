@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers crew complement, aircraft operating restrictions, flight duty periods, crew rest, navigation systems, equipment and cargo loading, and airfield reviews. It requires mission aircrews to review current airfield information, receive intelligence briefings for OCONUS missions, maintain interconnectivity, and review FCIF materials.</p>
             <p><strong>Applies to:</strong> This manual applies to all Regular Air Force COMPASS CALL units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Crew complement</li>
                 <li>Flight duty periods</li>
@@ -728,7 +744,7 @@
                 <li>Airfield reviews</li>
                 <li>Flight Crew Information File</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What airfield information must aircrews review before missions?</h3>
             <blockquote>Aircrews will consult the web-based airfield database maintained by Air Mobility Command Airfield Sustainability Branch (AMC/A3AS) and comply with the Global Decision Support System 2 (GDSS2)/ASRR for updates to airfield operability, weight bearing capacity, and Terminal Instrument Procedures (TERPS) reviews. (paragraph 3)</blockquote>
             <h3>What intelligence briefing is required before an OCONUS mission?</h3>

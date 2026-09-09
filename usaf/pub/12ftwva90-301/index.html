@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -711,7 +727,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/12ftw/publication/12ftwva90-301/12ftwva90-301.pdf">View 12FTWVA90-301 on armypubs.army.mil</a></p>
             <hr>
             <p>The publication identifies reportable activities and conduct, including violations, injustice, abuse of authority, and deficiencies. It provides complaint contact information and hotline numbers and states that caller identities will be protected.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Fraud, waste, and abuse reporting</li>
                 <li>Gross mismanagement</li>
@@ -720,7 +736,7 @@
                 <li>Misconduct reporting</li>
                 <li>Complaint hotlines</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must Air Force military members report?</h3>
             <blockquote>Air Force military members have a duty to promptly report fraud, waste, and abuse (FWA) or gross mismanagement; violations of law, policy, procedures, or regulations; an injustice; abuse of authority; misconduct; inappropriate conduct; and deficiencies, or like conditions, to the appropriate supervisor or commander, to an IG or other appropriate inspector, or through an established grievance channel.</blockquote>
             <h3>What should civilian employees report?</h3>

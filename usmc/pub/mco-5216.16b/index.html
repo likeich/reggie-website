@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -709,7 +725,7 @@
             <hr>
             <p>MCO 5216.16B identifies its cancellation, requests wide dissemination by commanding officers, and provides an alternative terminology for citing a single reference or enclosure. It states that the Order applies to the Marine Corps Reserve.</p>
             <p><strong>Applies to:</strong> This Order is applicable to the Marine Corps Reserve.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Subject use</li>
                 <li>Reference citations</li>
@@ -717,7 +733,7 @@
                 <li>Written communications</li>
                 <li>Marine Corps Reserve applicability</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What terminology may replace “reference (a)” in written communications?</h3>
             <blockquote>When citing one reference or enclosure in written communications the single term may be consistently cited in the text as &quot;the reference&quot; or &quot;the enclosure&quot; as an optional alternative to the traditional citation of &quot;reference (a)&quot; or &quot;enclosure (1).&quot; (paragraph 3)</blockquote>
             <h3>What terminology may replace “enclosure (1)” in written communications?</h3>

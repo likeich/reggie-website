@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -707,7 +723,7 @@
             <hr>
             <p>DAFI21-101_AMCSUP addresses aircraft grounding, Hangar Queen management, ground instructional trainer aircraft, dropped-object reporting, and flying crew chief feedback. It includes en route capability variances and requires compliance with the guidance memorandum.</p>
             <p><strong>Applies to:</strong> This guidance is applicable to Air Mobility Command.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Aircraft grounding</li>
                 <li>Hangar Queen management</li>
@@ -717,7 +733,7 @@
                 <li>FCC operational risk</li>
                 <li>En route capability variances</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What aircraft are exempt from the Hangar Queen Management Program?</h3>
             <blockquote>All aircraft placed on higher HHQ alert status are exempt from the Hangar Queen Management Program and reporting throughout the duration of alert status/posturing.</blockquote>
             <h3>When is an aircraft released from Hangar Queen status?</h3>

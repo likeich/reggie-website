@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It establishes telework guidance for full-time, regular, and situational arrangements, including continuity planning during emergencies. It assigns requirements to commanders, Unit Telework Officers, supervisors, and teleworkers.</p>
             <p><strong>Applies to:</strong> This publication applies to all personnel assigned to the Air Force Public Affairs Agency; the 1st Combat Camera Squadron, and the 2d and 3d Audiovisual Squadrons.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Telework eligibility</li>
                 <li>Telework agreements</li>
@@ -727,7 +743,7 @@
                 <li>Continuity of Operations Plan integration</li>
                 <li>Remote workspace safety</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who can be eligible for telework under AFPAAI36-101?</h3>
             <blockquote>Unless the nature of the job or poor performance prohibits it, every individual should be eligible for telework, and can request it on a full-time, regular, or situational basis, and should be made telework-ready. (paragraph 2)</blockquote>
             <h3>What agreement is required for telework?</h3>

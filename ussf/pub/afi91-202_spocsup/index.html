@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/spoc/publication/afi91-202_spocsup/afi91-202_spocsup.pdf">View AFI91-202_SPOCSUP on armypubs.army.mil</a></p>
             <hr>
             <p>It includes system descriptions, ESOH hazard discussions, risk levels, testing conclusions, safety anomalies, and points of contact. It specifies SDAR delivery schedules, review and concurrence, approval, format, mission information, spacecraft and launch vehicle descriptions, and debris assessments.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Safety release documentation</li>
                 <li>ESOH hazard assessment</li>
@@ -727,7 +743,7 @@
                 <li>Spacecraft descriptions</li>
                 <li>Launch vehicle debris assessments</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When is the preliminary design review draft SDAR due?</h3>
             <blockquote>Preliminary Design Review (PDR) draft SDAR: 30 days prior to the program or project PDR or equivalent program/project development milestone. (paragraph 1)</blockquote>
             <h3>When is the CDR draft SDAR due?</h3>

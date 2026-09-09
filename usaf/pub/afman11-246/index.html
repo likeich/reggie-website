@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>It establishes delegation, approval, planning, and certification requirements for demonstrations involving AC-130, MC-130, EC-130J, U-28, CV-22, and CAA personnel. It also specifies standard demonstration profiles, required proposal information, and post-event critique submissions.</p>
             <p><strong>Applies to:</strong> This manual applies to civilian employees and uniformed members of the Regular Air Force, Air Force Reserve and Air National Guard, unless explicitly otherwise provided.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Aircraft demonstrations</li>
                 <li>Mission capabilities demonstrations</li>
@@ -721,7 +737,7 @@
                 <li>Aircrew qualifications and certification</li>
                 <li>Aerial demonstration critiques</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who approves all demonstrations?</h3>
             <blockquote>The MAJCOM/A3 or equivalent is the approval authority for all demonstrations. (paragraph 4)</blockquote>
             <h3>What must requesting units provide for a demonstration proposal?</h3>

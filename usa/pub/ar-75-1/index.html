@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,14 +732,14 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1022549">View AR 75-1 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/pam-75-1/">PAM 75-1</a></li>
             </ul>
             <hr>
             <p>AR 75-1 covers DA investigation teams, coordination with criminal and collateral investigations, readiness impacts, and suspension or restriction notices. It requires designated points of contact, support for on-site investigations, and management of malfunction investigation information.</p>
             <p><strong>Applies to:</strong> This regulation applies to standard and nonstandard munitions, including commercial and foreign munitions, approved by the Deputy Chief of Staff, G 3/5/7 (DCS, G 3/5/7) for use by U.S. Forces.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Ammunition and explosives malfunctions</li>
                 <li>DA Investigation Team for Malfunctions</li>
@@ -732,7 +748,7 @@
                 <li>Malfunction investigation information</li>
                 <li>Munitions History Program</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the DAITM authorized to do during a malfunction investigation?</h3>
             <blockquote>The DAITM is authorized to perform comprehensive, first-hand inquiries on-site, directed toward establishing conditions and the chain-of-events leading to the malfunction. (paragraph 2-1)</blockquote>
             <h3>When must commanders determine whether an on-site DAITM investigation is required?</h3>

@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -707,7 +723,7 @@
             <hr>
             <p>It establishes requirements for managing modifications throughout their lifecycle and identifies key roles and responsibilities. It covers AF Form 1067 and Engineering Change Proposals, Configuration Review Board procedures, modification tracking, and closure.</p>
             <p><strong>Applies to:</strong> This AFSOCI applies to the Air National Guard (ANG), Air Education Training Command (AETC) and United States Special Operations Command (USSOCOM) regarding how they interact/integrate with the AFSOC modification proposal process.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Weapon system modification proposals</li>
                 <li>AF Form 1067</li>
@@ -717,7 +733,7 @@
                 <li>Modification lifecycle tracking</li>
                 <li>Modification status reporting and closure</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How long does the AFSOC modification process cover?</h3>
             <blockquote>The AFSOC modification process covers the entire lifecycle of a modification.</blockquote>
             <h3>Who is the waiver authority for AFSOCI63-1131?</h3>

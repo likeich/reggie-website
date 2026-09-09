@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <hr>
             <p>It covers credentialing assistance, maritime portfolios, merchant mariner credentials, qualified assessors, and related Coast Guard training and qualification records. It requires designated personnel and participating members to follow specified program roles, submit credential applications, and meet credentialing assistance conditions.</p>
             <p><strong>Applies to:</strong> All Coast Guard unit commanders, commanding officers, officers-in-charge, deputy or assistant commandants, and chiefs of headquarters staff elements must comply with the provisions of this Instruction.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Military to Mariner Program</li>
                 <li>Voluntary Credentialing Program</li>
@@ -728,7 +744,7 @@
                 <li>Qualified assessors</li>
                 <li>Transportation Worker Identification Credential</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What expenses can Coast Guard credentialing assistance cover?</h3>
             <blockquote>IAW Reference (a), the payment of credentialing, certification, and licensing exam fees, maintenance fees, renewals, and membership dues (when applicable) by the Coast Guard for eligible Service members.</blockquote>
             <h3>Which credentials can credentialing assistance pay for?</h3>

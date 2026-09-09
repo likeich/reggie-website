@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It establishes selection procedures for the Central Base Board and large unit boards, including board procedures, scoring, redaction, and member rank requirements. Compliance and attachments are mandatory, waivers are not authorized, and records must be maintained and disposed of under cited Air Force programs.</p>
             <p><strong>Applies to:</strong> This publication applies to all units assigned to Maxwell-Gunter AFB; it does not apply to Air Force Reserve or Air National Guard units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Senior Airman Below-the-Zone promotion</li>
                 <li>Central Base Board procedures</li>
@@ -727,7 +743,7 @@
                 <li>Promotion quotas</li>
                 <li>Selection results</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What opportunity does the Senior Airman Below-the-Zone program provide?</h3>
             <blockquote>The Senior Airman (SrA) Below-the-Zone (BTZ) Promotion Program is designed to provide exceptionally well-qualified Airmen First Class (A1C) a one-time opportunity to be considered for promotion to SrA six months prior to the fully qualified phase point. (paragraph 1)</blockquote>
             <h3>What procedures does MAXWELLAFBI36-2502 establish for SrA Below-the-Zone selection?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It addresses identifying family members with special needs and the availability of medical and educational services before reassignment. It also prescribes duties for personnel and agencies involved in the EFMP-M process and requires related records to be maintained and disposed of under Air Force requirements.</p>
             <p><strong>Applies to:</strong> This supplement applies to all military and civilian personnel and their dependents who are assigned or attached to the 39th Air Base Wing (ABW) that are entitled to receive medical care in a military treatment facility (MTF) as specified in AFMAN 41-210, TRICARE Operations and Patient Administration Functions.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Exceptional Family Member Program-Medical</li>
                 <li>Family member relocation</li>
@@ -727,7 +743,7 @@
                 <li>Newborn travel and residency</li>
                 <li>Q-coded sponsor rosters</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What documentation is needed for an EFMP reassignment due to unavailable services?</h3>
             <blockquote>The sponsor or adult family member will inquire with the local EFMP office to obtain required medical documentation for an EFMP reassignment request due to lack of required medical and/or educational services at follow on base. (paragraph 2-5)</blockquote>
             <h3>What happens when a sponsor with an EFMP-enrolled dependent is denied travel?</h3>

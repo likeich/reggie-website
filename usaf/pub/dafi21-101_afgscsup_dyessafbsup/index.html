@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication covers aircraft, systems, equipment, support equipment, components, safety practices, work scheduling, aircraft recovery, and maintenance documentation. It requires specified inspections, records, reporting, approval, and waiver processes for 7th Maintenance Group operations.</p>
             <p><strong>Applies to:</strong> It applies to all 7th Maintenance Group (MXG) organizations and personnel that maintain aircraft, aircraft systems, equipment, support equipment and components regardless of Air Force Specialty Code (AFSC).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Aerospace equipment maintenance management</li>
                 <li>Aircraft parking apron safety</li>
@@ -728,7 +744,7 @@
                 <li>Transient Alert support</li>
                 <li>Dedicated crew chief assignments</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What safety equipment must 7th Maintenance Group personnel use on the aircraft parking apron at night?</h3>
             <blockquote>1.13.3. (Added-Dyess) 7th Maintenance Group personnel must utilize beacons, vehicle flashers, and wear a reflective belt or reflective vest within the aircraft parking apron and Control Movement Area from the period of sunset to sunrise (as published by 7 OSS Weather Flight).</blockquote>
             <h3>Who can approve 12-hour shifts at Dyess Air Force Base?</h3>

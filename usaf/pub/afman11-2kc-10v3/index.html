@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The manual covers general information, aircrew roles, crew complement and management, aircraft operating restrictions, and related flight operations. It requires compliance, establishes waiver authorities, and addresses supplemental procedures, reports, and records.</p>
             <p><strong>Applies to:</strong> This manual applies to all civilian employees and uniformed members of the Regular Air Force and Air Force Reserve who operate or maintain KC-10 aircraft.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Aircrew complement and management</li>
                 <li>Aircraft operating restrictions</li>
@@ -726,7 +742,7 @@
                 <li>Passenger seat limitations</li>
                 <li>Air refueling altitude restrictions</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who can approve waivers for wing or unit requirements?</h3>
             <blockquote>The authorities to waive wing/unit level requirements in this manual are identified with a Tier (“T-0, T-1, T-2, T-3”) number following the compliance statement.</blockquote>
             <h3>How are waiver requests submitted?</h3>

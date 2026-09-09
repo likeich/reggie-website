@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It assigns duties for preparing, reviewing, certifying, and correcting T&amp;A reports, leave forms, overtime, and holiday premium pay requests. It requires training, supporting documentation, approval checks, and retention of records associated with T&amp;A reports, leave, and overtime.</p>
             <p><strong>Applies to:</strong> It applies to all units and tenant organizations under Seventh Air Force, Korea, employing KN civilian personnel paid by the 51st Comptroller Squadron (51 CPTS), Civilian Pay Section (FMFC).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Time and Attendance reports</li>
                 <li>Korean National civilian employees</li>
@@ -727,7 +743,7 @@
                 <li>Timekeeper duties</li>
                 <li>T&amp;A record retention</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the T&amp;A report used to certify?</h3>
             <blockquote>The T&amp;A report will be used to certify payroll disbursements to KN employees. (paragraph 1)</blockquote>
             <h3>How soon must training be established for newly assigned timekeepers?</h3>

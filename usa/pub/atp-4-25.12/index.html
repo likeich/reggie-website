@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=104111">View ATP 4-25.12 on armypubs.army.mil</a></p>
             <hr>
             <p>It covers unit water supply, food service sanitation, waste management, pest management, heat and cold injury, toxic industrial materials, noise hazards, and exercise collapse associated with sickle cell trait. It includes requirements for safe water supplies, food-handler hygiene, waste disposal, pest control, and preventive measures for environmental and health threats.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Unit water supply</li>
                 <li>Food service sanitation</li>
@@ -729,7 +745,7 @@
                 <li>Noise hazards</li>
                 <li>Sickle cell trait</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How should Soldiers detailed as food handlers wash before duty and food preparation?</h3>
             <blockquote>Soldiers detailed as food handlers must thoroughly wash their hands and arms prior to beginning duty and again before preparing food. (paragraph 4-34)</blockquote>
             <h3>When must food handlers wash and sanitize after handling food or equipment?</h3>

@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>It consolidates Air Force guidance for airfield markings, aircraft arresting systems, and visual air navigation systems. The manual defines requirements for installation, maintenance, and repair and identifies waiver procedures and responsible authorities.</p>
             <p><strong>Applies to:</strong> This AFMAN applies to individuals at all levels including Regular Air Force, Air Force Reserve (AFR), Air National Guard (ANG) units and personnel.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Airfield marking</li>
                 <li>Aircraft arresting systems</li>
@@ -722,7 +738,7 @@
                 <li>Airfield infrastructure repair</li>
                 <li>Non-standard airfield marking waivers</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What happens if a host nation agreement requires an international standard?</h3>
             <blockquote>If a written agreement exists between a host nation and Department of Defense (DoD) requiring the application of an international standard (or similar), that guidance supersedes this manual as per the agreement.</blockquote>
             <h3>What are Overseas Commands responsible for under AFMAN32-1040?</h3>

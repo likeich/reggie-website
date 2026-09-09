@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers B-2 initial qualification, mission qualification, continuation training, flying training, instructor courses, and senior officer courses. Training completion, evaluation, waiver, and supplemental publication requirements are included.</p>
             <p><strong>Applies to:</strong> This manual applies to military and civilian members assigned to Regular Air Force and Air National Guard (ANG) units. It does not apply Air Force Reserve units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>B-2 initial qualification training</li>
                 <li>B-2 mission qualification training</li>
@@ -727,7 +743,7 @@
                 <li>Senior Officer Course</li>
                 <li>Flying training</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When must the B-2 local training course be completed?</h3>
             <blockquote>Local training course is accomplished prior to start of B2 IQT at the discretion of 13 Bomb Squadron Commander.</blockquote>
             <h3>What happens if B-2 training is not completed within the specified time limit?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication covers electrical system components, deployment packages, site planning, layout, and electrical planning. It augments applicable technical orders, which remain the final authority for detailed installation, operation, maintenance, and removal procedures.</p>
             <p><strong>Applies to:</strong> This publication applies to active duty Air Force, Air National Guard (ANG), and Air Force Reserve Command (AFRC) Civil Engineer personnel.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Contingency electrical systems</li>
                 <li>Deployment packages</li>
@@ -728,7 +744,7 @@
                 <li>Power distribution centers</li>
                 <li>Electrical safety</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What knowledge should electrical and power production technicians have?</h3>
             <blockquote>The electrical and power production technicians using this TTP should have a basic knowledge of electrical components of the contingency systems.</blockquote>
             <h3>Where are detailed installation, operation, maintenance, and removal procedures found?</h3>

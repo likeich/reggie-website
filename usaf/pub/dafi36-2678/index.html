@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -707,7 +723,7 @@
             <hr>
             <p>DAFI36-2678 covers academic record updates, education-level updates, accreditation, acceptable documentation, and education classification codes. It includes procedures for officer and enlisted updates and miscellaneous education record changes.</p>
             <p><strong>Applies to:</strong> This publication applies to Department of the Air Force (DAF) uniformed members of the United States Air Force (USAF), United States Space Force (USSF), the Air Force Reserve (AFR), and the Air National Guard (ANG), except where otherwise noted.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Academic record updates</li>
                 <li>Education level updates</li>
@@ -717,7 +733,7 @@
                 <li>MilPDS education level degree codes</li>
                 <li>Miscellaneous education record updates</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How must records generated under DAFI36-2678 be handled?</h3>
             <blockquote>Ensure all records generated as a result of processes prescribed in this publication adhere to Air Force Instruction (AFI) 33-322, Records Management and Information Governance Program, and are disposed of in accordance with the Air Force Records Disposition Schedule, which is located in the Air Force Records Information Management System.</blockquote>
             <h3>Do USAF references in DAFI36-2678 also apply to the Space Force?</h3>

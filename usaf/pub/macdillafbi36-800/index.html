@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication addresses hazardous work situations, new work situation reviews, biennial reviews, and supervisor documentation. It requires use of AF Form 683 for new situations and daily written records for employees exposed to approved situations.</p>
             <p><strong>Applies to:</strong> This instruction applies to all employees who are exposed to a hazard, physical hardship, or working condition of an unusual nature that has not been practically eliminated by use of protective devices.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Environmental Differential Pay</li>
                 <li>Hazard Pay</li>
@@ -726,7 +742,7 @@
                 <li>Biennial reviews of approved pay situations</li>
                 <li>Daily exposure documentation</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What responsibility do supervisors have for workplace hazards?</h3>
             <blockquote>All supervisors (military and civilian) have a continuing responsibility to initiate positive action to eliminate dangers and risks that contribute to or cause any hazard, physical hardship, or working condition of an unusual nature. (paragraph 2)</blockquote>
             <h3>How are new work situations submitted for Environmental Differential Pay?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>AFPAM65-110 covers general duties, departure preparation, deployed-location procedures, funds security, emergency operations, daily operations, and subsistence of troops. It requires collection and maintaining information protected by the Privacy Act of 1974.</p>
             <p><strong>Applies to:</strong> These guidelines provide deployed disbursing/paying agents, home station disbursing officers, and commanders a brief overview of financial agent operations.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Deployed agent operations</li>
                 <li>Funds security</li>
@@ -725,7 +741,7 @@
                 <li>Foreign currency operations</li>
                 <li>Subsistence of troops</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How is subsistence for troops funded?</h3>
             <blockquote>Subsistence is funded from a Centrally Managed Account (CMA); do not use your AF Form 616, Fund Cite Authorization.</blockquote>
             <h3>When are drinking water and ice charged against AF Form 616?</h3>

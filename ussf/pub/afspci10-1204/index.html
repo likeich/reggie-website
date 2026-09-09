@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It establishes guidance and procedures for satellite operations and disposal and directs the transition of functions and responsibilities to subordinate units. It covers R&amp;D system transition, SYSCAP and OPSCAP assessments, CSAT reviews, launch recommendations, and operational reporting.</p>
             <p><strong>Applies to:</strong> It applies to Headquarters Air Force Space Command (HQ AFSPC) and all subordinate units utilizing dedicated or shared satellite control assets, except for Royal Air Force (RAF) Telemetry and Command Station (TCS), Oakhanger.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Satellite operations and disposal</li>
                 <li>R&amp;D system transition</li>
@@ -726,7 +742,7 @@
                 <li>Satellite Control Authority transfers</li>
                 <li>Launch schedule recommendations</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How often must constellation sustainment teams meet?</h3>
             <blockquote>CSATs will convene at least semi-annually, prior to the CLSRB, and review the Space Launch Manifest and Current Launch Schedule (CLS), examine the health of operational constellations (including possible disposal actions), ensure user requirements are satisfied and forecast launch requirements. (paragraph 7)</blockquote>
             <h3>What do SYSCAP and OPSCAP assessments support?</h3>

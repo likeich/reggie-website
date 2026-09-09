@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <p><a href="https://www.marines.mil/News/Publications/MCPEL/Electronic-Library-Display/Article/1450620/mco-355010/">View MCO 3550.10 on armypubs.army.mil</a></p>
             <hr>
             <p>It addresses range training systems, range control staffing and functions, fire desk operations, emergency procedures, equipment, reporting, and installation range regulations. It establishes standards, processes, personnel roles, certification programs, project submissions, and data requirements for range and training area management.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Range and training area management</li>
                 <li>Range planning and standards</li>
@@ -729,7 +745,7 @@
                 <li>Emergency procedures</li>
                 <li>RFMSS utilization data</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must range safety personnel do before assuming range and training area responsibilities?</h3>
             <blockquote>Safety regulations contained in references (b), (c), and local directives will be strictly enforced. Range safety personnel will be trained in accordance with applicable orders, publications and local directives; and assigned in writing prior to assuming RTA responsibilities. (paragraph 6)</blockquote>
             <h3>When must range control be notified about an aircraft mishap or medical emergency?</h3>

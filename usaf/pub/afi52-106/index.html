@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers candidate appointments, chaplain candidate participation, deferred active duty commitments, and program administration. It assigns duties for reviewing applicants, managing participants, conducting training, and processing appointments.</p>
             <p><strong>Applies to:</strong> This instruction applies to all civilian employees and uniformed members of the Regular Air Force (RegAF), the Air Force Reserve (AFR), and the Air National Guard (ANG).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Religious Professional Deferment Program</li>
                 <li>Chaplain candidate appointments</li>
@@ -726,7 +742,7 @@
                 <li>Inter-service transfers</li>
                 <li>Chaplain candidate training</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What happens to an outstanding active duty service commitment during RPDP participation?</h3>
             <blockquote>RPDP defers any prior outstanding active duty service commitment until the candidate successfully completes the program, voluntarily withdraws from the program, or is removed from the program.</blockquote>
             <h3>What must a candidate do after completing or leaving RPDP?</h3>

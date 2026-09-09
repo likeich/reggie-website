@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>AFI90-1702 addresses operational energy goals, data analysis, acquisition requirements, alternative aviation fuels, supply chains, education, and training. It requires contractor incorporation by reference and maintenance of records created by prescribed processes.</p>
             <p><strong>Applies to:</strong> This publication applies to Regular Air Force, Reserve Component, and Air National Guard members and civilian appropriated and non-appropriated fund employees except where noted otherwise and can be supplemented at a lower level.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Operational energy program</li>
                 <li>Aviation energy use</li>
@@ -727,7 +743,7 @@
                 <li>Operational energy supply chain</li>
                 <li>Operational energy data analysis</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How does AFI90-1702 define operational energy?</h3>
             <blockquote>Operational Energy is defined as the energy required for training, moving, and sustaining military forces and weapons platforms for military operations. (paragraph 90-17)</blockquote>
             <h3>What energy does the Air Force Operational Energy program focus on?</h3>

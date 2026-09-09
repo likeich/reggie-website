@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It provides procedures for developing and managing Crashed, Damaged, or Disabled Aircraft Recovery, Tool Control, Foreign Object Damage prevention, and Dropped Object Prevention programs. It requires tool accountability, control of equipment and personal protective equipment, and compliance with FOD prevention measures.</p>
             <p><strong>Applies to:</strong> This supplement provides procedures governing aerospace equipment maintenance management and applies to all assigned, attached or associated units of Peterson AFB that maintain aircraft, aircraft systems, equipment, support equipment, and components.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Crashed, Damaged, or Disabled Aircraft Recovery</li>
                 <li>Tool accountability</li>
@@ -727,7 +743,7 @@
                 <li>Aircraft impoundment</li>
                 <li>Flightline personal protective equipment</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must personnel do with tools used on the flightline or aircraft?</h3>
             <blockquote>Personnel that use tools/equipment on the flightline, on aircraft, or on Aerospace Ground Equipment (AGE) or maintain support equipment that is used on aircraft or on the flightline are required to use an accountability system IAW chapter 1, chapter 8 and chapter 11 of this instruction.</blockquote>
             <h3>How must tools be secured and accounted for?</h3>

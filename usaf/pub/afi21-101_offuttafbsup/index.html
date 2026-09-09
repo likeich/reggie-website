@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>AFI21-101_OFFUTTAFBSUP adds policies for mobile communication devices, flightline photography, CND sign-offs, cyber security, scheduling, TDY maintenance, COMSEC/CCI accountability, and the Dedicated Crew Chief program. It requires compliance with the publication and establishes approval, reporting, accountability, training, and equipment-status requirements.</p>
             <p><strong>Applies to:</strong> This publication implements DAFI 21-101, and AFI 21-101_ACC Supplement, and applies to the 55th Wing and geographically separated operating locations and TDY locations where 55th Wing RC/TC/WC/-135 aircraft are operating.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Commercial Mobile Devices</li>
                 <li>Flightline photography</li>
@@ -728,7 +744,7 @@
                 <li>Dedicated Crew Chief program</li>
                 <li>Critical support equipment</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When can maintenance personnel use personal and government Commercial Mobile Devices?</h3>
             <blockquote>Maintenance personnel are authorized to use personal and government CMDs for unclassified voice and text communication on the flightline and aboard aircraft; unless, classified information is present, stored on-board, being discussed, in-use, or CMD use is otherwise restricted by technical data or policy.</blockquote>
             <h3>Who can sign off first-time and repeat CNDs?</h3>

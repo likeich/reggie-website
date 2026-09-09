@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>MCO 5710.8 establishes notification and approval processes and planning and execution considerations for these embarkations. It addresses risks to the force, mission, and institution, along with security, medical, safety, materiel, security cooperation, civilian, and berthing matters.</p>
             <p><strong>Applies to:</strong> This Order applies to all embarkations of Marine personnel and materiel aboard foreign flagged vessels.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Foreign vessel embarkation</li>
                 <li>Notification and approval processes</li>
@@ -730,7 +746,7 @@
                 <li>Security cooperation</li>
                 <li>Berthing</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What approval is required before embarking aboard a foreign vessel?</h3>
             <blockquote>Prior to any embarkation aboard a foreign vessel, the requesting Marine Corps organization or unit must seek approval from the first general or flag officer in the operational chain of command to which the Marine forces are assigned, allocated, or attached. (paragraph 3)</blockquote>
             <h3>What notification is required after embarkation approval?</h3>

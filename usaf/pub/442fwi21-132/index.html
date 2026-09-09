@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>442FWI21-132 establishes procedures for fuel systems facilities, aircraft and external tank preparation, controlled access, and severe weather restrictions. It requires training, notifications, configuration checks, fire suppression readiness, and suspension of operations under specified conditions.</p>
             <p><strong>Applies to:</strong> These procedures apply to all personnel assigned to the 442d Command Post, 442d Maintenance Group and 442d Operations Group.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Aircraft fuel systems maintenance</li>
                 <li>External aircraft fuel tank storage</li>
@@ -728,7 +744,7 @@
                 <li>Aircraft maintenance configuration</li>
                 <li>Fire suppression systems</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must happen before open fuel tank or confined space entry maintenance begins?</h3>
             <blockquote>Fire Department (660-687-4507) and Maintenance Operation Center (MOC) (660687-1250) notification prior to beginning open fuels tank/confined space entry maintenance and after completion of maintenance. (paragraph 2)</blockquote>
             <h3>What ammunition must be removed before an aircraft is delivered for fuel systems maintenance?</h3>

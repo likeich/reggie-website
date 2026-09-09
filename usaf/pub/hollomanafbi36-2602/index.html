@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>HOLLOMANAFBI36-2602 defines program roles, detail request requirements, eligible grades, unit credit, and exemption procedures. It also establishes Base Appearance Team composition and responsibilities.</p>
             <p><strong>Applies to:</strong> This publication applies to all units assigned to the 49th Wing.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Base Detail Program management</li>
                 <li>Detail request requirements</li>
@@ -727,7 +743,7 @@
                 <li>Base Appearance Team composition</li>
                 <li>Base Appearance Team duties</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who appoints the Base Detail Program manager?</h3>
             <blockquote>The program manager will be appointed, by memorandum, by the 49th Wing Vice Commander (49 WG/CV) as the tasking authority. (paragraph 1)</blockquote>
             <h3>How quickly must non-required detail requests be sent for approval?</h3>

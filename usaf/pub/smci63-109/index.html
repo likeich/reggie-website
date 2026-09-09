@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>SMCI63-109 implements AFI 65-508 and describes the purpose, structure, roles, processes, and products of the SMC cost centralization process. It addresses OPCON and ADCON, cost estimating activities, personnel actions, resource management, and approval of cost products.</p>
             <p><strong>Applies to:</strong> This instruction applies to military and civilian personnel assigned to SMC and programs under the Air Force Program Executive Office for Space (AFPEO/SP).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>SMC cost centralization</li>
                 <li>Cost analysis operational control</li>
@@ -727,7 +743,7 @@
                 <li>Cost resource management</li>
                 <li>Task Management Tool</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who retains administrative control of cost analysis personnel?</h3>
             <blockquote>The PCCs retain ADCON of their cost analysis personnel in handling routine matters such as time keeping, leave approvals, work schedules, and conducting mid-term and annual appraisal reviews, unit logistics, discipline, training/certification, and other matters not included in the operational missions of the cost estimating staff.</blockquote>
             <h3>Who has operational control of financial management cost analysis assets?</h3>

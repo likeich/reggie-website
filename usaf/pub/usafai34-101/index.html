@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/usafa/publication/usafai34-101/usafai34-101.pdf">View USAFAI34-101 on armypubs.army.mil</a></p>
             <hr>
             <p>USAFAI34-101 covers license delegation, eligibility, renewal and termination, licensee status, responsibilities, and operating procedures. It requires compliance with installation procedures, liability for damage or injury, and specified grocery-bagging performance standards.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Commissary license delegation</li>
                 <li>License eligibility and renewal</li>
@@ -725,7 +741,7 @@
                 <li>Carryout service responsibilities</li>
                 <li>Head Bagger operations</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who can grant a USAFA Commissary bagging license?</h3>
             <blockquote>10 ABW/CC, or designee retains the exclusive right to grant a license that authorizes an individual to contract with Commissary patrons for the bagging of groceries at the USAFA Commissary and the delivery of those groceries to the vehicles of a patron. (paragraph 3)</blockquote>
             <h3>How long is a Commissary license valid, and when must renewal applications be submitted?</h3>

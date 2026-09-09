@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,13 +733,13 @@
             <hr>
             <p>The publication addresses driving privilege suspension or revocation, point assessments for on-base violations, and effective dates for off-installation offenses. It requires mandatory action in specified circumstances and systematic application of installation commander policy.</p>
             <p><strong>Applies to:</strong> The provisions apply to all persons within the limits of Scott AFB to include, but not limited to, military personnel, civilian employees, family members, visitors, and Department of Defense (DoD) contractors.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Motor vehicle use in felony commission</li>
                 <li>Fleeing or attempting to elude convictions</li>
                 <li>Racing on the highway convictions</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When is suspension or revocation of driving privileges discretionary?</h3>
             <blockquote>Suspension for a period of 6 months or less or revocation for a period not to exceed 1 year is discretionary. (paragraph 4)</blockquote>
             <h3>What is the effective date for an off-installation offense suspension or revocation?</h3>

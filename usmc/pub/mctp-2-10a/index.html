@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>It covers intelligence staff responsibilities, collection assets, collection principles, collection management, requirements analysis, intelligence requirements, and ICR development. The publication details doctrine and tactics, techniques, and procedures for conducting intelligence collection.</p>
             <p><strong>Applies to:</strong> MCWP 2-2 is primarily for intelligence personnel who plan and execute intelligence collection activities.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Intelligence staff responsibilities</li>
                 <li>MAGTF intelligence and reconnaissance collection assets</li>
@@ -729,7 +745,7 @@
                 <li>Intelligence requirements</li>
                 <li>ICR development process</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does MCTP 2-10A detail about intelligence collection?</h3>
             <blockquote>Marine Corps Warfighting Publication (MCWP) 2-2, MAGTF Intelligence Collection, builds on the doctrinal foundation established by Marine Corps Doctrinal Publication (MCDP) 2, Intelligence, and Marine Corps Warfighting Publication (MCWP) 2-1, Intelligence Operations, detailing specific doctrine and tactics, techniques, and procedures (TTP) to conduct intelligence collection to support the Marine air-ground task force (MAGTF). (paragraph 3)</blockquote>
             <h3>Who is MCTP 2-10A primarily for?</h3>

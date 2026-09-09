@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1030846">View AR 350-1 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/army-dir-2018-02/">ARMY DIR 2018-02</a></li>
                 <li><a href="/usa/pub/army-dir-2018-07-11/">ARMY DIR 2018-07-11</a></li>
@@ -738,7 +754,7 @@
             </ul>
             <hr>
             <p>AR 350-1 addresses institutional training, civilian development, unit training, training support, modernization, mandatory training, parachuting, and airborne transportability. It establishes requirements for training proficiency, readiness certification, training management, and training support systems.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Institutional training and education</li>
                 <li>Civilian training and development</li>
@@ -748,7 +764,7 @@
                 <li>Permissive parachuting</li>
                 <li>Joint airborne and air transportability training</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What are unit commanders responsible for in Army training?</h3>
             <blockquote>Unit commanders are responsible for the training proficiency of their unit, and when required, for certifying training readiness by unit and echelon. (paragraph 1-9)</blockquote>
             <h3>What training requirements are included in training proficiency and readiness certification?</h3>

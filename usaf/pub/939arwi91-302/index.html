@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/939arw/publication/939arwi91-302/939arwi91-302.pdf">View 939ARWI91-302 on armypubs.army.mil</a></p>
             <hr>
             <p>It covers operator qualifications, annual familiarization, posted operating procedures, mechanical-failure response, and Lock Out / Tag Out procedures. It requires training records for maintenance and non-maintenance personnel and documentation on AF Form 55 or a facsimile.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Main hangar door operation</li>
                 <li>Operator training</li>
@@ -725,7 +741,7 @@
                 <li>Hangar door signage</li>
                 <li>Aircraft hangar training documentation</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What annual training is required for main hangar door operators?</h3>
             <blockquote>Section supervisors will ensure individuals who operate main hangar doors accomplish hands on operator training GO81 code POR 0007 and main hangar door familiarization slideshow GO81code POR 0006 annually. (paragraph 1)</blockquote>
             <h3>What must happen when main hangar door operation is interrupted by mechanical failure?</h3>

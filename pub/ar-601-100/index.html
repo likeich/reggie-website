@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=4355">View AR 601-100 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/army-dir-2019-14/">ARMY DIR 2019-14</a></li>
                 <li><a href="/usa/pub/army-dir-2019-27/">ARMY DIR 2019-27</a></li>
@@ -725,7 +741,7 @@
             </ul>
             <hr>
             <p>It covers citizenship, medical and fitness standards, conscientious objector status, security clearance, age, education, loyalty, character, convictions, and ineligibility. It also addresses Regular Army integration, personnel sources, service obligations, appointment grades, notifications, delays, assignments, and posthumous appointments.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Citizenship requirements</li>
                 <li>Medical and fitness standards</li>
@@ -736,7 +752,7 @@
                 <li>Regular Army integration</li>
                 <li>Posthumous appointments</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What proof of U.S. citizenship is required for a Regular Army appointment?</h3>
             <blockquote>Applicants must prove U.S. citizenship by submitting a notarized birth certificate, certificate of citizenship, certificate of naturalization, an FS 240 (Consular Report of Birth Abroad), an FS 545 (Certification of Birth Abroad of a Citizen of the United States of America), a DS 1350 (Certification of Birth Abroad to U.S. Citizen), a passport, and so on. (paragraph 1-5)</blockquote>
             <h3>What physical profile disqualifies someone from a Regular Army appointment?</h3>

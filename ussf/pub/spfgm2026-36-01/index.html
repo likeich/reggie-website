@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,14 +733,14 @@
             <hr>
             <p>It covers Space Force duty-status equivalencies, assignment processes, processing timelines, and ADSCs for LL.M. AFIT students. Compliance with the memorandum is mandatory, and its directions prevail when inconsistent with specified Air Force, Space Force, or Department of the Air Force publications.</p>
             <p><strong>Applies to:</strong> This guidance is applicable to all uniformed Guardians.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Space Force duty-status equivalencies</li>
                 <li>Guardian assignment timelines</li>
                 <li>INCAP Pay processing timelines</li>
                 <li>ADSCs for LL.M. AFIT students</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What duty-status terms does the Space Force equivalency table replace?</h3>
             <blockquote>When applying a DAF issuance, form or similar document to members of the Space Force who are managed under the new military personnel management system established IAW Subtitle F, replace the existing term with the equivalent Space Force term. (paragraph 1)</blockquote>
             <h3>How often are Guardian Assignment Timeline cycles conducted?</h3>

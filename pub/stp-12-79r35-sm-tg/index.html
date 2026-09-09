@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=81129">View STP 12-79R35-SM-TG on armypubs.army.mil</a></p>
             <hr>
             <p>The publication covers recruiting-zone analysis, planning, school and college penetration, prospecting, sales presentations, eligibility, applicant processing, and AMEDD recruiting. Its excerpts require conversion-rate analysis, documented prospecting and follow-up, complete application packets, and specified performance measures.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Recruiting-zone analysis</li>
                 <li>Conversion data</li>
@@ -729,7 +745,7 @@
                 <li>Applicant processing</li>
                 <li>Recruiter Workstation operations</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What conversion rates and targets does the publication require recruiters to analyze?</h3>
             <blockquote>Compute conversion rates for: (1) Each month of data on hand to determine seasonal factors, i.e., fluctuation in prospecting results apparently stemming from recurring annual or seasonal events, i.e., hunting season, Christmas, HS graduation, crop harvesting, etc. (paragraph 5)</blockquote>
             <h3>What does low conversion from appointments made to appointments conducted indicate?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers A1C eligibility verification, promotion scheduling, quota computation, and Central Base Board and Large Unit Board procedures. The program provides a one-time promotion consideration, with selection opportunities established at 15 percent.</p>
             <p><strong>Applies to:</strong> It applies to all eligible Active Duty Airman First Class (A1C) who are assigned to JBER, but does not apply to Air National Guard (ANG) or Air Force Reserve units and members.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Senior Airman Below-the-Zone promotion</li>
                 <li>A1C eligibility verification</li>
@@ -726,7 +742,7 @@
                 <li>Central Base Board nominations</li>
                 <li>Large Unit Board authority</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who administers the BTZ program?</h3>
             <blockquote>As the Host Wing Commander (CC), the 673 ABW/CC is responsible for administering the BTZ program. (paragraph 2)</blockquote>
             <h3>How are BTZ quotas established?</h3>

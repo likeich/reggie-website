@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -706,7 +722,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/af_a1/publication/afman34-209/afman34-209.pdf">View AFMAN34-209 on armypubs.army.mil</a></p>
             <hr>
             <p>It covers accounting principles, standards, requirements, nonappropriated fund accounting roles, and financial statements. It also updates the Air Force Morale, Welfare, and Recreation Logistics property, asset, and vehicle management program and incorporates guidance from superseded publications.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Accounting principles</li>
                 <li>Accrual accounting</li>
@@ -716,7 +732,7 @@
                 <li>Community Commons</li>
                 <li>MWR Logistics property, asset, and vehicle management</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How must records created under AFMAN34-209 be maintained and disposed of?</h3>
             <blockquote>Ensure all records created as a result of processes prescribed in this publication are maintained in accordance with Air Force Manual (AFMAN) 33-363, Management of Records, and disposed of in accordance with the Air Force Records Disposition Schedule located in the Air Force Records Information Management System (AFRIMS).</blockquote>
             <h3>How are recommended changes and questions about AFMAN34-209 submitted?</h3>

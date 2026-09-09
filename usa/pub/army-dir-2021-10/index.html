@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,14 +732,14 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1022126">View ARMY DIR 2021-10 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/ar-600-63/">AR 600-63</a></li>
             </ul>
             <hr>
             <p>The publication addresses the CRRT’s consolidated Soldier information, risk factors, intervention and prevention strategies, and Army and Department of Defense data sources. It requires training before access, limits access to specified officials, and requires safeguards for personally identifiable information and personal health information.</p>
             <p><strong>Applies to:</strong> The provisions of this directive apply to the Regular Army, Army National Guard/Army National Guard of the United States, and U.S. Army Reserve.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Commanders Risk Reduction Toolkit</li>
                 <li>CRRT access requirements</li>
@@ -733,7 +749,7 @@
                 <li>Army data sources</li>
                 <li>Department of Defense data sources</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the Commanders Risk Reduction Toolkit designed to show command officials?</h3>
             <blockquote>The Army CRRT is a web-based tool that includes 26 authoritative data sources displaying 40 risk factors to present command officials with a consolidated history of each Soldiers personal information and potential risk. (paragraph 3)</blockquote>
             <h3>Who can access aggregate CRRT data?</h3>

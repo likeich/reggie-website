@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>It covers dental care categories, preventive dentistry, readiness classification, operational support, dental organizations, treatment facilities, logistics, and administrative procedures. It describes dental support across competition, crisis, armed conflict, stability operations, and defense support of civil authorities, and addresses training, medical ethics, evacuation, and specialized dental functions.</p>
             <p><strong>Applies to:</strong> The principal audience for ATP 4-02.19 is commanders, staff, surgeons, surgeon sections at echelon, Army Health System (AHS) planners, and Army Medical Department personnel and units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Dental readiness</li>
                 <li>Preventive dentistry</li>
@@ -730,7 +746,7 @@
                 <li>Dental support to reconstitution</li>
                 <li>Forensic dental identification</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What dental examination must Soldiers undergo before deployment?</h3>
             <blockquote>Soldiers must undergo oral examinations to identify any oral health threats. (paragraph 1-29)</blockquote>
             <h3>What must units and Soldiers complete before soldier readiness processing?</h3>

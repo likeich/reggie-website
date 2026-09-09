@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers airfield facilities, lighting, controlled movement areas, local ATC frequencies, navigational aids, aircraft priorities, and lost communication procedures. Compliance is mandatory, and deviations are not authorized except for safety of flight considerations.</p>
             <p><strong>Applies to:</strong> It applies to all personnel conducting or supporting flying operations at EDF to include Reserve and Guard units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>NVD ground operations</li>
                 <li>Local aircraft priorities</li>
@@ -726,7 +742,7 @@
                 <li>Airfield lighting systems</li>
                 <li>Lost communication procedures</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What ground control frequencies does 3WGI13-204 specify?</h3>
             <blockquote>Ground operations will use Ground Control frequencies 275.8 or 121.8.</blockquote>
             <h3>How many aircraft can participate in NVD ground operations?</h3>

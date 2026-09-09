@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -706,7 +722,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/aetc/publication/aetcman90-7001/aetcman_90-7001.pdf">View AETCMAN90-7001 on armypubs.army.mil</a></p>
             <hr>
             <p>It addresses data requirements for IT software, data definitions, metadata, collection, storage, integration, interoperability, quality, sharing, analytics, security, and privacy. It requires compliance with established data standards and governance structures for systems handling student and learning data.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Student and learning data standards</li>
                 <li>IT software data requirements</li>
@@ -717,7 +733,7 @@
                 <li>Data usage, sharing, and analytics</li>
                 <li>Data security and privacy</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Which publication prevails when AETCMAN90-7001 conflicts with higher headquarters directives?</h3>
             <blockquote>To the extent its directions are inconsistent with higher headquarters (e.g., Air Force and Department of Defense) directive publications; the directives in the higher headquarters publication prevails and relief for non-compliance (a waiver) must be granted before deviating from established standard, The authorities to waive requirements in this publication are identified with a Tier (“T-0, T-1, T-2, T-3”) number following the compliance statement.</blockquote>
             <h3>How are waiver requests under AETCMAN90-7001 submitted?</h3>

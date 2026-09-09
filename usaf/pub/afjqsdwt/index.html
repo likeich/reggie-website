@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It establishes GO/NO GO qualification standards, trainer and certifier requirements, training documentation, and additional-duty procedures. It also covers annual recertification and training subjects including range safety, ammunition, weapons, optics, and instruction.</p>
             <p><strong>Applies to:</strong> This AFJQS applies to Security Forces NCOs assigned to perform duties as a Defender Weapons Trainer.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>GO/NO GO task qualification</li>
                 <li>CATM trainer certification</li>
@@ -728,7 +744,7 @@
                 <li>Weapons and ammunition instruction</li>
                 <li>Optics and laser aiming devices</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does GO mean for Defender Weapons Trainer qualification?</h3>
             <blockquote>GO means the individual can perform the task without assistance utilizing appropriate instructions or other procedural guidance. (paragraph 2)</blockquote>
             <h3>Who must teach annual and inservice training under AFJQSDWT?</h3>

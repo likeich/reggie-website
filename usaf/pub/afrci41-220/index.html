@@ -586,8 +586,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -608,6 +617,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -702,7 +718,7 @@
             <hr>
             <p>It covers RMU mission sets, key-position responsibilities, mission-specific position requirements, organizational structures, codes, and authorized duty titles. It outlines exception-to-policy requests for RMU organizational structure or reporting and requires compliance with the publication.</p>
             <p><strong>Applies to:</strong> This instruction applies to all Air Force Reserve (AFR) military members, DAF civilian employees, and those with a contractual obligation to abide by the terms of DAF issuances, except where noted otherwise.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>RMU mission sets</li>
                 <li>RMU composition</li>
@@ -713,7 +729,7 @@
                 <li>Organizational structure codes</li>
                 <li>Authorized duty titles</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the RMU commander responsible for?</h3>
             <blockquote>The RMU/CC has the ultimate responsibility for the training and readiness of their forces.</blockquote>
             <h3>How must waiver requests be submitted?</h3>

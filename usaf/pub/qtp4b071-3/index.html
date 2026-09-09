@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -711,7 +727,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/af_sg/publication/qtp4b071-3/qtp4b071-3.pdf">View QTP4B071-3 on armypubs.army.mil</a></p>
             <hr>
             <p>It covers exposure points, medical effects points, health hazard severity, illness probability, exposure duration, and exposed personnel. It requires determining a RAC using AFI 91-202 and recording applicable data in OEHMIS, DOEHRS, or an equivalent.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Occupational health risk assessment codes</li>
                 <li>Exposure points</li>
@@ -722,7 +738,7 @@
                 <li>Exposed personnel points</li>
                 <li>Health-related hazard RACs</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the purpose of a risk assessment code?</h3>
             <blockquote>Risk Assessment Codes are an expression of the degree of risk associated with an occupational hazard or deficiency that combines hazard severity and mishap probability into a single numeric identifier. (paragraph 1)</blockquote>
             <h3>How are RACs used to prioritize hazard abatement?</h3>

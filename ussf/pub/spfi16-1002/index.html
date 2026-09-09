@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>It addresses threat representation in scenarios, authorized model types, model access, and acceptable use. It requires DIAAE authoritative threat intelligence for threat models used across the USSF MS&amp;A enterprise.</p>
             <p><strong>Applies to:</strong> This publication applies to all civilian employees and uniformed members of the United States Space Force (USSF) and those with a contractual obligation to abide by the terms of Department of the Air Force (DAF) issuances, except where otherwise noted.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Threat representation in scenarios</li>
                 <li>Threat model types</li>
@@ -721,7 +737,7 @@
                 <li>Analytic excursions</li>
                 <li>Space Threat Model &amp; Simulation Committee</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must happen when an analytic excursion changes threat data?</h3>
             <blockquote>When such analytic excursions are conducted and require threat data to deviate from established intelligence analytical record, then the MS&amp;A activity must be clearly identified as excursions and include specific explanations of (1) how the threat data in the MS&amp;A event deviates from the relevant authoritative DIAAE assessments and (2) why that excursion was used. (paragraph 4)</blockquote>
             <h3>What threat model types are authorized?</h3>

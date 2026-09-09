@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers driving privileges, traffic supervision, traffic ticket processing, incident reports, and driving violations that may result in revocation or suspension. It requires collateral or appearances before a United States Magistrate for certain motor vehicle violations and establishes a traffic point system.</p>
             <p><strong>Applies to:</strong> This instruction pertains to all personnel operating a vehicle on the MSP ARS and areas under its jurisdictional control.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Driving privileges</li>
                 <li>Traffic ticket processing</li>
@@ -726,7 +742,7 @@
                 <li>Driving privilege revocations</li>
                 <li>Incident reports</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What happens if a driver refuses chemical testing?</h3>
             <blockquote>Failure to do so will result in a revocation of driving privileges for a minimum of 12 months. (paragraph 2)</blockquote>
             <h3>What types of traffic tickets are issued on MSP ARS?</h3>

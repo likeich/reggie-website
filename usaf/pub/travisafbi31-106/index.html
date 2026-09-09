@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>TRAVISAFBI31-106 establishes access control and sponsorship requirements, guest stay limits, curfew hours and exceptions, and child supervision standards. It also defines prohibited conduct and sets out the Travis Disciplinary Action Program, including hearings and corrective actions.</p>
             <p><strong>Applies to:</strong> The provisions of this instruction apply to all personnel who visit, live or work on TAFB.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Travis Air Force Base sponsorship</li>
                 <li>Base curfew hours and exceptions</li>
@@ -727,7 +743,7 @@
                 <li>Travis Disciplinary Action Program</li>
                 <li>TDAP corrective actions</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the minimum age for leaving a child alone?</h3>
             <blockquote>The minimum age for a child to be left alone is 10, provided child has appropriate level of self-care skills and maturity. (paragraph 3)</blockquote>
             <h3>What qualifies as a lack of child supervision?</h3>

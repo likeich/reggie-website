@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -706,7 +722,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/af_a4/publication/dafpam32-7089/dafpam32-7089.pdf">View DAFPAM32-7089 on armypubs.army.mil</a></p>
             <hr>
             <p>It covers environmental requirements, leak detection, equipment repair and maintenance, refrigerant recovery, disposal, reporting, and phasedowns. It also addresses operations management, replacement, inspection, documentation, and refrigerant properties.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Regulated refrigerants</li>
                 <li>Refrigerant venting prohibition</li>
@@ -717,7 +733,7 @@
                 <li>HFC refrigerant phasedown</li>
                 <li>Refrigerant leak detection</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What agreements apply when covered personnel are tenants of a non-DAF organization?</h3>
             <blockquote>In instances where the identified organizations and personnel are tenants to a non-DAF organization, those personnel will follow the requirements identified in applicable and enforceable agreements in accordance with Air Force Instruction (AFI) 25-201, Intra-Service, Intra-Agency, and InterAgency Support Agreements Procedures.</blockquote>
             <h3>How should recommended changes to DAFPAM32-7089 be submitted?</h3>

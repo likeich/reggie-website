@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication establishes eligibility priorities, registration requirements, storage rules, waiting-list procedures, and fee policies. It requires proof of ownership and current vehicle documentation, and addresses abandoned property, delinquent fees, and refunds.</p>
             <p><strong>Applies to:</strong> It applies to all personnel assigned or attached to Scott AFB to include the 932d Airlift Wing (AFRES) and the 126th Air Refueling Wing (ANG).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Recreational vehicle storage</li>
                 <li>Eligibility priorities</li>
@@ -727,7 +743,7 @@
                 <li>Lot fees</li>
                 <li>Abandoned property</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What documents are required to register a vehicle or recreational item?</h3>
             <blockquote>Owners registering vehicles/items will be required show proof of ownership, current license, registration, and tags. (paragraph 4)</blockquote>
             <h3>What registration and tag requirements apply to recreational vehicles?</h3>

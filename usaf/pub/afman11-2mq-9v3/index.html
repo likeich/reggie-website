@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication contains procedures for ground control stations, communications, takeoff and landing, fuel, ordnance, emergency procedures, and low-altitude operations. It also addresses automatic takeoff and landing, divert planning, weather guidance, currency requirements, laser training mode operations, and frequency deconfliction.</p>
             <p><strong>Applies to:</strong> This publication applies to all civilian employees and uniformed members of the Regular Air Force, Air Force Reserve, and Air National Guard (ANG) conducting MQ-9 operations.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>MQ-9 mission planning and briefing</li>
                 <li>Ground control station operations</li>
@@ -728,7 +744,7 @@
                 <li>Low-altitude operations</li>
                 <li>Automatic takeoff and landing</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Are records created under AFMAN11-2MQ-9V3 subject to records management requirements?</h3>
             <blockquote>Ensure all records generated as a result of processes prescribed in this publication adhere to Air Force Instruction (AFI) 33-322, Records Management and Information Governance Program, and are disposed in accordance with (IAW) the Air Force Records Disposition Schedule, which is located in the Air Force Records Information Management System.</blockquote>
             <h3>How are recommended changes to AFMAN11-2MQ-9V3 submitted?</h3>

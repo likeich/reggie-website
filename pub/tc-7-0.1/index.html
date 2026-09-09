@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>It covers formal and informal AARs, combat applications, planning, preparation, conduct, follow-up, retraining, and lessons learned. It requires AAR results to support performance improvement, SOP updates, and future training and operations.</p>
             <p><strong>Applies to:</strong> This publication applies to all Army leaders and the three components of the Total Army: the Regular Army, the Army National Guard, and the Army Reserve.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>After action review fundamentals</li>
                 <li>Formal and informal after action reviews</li>
@@ -729,7 +745,7 @@
                 <li>Immediate retraining</li>
                 <li>AAR results and lessons learned</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How soon are informal after action reviews typically conducted?</h3>
             <blockquote>Informal AARs require less planning and preparation and are typically done immediately following a training event. (paragraph 1-6)</blockquote>
             <h3>When are formal after action reviews planned?</h3>

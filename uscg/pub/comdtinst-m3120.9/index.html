@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <hr>
             <p>It defines shipboard directions, relative bearings, ship motion, and measurement terminology. It covers safety and operational requirements for launch and recovery, mooring, anchoring, towing, and fueling evolutions, including risk management, communications, equipment checks, personal protective equipment, and qualification requirements.</p>
             <p><strong>Applies to:</strong> The following requirements are generic in nature and applicable to all cutters during launch and recovery operations.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Shipboard direction and position terminology</li>
                 <li>Ship motion and measurements</li>
@@ -729,7 +745,7 @@
                 <li>Personal protective equipment</li>
                 <li>Fueling at sea</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What risk management is required for cutter boat launch and recovery?</h3>
             <blockquote>Cutters shall complete risk management as part of evolution planning per Chapter 3. (paragraph 1)</blockquote>
             <h3>What personal protective equipment is required for cutter boat launch and recovery?</h3>

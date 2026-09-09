@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication covers driving privileges, traffic planning and codes, traffic accidents, driving records, and the traffic point system. It requires standardized procedures for traffic supervision and safe movement of vehicles, materials, and personnel on SAFB.</p>
             <p><strong>Applies to:</strong> The provisions of this instruction apply to all personnel assigned, attached or associated with the 20th Fighter Wing (20 FW), tenant units and all other individuals, whether military or civilian, while upon SAFB or any of its property.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Driving privileges</li>
                 <li>Implied consent testing</li>
@@ -728,7 +744,7 @@
                 <li>Traffic point system</li>
                 <li>DD Form 1408 procedures</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When can a traffic ticket be voided?</h3>
             <blockquote>Once a traffic ticket has been issued, normally only the issuing official may void it. The DFC, or his designees (20 SFS/S-3O), may void for obvious administrative or legal errors when an inappropriate citation has been annotated. (paragraph 33-332)</blockquote>
             <h3>What happens when a vehicle owner knowingly permits an unqualified driver to drive?</h3>

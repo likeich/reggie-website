@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -711,7 +727,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/af_sg/publication/cfetp4t0x2c1/cfetp4t0x2c1.pdf">View CFETP4T0X2C1 on armypubs.army.mil</a></p>
             <hr>
             <p>It identifies AFSC 4T0X2 as Histopathology and records the discontinuance of Trade Skill Certification after DD Form 2586 implementation. The change deletes paragraph 9.4 and states that the publication has no releasability restrictions.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Histopathology</li>
                 <li>AFSC 4T0X2</li>
@@ -719,7 +735,7 @@
                 <li>DD Form 2586</li>
                 <li>Career field education and training</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Why was Trade Skill Certification discontinued?</h3>
             <blockquote>Implementation of the DD Form 2586, Verification of Military Experience and Training, resulted in the discontinuance of the Trade Skill Certification.</blockquote>
             <h3>Are there releasability restrictions on CFETP4T0X2C1?</h3>

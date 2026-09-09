@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,14 +732,14 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1005514">View PAM 71-32 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/ar-71-32/">AR 71-32</a></li>
             </ul>
             <hr>
             <p>PAM 71-32 consolidates procedures for force design updates, tables of organization and equipment, basis of issue plans, and manpower management. It includes processes for tables of distribution and allowances, unit identification codes, manpower requirements criteria, multiple component units, Total Army Analysis, and equipment requirements.</p>
             <p><strong>Applies to:</strong> These procedures apply to the Regular Army, the U.S. Army National Guard and the U.S. Army Reserve for managing requirements for equipment over the system line item number (LIN) life cycle.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Force design updates</li>
                 <li>Tables of organization and equipment</li>
@@ -734,7 +750,7 @@
                 <li>Multiple component units</li>
                 <li>Total Army Analysis</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who oversees Total Army Analysis and force management matters?</h3>
             <blockquote>The DCS, G3/5/7, FM is responsible for oversight of all matters pertaining to Total Army Analysis (TAA), command plan, force integration, force management and documentation. (paragraph 1-4)</blockquote>
             <h3>What does the Force Integration Functional Area Analysis determine?</h3>

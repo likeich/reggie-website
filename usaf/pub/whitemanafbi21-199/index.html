@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It defines tools, equipment, electronic devices, airfields, and aircraft and flight line maintenance facilities. It requires unit programs, permanent markings, inventory controls, immediate reporting of missing items, and completion of AFGSC Form 145.</p>
             <p><strong>Applies to:</strong> It applies to all units assigned to the 509th Bomb Wing (509 BW), to include US Air Force Reserve, Air National Guard, and Civil Air Patrol, with the exception of the 509th Maintenance Group (509 MXG).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Airfield tool control</li>
                 <li>Tool and equipment accountability</li>
@@ -726,7 +742,7 @@
                 <li>Missing tool reporting</li>
                 <li>FOD prevention</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must units establish to comply with WHITEMANAFBI21-199?</h3>
             <blockquote>To be in compliance with this instruction, units must establish a program or demonstrate that existing programs meet the intent of positive tool and equipment accountability and control. (paragraph 1)</blockquote>
             <h3>What must flight chiefs and section NCOICs do with tools used on the flightline?</h3>

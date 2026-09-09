@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>It addresses stopping and inspecting personnel or vehicles, suspension and reinstatement of driving privileges, vehicle impoundment, traffic enforcement, and accident reporting. It also establishes rules for motorcycles, bicycles, pedestrians, parking, traffic violation reports, and mandatory points assessments.</p>
             <p><strong>Applies to:</strong> All provisions are directive in nature and apply to all organizations and personnel located on or within the jurisdictional limits of LAAFB, CA.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Driving privileges</li>
                 <li>Vehicle impoundment</li>
@@ -721,7 +737,7 @@
                 <li>Motor vehicle accident reporting</li>
                 <li>Traffic point system</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When does California Vehicle Code take precedence over Air Force publications?</h3>
             <blockquote>When a conflict between the CVC and AFPD 31-1, AFI 31-218_IP, AFMAN 31-116 or LAAFB 31-116 exists, the CVC will supersede the listed Air Force Publications.</blockquote>
             <h3>How must records created under LOSANGELESAFBI31-112 be handled?</h3>

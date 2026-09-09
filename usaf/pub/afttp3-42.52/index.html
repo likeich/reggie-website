@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -707,7 +723,7 @@
             <hr>
             <p>Its chapters address AECS overview, command and control, communications, operations, education, and training. The publication requires records created through prescribed processes to be maintained and disposed of under Air Force records guidance, and requires collection or maintenance of information protected by the Privacy Act of 1974.</p>
             <p><strong>Applies to:</strong> This publication applies to all Air Force military personnel in the Regular Air Force, Air Reserve Component (ARC), and Air Force civilian personnel (Air National Guard [ANG] is considered to be a Major Command [MAJCOM] in this publication).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Aeromedical evacuation command squadron capabilities</li>
                 <li>Command and control</li>
@@ -716,7 +732,7 @@
                 <li>Weapons security, storage, and handling</li>
                 <li>Education and training</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is AFTTP3-42.52 the primary reference for?</h3>
             <blockquote>The Air Force Tactics, Techniques and Procedures (AFTTP) 3-42 series of publications is the primary reference for medical combat support capabilities.</blockquote>
             <h3>Is the doctrine in AFTTP3-42.52 directive?</h3>

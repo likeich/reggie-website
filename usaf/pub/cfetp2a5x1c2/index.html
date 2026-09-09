@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -711,7 +727,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/af_a4/publication/cfetp2a5x1c2/cfetp2a5x1c2.pdf">View CFETP2A5X1C2 on armypubs.army.mil</a></p>
             <hr>
             <p>It changes course information, task numbering, and qualitative requirements for C-40/VC-25, C-5, and C-17 aircraft. The change is effective immediately, requires compliance with DAFMAN 36-2689 and other training policies and documentation, and requires replacement of pages 73 and 74.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Aircraft maintenance common training requirements</li>
                 <li>C-40 qualitative requirements</li>
@@ -720,7 +736,7 @@
                 <li>C-17 qualitative requirements</li>
                 <li>In-resident course objectives</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What training compliance does CFETP2A5X1C2 require?</h3>
             <blockquote>Compliance with DAFMAN 36-2689 and other training policies and documentation is required.</blockquote>
             <h3>Which publication does CFETP2A5X1C2 change?</h3>

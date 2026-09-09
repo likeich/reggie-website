@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication addresses AED acquisition, placement, maintenance, quality assurance, documentation, deployment, and use within Wright-Patterson Air Force Base facilities. It requires records to be maintained and disposed of under specified Air Force records procedures and establishes biennial PAD site evaluations.</p>
             <p><strong>Applies to:</strong> This publication applies to all Air Force (AF), Air Force Reserve Command (AFRC), and host base/tenant owned facilities (to include space leased for period(s) over 179 days), as defined by the Air Force Real Property Agency, required to implement a PAD program.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Public Access Defibrillator Program management</li>
                 <li>AED acquisition and placement</li>
@@ -727,7 +743,7 @@
                 <li>PAD site evaluations</li>
                 <li>AED event restoration</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How often are PAD site evaluations scheduled?</h3>
             <blockquote>The PAD Program Coordinator will schedule the evaluation with each PAD site biennially. (paragraph 2)</blockquote>
             <h3>Who submits the PAD evaluation checklist and when?</h3>

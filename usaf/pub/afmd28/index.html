@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -706,7 +722,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/saf_pa/publication/afmd28/afmd28.pdf">View AFMD28 on armypubs.army.mil</a></p>
             <hr>
             <p>It defines AFPAA’s combat camera, audiovisual production, public affairs, symbols and marks, and visual information functions. It requires the agency to support Air Force and Space Force leadership, manage public affairs capabilities, and coordinate with other agencies.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Combat camera operations</li>
                 <li>Audiovisual production</li>
@@ -716,7 +732,7 @@
                 <li>Public website operations</li>
                 <li>Direct communication</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does AFPAA provide for military operations?</h3>
             <blockquote>The agency prepares all assigned active forces for the Department of the Air Force, joint, or combined operations in the roles of force support and sustainment, power projection, and military operations other than war. (paragraph 1)</blockquote>
             <h3>What combat camera capability does AFPAA provide?</h3>

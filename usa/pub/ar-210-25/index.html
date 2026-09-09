@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1020942">View AR 210-25 on armypubs.army.mil</a></p>
             <hr>
             <p>AR 210-25 addresses permits for vending facilities, State licensing agency applications, arbitration, annual reports, and internal control evaluation. It requires written applications, specifies permit conditions, and requires annual reporting of applications and vending machine income.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Vending facility permits</li>
                 <li>State licensing agency applications</li>
@@ -727,7 +743,7 @@
                 <li>Arbitration</li>
                 <li>Internal control evaluation</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How must applications for vending facility permits be submitted?</h3>
             <blockquote>Applications for permits by the State licensing agency to operate vending facilities (except cafeterias) on Armycontrolled property must be submitted in writing, through the on-site official, to the CG, IMCOM (IMWR), 2405 Gun Shed Road, Joint Base San Antonio, Fort Sam Houston, TX 78234 1223, to the DCS, G 9 (DAIN ZA), 600 Army Pentagon, Washington, DC 20310 0600. (paragraph 4)</blockquote>
             <h3>How long is a vending facility permit issued for?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>AR 15-1 addresses committee establishment, renewal, amendment, termination, charters, open meetings, and program oversight. It requires internal controls to be tested and evaluated at least once every 5 years, with deficiencies explained and corrective action identified.</p>
             <p><strong>Applies to:</strong> A committee is defined as any committee, board, commission, council, conference, panel, task force, integrated process team, or other similar group or any subcommittee or subgroup thereof that is composed of United States or foreign officials and is established at the direction of the OSD or heads of DoD components.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Federal Advisory Committees</li>
                 <li>Intergovernmental and Intragovernmental Committees</li>
@@ -728,7 +744,7 @@
                 <li>Internal control evaluation</li>
                 <li>Army Group Federal Officer evaluation</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What form certifies that an internal control evaluation was conducted?</h3>
             <blockquote>Certification that the evaluation has been conducted must be accomplished on a DA Form 11 2 (Internal Control Evaluation Certification). (paragraph 1-8)</blockquote>
             <h3>What must be done when an internal control evaluation identifies deficiencies?</h3>

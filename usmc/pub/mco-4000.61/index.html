@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>It covers access management across the requisition authority level and the supporting logistics hierarchy. It requires roles, procedures, reviews, certifications, appointments, and oversight for E-commerce system access.</p>
             <p><strong>Applies to:</strong> This Order establishes Marine Corps-specific requirements for the administration of user access for all E-commerce systems used in support of a requisitioning authority command’s Procure-to-Pay (P2P) business process.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>E-commerce system access management</li>
                 <li>Access controls</li>
@@ -729,7 +745,7 @@
                 <li>Major command provisioning</li>
                 <li>Parent command administration</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What systems does MCO 4000.61 cover?</h3>
             <blockquote>The scope of this Order is focused on those systems used for requesting, ordering, and performing receipt and acceptance of materials or services purchased by commands citing Marine Corps appropriations for both federal and commercial sources of supply; see enclosure (2) for a list of systems commonly used by the Marine Corps within P2P business process. (paragraph 1)</blockquote>
             <h3>What does MCO 4000.61 require for E-commerce system access?</h3>

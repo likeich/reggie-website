@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers operational support for aeromedical evacuation across humanitarian assistance, disaster relief, contingencies, war, and civilian support scenarios. It requires mission capability, global patient movement capability, administrative control, and oversight of the Aeromedical Evacuation mission.</p>
             <p><strong>Applies to:</strong> This Mission Directive applies to individuals assigned to HQ AFRC.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Aeromedical evacuation operations</li>
                 <li>Humanitarian assistance and disaster relief</li>
@@ -726,7 +742,7 @@
                 <li>Administrative control</li>
                 <li>Aeromedical Evacuation mission oversight</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What operations do Aeromedical Evacuation Squadrons support?</h3>
             <blockquote>The Aeromedical Evacuation Squadrons provides operational support in aeromedical evacuation operations to support the full spectrum of potential scenarios, including but not limited to, humanitarian assistance and disaster relief operations, small-scale contingencies, major theater war, and defense support of civilian authorities. (paragraph 1)</blockquote>
             <h3>Where does the Aeromedical Evacuation Squadrons Commander report?</h3>

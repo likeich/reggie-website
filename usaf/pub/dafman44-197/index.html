@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It assigns responsibility for carrying out the DAF drug testing program at the installation level and sets standards and procedures for DDR activities. Compliance with its prohibitions and mandatory provisions is required and may result in administrative disciplinary action.</p>
             <p><strong>Applies to:</strong> The DAFMAN applies to Department of the Air Force (DAF) military personnel that includes the Regular Air Force (RegAF), United States Space Force (USSF), Air Force Reserve (AFR), and Air National Guard (ANG).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Military drug testing</li>
                 <li>Drug Demand Reduction activities</li>
@@ -727,7 +743,7 @@
                 <li>Privacy Act information</li>
                 <li>Air Force drug testing records</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does DAFMAN44-197 say about using kratom products?</h3>
             <blockquote>While the use of kratom products is legal in some jurisdictions, the use or ingestion of products made or derived from kratom, which includes semi-synthetic or synthetic products containing mitragynine and 7-hydroxymitragynine is prohibited regardless of the product’s concentration, claimed or actual, and regardless of whether such products may lawfully be bought, sold, or used under applicable civilian law.</blockquote>
             <h3>What can happen when military members fail to follow DAFMAN44-197?</h3>

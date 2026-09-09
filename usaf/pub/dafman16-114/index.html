@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers international agreements, information exchange, test and evaluation, foreign comparative testing, and cooperative research and development. Its formats address project scope, quantities, costs, financial contributions, defense articles and services, national security benefits, and contractors.</p>
             <p><strong>Applies to:</strong> This publication applies to all civilian employees and uniformed members of the Regular Air Force, the Air Force Reserve, the Air National Guard, the United States Space Force and all those who prepare, manage, review, or participate in IAC projects and are contractually obligated to comply with DAF publications.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>International armaments cooperation programs</li>
                 <li>International agreements</li>
@@ -728,7 +744,7 @@
                 <li>Defense articles and services contributions</li>
                 <li>Prime contractors and subcontractors</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does DAFMAN16-114 require for communication in a data exchange annex?</h3>
             <blockquote>Only those Authorities listed in subparagraphs 2.a.(2) and 2.b.(2) herein are authorized to initiate communication. (paragraph 3)</blockquote>
             <h3>Who pays the costs of an information exchange annex?</h3>

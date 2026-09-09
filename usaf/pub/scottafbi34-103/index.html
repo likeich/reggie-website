@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication covers eligibility, permit administration, resale-lot procedures, vehicle registration, insurance, fees, and trailer security. It requires patrons to meet vehicle, display, space-use, housekeeping, and payment requirements.</p>
             <p><strong>Applies to:</strong> It applies to all members, military and civilian, part-time and full-time employees or volunteers, and all patrons of the POV resale lot.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>POV resale lot eligibility</li>
                 <li>Permit issuance and renewal</li>
@@ -726,7 +742,7 @@
                 <li>Administrative fees</li>
                 <li>Vehicle damage responsibility</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who must use the POV resale lot to sell personal vehicles?</h3>
             <blockquote>Active duty and retired military personnel, their dependents, and DOD civilians are required to utilize the POV resale lot, for the purpose of selling POVs, motorcycles, all terrain vehicles, scooters, boats, campers, trailers, or other devices used for personal conveyance or relocating personal property items. (paragraph 1)</blockquote>
             <h3>How long are POV resale lot permits issued for?</h3>

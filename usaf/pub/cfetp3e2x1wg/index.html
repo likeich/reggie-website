@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>It contains Federal Wage System progression information, family series training standards, course objectives, support materials, and education and training course indexes. It also identifies training support resources and outlines the two-part structure used to plan, manage, and control training within the job series.</p>
             <p><strong>Applies to:</strong> The CFETP provides Federal Wage System (FWS) personnel with a clear career path to success and instill rigor in all aspects of our job series training.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Federal Wage System progression</li>
                 <li>Family Series Training Standard</li>
@@ -722,7 +738,7 @@
                 <li>Education and training course index</li>
                 <li>Continuous Development Framework Model</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What career benefit does CFETP3E2X1WG provide?</h3>
             <blockquote>The CFETP provides Federal Wage System (FWS) personnel with a clear career path to success and instill rigor in all aspects of our job series training.</blockquote>
             <h3>How is CFETP3E2X1WG structured?</h3>

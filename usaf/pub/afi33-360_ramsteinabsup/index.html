@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The supplement establishes roles for Unit Publications Monitors, commanders, Office of Primary Responsibility personnel, and Publication Managers. It requires coordination through designated systems, retention of publication records, updates within 180 days of higher-headquarters changes, and centralized publication of below wing-level operating instructions.</p>
             <p><strong>Applies to:</strong> It applies to all personnel who are assigned to the 86th Airlift Wing, Tenant Units and geographically separated units, excluding the 65th Air Base Group, Lajes Field.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Unit Publications Monitor appointments</li>
                 <li>Publication coordination SharePoint site</li>
@@ -727,7 +743,7 @@
                 <li>Digital and wet signatures</li>
                 <li>Below wing-level operating instructions</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who appoints Unit Publications Monitors for a wing or unit publication?</h3>
             <blockquote>If a unit has developed or intends to develop a wing publication or unit operating instruction, the Group/Unit Commander will appoint a primary and alternate Unit Publications Monitor (UPM) to manage and maintain their publications and forms and/or operating instructions.</blockquote>
             <h3>How must commanders appoint Unit Publication Monitors?</h3>

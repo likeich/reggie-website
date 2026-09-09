@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It implements and extends guidance on aircraft and equipment maintenance management. It requires procedures for discrepancy handling, engine runs, squib control, documentation reviews, and root cause analysis.</p>
             <p><strong>Applies to:</strong> It applies to all military, civilian, and tenant and associated unit personnel assigned to the 22d Maintenance Group (MXG) and 931st Maintenance Group (MXG), except where otherwise noted.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Aircraft discrepancy procedures</li>
                 <li>Cannot Duplicate discrepancies</li>
@@ -726,7 +742,7 @@
                 <li>Maintenance debriefs</li>
                 <li>Root Cause Analysis surveys</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How must a Cannot Duplicate discrepancy be cleared?</h3>
             <blockquote>The discrepancy may be cleared only after thorough troubleshooting has been accomplished.</blockquote>
             <h3>What codes are required for Cannot Duplicate discrepancies in FMxC2?</h3>

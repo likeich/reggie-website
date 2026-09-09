@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers transfer guidance, care for unstable patients, WHASC Mental Health Clinic transfers, and transfers from clinics to higher levels of care. It requires facility and EMTALA compliance, transfer documentation, provider coordination, and recorded consent where specified.</p>
             <p><strong>Applies to:</strong> This publication applies to all personnel assigned, attached, or under contract to the 59th Medical Wing (MDW) with the exception of personnel working under the purview of the 959th Medical Group [Brooke Army Medical Center (BAMC)] and those at the 559th Medical Squadron (Joint Base San Antonio - Randolph).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Patient transfer criteria</li>
                 <li>59 MDW Form 27</li>
@@ -727,7 +743,7 @@
                 <li>Family Emergency Center transfers</li>
                 <li>BAMC inpatient admissions</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When is a patient transfer warranted?</h3>
             <blockquote>Transfer of care is made when the patient cannot be given the appropriate level of care in their current clinical location and currently available resources to sustain a particular patient’s normal state of health. (paragraph 1)</blockquote>
             <h3>What requirements must all patient transfers meet?</h3>

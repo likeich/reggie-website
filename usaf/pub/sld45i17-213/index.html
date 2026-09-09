@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It addresses security controls, system design, pathways, cabling, user work areas, outside plant, labeling, testing, and documentation. It requires compliance with applicable telecommunications, physical security, and cyber protection standards for new construction and renovation projects.</p>
             <p><strong>Applies to:</strong> Except where explicitly stated as otherwise and approved by the SLD 45/SC, the standards, instructions, and guidelines summarized herein are applicable to all SLD 45 projects.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Physical and personnel security</li>
                 <li>Telecommunications system design</li>
@@ -728,7 +744,7 @@
                 <li>Identification and labeling</li>
                 <li>Environmental risk avoidance</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What physical security controls does SLD45I17-213 require?</h3>
             <blockquote>Physical measures designed to safeguard personnel, facilities, equipment, and data are required to prevent unauthorized access and to safeguard against espionage, sabotage, theft, damage, or destruction. (paragraph 1)</blockquote>
             <h3>Is compliance with DoD 5200.08 mandatory for telecommunications projects?</h3>

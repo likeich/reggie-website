@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication addresses international agreements, firefighting hazards, accidental criteria, separation distances, armored vehicles, and energetic liquid storage. It requires legal reviews, periodic waiver reviews, and specified storage protections.</p>
             <p><strong>Applies to:</strong> This supplement applies to all Air Force Special Operations Command (AFSOC), contractor personnel and facilities involved in explosive operations within AFSOC, and Air National Guard (ANG) and Air Force Reserve Command (AFRC) units when gained.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>International agreements and explosives safety waivers</li>
                 <li>Firefighting and explosives hazards</li>
@@ -725,7 +741,7 @@
                 <li>Heavy armored vehicle separation distances</li>
                 <li>Energetic liquid package storage</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must be examined for explosives safety waivers or exemptions?</h3>
             <blockquote>International agreements related to the U.S. presence or activities must be examined to identify if there are any relevant provisions pertaining to explosives safety waivers or exemptions in order to ensure obligations of the United States and foreign partners are met.</blockquote>
             <h3>When may a fire involving explosives be fought?</h3>

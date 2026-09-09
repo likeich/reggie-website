@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>18WGI21-113 addresses local manufacture authorization, materials management, non-stock listed lines, stock listed items, tube assemblies and procurable assets. It requires specified documentation, supply-system checks, material verification and approval processes for applicable requests.</p>
             <p><strong>Applies to:</strong> It applies to all assigned and attached offices to 18th Wing (18WG) units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Local manufacture authorization</li>
                 <li>Procurable tube assemblies</li>
@@ -726,7 +742,7 @@
                 <li>Stock listed items with local manufacture</li>
                 <li>Materials management</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>When are local manufacture requests automatically approved?</h3>
             <blockquote>LM requests are automatically approved if Source Maintenance and Recoverability (SMR) codes identify them as LM and the fabricating activity has the capability to fabricate requested item. (paragraph 1)</blockquote>
             <h3>What restrictions apply to manufacturing procurable lines?</h3>

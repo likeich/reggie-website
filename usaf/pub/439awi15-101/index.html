@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers weather observations, forecasts, warnings, watches, advisories, space weather data, information dissemination, and base-wide reciprocal support. Compliance with the publication is mandatory.</p>
             <p><strong>Applies to:</strong> It applies to units assigned or attached to Westover Air Reserve Base (WARB).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Surface weather observations</li>
                 <li>Terminal aerodrome forecasts</li>
@@ -727,7 +743,7 @@
                 <li>Emergency management support</li>
                 <li>Pilot to Metro Service support</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How quickly must changes in the flight MEF be relayed?</h3>
             <blockquote>439 AW/CP will: 7.3.1. Immediately relay changes in the flight MEF to aircrews or the OPSUP, if one is available, when received from the WF. (paragraph 7)</blockquote>
             <h3>Who is responsible for sounding the Emergency Notification System?</h3>

@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -711,14 +727,14 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1031078">View AR 1-10 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/army-dir-2019-17/">ARMY DIR 2019-17</a></li>
             </ul>
             <hr>
             <p>It covers Combined Federal Campaign fundraising, non-CFC fundraising, local fundraising, conflict avoidance, voluntary giving, and prohibited fundraising activities. It requires authorized activities to follow applicable regulations and prohibits compulsion, coercion, and actions contrary to true voluntary giving.</p>
             <p><strong>Applies to:</strong> This regulation prescribes general policy for administering fundraising activities within the Department of the Army (DA).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Combined Federal Campaign fundraising</li>
                 <li>Non-CFC fundraising</li>
@@ -727,7 +743,7 @@
                 <li>Voluntary giving</li>
                 <li>Prohibited fundraising activities</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the only authorized solicitation of federal employees for charitable organizations?</h3>
             <blockquote>5 CFR Part 950 states that the CFC is the only authorized solicitation of employees in the Federal workplace on behalf of charitable organizations. (paragraph 2-1)</blockquote>
             <h3>When are limited non-CFC fundraising activities allowed?</h3>

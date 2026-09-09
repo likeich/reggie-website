@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,14 +732,14 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1026762">View PAM 145-2 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/ar-145-2/">AR 145-2</a></li>
             </ul>
             <hr>
             <p>It sets criteria and procedures for military training certificates and the designation of Distinguished Military Students and Graduates. It also covers U.S. and foreign awards, Senior ROTC awards, Junior ROTC and NDCC awards, and unit awards.</p>
             <p><strong>Applies to:</strong> Unless otherwise noted, all references to the Junior ROTC Program in this regulation will mean the Army Junior ROTC units and the National Defense Cadet Corps (NDCC) units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Military training certificates</li>
                 <li>Distinguished Military Student designation</li>
@@ -732,7 +748,7 @@
                 <li>Junior ROTC and NDCC awards</li>
                 <li>Honor Unit with Distinction streamers</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What students may receive a Senior ROTC military training certificate?</h3>
             <blockquote>Only conditional students and participating immigrant foreign students may be presented a DA Form 134 (Military Training CertificateReserve Officers Training Corps) after successfully completing all or part of the Senior Reserve Officers Training Corps (SROTC) Program. (paragraph 2-1)</blockquote>
             <h3>What certificate may a Junior ROTC student receive after one year?</h3>

@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -707,7 +723,7 @@
             <hr>
             <p>It covers organizational lineage and honors, USAF heraldry, monthly organization status change reports, and aerial victory credits. It requires compliance with the instruction and attachments and identifies waiver authorities through tier numbers and approval procedures.</p>
             <p><strong>Applies to:</strong> This instruction applies to all civilian employees and uniformed members of the United States Air Force (USAF), Air National Guard (ANG), and Air Force Reserve (AFR).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Organizational lineage and honors</li>
                 <li>Expeditionary provisional organizations</li>
@@ -716,7 +732,7 @@
                 <li>Monthly organization status change reports</li>
                 <li>Aerial victory credits</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How must records created under AFI84-105 be handled?</h3>
             <blockquote>Ensure all records generated as a result of processes prescribed in this publication adhere to Air Force Instruction (AFI) 33-322, Records Management and Information Governance Program, and are disposed in accordance with the Air Force Records Disposition Schedule, which is located in the Air Force Records Information Management System.</blockquote>
             <h3>How are waiver authorities identified in AFI84-105?</h3>

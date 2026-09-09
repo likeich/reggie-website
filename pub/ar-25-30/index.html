@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,14 +732,14 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1020790">View AR 25-30 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/pam-25-40/">PAM 25-40</a></li>
             </ul>
             <hr>
             <p>AR 25-30 covers administrative publication types, revision actions, prescribed forms, printing, distribution, and publishing processes. It requires publication revisions to follow specified procedures and sets a five-year currency standard for DA administrative publications.</p>
             <p><strong>Applies to:</strong> The policy prescribed by this regulation applies to all DA publications, regardless of format or delivery medium, except those defined in AR 525 95 and AR 360 1.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Administrative publication types</li>
                 <li>Publication revision actions</li>
@@ -732,7 +748,7 @@
                 <li>Publishing processes</li>
                 <li>Publication currency standards</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What must new DA administrative publications conform to?</h3>
             <blockquote>New DA administrative publications must conform to the policy of this regulation and the procedures prescribed by DA Pam 25 40. (paragraph 4-1)</blockquote>
             <h3>What can an administrative revision change?</h3>

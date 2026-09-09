@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/usafe/publication/usafei24-209/usafei24-209.pdf">View USAFEI24-209 on armypubs.army.mil</a></p>
             <hr>
             <p>It covers routes, police notification, training and certifications, explosive classification, movement notifications, vehicle requirements, segregation, escorts, documentation, emergencies, and EOD support. Compliance with USAFEI24-209 is mandatory, and it includes maximum allowable limits and information for crews.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Routes and police notification</li>
                 <li>Training and certifications</li>
@@ -727,7 +743,7 @@
                 <li>Attendants and armed escorts</li>
                 <li>Emergency actions</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What should happen if a fire involves explosives cargo?</h3>
             <blockquote>Fire Involving Cargo: Do not attempt to deal with the fire, evacuate the area and contact the emergency services. (paragraph 3)</blockquote>
             <h3>How far away must unauthorized persons stay from damaged or endangered cargo?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>It covers initial and subsequent classification, retesting, ASVAB, AFCT, Web-AFCT, scoring, and test facilities. It requires specific conditions for standard classification tests and prohibits retesting solely to increase an attained qualifying score.</p>
             <p><strong>Applies to:</strong> This Order serves as the primary source for active duty and reserve Marine personnel regarding classification testing.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Marine Corps Classification Testing Program</li>
                 <li>Initial classification processing</li>
@@ -730,7 +746,7 @@
                 <li>Classification test scoring</li>
                 <li>Marine Corps test facilities</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Can a Marine retest to increase an already qualifying score?</h3>
             <blockquote>A Marine that has already attained the basic requirement for an assignment or program requiring a minimum classification test score will not be allowed to retest solely for the purpose of increasing their score. (paragraph 5)</blockquote>
             <h3>Who must receive retests when test scores cannot be found?</h3>

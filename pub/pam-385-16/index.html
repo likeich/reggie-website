@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,14 +732,14 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=1021111">View PAM 385-16 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/ar-385-10/">AR 385-10</a></li>
             </ul>
             <hr>
             <p>PAM 385-16 addresses system safety management, risk and hazard management, acquisition life-cycle phases, testing and evaluation, weapon system safety reviews, and facility system safety. It requires hazard identification and resolution, system safety management plans, hazard tracking systems, and acceptance of residual risks before fielding.</p>
             <p><strong>Applies to:</strong> This pamphlet identifies system safety procedures required by AR 385 10 for program executive officers (PEOs); program, project, or product managers (PMs); capability developers (CAPDEVs); materiel developers (MATDEVs); testers; independent evaluators; and system safety engineers.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>System safety management</li>
                 <li>Risk and hazard management</li>
@@ -733,7 +749,7 @@
                 <li>Hazard tracking systems</li>
                 <li>System safety management plans</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the purpose of system safety testing and evaluation?</h3>
             <blockquote>The major effort of safety testing should be directed toward identifying, evaluating, and tracking these hazards (see chap 2). (paragraph 4-1)</blockquote>
             <h3>Does every test event have to be performed for every system?</h3>

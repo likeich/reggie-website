@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication addresses accident and abuse investigations, incident reporting, repair funding, organizational responsibilities, and anti-idling limits. It requires specified reports, commander recommendations, reimbursement for accident and abuse repairs, and a five-minute idling limit for Air Force managed GMVs unless an exception applies.</p>
             <p><strong>Applies to:</strong> This instruction applies to all Active Duty, Reserve, Guard, Contractors, Department of Defense (DoD) Civilians assigned or attached to McChord Field.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Vehicle accident investigations</li>
                 <li>Vehicle abuse reporting</li>
@@ -726,7 +742,7 @@
                 <li>Telematics data</li>
                 <li>Government vehicle idling limits</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How soon must an Air Force or Army vehicle accident be reported?</h3>
             <blockquote>For Air Force or Army owned assets involved in an accident, notify 627 LRS/LGRV within 24 hours (or the next duty day) with a completed SF 91, Motor Vehicle Accident Report, and police report. (paragraph 3)</blockquote>
             <h3>When can maintenance repairs begin after a vehicle accident?</h3>

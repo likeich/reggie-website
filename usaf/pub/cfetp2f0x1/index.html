@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It identifies initial skills, upgrade, qualification, advanced, and continuing education and training. It lists specialty courses, training sources, delivery methods, and resource constraints.</p>
             <p><strong>Applies to:</strong> This CFETP provides information necessary for the Air Force Career Field Manager (AFCFM), MAJCOM functional managers, commanders, training managers, supervisors, trainers, and applicable AETC training wing to plan, develop, manage, and conduct an effective career field education and training program.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Petroleum and cryogenic operations</li>
                 <li>Fuels competencies</li>
@@ -728,7 +744,7 @@
                 <li>Proficiency codes</li>
                 <li>Fuels career courses</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What mandatory training must each individual complete?</h3>
             <blockquote>Each individual will complete the mandatory training requirements specified in this plan. (paragraph 2)</blockquote>
             <h3>When can competency objective training be omitted?</h3>

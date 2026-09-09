@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers flying operations supervision structure, supervision chains, applicability, waivers, and certification authorities. It requires compliance with specified attachments and sets training requirements.</p>
             <p><strong>Applies to:</strong> It applies to AETC units and personnel conducting flying operations.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Flying operations supervision</li>
                 <li>Supervision chains</li>
@@ -726,7 +742,7 @@
                 <li>Flying operations training</li>
                 <li>AETC unit requirements</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Does AFI11-418_AETCSUP apply to Air Force Reserve Command or Air National Guard units?</h3>
             <blockquote>With the exception of personnel participating in an associate instructor program, this supplement does not apply to Air Force Reserve Command or Air National Guard units unless specified by major command Memorandum of Understanding.</blockquote>
             <h3>What records requirements does AFI11-418_AETCSUP establish?</h3>

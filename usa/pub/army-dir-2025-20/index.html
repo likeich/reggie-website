@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>The directive addresses absent-unknown, AWOL, missing, DUSTWUN, and desertion classifications. It sets timelines for duty-status changes, notifications, law enforcement reporting, casualty actions, and investigations.</p>
             <p><strong>Applies to:</strong> This directive applies to all Soldiers in the Regular Army, Army National Guard/Army National Guard of the United States, and U.S. Army Reserve who are reportable to the Casualty and Mortuary Affairs Operations Division (CMAOD) pursuant to Army Regulation 638-8.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Absent-unknown duty status</li>
                 <li>AWOL determinations</li>
@@ -728,7 +744,7 @@
                 <li>Desertion reporting</li>
                 <li>Law enforcement notifications</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How soon must a Soldier’s duty status change to absent-unknown?</h3>
             <blockquote>Effective immediately, commanders will change the duty status of any Soldier determined to be absent from the place of duty to &quot;absent-unknown.&quot; (paragraph 638-8)</blockquote>
             <h3>How long can a Soldier remain in absent-unknown status?</h3>

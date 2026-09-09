@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication covers aircrew life support configurations, consolidated equipment tables, floor plans, emergency exits, safety aisles, and reference weights. It requires equipment control and documentation, unobstructed emergency access, and load planning using DD Form 365-4 instructions.</p>
             <p><strong>Applies to:</strong> This manual applies to all civilian employees and uniformed members of the Regular Air Force and Air Force Reserve who operate or maintain AC-130J aircraft.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>AC-130J standard equipment</li>
                 <li>Aircrew life support equipment configuration</li>
@@ -728,7 +744,7 @@
                 <li>Aircraft defensive system equipment</li>
                 <li>DD Form 365-4 load planning</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How much tie-down equipment is required for AC-130J cargo and loose equipment?</h3>
             <blockquote>At all times, the amount of tie-down equipment required will include enough equipment to secure the landing gear in an emergency as well as secure all cargo and loose equipment.</blockquote>
             <h3>What happens when additional equipment is added?</h3>

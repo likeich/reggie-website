@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication contains guidance on local operations, quiet hours, call signs, weather, environmental restrictions, aircrew equipment, in-flight publications, alternate missions, cross-country flights, and noise abatement. It requires compliance by applicable pilots and establishes reporting, equipment, flight-document, and noise-abatement requirements.</p>
             <p><strong>Applies to:</strong> This supplement established policies and procedures relating to F-16 operations for the 52d Operations Group (OG) and applies to all 52 OG units, and all 52 OGgained units operating United States Air Forces in Europe (USAFE) owned, managed, and/or all controlled aircraft.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Quiet hours</li>
                 <li>Flight call signs</li>
@@ -728,7 +744,7 @@
                 <li>Cross-country flight planning</li>
                 <li>Noise abatement</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who must comply with AFMAN11-2F-16V3_SPANGDAHLEMABSUP when operating 52 OG-assigned aircraft?</h3>
             <blockquote>All pilots assigned and attached to the 52 OG will comply with this instruction when operating 52 OG-assigned aircraft whether at home station or deployed.</blockquote>
             <h3>What guidance applies when this supplement conflicts with deployed unit directives?</h3>

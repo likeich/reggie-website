@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication assigns duties for cryogenic storage, ready and hold lines, low-use trailers, emergency fills, and servicing operations. It requires safe, functional equipment, qualified operators, protective equipment, and a two-person safety policy.</p>
             <p><strong>Applies to:</strong> This instruction applies to all authorized Aircraft Maintenance Units (AMU), 726th Air Mobility Squadron (AMS), support equipment maintenance organizations, and all transient alert personnel on Spangdahlem Air Base.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Aircraft liquid oxygen servicing units</li>
                 <li>Cryogenic storage</li>
@@ -726,7 +742,7 @@
                 <li>Servicing safety personnel</li>
                 <li>Personal protective equipment</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who may operate aircraft liquid oxygen servicing equipment?</h3>
             <blockquote>Only properly qualified individuals will operate servicing equipment.</blockquote>
             <h3>What must users check before operating servicing equipment?</h3>

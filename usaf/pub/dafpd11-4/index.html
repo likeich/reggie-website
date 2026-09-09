@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>DAFPD11-4 addresses flying training, aircrew status, aviation service, and operational support fliers. It requires aviation actions and aircrew members to be managed through ARMS and sets conditions for flying-related status and pay.</p>
             <p><strong>Applies to:</strong> This policy directive applies to the United States Space Force, Regular Air Force, the Air Force Reserve, the Air National Guard, all DAF civilian employees, those with contractual obligation to abide by the terms of DAF issuances, and aircrew personnel, commanders, and supervisors of aircrew personnel.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Flying training</li>
                 <li>Aircrew status</li>
@@ -726,7 +742,7 @@
                 <li>Aviation service</li>
                 <li>Operational support fliers</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does ARMS manage for aircrew members?</h3>
             <blockquote>ARMS is the designated Department of the Air Force management system for aviation actions and all active and inactive aircrew members will be entered into this system. It will be used to manage flying qualification, operational training, and entitlements to flying incentive pay in accordance with DoDI 7730.67. (paragraph 3)</blockquote>
             <h3>Who oversees the Department of the Air Force’s flying programs?</h3>

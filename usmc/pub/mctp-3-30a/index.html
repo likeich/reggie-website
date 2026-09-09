@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>It describes MAGTF command structures, staff roles and responsibilities, action-officer skills, coordination measures, standardized reports, and information management systems and processes. Its formats address point papers, talking papers, information papers, trip reports, naval messages, and staff studies.</p>
             <p><strong>Applies to:</strong> The information contained in MCTP 3-30A applies to major subordinate commands, regiment/group, and battalion/squadron levels.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>MAGTF command structure</li>
                 <li>Personal, special, and general staffs</li>
@@ -730,7 +746,7 @@
                 <li>Correspondence formats</li>
                 <li>Staff studies</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What levels does MCTP 3-30A apply to?</h3>
             <blockquote>The information contained in MCTP 3-30A applies to major subordinate commands, regiment/group, and battalion/squadron levels.</blockquote>
             <h3>What does MCTP 3-30A say about recommendations?</h3>

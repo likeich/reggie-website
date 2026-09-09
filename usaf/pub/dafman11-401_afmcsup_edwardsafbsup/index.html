@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>The publication covers flight requests, flight approvals, contractor authorization, inter-fly agreements, orientation flights, and waiver authority. It requires compliance with the publication and its attachments, and specifies procedures for documenting and approving certain flying activities.</p>
             <p><strong>Applies to:</strong> This publication applies to civilian employees and uniformed members of the Regular Air Force, U.S. Space Force (USSF), Air Force Reserve (AFR) and the Air National Guard (ANG), as well as Air Force aircrew personnel assigned to active flying positions in the Civil Air Patrol.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Flying resource management</li>
                 <li>Aircrew flight management programs</li>
@@ -723,7 +739,7 @@
                 <li>Inter-fly agreements</li>
                 <li>T-3 waivers</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Are the attachments to DAFMAN11-401_AFMCSUP_EDWARDSAFBSUP mandatory?</h3>
             <blockquote>Compliance with the attachments in this publication is mandatory.</blockquote>
             <h3>Where must flight requests for MESPs, MEPs, Qualitative Evaluations, Qualified Crewmembers, and Orientation Flyers be submitted?</h3>

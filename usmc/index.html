@@ -560,8 +560,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -582,6 +591,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -666,7 +682,7 @@
         <div id="seo-fallback">
             <h1>U.S. Marine Corps Regulations - Reggie</h1>
             <p>Ask a question about U.S. Marine Corps regulations and get an answer citing the governing publication. Searches the full text of MCPEL's publications.</p>
-            <h2>Frequently referenced publications</h2>
+            <h2>Frequently Referenced Publications</h2>
             <ul>
                 <li><a href="/usmc/pub/mco-1000.12/">MCO 1000.12</a> &mdash; Naval Reserve Program Nine Personnel Support To The U.s. Marine Corps...</li>
                 <li><a href="/usmc/pub/mco-1000.14/">MCO 1000.14</a> &mdash; National Call To Service Enslisted Commissioning Program</li>
@@ -675,7 +691,7 @@
                 <li><a href="/usmc/pub/mco-1001.39k/">MCO 1001.39K</a> &mdash; Pre-separation Counseling Concerning Marine Corps Reserve (mcr)...</li>
                 <li><a href="/usmc/pub/mco-1001.52k/">MCO 1001.52K</a> &mdash; Active Reserve (ar) Support To The United States Marine Corps Reserve</li>
             </ul>
-            <h2>Browse by series</h2>
+            <h2>Browse by Series</h2>
             <ul>
                 <li><a href="/usmc/pubs/mco/">MCO</a></li>
                 <li><a href="/usmc/pubs/mcbul/">MCBul</a></li>

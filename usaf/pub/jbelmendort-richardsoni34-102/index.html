@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It establishes the 673d Air Base Wing’s list of installation meetings and identifies meeting purposes, outcomes, occurrences, and responsible offices. Compliance is mandatory, and the instruction sets requirements for waivers, supplements, and records.</p>
             <p><strong>Applies to:</strong> This instruction applies to all JBER community members and mission partners to include the Army, Air National Guard, and Air Force Reserve units and members.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Installation meetings</li>
                 <li>Meeting occurrence</li>
@@ -726,7 +742,7 @@
                 <li>Meeting attendees</li>
                 <li>Agenda validation</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who is responsible for coordinating installation meeting spaces and providing readaheads?</h3>
             <blockquote>OPR is responsible for coordinating a meeting space and providing readaheads to the commander or meeting chair. (paragraph 2)</blockquote>
             <h3>How often does the JBER Community Action Council meet?</h3>

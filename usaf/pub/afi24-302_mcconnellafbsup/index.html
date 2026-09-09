@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The publication addresses repair reimbursement, vehicle investigations, damage reporting, Vehicle Control Official appointments, and idling exemptions. It requires unit-level oversight, operator care, and compliance with specified reporting and training timelines.</p>
             <p><strong>Applies to:</strong> This instruction is applicable to all persons operating government-owned/leased vehicles/ equipment assigned or attached to McConnell AFB, supported by the 22d Logistics Readiness Squadron (22 LRS).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Accident and abuse repairs</li>
                 <li>Repair reimbursement</li>
@@ -727,7 +743,7 @@
                 <li>Operator training</li>
                 <li>Vehicle investigations</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who pays for accident and abuse repairs at McConnell AFB?</h3>
             <blockquote>The 22 LRS Vehicle Management Flight (LGRV) is not funded for accident and abuse repairs. Using organizations fund repairs resulting from these incurred costs, regardless of the determination of pecuniary liability. (paragraph 1)</blockquote>
             <h3>How must organizations reimburse 22 LRS/LGRV for vehicle repairs?</h3>

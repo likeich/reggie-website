@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -714,7 +730,7 @@
             <hr>
             <p>MCO 5580.4A updates LEOSA credential issuance procedures and establishes guidelines for current, retired, and separated Marine Corps law enforcement officers. It requires applicable organizations to comply with the enclosure and addresses credential management, eligibility verification, training, applications, and credential returns.</p>
             <p><strong>Applies to:</strong> This Order is applicable to the Marine Corps Total Force.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>LEOSA credential issuance</li>
                 <li>LEOSA eligibility verification</li>
@@ -723,7 +739,7 @@
                 <li>Credential manager appointments</li>
                 <li>Returning LEOSA credentials</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who may carry a concealed firearm under LEOSA?</h3>
             <blockquote>Under the provisions of LEOSA, qualified active, retired, and separated law enforcement officers (LEO) may carry a concealed firearm that has been shipped or transported in interstate or foreign commerce. (paragraph 1)</blockquote>
             <h3>What organizations must comply with the LEOSA enclosure?</h3>

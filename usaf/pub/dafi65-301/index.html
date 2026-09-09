@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers audit planning, audit liaison, access to information, management comments, corrective actions, findings, recommendations, and potential monetary benefits. It requires monitoring and reporting on audit follow-up activities and establishes responsibilities for Air Force audit organizations.</p>
             <p><strong>Applies to:</strong> This publication applies to all civilian employees and uniformed members of the Regular Air Force, the Air Force Reserve, the Air National Guard, and the United States Space Force.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Internal audit services</li>
                 <li>Risk-based audit planning</li>
@@ -727,7 +743,7 @@
                 <li>Corrective actions</li>
                 <li>Potential monetary benefits</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who provides internal audit services for the Department of the Air Force?</h3>
             <blockquote>The Air Force Audit Agency (AFAA), under the direction of the Auditor General, is the sole provider of internal audit services and collaborates with internal and external organizations to execute the audit liaison and follow-up program for the Department of the Air Force (DAF).</blockquote>
             <h3>What must auditors do to conduct audits?</h3>

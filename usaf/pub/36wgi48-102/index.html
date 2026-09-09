@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It assigns food safety duties to Public Health, food facility supervisors, receiving agents, and supporting organizations. It requires inspections of MREs and temporary food facilities, evaluation of temperature-stressed foods, and documentation of food losses.</p>
             <p><strong>Applies to:</strong> This instruction applies to all food facilities on Andersen Air Force Base and will also apply to the Air National Guard and Air Force Reserve Command.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Food delivery sources</li>
                 <li>MRE inspections</li>
@@ -726,7 +742,7 @@
                 <li>Temperature-stressed foods</li>
                 <li>Food facility design and remodeling</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What sources must food delivered to Andersen AFB come from?</h3>
             <blockquote>Ensure all foods delivered to Andersen AFB come from one of the approved sources listed in AFI 48-116 and the local US Army Approved Sources Directory. (paragraph 1)</blockquote>
             <h3>How often are government-owned MREs inspected?</h3>

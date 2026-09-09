@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>Its chapters cover general information, mission planning, and normal operating procedures, including fuel planning, mobile devices, stall training, and go-arounds. Compliance is mandatory, and the publication requires records handling under Air Force records management requirements.</p>
             <p><strong>Applies to:</strong> It applies to all military and civilian personnel of the Regular Air Force and the Air Force Reserve who operate the U-2 aircraft, perform Mobile Officer duties, or act as Supervisor of Flying (SOF) for U-2 units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Mission planning</li>
                 <li>Fuel planning procedures</li>
@@ -722,7 +738,7 @@
                 <li>Touch-and-go landings</li>
                 <li>Flight manuals and checklists</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Are the reporting requirements in AFMAN11-2U-2V3 subject to licensing?</h3>
             <blockquote>The reporting requirements in this publication are exempt from licensing in accordance with (IAW) Air Force Instruction (AFI) 33-324, The Air Force Information Collections and Reports Management Program.</blockquote>
             <h3>What records management rules apply to records generated under AFMAN11-2U-2V3?</h3>

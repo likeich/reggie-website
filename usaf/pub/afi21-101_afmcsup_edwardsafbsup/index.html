@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers technical data use, munitions operations, aircraft maintenance, engine records, F-35 logistics tracking, and test-program logistics support. It requires approved technical data for munitions and maintenance operations, job-site access to technical orders, and documented engine actions.</p>
             <p><strong>Applies to:</strong> This instruction is applicable to all operational and maintenance activities on Edwards AFB.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Technical data use at job sites</li>
                 <li>Munitions maintenance operations</li>
@@ -728,7 +744,7 @@
                 <li>Aircraft Structural Integrity Program</li>
                 <li>Radiation protection</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What technical data must be available at a maintenance job site?</h3>
             <blockquote>Technical Order (TO) 00-5-1, AF Technical Order System, requires that Operations and Maintenance TOs must be available and used at the job site.</blockquote>
             <h3>What is the local definition of a maintenance job site?</h3>

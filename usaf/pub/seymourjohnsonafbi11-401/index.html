@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It defines orientation flight participants and categories, including Orientation Flights, Distinguished Visitor Flights, Public Affairs Flights, and the Spouse Taxi Program. It sets requirements for medical clearance, physical standards, flight restrictions, approvals, scheduling, and program management.</p>
             <p><strong>Applies to:</strong> It applies to individuals at all levels including who participate in or conduct orientation flights in 4 FW aircraft, including the Air Force Reserve and Air National Guard (ANG), except where otherwise noted.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Orientation flight categories</li>
                 <li>Medical clearance</li>
@@ -727,7 +743,7 @@
                 <li>Flight approvals</li>
                 <li>Orientation flight scheduling</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the purpose of the 4 FW Orientation Flight Program?</h3>
             <blockquote>The purpose of the 4 FW Orientation Flight Program is to reward, motivate, or increase an individual's understanding of the 4 FW mission, and to increase public understanding and appreciation of the USAF. (paragraph 1)</blockquote>
             <h3>What are the primary flight categories in the program?</h3>

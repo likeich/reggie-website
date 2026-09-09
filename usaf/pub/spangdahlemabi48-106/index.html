@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The instruction covers occupational health exams, medical surveillance, workplace hazard exposure, shop visits, and coordination with the German Occupational Health Clinic. It requires procedures for examinations and restrictions, defined office responsibilities, and maintenance and disposition of program records.</p>
             <p><strong>Applies to:</strong> This instruction applies to all Non-US civilian employees who are exposed to potential workplace hazards.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Occupational health examinations</li>
                 <li>Workplace hazard exposure</li>
@@ -726,7 +742,7 @@
                 <li>Occupational Health Data Sheet</li>
                 <li>German Occupational Health Clinic</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who must develop procedures for the occupational health requirements?</h3>
             <blockquote>All offices with primary responsibilities listed below are required to develop procedures for ensuring requirements are met.</blockquote>
             <h3>When must pre-placement exams be completed?</h3>

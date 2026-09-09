@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/af_st/publication/hafmd1-50/hafmd1-50.pdf">View HAFMD1-50 on armypubs.army.mil</a></p>
             <hr>
             <p>It establishes the Chief Scientist’s role in providing independent perspectives, evaluations, and advice on scientific and technical issues. It also defines relationships with Department of the Air Force offices and assigns duties involving strategy, research, leadership, STEM initiatives, and science and technology awards.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Chief Scientist mission</li>
                 <li>Scientific and technical advice</li>
@@ -726,7 +742,7 @@
                 <li>STEM initiatives</li>
                 <li>Science and Technology award programs</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What is the Chief Scientist responsible for?</h3>
             <blockquote>The Chief Scientist has overall responsibility to provide an independent perspective on scientific and technical issues affecting the Department’s mission. (paragraph 1)</blockquote>
             <h3>What authority does the Secretary of the Air Force retain?</h3>

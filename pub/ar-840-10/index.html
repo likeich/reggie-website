@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>AR 840-10 establishes authority and basis of issue for heraldic items used by Department of the Army organizations and personnel. It also addresses flag materials, design standards, restrictions, United States flag display, and flags used by senior government officials.</p>
             <p><strong>Applies to:</strong> This regulation prescribes the design, acquisition, display, disposition, and use of flags, guidons, streamers, automobile and aircraft plates, tabards, by Department of the Army (DA) organizations and personnel.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>United States flag display</li>
                 <li>Flag designs</li>
@@ -730,7 +746,7 @@
                 <li>Danger flags and streamers</li>
                 <li>Organizational colors and guidons</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What design must the U.S. flag have?</h3>
             <blockquote>The U.S. flag will always be displayed or carried in ceremonies when any other flags are displayed or carried. (paragraph 2-1)</blockquote>
             <h3>How many U.S. flags may be flown at one time at a CONUS Army installation?</h3>

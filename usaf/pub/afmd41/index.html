@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>AFMAA determines current, future, peacetime, and wartime manpower requirements to improve mission performance, effectiveness, and resource efficiency. The publication assigns AFMAA duties involving manpower analysis, readiness programs, analytic infrastructure, resource allocation, policy development, and specialized education and training.</p>
             <p><strong>Applies to:</strong> AFMAA is a Field Operating Agency organized under the Deputy Chief of Staff for Manpower, Personnel, and Services, Headquarters, United States Air Force.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Manpower requirements determination</li>
                 <li>Total force analytics</li>
@@ -727,7 +743,7 @@
                 <li>Manpower policy analysis</li>
                 <li>Specialized education and training</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does AFMAA execute for manpower requirements and analytics?</h3>
             <blockquote>Executes the Air Force Management Engineering Program as it applies to manpower requirements determination, total force analytics and requirements, logistics composite model (LCOM), manpower programming factors, senior grade reviews, grade allocation, manpower availability factors, organizational assessments, as well as process and performance improvement initiatives. (paragraph 3)</blockquote>
             <h3>What operational contingency support does AFMAA provide?</h3>

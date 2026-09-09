@@ -591,8 +591,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -613,6 +622,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -706,13 +722,13 @@
                 <li><strong>Status:</strong> ACTIVE</li>
             </ul>
             <p><a href="https://armypubs.army.mil/ProductMaps/PubForm/Details.aspx?PUB_ID=104815">View ARMY DIR 2014-25 on armypubs.army.mil</a></p>
-            <h2>Related publications</h2>
+            <h2>Related Publications</h2>
             <ul>
                 <li><a href="/usa/pub/ar-190-9/">AR 190-9</a></li>
             </ul>
             <hr>
             <p>It defines Army Wanted Fugitives through Title 10 status, desertion-related offenses, and NCIC warrants. It specifies fugitive information for publication, prohibited personally identifiable information, data validation, and operational security review.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Army Wanted Fugitives</li>
                 <li>Public Web site</li>
@@ -721,7 +737,7 @@
                 <li>Personally identifiable information</li>
                 <li>Operational security review</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What information will the Army wanted fugitives Web site publish?</h3>
             <blockquote>The Provost Marshal General will establish a publicly accessible Web site that publishes the name, aliases, age, date of birth, height, weight, race, hair color, eye color, physical identifiers (such as descriptions of tattoos), photographs and occupational/vocational skills of fugitives. (paragraph 3)</blockquote>
             <h3>What information may not appear on the Army wanted fugitives Web site?</h3>

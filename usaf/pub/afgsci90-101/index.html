@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/afgsc/publication/afgsci90-101/afgsci90-101.pdf">View AFGSCI90-101 on armypubs.army.mil</a></p>
             <hr>
             <p>AFGSCI90-101 addresses the SCRP’s council, office, assessment processes, tracking mechanism, and project and issue resolution activities. It requires root cause analyses, corrective action plans, performance measures, and follow-up evaluations in specified circumstances.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Strategic Coordination and Resolution Program</li>
                 <li>Commander’s Resolution Council</li>
@@ -727,7 +743,7 @@
                 <li>Coordination and Resolution Tracking Mechanism</li>
                 <li>Standardized Assessment Processes</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What process does AFGSCI90-101 establish for project planning and issue resolution?</h3>
             <blockquote>The SCRP is designed to enhance readiness or improve combat capability by providing AFGSC and its subordinate units with an established, proactive, and enduring project planning, implementation, and issue resolution process. (paragraph 1)</blockquote>
             <h3>What analysis is required for AFGSC organizational and operational issues?</h3>

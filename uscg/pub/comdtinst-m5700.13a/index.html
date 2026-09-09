@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -718,7 +734,7 @@
             <hr>
             <p>The publication covers external affairs policy, information release, contingency response, organizational communications, community engagement, social media, heritage, and workforce development. It requires coordinated communication, application of security, accuracy, policy, and propriety standards, and defined qualifications for external affairs personnel.</p>
             <p><strong>Applies to:</strong> It is intended to provide operational guidance for Coast Guard personnel and is not intended to nor does it impose legally-binding requirements on any party outside the Coast Guard.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>External affairs policy</li>
                 <li>Release of information</li>
@@ -729,7 +745,7 @@
                 <li>Heritage assets</li>
                 <li>External affairs workforce development</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What does COMDTINST M5700.13A say about releasing information during ongoing law enforcement operations?</h3>
             <blockquote>The proactive release of information about ongoing lawenforcement activities/operations is not authorized except in those cases where specific operational objectives are achieved through the proactive release of information. (paragraph 9)</blockquote>
             <h3>What must Coast Guard spokespersons protect when releasing law enforcement information?</h3>

@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers preparation, instruction, demonstrations, vehicle operation, safety, physiological and psychological factors, heat stress, dehydration, and evaluation. It requires lectures, demonstrations, hands-on driving, and a performance test for operating vehicles while maintaining a small arms weapon.</p>
             <p><strong>Applies to:</strong> In accordance with (IAW) DAFI 10-2503, Chemical, Biological, Radiological, Nuclear (CERN) Defense Program, members must be prepared to perform functional tasks while wearing CBRN defense individual protective equipment (IPE) for extended periods of time.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>MOPP Level 4 vehicle operations</li>
                 <li>Physiological and psychological factors</li>
@@ -728,7 +744,7 @@
                 <li>Work/rest cycles and fluid replacement</li>
                 <li>CBRN supplemental information</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What training enables operation of government motor vehicles in MOPP Level 4?</h3>
             <blockquote>Given lectures, demonstrations, hands-on driving session and a performance test, trainees will be able to operate Government Motor Vehicles (GMVs), Low Speed Vehicles (LSVs), work equipment, and other common ground vehicles while in Mission Oriented Protective Posture (MOPP) Level 4 (Field gear, overgarment, footwear, mask, hood, and handwear), and while maintaining a small arms weapon (dummy rubber rifle) during day and night operations. (paragraph 6)</blockquote>
             <h3>What additional training may specialty vehicle operators need?</h3>

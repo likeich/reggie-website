@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>It covers enlistment waivers, applicant processing, Military Entrance Processing Station procedures, civilian-acquired skills, and post-enlistment actions. It also establishes enlistment programs, options, incentives, and Selected Reserve incentive policies.</p>
             <p><strong>Applies to:</strong> This regulation prescribes eligibility criteria governing the enlistment of persons, with or without prior service (PS), into the Regular Army (RA), the U.S. Army Reserve (USAR), and the Army National Guard (ARNG).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Enlistment waivers</li>
                 <li>Applicant processing</li>
@@ -730,7 +746,7 @@
                 <li>Reentry eligibility codes</li>
                 <li>Offense classifications</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Is a physical examination outside the MEPS system authorized?</h3>
             <blockquote>Physical examination outside of the MEPS system is not authorized (except in authorized overseas locations). (paragraph 6-2)</blockquote>
             <h3>What happens if REQUEST is used for an unauthorized purpose?</h3>

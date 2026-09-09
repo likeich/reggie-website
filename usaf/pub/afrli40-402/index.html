@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It establishes the AFRL Human Research Protection Program and addresses review, oversight, informed consent, privacy, reporting, and research misconduct. It requires ethical conduct, applicable approvals, prompt reporting of adverse events, and protections for human subjects and research data.</p>
             <p><strong>Applies to:</strong> This instruction covers all AFRL-conducted or -supported research activities, including tests and evaluation, that involve humans, human data, human biospecimens, or activities regulated by the Food and Drug Administration (FDA).</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Human research review</li>
                 <li>Human subjects protections</li>
@@ -728,7 +744,7 @@
                 <li>Genetic research</li>
                 <li>Conflicts of interest</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What research must AFRL conduct or support under ethical requirements?</h3>
             <blockquote>AFRL will only conduct or support research which is ethical and conducted IAW applicable Federal, DoD, and DAF HRPP requirements. (paragraph 2)</blockquote>
             <h3>How quickly must investigators report a UPIRTSO to the AFRL IRB?</h3>

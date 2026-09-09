@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It identifies personnel and purposes for access to specified facilities, including inspections, servicing, communications maintenance, and generator operations. It restricts equipment operation, electrical-room storage, telephone repair access, and contractor entry and key control.</p>
             <p><strong>Applies to:</strong> This publication implements Air Force Policy Directive (AFPD) 32-10, Installations and Facilities. It establishes procedures to permit access to certain rooms on Laughlin AFB and applies to individuals at all levels who have access or want to gain access to certain rooms/buildings.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Mechanical room access</li>
                 <li>Boiler room access</li>
@@ -728,7 +744,7 @@
                 <li>Contractor entry authorization</li>
                 <li>Telephone company access</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who may start, stop, adjust, or tamper with facility heating or air conditioning equipment?</h3>
             <blockquote>No one, except as identified in paragraph 2, may start, stop, adjust or tamper with any facility heating or air conditioning equipment. (paragraph 4)</blockquote>
             <h3>Can electrical equipment rooms be used for storage?</h3>

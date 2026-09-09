@@ -596,8 +596,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -618,6 +627,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -712,7 +728,7 @@
             <hr>
             <p>The publication addresses self-assessment, deficiency management, unit effectiveness, readiness evaluations, and inspection activities. It requires designated deficiency-management points of contact, mandatory training, annual assessments, and documented submissions for oversight.</p>
             <p><strong>Applies to:</strong> This publication applies to AETC Regular Air Force, AETC-gained ANG units, and AETC-gained AFRC units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Self-assessment programs</li>
                 <li>Deficiency management</li>
@@ -722,7 +738,7 @@
                 <li>Nuclear Surety Inspection</li>
                 <li>Commander briefings</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What training is required for deficiency management and oversight personnel?</h3>
             <blockquote>HQ AETC Directorates are now required to appoint deficiency management POCs to track data and facilitate IGEMS actions, with mandatory training for both Pertinent Oversight Authorities (POA) and deficiency management POCs.</blockquote>
             <h3>What must self-assessment programs include beyond MICT?</h3>

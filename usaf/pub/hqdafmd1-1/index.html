@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It describes the Department of the Air Force mission, the structure and relationships of HQ DAF, and the roles of senior officials. It establishes assignments and delegations of authority and specifies the order of succession for the Secretary of the Air Force.</p>
             <p><strong>Applies to:</strong> COMPLIANCE WITH THIS PUBLICATION IS MANDATORY</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Department of the Air Force mission</li>
                 <li>Organizational relationships</li>
@@ -726,7 +742,7 @@
                 <li>Secretary of the Air Force succession</li>
                 <li>Air Staff and Space Staff</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How is the Department of the Air Force organized?</h3>
             <blockquote>The Department of the Air Force, pursuant to Title 10 United States Code (U.S.C.) §§ 9011 and 9013, is organized under the Secretary of the Air Force (SecAF) who is appointed from civilian life by the President with the advice and consent of the Senate. (paragraph 1)</blockquote>
             <h3>What is the chain of command for the Department of the Air Force?</h3>

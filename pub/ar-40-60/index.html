@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -719,7 +735,7 @@
             <hr>
             <p>AR 40-60 sets tenets and general policy for medical acquisition, including FDA and EPA approval, commercial products, integrated teams, and Decision Gate procedures. It also addresses requirements documentation, test and evaluation, medical assemblages, funding, and AMEDD acquisition workforce development.</p>
             <p><strong>Applies to:</strong> This policy applies to those acquisition programs funded by Army resources, as well as to those assigned to the Army for execution by the Assistant Secretary of Defense for Health Affairs (ASD(HA)) and funded by Defense Health Program (DHP) resources.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Medical acquisition policy</li>
                 <li>Medical acquisition process</li>
@@ -729,7 +745,7 @@
                 <li>Medical resupply and supply sets</li>
                 <li>Acquisition workforce management</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What products can the AMEDD acquire for Soldier use?</h3>
             <blockquote>The AMEDD will acquire only U.S. Food and Drug Administration (FDA) or Environmental Protection Agency (EPA) approved products for Soldier use, whenever such approvals would be needed for civilian-use products. (paragraph 1-6)</blockquote>
             <h3>What must Army medical acquisition projects meet?</h3>

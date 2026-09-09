@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>AFI36-3002_15ABWSUP establishes written procedures for casualty notification, reporting, medical coordination, and emergency family member travel. It requires casualty information to be collected and maintained under Privacy Act protections and assigns duties to wing, unit, security forces, and medical personnel.</p>
             <p><strong>Applies to:</strong> This instruction establishes procedures for the effective execution of the Air Force Casualty Services Program and is applicable to all assigned and associate Air Force units.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Casualty notification</li>
                 <li>Casualty reporting</li>
@@ -727,7 +743,7 @@
                 <li>Emergency Family Member Travel</li>
                 <li>Casualty notification standby coverage</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What information must the 15th Wing Command Post provide to the Casualty Assistance Representative?</h3>
             <blockquote>Records and provides CAR all available data (name, rank, unit, social security number, status [active, civil service/non-appropriated funds employee, contractor], location of accident or location of patient, date/time of incident, cause of injury or death, name, unit/organization, and phone number of source/individual reporting casualty, and any additional pertinent information).</blockquote>
             <h3>Who must make casualty notifications when next of kin live locally?</h3>

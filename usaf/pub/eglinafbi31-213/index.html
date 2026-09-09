@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It establishes board membership, rotating leadership, meeting requirements, investigation procedures, and coordination with installation commanders. It requires notice and an opportunity to present relevant information before an off-limits recommendation, and sets conditions for removing restrictions.</p>
             <p><strong>Applies to:</strong> The AFDCB functions under the supervision of a president and serves all military personnel and family members at or near Eglin AFB and Hurlburt Field.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>AFDCB composition</li>
                 <li>Rotating board presidency</li>
@@ -726,7 +742,7 @@
                 <li>Board meeting procedures</li>
                 <li>Removal of off-limits restrictions</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How often must the AFDCB meet?</h3>
             <blockquote>The board will convene at least once quarterly or as situations dictate. (paragraph 4)</blockquote>
             <h3>What must happen before an off-limits restriction is recommended?</h3>

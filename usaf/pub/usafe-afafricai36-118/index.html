@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>The instruction covers classification procedures, position descriptions, classification surveys, position changes, evaluation statements, and organization books and charts. It requires accurate position descriptions, certification before recruitment, and defined procedures for classification reviews and advice.</p>
             <p><strong>Applies to:</strong> This instruction applies to all USAFE-AFAFRICA Regular Air Force supervisors whose FN employees are serviced by a CPF.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Non-U.S. position classification</li>
                 <li>Foreign National employees</li>
@@ -727,7 +743,7 @@
                 <li>Position changes</li>
                 <li>Classification review requests</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How often can a civilian position review or audit be requested?</h3>
             <blockquote>A civilian position review/audit may be requested by management or employee when significant changes have occurred (i.e., mission change, technological advances, additional duties, etc.). Normally, audit/review requests will not be accepted if one has been accomplished within the last 2 years. (paragraph 3)</blockquote>
             <h3>What makes a position description adequate for classification?</h3>

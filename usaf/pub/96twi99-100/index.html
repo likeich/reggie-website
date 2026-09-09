@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -716,7 +732,7 @@
             <p><a href="https://static.e-publishing.af.mil/production/1/96tw/publication/96twi99-100/96twi99-100.pdf">View 96TWI99-100 on armypubs.army.mil</a></p>
             <hr>
             <p>It covers project phases, customer agreements, test or training directives, Earned Value Management, monitoring, materiel surge support, and continuous process improvement. It requires compliance with the process, project management tools, and procedures defined in the instruction.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Test Project Management Process</li>
                 <li>Earned Value Management</li>
@@ -725,7 +741,7 @@
                 <li>materiel surge support</li>
                 <li>continuous process improvement</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>What project management technique does 96TWI99-100 use to measure and control project performance?</h3>
             <blockquote>The 96 TW implemented EVM as the project management technique for establishing a project plan and measuring and controlling project performance in an objective manner. (paragraph 3)</blockquote>
             <h3>What must the project performance baseline reflect?</h3>

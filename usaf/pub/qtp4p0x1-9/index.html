@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers selecting five medications, conducting initial and ending inventories, tracking orders and dispensing, calculating inventory differences, and reporting results. It requires performance checklist evaluation and documentation of task completion in the trainee’s Air Force Training Record.</p>
             <p><strong>Applies to:</strong> This Qualification Training Package (QTP) was developed to enhance and standardize on-the-job training for 4P0X1 personnel.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Five medication audit process</li>
                 <li>Initial and ending medication inventories</li>
@@ -726,7 +742,7 @@
                 <li>Drug diversion trend monitoring</li>
                 <li>Pharmacy audit reporting</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>How often must the inventory of five selected noncontrolled medications be audited?</h3>
             <blockquote>The Medical Treatment Facility (MTF) will: Conduct monthly audit of inventory of five selected noncontrolled medications from the top 100 line items by dollar volume. (paragraph 3)</blockquote>
             <h3>Who selects the medications for the audit?</h3>

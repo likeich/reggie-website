@@ -601,8 +601,17 @@
                     // with no way out but knowing to reload.
                     setTimeout(function () {
                         observer.disconnect();
-                        dismissBootScreen();
-                        if (!composeCanvas(target)) showBootFailed();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
                     }, 25000);
                 }
 
@@ -623,6 +632,13 @@
                 // happened and offers the one thing that fixes it.
                 function showBootFailed() {
                     if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
                     var box = document.createElement('div');
                     box.id = 'boot-failed';
                     box.setAttribute('role', 'alert');
@@ -717,7 +733,7 @@
             <hr>
             <p>It covers entry policy, general provisions, request handling, approval authority, and procedures for restricted areas and Danger Zone 4. It requires written requests at least 10 duty days before requested entry and sets conditions for approval and emergency passage.</p>
             <p><strong>Applies to:</strong> This instruction applies to all 30 SW organizations and provides guidance for other agencies requesting permission to fly in the restricted airspace or enter surface Danger Zone 4.</p>
-            <h2>Topics covered</h2>
+            <h2>Topics Covered</h2>
             <ul>
                 <li>Restricted airspace entry</li>
                 <li>Danger Zone 4 entry</li>
@@ -726,7 +742,7 @@
                 <li>Emergency passage</li>
                 <li>Hazardous range operations</li>
             </ul>
-            <h2>Questions and answers</h2>
+            <h2>Questions and Answers</h2>
             <h3>Who must receive requests to enter Vandenberg AFB restricted airspace or Danger Zone 4?</h3>
             <blockquote>All 30 SW organizations will promptly forward all requests to enter restricted airspace over Vandenberg AFB or surface Danger Zone 4 to the 2d Range Operations Squadron Airspace and Offshore Management Flight (2 ROPS/DON). (paragraph 1)</blockquote>
             <h3>What is prohibited within Danger Zone 4?</h3>
