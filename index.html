@@ -8,7 +8,7 @@
          asks for /pub/composeResources/... and 404s, which throws out of
          composition and freezes the canvas. Must precede the first script. -->
     <base href="/">
-    <meta name="description" content="Ask a question about US military regulations and get an answer citing the governing publication, with paragraph and page references. Covers Army, Marine Corps, Coast Guard, Space Force, Air Force.">
+    <meta name="description" content="Ask a question about US military regulations and get an answer citing the governing publication, with paragraph and page references. Covers Army, Marine Corps, Navy, Coast Guard, Space Force, Air Force.">
     <title>Reggie - AI Search for US Military Regulations</title>
     <link rel="canonical" href="https://reggie.bot/">
     <!-- The shell is shared by every page, so this names no one service.
@@ -22,7 +22,7 @@
     <meta property="og:url" content="https://reggie.bot/">
     <meta property="og:site_name" content="Reggie.Bot">
     <meta property="og:title" content="Reggie - AI Search for US Military Regulations">
-    <meta property="og:description" content="Ask a question about US military regulations and get an answer citing the governing publication, with paragraph and page references. Covers Army, Marine Corps, Coast Guard, Space Force, Air Force.">
+    <meta property="og:description" content="Ask a question about US military regulations and get an answer citing the governing publication, with paragraph and page references. Covers Army, Marine Corps, Navy, Coast Guard, Space Force, Air Force.">
     <!-- icon-512, not icon_round: that one is 192x192, and previews commonly
          refuse an image below 200x200 outright -- which is why a shared answer
          arrived with no picture at all rather than a small one. Dimensions are
@@ -35,7 +35,7 @@
     <meta property="og:image:alt" content="Reggie.Bot">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Reggie - AI Search for US Military Regulations">
-    <meta name="twitter:description" content="Ask a question about US military regulations and get an answer citing the governing publication, with paragraph and page references. Covers Army, Marine Corps, Coast Guard, Space Force, Air Force.">
+    <meta name="twitter:description" content="Ask a question about US military regulations and get an answer citing the governing publication, with paragraph and page references. Covers Army, Marine Corps, Navy, Coast Guard, Space Force, Air Force.">
     <meta name="twitter:image" content="https://reggie.bot/icon-512.png">
 
     <script type="application/ld+json">
@@ -43,7 +43,7 @@
   "@context": "https://schema.org",
   "@type": "WebSite",
   "name": "Reggie - AI Search for US Military Regulations",
-  "description": "Ask a question about US military regulations and get an answer citing the governing publication, with paragraph and page references. Covers Army, Marine Corps, Coast Guard, Space Force, Air Force.",
+  "description": "Ask a question about US military regulations and get an answer citing the governing publication, with paragraph and page references. Covers Army, Marine Corps, Navy, Coast Guard, Space Force, Air Force.",
   "url": "https://reggie.bot/"
 }
     </script>
@@ -124,6 +124,14 @@
                     "favicon192": "/favicon-192-usmc.png",
                     "favicon96": "/favicon-96-usmc.png",
                     "appIcon": "/icon-192-usmc.png"
+                },
+                "usn": {
+                    "accent": "#3377FF",
+                    "mark": "/icon_round_usn.png",
+                    "manifest": "/manifest-usn.webmanifest",
+                    "favicon192": "/favicon-192-usn.png",
+                    "favicon96": "/favicon-96-usn.png",
+                    "appIcon": "/icon-192-usn.png"
                 },
                 "usaf": {
                     "accent": "#7FB3F0",
@@ -681,11 +689,12 @@
              instant before the app boots. -->
         <div id="seo-fallback">
             <h1>Reggie - AI Search for US Military Regulations</h1>
-            <p>Ask a question about US military regulations and get an answer citing the governing publication, with paragraph and page references. Covers Army, Marine Corps, Coast Guard, Space Force, Air Force.</p>
+            <p>Ask a question about US military regulations and get an answer citing the governing publication, with paragraph and page references. Covers Army, Marine Corps, Navy, Coast Guard, Space Force, Air Force.</p>
             <h2>Choose a Service</h2>
             <ul>
                 <li><a href="/usa/">U.S. Army</a> &mdash; ArmyPubs</li>
                 <li><a href="/usmc/">U.S. Marine Corps</a> &mdash; MCPEL</li>
+                <li><a href="/usn/">U.S. Navy</a> &mdash; DONI</li>
                 <li><a href="/uscg/">U.S. Coast Guard</a> &mdash; CG Directives</li>
                 <li><a href="/ussf/">U.S. Space Force</a> &mdash; e-Publishing</li>
                 <li><a href="/usaf/">U.S. Air Force</a> &mdash; e-Publishing</li>

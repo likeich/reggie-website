@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Compose resolves relative asset paths (./composeResources/...) against
+         the document URL. Without this, every deep link such as /pub/ar-670-1
+         asks for /pub/composeResources/... and 404s, which throws out of
+         composition and freezes the canvas. Must precede the first script. -->
+    <base href="/">
+    <meta name="description" content="All 431 BUMEDINST publications (Navy Medicine Directives), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.">
+    <title>BUMEDINST - Navy Medicine Directives</title>
+    <link rel="canonical" href="https://reggie.bot/usn/pubs/bumedinst/">
+    <!-- The shell is shared by every page, so this names no one service.
+         It said "Army regulations, AR 670-1, ... armypubs" while the Army
+         owned the root, which put one service on the Coast Guard's pages
+         too. Search engines ignore this tag; it is corrected because it
+         was wrong, not because it ranks. -->
+    <meta name="keywords" content="military regulations, Army regulations, Marine Corps orders, Coast Guard instructions, Space Force publications, Air Force instructions, armypubs, MCPEL, e-Publishing, military publications search">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://reggie.bot/usn/pubs/bumedinst/">
+    <meta property="og:site_name" content="Reggie.Bot">
+    <meta property="og:title" content="BUMEDINST - Navy Medicine Directives">
+    <meta property="og:description" content="All 431 BUMEDINST publications (Navy Medicine Directives), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.">
+    <!-- icon-512, not icon_round: that one is 192x192, and previews commonly
+         refuse an image below 200x200 outright -- which is why a shared answer
+         arrived with no picture at all rather than a small one. Dimensions are
+         declared so a preview can lay out its card without fetching the image
+         first. -->
+    <meta property="og:image" content="https://reggie.bot/icon-512.png">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:alt" content="Reggie.Bot">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="BUMEDINST - Navy Medicine Directives">
+    <meta name="twitter:description" content="All 431 BUMEDINST publications (Navy Medicine Directives), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.">
+    <meta name="twitter:image" content="https://reggie.bot/icon-512.png">
+
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "BUMEDINST - Navy Medicine Directives",
+  "description": "All 431 BUMEDINST publications (Navy Medicine Directives), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.",
+  "url": "https://reggie.bot/usn/pubs/bumedinst/"
+}
+    </script>
+    <!-- A disc that touches all four edges, cropped tight to the mark.
+         The old favicon was the app icon as drawn for the app: its circle sat
+         inset inside the square with transparent margin, and the head filled
+         only 63% of that circle. Google crops favicons to a circle of its own,
+         so what arrived was a small disc inside a ring of page background --
+         the white padding in a search result. Now the disc fills the square
+         exactly, so Google's crop lands on the artwork's own edge, and the
+         head fills more of it.
+         Still a circle rather than a square: a tab draws the icon as given,
+         with no crop, and a circle is what this app looks like.
+         PNGs first and sized -- Google wants a square multiple of 48px -- with
+         the .ico kept for anything that asks for one. -->
+    <!-- Neutral, not the Army's. The boot script below repaints these for a
+         reader who has chosen a service, but only once it runs: before that,
+         and for every crawler, link preview and background tab that never
+         executes it, what stands is what the document declares. Shipping gold
+         here undid the neutral boot the script exists to provide. -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192-neutral.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96-neutral.png">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <!-- Installable. theme-color paints the browser chrome and the splash
+         screen; without apple-touch-icon iOS renders a screenshot instead. -->
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#141414">
+    <link rel="apple-touch-icon" href="/icon-192-neutral.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Reggie.Bot">
+    <!-- The branch, decided before the first paint.
+
+         The app takes seconds to boot -- 15MB of wasm has to arrive and start
+         -- and until it does, this file is the whole of what a reader sees.
+         Both branch-coloured things on it, the spinner and the mark, used to
+         be the Army's outright, so anyone who had chosen another service
+         watched a gold screen resolve into their own colour on every single
+         load. On the 1,546 generated pages too: all of them are rendered from
+         this template.
+
+         So the two colours are read from the same localStorage key the app
+         writes ("branch", set by SettingsBranchStore) and applied as custom
+         properties on the root element, inline and synchronously, before the
+         stylesheet below is ever used to draw anything.
+
+         Kept deliberately dumb -- a literal table, no fetch, no dependency on
+         the wasm having loaded -- because anything that can fail here fails in
+         the one window where nothing else is running yet. An unreadable or
+         unrecognised value leaves the Army showing, which is what every
+         reader who has never chosen a service should see anyway.
+
+         model.seo.BootPaletteTest pins this table against Branch: plain HTML
+         is invisible to the compiler, so nothing else would notice the day a
+         service is added or a palette is retuned. -->
+    <script>
+        (function () {
+            // Valid JSON on purpose: model.seo.BootPaletteTest parses this
+            // table and checks every path in it against Branch and against
+            // the files on disk. Plain HTML is invisible to the compiler, and
+            // the exhaustive `when`s that stop Branch drifting elsewhere have
+            // no reach in here, so this is the only thing that will notice the
+            // day a service is added or a palette retuned.
+            var BRANDS = {
+                "usa": {
+                    "accent": "#FFCB05",
+                    "mark": "/icon_round.png",
+                    "manifest": "/manifest-usa.webmanifest",
+                    "favicon192": "/favicon-192.png",
+                    "favicon96": "/favicon-96.png",
+                    "appIcon": "/icon-192.png"
+                },
+                "usmc": {
+                    "accent": "#E04B4B",
+                    "mark": "/icon_round_usmc.png",
+                    "manifest": "/manifest-usmc.webmanifest",
+                    "favicon192": "/favicon-192-usmc.png",
+                    "favicon96": "/favicon-96-usmc.png",
+                    "appIcon": "/icon-192-usmc.png"
+                },
+                "usn": {
+                    "accent": "#3377FF",
+                    "mark": "/icon_round_usn.png",
+                    "manifest": "/manifest-usn.webmanifest",
+                    "favicon192": "/favicon-192-usn.png",
+                    "favicon96": "/favicon-96-usn.png",
+                    "appIcon": "/icon-192-usn.png"
+                },
+                "usaf": {
+                    "accent": "#7FB3F0",
+                    "mark": "/icon_round_usaf.png",
+                    "manifest": "/manifest-usaf.webmanifest",
+                    "favicon192": "/favicon-192-usaf.png",
+                    "favicon96": "/favicon-96-usaf.png",
+                    "appIcon": "/icon-192-usaf.png"
+                },
+                "ussf": {
+                    "accent": "#C8D2E0",
+                    "mark": "/icon_round_ussf.png",
+                    "manifest": "/manifest-ussf.webmanifest",
+                    "favicon192": "/favicon-192-ussf.png",
+                    "favicon96": "/favicon-96-ussf.png",
+                    "appIcon": "/icon-192-ussf.png"
+                },
+                "uscg": {
+                    "accent": "#F57C00",
+                    "mark": "/icon_round_uscg.png",
+                    "manifest": "/manifest-uscg.webmanifest",
+                    "favicon192": "/favicon-192-uscg.png",
+                    "favicon96": "/favicon-96-uscg.png",
+                    "appIcon": "/icon-192-uscg.png"
+                }
+            };
+
+            // Nobody's colours until somebody has chosen. The Army was the
+            // default here, so a reader who had never answered the picker
+            // watched the app load in gold behind a gold favicon -- the
+            // question still on screen and already answered underneath.
+            //
+            // Grey is ui.theme.NEUTRAL_PRIMARY, the same colour the app paints
+            // while the picker is open, so the handover from HTML to Compose
+            // is invisible instead of a flash of the wrong service.
+            var NEUTRAL = {
+                "accent": "#D4D4D4",
+                "mark": "/icon_round_neutral.png",
+                "manifest": "/manifest.webmanifest",
+                "favicon192": "/favicon-192-neutral.png",
+                "favicon96": "/favicon-96-neutral.png",
+                "appIcon": "/icon-192-neutral.png"
+            };
+
+            var slug = null;
+            // Saved before the services were renamed. Those strings sit in
+            // browsers and keep arriving; Branch.bySlug and the database's
+            // branch_canonical() map them the same way.
+            var LEGACY = {"army": "usa", "navy": "usn", "marine-corps": "usmc",
+                          "air-force": "usaf", "space-force": "ussf",
+                          "coast-guard": "uscg"};
+            // localStorage throws outright rather than returning null when a
+            // browser blocks storage, so the read is guarded and not just the
+            // value it returns.
+            // The address first. A shared link names the service, and that is
+            // a firmer answer than whatever this browser chose last time --
+            // reading only localStorage meant arriving cold at /usaf/news/
+            // painted Army gold until Compose started. Route.serviceOf is the
+            // same rule in Kotlin; an unprefixed path is nobody's here,
+            // because the picker has to be free to ask.
+            var first = (location.pathname.split("/")[1] || "").toLowerCase();
+            first = LEGACY[first] || first;
+            if (BRANDS[first]) slug = first;
+
+            // localStorage throws outright rather than returning null when a
+            // browser blocks storage, so the read is guarded and not just the
+            // value it returns.
+            if (slug === null) {
+                try {
+                    var stored = localStorage.getItem("branch");
+                    stored = LEGACY[stored] || stored;
+                    if (BRANDS[stored]) slug = stored;
+                } catch (e) { /* no reachable choice; stay neutral and ask */ }
+            }
+
+            var brand = slug === null ? NEUTRAL : BRANDS[slug];
+            var root = document.documentElement;
+            root.setAttribute("data-branch", slug === null ? "neutral" : slug);
+            root.style.setProperty("--brand", brand.accent);
+            root.style.setProperty("--brand-logo", "url(" + brand.mark + ")");
+
+            // The tab icon, and the app if it has been installed.
+            //
+            // These are rewritten rather than written, so this script has to
+            // sit below the links it edits -- which is why it is at the end of
+            // <head> rather than the top. Still ahead of the stylesheet and of
+            // every element it colours, which is what matters for the paint.
+            //
+            // The manifest is the one branch-coloured thing nothing above can
+            // reach: an installed app's splash screen is drawn by the
+            // operating system, from icons it fetched for itself, so the only
+            // lever we have is which URL the link names. One manifest per
+            // service is written into the distribution by GenerateSeoPages,
+            // derived from the neutral base; all six share an id, so
+            // switching service re-skins the installed app rather than
+            // offering a second copy of it.
+            function repoint(selector, href) {
+                var link = document.querySelector(selector);
+                if (link) link.href = href;
+            }
+            repoint('link[rel="manifest"]', brand.manifest);
+            repoint('link[rel="icon"][sizes="192x192"]', brand.favicon192);
+            repoint('link[rel="icon"][sizes="96x96"]', brand.favicon96);
+            repoint('link[rel="apple-touch-icon"]', brand.appIcon);
+        })();
+    </script>
+    <style>
+        /* The flex centering that used to live here sized #root to its
+           content rather than stretching it, so the app rendered in a narrow
+           column once ComposeViewport replaced the fixed-size canvas. */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #0a0a0a;
+            color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+
+        #ComposeTarget {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        /* Readable if the app never boots, invisible the moment it does. */
+        #seo-fallback {
+            max-width: 46rem;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            font-family: Arial, sans-serif;
+            line-height: 1.5;
+        }
+
+        /* No flex centering here: it existed to centre the old fixed-size
+           canvas. As a flex item the Compose container sized to its content
+           (300px) instead of stretching, so the app rendered in a narrow
+           column. ComposeViewport fills whatever container it is given. */
+        #root {
+            width: 100%;
+            height: 100%;
+            /* Anchors #boot, which is layered over the app rather than sitting
+               inside it. */
+            position: relative;
+        }
+
+        /* The SEO copy has to be real markup in the initial response, but a
+           wall of unstyled text is not what a visitor should stare at for the
+           seconds wasm takes to boot. #boot covers it with the app's own
+           colours; both are removed the moment Compose paints. */
+        /* Layered over the app, not inside it. It used to live inside
+           #ComposeTarget so that Compose would tear it down on mount -- which
+           it did, instantly and before any transition could run, so the
+           loading screen vanished in a hard cut. Out here its removal is ours
+           to time, and it can fade.
+
+           pointer-events: none is what makes that safe. An earlier overlay
+           swallowed the pointer, and Compose, never having seen the pointer
+           enter its canvas, ignored the first click anywhere in the app even
+           after the overlay was gone. Transparent to input from the first
+           frame, the canvas underneath gets every event as usual. Absolute
+           within #root, never fixed. */
+        #boot {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #141414;
+            transition: opacity .45s ease;
+
+            /* The ring sits immediately outside the logo, touching it, so the
+               two sizes are derived from one another rather than set
+               independently. */
+            --boot-logo: clamp(160px, 42vmin, 300px);
+            --boot-ring-width: 7px;
+        }
+
+        #boot.done { opacity: 0; }
+
+        /* Square by construction: the ring is a border on a circle, and a
+           circle drawn on a non-square box is an ellipse. */
+        /* Only ever inserted when the app did not start. Centred over the
+           fallback text rather than replacing it, so the page still says what
+           the site is. */
+        #boot-failed {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            max-width: 22rem;
+            padding: 1.25rem 1.5rem;
+            border-radius: 12px;
+            background: #1c1c1c;
+            color: #f2f2f2;
+            font: 16px/1.5 system-ui, -apple-system, sans-serif;
+            text-align: center;
+        }
+
+        #boot-failed p { margin: 0 0 1rem; }
+
+        #boot-failed button {
+            font: inherit;
+            padding: 0.5rem 1.25rem;
+            border: 0;
+            border-radius: 8px;
+            background: var(--brand, #FFCB05);
+            color: #141414;
+            cursor: pointer;
+        }
+
+        #boot-mark {
+            position: relative;
+            width: calc(var(--boot-logo) + 2 * var(--boot-ring-width));
+            height: calc(var(--boot-logo) + 2 * var(--boot-ring-width));
+        }
+
+        /* A background image, not an <img>: the source has to be settled
+           before the first paint, and the script that settles it runs in
+           <head>, where there is no element yet to set a src on. A custom
+           property crosses that gap; a DOM write cannot. */
+        #boot-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: var(--boot-logo);
+            height: var(--boot-logo);
+            margin: calc(var(--boot-logo) / -2) 0 0 calc(var(--boot-logo) / -2);
+            border-radius: 50%;
+            background-image: var(--brand-logo, url(/icon_round.png));
+            background-size: cover;
+        }
+
+        /* One arc travelling around the logo. The track is drawn in the same
+           near-black the app uses for a raised surface, so only the coloured
+           arc reads as motion.
+
+           The fallbacks here and on the mark are what a reader sees if the
+           script above never ran at all -- scripting off, or a CSP that
+           refuses it. The Army's colours, which is what the app itself falls
+           back to. */
+        #boot-ring {
+            position: absolute;
+            inset: 0;
+            border: var(--boot-ring-width) solid #2D2D2D;
+            border-top-color: var(--brand, #FFCB05);
+            border-radius: 50%;
+            animation: boot-spin 1.1s linear infinite;
+        }
+
+        @keyframes boot-spin { to { transform: rotate(360deg); } }
+
+        /* Respect a reduced-motion preference: keep the indicator, drop the
+           spin. */
+        @media (prefers-reduced-motion: reduce) {
+            #boot-ring { animation: none; }
+            /* Uncover the app at once rather than dissolving into it. */
+            #boot { transition: none; }
+        }
+    </style>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CEQC3WB0MN"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-CEQC3WB0MN');
+    </script>
+    <script type="application/javascript">
+        // Function to create an object from a list of parameters and values
+        function createParamValueObject(params, values) {
+            var paramArray = params.split(',');
+            var valueArray = values.split(',');
+
+            if (paramArray.length !== valueArray.length) {
+                throw new Error('The number of parameters must match the number of values');
+            }
+
+            var result = {};
+            for (var i = 0; i < paramArray.length; i++) {
+                result[paramArray[i].trim()] = valueArray[i].trim();
+            }
+
+            return result;
+        }
+
+        // Read one archived publication and hand back its text.
+        //
+        // The corpus is stored gzipped -- 616MB of Air Force text is 169MB
+        // packed -- and the services after the Army keep no text column in
+        // Postgres, so a result card's supporting line is found here from the
+        // archive instead. DecompressionStream unpacks the body as it
+        // arrives, which is why this is a few lines of JS rather than an
+        // inflate implementation in Kotlin, and why the bytes never cross the
+        // wasm boundary.
+        //
+        // Resolves to null for anything at all -- a 404, an offline browser,
+        // a body that is not gzip. A missing snippet is a card with one less
+        // line on it; a thrown error is a search that looks broken.
+        function fetchArchivedText(url) {
+            return fetch(url)
+                .then(function (response) {
+                    if (!response.ok || !response.body) return null;
+                    return new Response(
+                        response.body.pipeThrough(new DecompressionStream('gzip'))
+                    ).text();
+                })
+                .catch(function () { return null; });
+        }
+
+        function shareContent(text) {
+            const url = window.location.href; // Get the current page URL
+            if (navigator.share) {
+                navigator.share({
+                    // Named explicitly rather than taken from document.title.
+                    // What is being shared is an answer, not the page it was
+                    // read on, and the sheet showed whichever page the app had
+                    // been served as -- "Army Links" on top of a regulation
+                    // answer, for anyone who arrived through that link.
+                    title: 'Reggie.Bot',
+                    text: text,
+                    url: url
+                }).then(() => {
+                    console.log('Successfully shared');
+                }).catch((error) => {
+                    console.error('Error sharing:', error);
+                });
+            } else {
+                console.error('Web Share API not supported in this browser');
+            }
+        }
+
+        // Waits for the helpers the app expects, but not forever.
+        //
+        // This polled every 100ms with no limit. Anything it waited on that
+        // never arrived -- a blocked third-party script, an extension that
+        // removed a global -- was a permanent, silent blank page: no error, no
+        // timeout, and the wasm never even requested. Loading the app late is
+        // recoverable; never loading it is not, so the deadline calls through
+        // anyway rather than giving up.
+        function waitForFunctions(functionNames, callback) {
+            var deadline = Date.now() + 5000;
+
+            function checkFunctions() {
+                for (let i = 0; i < functionNames.length; i++) {
+                    if (typeof window[functionNames[i]] !== "function") {
+                        if (Date.now() > deadline) {
+                            console.warn('proceeding without ' + functionNames[i]);
+                            break;
+                        }
+                        setTimeout(checkFunctions, 100);
+                        return;
+                    }
+                }
+                callback();
+            }
+
+            checkFunctions();
+        }
+
+        function detectUnsupportedBrowser() {
+            const userAgent = navigator.userAgent;
+
+            // Check if the browser is Safari and not Chrome or Firefox on iOS
+            const isSafari = /^((?!chrome|android|crios|fxios).)*safari/i.test(userAgent);
+
+            if (isSafari) {
+                // Extract the Safari version from the userAgent
+                const versionMatch = userAgent.match(/Version\/(\d+\.\d+)/);
+                if (versionMatch) {
+                    const safariVersion = parseFloat(versionMatch[1]);
+                    console.log(`Safari version detected: ${safariVersion}`);
+                    return safariVersion < 18.2;
+                }
+            }
+            console.log("Browser is not Safari or version not detected.");
+            return false;
+        }
+
+        if (detectUnsupportedBrowser()) {
+            window.location.href = "unsupported_browser.html";
+        } else {
+            window.onload = function() {
+                function dismissBootScreen() {
+                    var boot = document.getElementById('boot');
+                    if (!boot || boot.classList.contains('done')) return;
+                    boot.classList.add('done');
+                    // transitionend removes it as soon as the fade finishes;
+                    // the timer is the backstop for a browser that never fires
+                    // one (a reduced-motion setting removes the transition
+                    // altogether), so the overlay can never be left behind.
+                    boot.addEventListener('transitionend', function () { boot.remove(); });
+                    setTimeout(function () { boot.remove(); }, 1000);
+                }
+
+                // Compose renders to a canvas, and that canvas is the signal
+                // that the app is really up. It is not in the document though:
+                // Compose Multiplatform 1.11 puts it inside a shadow root, so
+                // document.querySelector('canvas') returns null forever and
+                // waiting on that meant waiting on something that never came.
+                function composeCanvas(root) {
+                    if (root.querySelector('canvas')) return true;
+                    var hosts = root.querySelectorAll('*');
+                    for (var i = 0; i < hosts.length; i++) {
+                        var shadow = hosts[i].shadowRoot;
+                        if (shadow && shadow.querySelector('canvas')) return true;
+                    }
+                    return false;
+                }
+
+                // Two frames after it mounts it has painted, so the overlay can
+                // dissolve into the app rather than off a blank canvas.
+                function dismissWhenComposePaints() {
+                    var target = document.getElementById('ComposeTarget');
+                    if (!target) return;
+                    var observer = new MutationObserver(function () {
+                        if (!composeCanvas(target)) return;
+                        observer.disconnect();
+                        requestAnimationFrame(function () {
+                            requestAnimationFrame(dismissBootScreen);
+                        });
+                    });
+                    observer.observe(target, { childList: true, subtree: true });
+
+                    // If wasm never boots, say so. This used to dismiss the
+                    // overlay and nothing else, so a failed boot and a slow one
+                    // looked the same -- and both looked like a broken site
+                    // with no way out but knowing to reload.
+                    setTimeout(function () {
+                        observer.disconnect();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
+                    }, 25000);
+                }
+
+                dismissWhenComposePaints();
+
+                // Registered after load, and deliberately after the wasm has
+                // been asked for: the app is ~15MB and the worker must not
+                // compete with it on a first visit. It pays off on the second.
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('/sw.js').catch(function (e) {
+                        // Not fatal - the app works without it.
+                        console.warn('service worker registration failed', e);
+                    });
+                }
+
+                // Shown only when the app really did not start. The fallback
+                // text underneath says what the site is; this says what
+                // happened and offers the one thing that fixes it.
+                function showBootFailed() {
+                    if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
+                    var box = document.createElement('div');
+                    box.id = 'boot-failed';
+                    box.setAttribute('role', 'alert');
+                    box.innerHTML =
+                        '<p>Reggie could not finish loading.</p>' +
+                        '<button type="button">Reload</button>';
+                    box.querySelector('button').addEventListener('click', function () {
+                        // Bypass both caches: the likeliest cause is a cached
+                        // copy that is no longer whole.
+                        if (window.caches && caches.keys) {
+                            caches.keys().then(function (names) {
+                                return Promise.all(names.map(function (n) { return caches.delete(n); }));
+                            }).catch(function () {}).then(function () { location.reload(); });
+                        } else {
+                            location.reload();
+                        }
+                    });
+                    document.getElementById('root').appendChild(box);
+                }
+
+                // A tab the browser reclaimed and then restored.
+                //
+                // Everything here runs inside window.onload, and a page
+                // restored from the back/forward cache never fires load again
+                // -- so if whatever was on screen is gone, nothing rebuilds
+                // it. Storage pressure can also empty the cache the app was
+                // served from, which is what leaves a blank white document
+                // rather than this app's own dark shell.
+                window.addEventListener('pageshow', function (event) {
+                    if (!event.persisted) return;
+                    var target = document.getElementById('ComposeTarget');
+                    if (target && composeCanvas(target)) return;
+                    location.reload();
+                });
+
+                function loadWasm() {
+                    var canvas = document.getElementById('ComposeTarget');
+                    canvas.focus();
+
+                    var script = document.createElement('script');
+                    // Absolute: this same file is served at /news, /pubs and
+                    // friends so deep links work, and a relative path would
+                    // look for /news/composeApp.js and never boot.
+                    script.src = "/composeApp.js";
+                    document.head.appendChild(script);
+                }
+
+                // List of functions to wait for
+                const functionsToWaitFor = ["createParamValueObject", "gtag", "shareContent"];
+
+                // Wait for all functions before loading Wasm
+                waitForFunctions(functionsToWaitFor, loadWasm);
+            };
+        }
+    </script>
+</head>
+<body>
+<!-- ComposeViewport (Compose Multiplatform 1.11, which replaced
+     CanvasBasedWindow) attaches to a CONTAINER and creates its own canvas
+     inside it. Leaving a <canvas> here gives an unsized 300x150 default that
+     renders nothing, and a second canvas nested inside it. -->
+<div id="root">
+    <!-- No visible text: the mark and the ring around it say "loading" on
+         their own. aria-label keeps that legible to a screen reader without
+         putting a caption back on the screen. -->
+    <div id="boot" role="status" aria-live="polite" aria-label="Loading Reggie.Bot">
+        <div id="boot-mark">
+            <div id="boot-ring"></div>
+            <div id="boot-logo"></div>
+        </div>
+    </div>
+
+    <!-- Compose replaces the contents of #ComposeTarget on boot, so users never
+         see this. Crawlers do: the app renders to a <canvas>, which search
+         engines cannot read at all, leaving the site with no indexable text
+         whatsoever. This is the only content Google gets today. -->
+    <div id="ComposeTarget" aria-label="Interactive application area" tabindex="0">
+        <!-- Not wrapped in <noscript>: crawlers that execute JS ignore it, and
+             this needs to be real markup in the initial response. Compose
+             clears the container when it mounts, so users see it only for the
+             instant before the app boots. -->
+        <div id="seo-fallback">
+            <h1>BUMEDINST - Navy Medicine Directives</h1>
+            <p>All 431 BUMEDINST publications (Navy Medicine Directives), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.</p>
+            <h2>431 Publications</h2>
+            <ul>
+                <li><a href="/usn/pub/bumedinst-1001.2e/">BUMEDINST 1001.2E</a> — Reserve Officer Classification, Subspecialty, And Qualification Designator Codes — 2/19/2025</li>
+                <li><a href="/usn/pub/bumedinst-1050.4/">BUMEDINST 1050.4</a> — Convalescent Leave Following Childbirth And Perinatal Loss — 6/8/2026</li>
+                <li><a href="/usn/pub/bumedinst-11010.7b/">BUMEDINST 11010.7B</a> — Procurement, Lease, And Use Of Relocatable Facilities — 7/25/2025</li>
+                <li><a href="/usn/pub/bumedinst-11011.1a/">BUMEDINST 11011.1A</a> — Procurement Of Leases For Class Two Real Property — 8/23/2018</li>
+                <li><a href="/usn/pub/bumedinst-11014.5a/">BUMEDINST 11014.5A</a> — Sustainment, Restoration, And Modernization Of Class 2 Real Property — 6/21/2018</li>
+                <li><a href="/usn/pub/bumedinst-11110.8b/">BUMEDINST 11110.8B</a> — Health Facility Planning And Project Officer Program — 5/29/2018</li>
+                <li><a href="/usn/pub/bumedinst-11240.6b/">BUMEDINST 11240.6B</a> — Government Vehicles – Non-tactical Vehicles And Equipment — 4/22/2026</li>
+                <li><a href="/usn/pub/bumedinst-1200.1b/">BUMEDINST 1200.1B</a> — Additional Qualification Designator Program For Chemical, Biological, Radiological, And Nuclear Defense — 1/16/2026</li>
+                <li><a href="/usn/pub/bumedinst-12000.1h/">BUMEDINST 12000.1H</a> — Timekeeping, Leave, And Pay For Non-bargaining Unit Civilian Personnel — 3/28/2023</li>
+                <li><a href="/usn/pub/bumedinst-12000.9/">BUMEDINST 12000.9</a> — Navy Medicine Office Of The Civilian Corps — 8/22/2017</li>
+                <li><a href="/usn/pub/bumedinst-1221.3a/">BUMEDINST 1221.3A</a> — Navy Enlisted Classification Code 8450 Mammography Technologist — 2/7/2025</li>
+                <li><a href="/usn/pub/bumedinst-12351.1c/">BUMEDINST 12351.1C</a> — Workforce Shaping, Reduction-in-force, Voluntary Separation Incentive Pay, And Voluntary Early Retirement Authority — 3/31/2025</li>
+                <li><a href="/usn/pub/bumedinst-12351.2b/">BUMEDINST 12351.2B</a> — Competitive Area For Reduction In Force Of Bureau Of Medicine And Surgery Civilian Employees — 3/20/2025</li>
+                <li><a href="/usn/pub/bumedinst-12351.3a/">BUMEDINST 12351.3A</a> — Establishment Of Competitive Levels For The Bureau Of Medicine And Surgery — 4/4/2025</li>
+                <li><a href="/usn/pub/bumedinst-12410.7a/">BUMEDINST 12410.7A</a> — Payment Of Expenses For Academic Courses And Professional Credentials For Civilian Employees — 8/15/2025</li>
+                <li><a href="/usn/pub/bumedinst-12430.6a/">BUMEDINST 12430.6A</a> — Department Of Defense Performance Management And Appraisal Program — 7/13/2022</li>
+                <li><a href="/usn/pub/bumedinst-12451.4d/">BUMEDINST 12451.4D</a> — Incentive Awards Program — 2/18/2025</li>
+                <li><a href="/usn/pub/bumedinst-12500.3/">BUMEDINST 12500.3</a> — Standard Position Description Library — 10/1/2019</li>
+                <li><a href="/usn/pub/bumedinst-12550.1a/">BUMEDINST 12550.1A</a> — Recruitment And Retention Flexibilities And Incentives Policies And Procedures — 7/31/2026</li>
+                <li><a href="/usn/pub/bumedinst-12792.2/">BUMEDINST 12792.2</a> — Civilian Drug Free Workplace — 4/27/2026</li>
+                <li><a href="/usn/pub/bumedinst-1300.2b/">BUMEDINST 1300.2B</a> — Suitability Screening, Medical Assignment Screening, And Exceptional Family Member Program Identification And Enrollment — 7/27/2016</li>
+                <li><a href="/usn/pub/bumedinst-1300.3a/">BUMEDINST 1300.3A</a> — Suitability Screening For Individuals Nominated For Individual Augmentee And Support Assignments To Overseas Contingency Operations, And Specific Temporary Additional Duty Assignments — 7/6/2010</li>
+                <li><a href="/usn/pub/bumedinst-1300.4/">BUMEDINST 1300.4</a> — Redeployment Screening Procedures For Individuals Returning From Overseas Contingency Operations Support Assignments — 10/23/2012</li>
+                <li><a href="/usn/pub/bumedinst-1300.6/">BUMEDINST 1300.6</a> — GENERAL DEPLOYABILITY ASSESSMENTS IN SUPPORT OF OPERATIONAL MEDICAL READINESS (Corrected - 3/28/2023) — 2/21/2023</li>
+                <li><a href="/usn/pub/bumedinst-1300.8/">BUMEDINST 1300.8</a> — Utilization Of Expeditionary Medical Systems Equipment For Training And Exercises And Operational Employment — 1/10/2024</li>
+                <li><a href="/usn/pub/bumedinst-1410.1b/">BUMEDINST 1410.1B</a> — MILESTONE QUALIFICATION PROGRAM FOR ACTIVE COMPONENT MEDICAL DEPARTMENT OFFICERS (Updated 4/9/2026) — 3/4/2026</li>
+                <li><a href="/usn/pub/bumedinst-1412.1f/">BUMEDINST 1412.1F</a> — Command Qualification Program For Active Component Medical Department Officers — 5/4/2026</li>
+                <li><a href="/usn/pub/bumedinst-1412.2a/">BUMEDINST 1412.2A</a> — Senior Executive Medicine Qualification Program For Active Component Medical Department Officers — 3/12/2026</li>
+                <li><a href="/usn/pub/bumedinst-1500.15f/">BUMEDINST 1500.15F</a> — Resuscitation Education And Training Policy — 10/17/2017</li>
+                <li><a href="/usn/pub/bumedinst-1500.20a/">BUMEDINST 1500.20A</a> — Funding Professional Credentials And Certification Examinations — 11/3/2017</li>
+                <li><a href="/usn/pub/bumedinst-1500.23d/">BUMEDINST 1500.23D</a> — Accreditation Of Medical Department Enlisted Technical Education And Training — 3/10/2025</li>
+                <li><a href="/usn/pub/bumedinst-1500.25d/">BUMEDINST 1500.25D</a> — Navy Medicine Master Training Specialist Program — 12/10/2024</li>
+                <li><a href="/usn/pub/bumedinst-1500.27b/">BUMEDINST 1500.27B</a> — Radiation Health Training For Designated Medical Department Personnel — 9/18/2024</li>
+                <li><a href="/usn/pub/bumedinst-1500.29d/">BUMEDINST 1500.29D</a> — Navy Medicine Command Training Program — 3/1/2021</li>
+                <li><a href="/usn/pub/bumedinst-1500.30/">BUMEDINST 1500.30</a> — Training And Certification Requirements For Healthcare Practitioners Performing Commercial Driver Examinations — 5/14/2014</li>
+                <li><a href="/usn/pub/bumedinst-1500.31/">BUMEDINST 1500.31</a> — Uniformed Services University Of The Health Sciences Enlisted To Medical Degree Preparatory Program — 5/7/2015</li>
+                <li><a href="/usn/pub/bumedinst-1500.32b/">BUMEDINST 1500.32B</a> — Training Requirements Integration Process — 5/30/2024</li>
+                <li><a href="/usn/pub/bumedinst-1500.33b/">BUMEDINST 1500.33B</a> — Standard Organizational Policy For Navy Nursing Compentencies And Clinical Readiness — 2/20/2026</li>
+                <li><a href="/usn/pub/bumedinst-1500.35a/">BUMEDINST 1500.35A</a> — High-risk Training Policy — 1/13/2025</li>
+                <li><a href="/usn/pub/bumedinst-1500.36a/">BUMEDINST 1500.36A</a> — Enterprise Training Framework — 5/21/2026</li>
+                <li><a href="/usn/pub/bumedinst-1500.37/">BUMEDINST 1500.37</a> — Individual Level Training — 5/13/2026</li>
+                <li><a href="/usn/pub/bumedinst-1510.19d/">BUMEDINST 1510.19D</a> — Corporate Enterprise Training And Activity Resource System — 2/7/2025</li>
+                <li><a href="/usn/pub/bumedinst-1510.25b/">BUMEDINST 1510.25B</a> — Tactical Combat Casualty Care Program — 4/9/2025</li>
+                <li><a href="/usn/pub/bumedinst-1510.27a/">BUMEDINST 1510.27A</a> — Hospital Corpsman Proficiency Assurance Program — 6/9/2026</li>
+                <li><a href="/usn/pub/bumedinst-1520.30d/">BUMEDINST 1520.30D</a> — Annual Training For Naval Reserve Officer Students — 11/18/2024</li>
+                <li><a href="/usn/pub/bumedinst-1520.34c/">BUMEDINST 1520.34C</a> — Continuing Education Programs For Medical Corps And Nurse Corps Officers — 6/30/2025</li>
+                <li><a href="/usn/pub/bumedinst-1520.37d/">BUMEDINST 1520.37D</a> — Navy Dental Officer Professional Education — 5/21/2026</li>
+                <li><a href="/usn/pub/bumedinst-1520.41a/">BUMEDINST 1520.41A</a> — Administration Of Post Graduate Dental Education Programs — 6/1/2021</li>
+                <li><a href="/usn/pub/bumedinst-1520.42b/">BUMEDINST 1520.42B</a> — Application Guidance For Undersea Medical Officer And Aerospace Medicine Professional Training — 6/11/2021</li>
+                <li><a href="/usn/pub/bumedinst-1520.43/">BUMEDINST 1520.43</a> — Medical Department Education Requirements And Selection Board Application Procedures — 2/1/2018</li>
+                <li><a href="/usn/pub/bumedinst-1520.44b/">BUMEDINST 1520.44B</a> — Navy Medicine Accessions Department Handbook — 11/13/2024</li>
+                <li><a href="/usn/pub/bumedinst-1520.45/">BUMEDINST 1520.45</a> — Master Clinician Program — 10/14/2022</li>
+                <li><a href="/usn/pub/bumedinst-1521.1/">BUMEDINST 1521.1</a> — Mental Health Integration For Chaplain Services Education Program — 12/14/2021</li>
+                <li><a href="/usn/pub/bumedinst-1524.1d/">BUMEDINST 1524.1D</a> — Graduate Medical Education Training — 9/10/2024</li>
+                <li><a href="/usn/pub/bumedinst-1543.1b/">BUMEDINST 1543.1B</a> — Navy Medicine Modeling And Simulation Management — 6/1/2021</li>
+                <li><a href="/usn/pub/bumedinst-1551.5a/">BUMEDINST 1551.5A</a> — Naval Aviation Survival Training Program Governance And Curriculum Management — 5/14/2026</li>
+                <li><a href="/usn/pub/bumedinst-1650.1b/">BUMEDINST 1650.1B</a> — Navy Medicine Military Awards Program — 2/27/2024</li>
+                <li><a href="/usn/pub/bumedinst-1650.3d/">BUMEDINST 1650.3D</a> — Captain Joan Dooling Award For Information Professional Excellence — 2/13/2025</li>
+                <li><a href="/usn/pub/bumedinst-1650.4a/">BUMEDINST 1650.4A</a> — Outstanding Navy Reserve Medicine Officer Of The Year Award — 3/2/2026</li>
+                <li><a href="/usn/pub/bumedinst-1650.5c/">BUMEDINST 1650.5C</a> — Independent Duty Corpsman Of The Year Award Program — 3/11/2024</li>
+                <li><a href="/usn/pub/bumedinst-1650.7a/">BUMEDINST 1650.7A</a> — Danyelle Luckey Sacred Trust Award — 4/15/2024</li>
+                <li><a href="/usn/pub/bumedinst-1650.8/">BUMEDINST 1650.8</a> — Career Counselor Of The Year Program — 10/24/2024</li>
+                <li><a href="/usn/pub/bumedinst-1700.4e/">BUMEDINST 1700.4E</a> — Shore Sailor Of The Year Program — 3/5/2025</li>
+                <li><a href="/usn/pub/bumedinst-1730.2d/">BUMEDINST 1730.2D</a> — Religious Ministry In Navy Medicine Budget Submitting Office 18 Activities — 5/12/2025</li>
+                <li><a href="/usn/pub/bumedinst-1755.1a/">BUMEDINST 1755.1A</a> — Educational And Developmental Intervention Services And Early Intervention Services — 1/11/2023</li>
+                <li><a href="/usn/pub/bumedinst-1770.14a/">BUMEDINST 1770.14A</a> — Traumatic Injury Servicemembers Group Life Insurance Implementation Guidance — 12/10/2024</li>
+                <li><a href="/usn/pub/bumedinst-1900.2a/">BUMEDINST 1900.2A</a> — Administrative Separations For Conditions Not Amounting To A Disability — 9/21/2022</li>
+                <li><a href="/usn/pub/bumedinst-2620.2a/">BUMEDINST 2620.2A</a> — Bureau Of Medicine And Surgery Next Generation Enterprise Network Services Delivery Program — 12/12/2023</li>
+                <li><a href="/usn/pub/bumedinst-3000.1/">BUMEDINST 3000.1</a> — Naval Expeditionary Health Service Support Optimized Fleet Response Plan — 2/1/2023</li>
+                <li><a href="/usn/pub/bumedinst-3070.1a/">BUMEDINST 3070.1A</a> — Navy Medicine Operations Security Program — 7/8/2024</li>
+                <li><a href="/usn/pub/bumedinst-3090.1/">BUMEDINST 3090.1</a> — Maritime Operations Center Conditions And Transition — 11/13/2024</li>
+                <li><a href="/usn/pub/bumedinst-3100.1b/">BUMEDINST 3100.1B</a> — Commander's Critical Information Requirements — 5/15/2023</li>
+                <li><a href="/usn/pub/bumedinst-3104.1a/">BUMEDINST 3104.1A</a> — Management And Operation Of Medical And Dental Visual Information Program — 8/23/2021</li>
+                <li><a href="/usn/pub/bumedinst-3104.2a/">BUMEDINST 3104.2A</a> — Use Of Personally Owned Imaging And Recording Devices — 2/8/2013</li>
+                <li><a href="/usn/pub/bumedinst-3120.1/">BUMEDINST 3120.1</a> — Standard Organization Code Policy — 5/26/2026</li>
+                <li><a href="/usn/pub/bumedinst-3150.3a/">BUMEDINST 3150.3A</a> — Navy Medicine Diving Program — 6/30/2025</li>
+                <li><a href="/usn/pub/bumedinst-3400.3a/">BUMEDINST 3400.3A</a> — Operational Readiness In Chemical, Biological, Radiological, And Nuclear Environments — 8/8/2025</li>
+                <li><a href="/usn/pub/bumedinst-3440.10c/">BUMEDINST 3440.10C</a> — Emergency Management Program — 1/21/2026</li>
+                <li><a href="/usn/pub/bumedinst-3440.12/">BUMEDINST 3440.12</a> — Navy Medicine Emergency Preparedness Logistical Guidance For Chemical, Biological, Radiological, And Nuclear Program — 6/26/2015</li>
+                <li><a href="/usn/pub/bumedinst-3440.13/">BUMEDINST 3440.13</a> — Installation Support Patient Decontamination Team Concept Of Operations — 3/1/2021</li>
+                <li><a href="/usn/pub/bumedinst-3500.3b/">BUMEDINST 3500.3B</a> — Navy Medicine Lessons Learned Program — 5/13/2025</li>
+                <li><a href="/usn/pub/bumedinst-3500.5b/">BUMEDINST 3500.5B</a> — Pandemic And Infectious Disease Policy — 5/13/2026</li>
+                <li><a href="/usn/pub/bumedinst-3500.6a/">BUMEDINST 3500.6A</a> — Navy Medicine Pandemic Influenza Response Stockpile Logistical Guidance — 6/15/2016</li>
+                <li><a href="/usn/pub/bumedinst-3500.7/">BUMEDINST 3500.7</a> — Naval Knowledge, Skills, And Abilities For Readiness Reporting And Assessment — 5/9/2025</li>
+                <li><a href="/usn/pub/bumedinst-3501.1b/">BUMEDINST 3501.1B</a> — Operational Readiness Reporting And Monitoring Program — 3/3/2021</li>
+                <li><a href="/usn/pub/bumedinst-3502.5a/">BUMEDINST 3502.5A</a> — Navy Medicine Mission Assurance Program — 5/8/2026</li>
+                <li><a href="/usn/pub/bumedinst-4100.3b/">BUMEDINST 4100.3B</a> — Energy Management Program — 7/29/2024</li>
+                <li><a href="/usn/pub/bumedinst-4200.2d/">BUMEDINST 4200.2D</a> — Health Care Services Contracting — 7/25/2014</li>
+                <li><a href="/usn/pub/bumedinst-4200.5c/">BUMEDINST 4200.5C</a> — Contract Services Management And Oversight — 12/29/2025</li>
+                <li><a href="/usn/pub/bumedinst-4860.5b/">BUMEDINST 4860.5B</a> — Commercial Activities Program — 12/27/2018</li>
+                <li><a href="/usn/pub/bumedinst-5030.3c/">BUMEDINST 5030.3C</a> — Navy Medicine Logos, Corps Seals, And Brand Guidance — 2/25/2022</li>
+                <li><a href="/usn/pub/bumedinst-5040.2e/">BUMEDINST 5040.2E</a> — Command Inspection Program — 6/22/2022</li>
+                <li><a href="/usn/pub/bumedinst-5041.6b/">BUMEDINST 5041.6B</a> — Navy Medicine Hotline Program — 6/23/2022</li>
+                <li><a href="/usn/pub/bumedinst-5050.6b/">BUMEDINST 5050.6B</a> — Continuing Education, Professional Update Training, And Alternative Instructional Systems For Medical Department Personnel — 1/14/2026</li>
+                <li><a href="/usn/pub/bumedinst-5060.1a/">BUMEDINST 5060.1A</a> — Naval Aerospace And Operational Physiology Program Awards — 4/1/2025</li>
+                <li><a href="/usn/pub/bumedinst-5100.13g/">BUMEDINST 5100.13G</a> — Navy Medicine Safety And Occupational Health Program — 1/22/2025</li>
+                <li><a href="/usn/pub/bumedinst-5100.16/">BUMEDINST 5100.16</a> — Safety Management System — 10/16/2024</li>
+                <li><a href="/usn/pub/bumedinst-5200.13c/">BUMEDINST 5200.13C</a> — Integrated Risk Management Program — 3/19/2025</li>
+                <li><a href="/usn/pub/bumedinst-5210.9b/">BUMEDINST 5210.9B</a> — Forms And Reports Management Program And Survey Coordination — 6/16/2009</li>
+                <li><a href="/usn/pub/bumedinst-5216.13/">BUMEDINST 5216.13</a> — Responses To Congressional Inquiries — 3/30/2011</li>
+                <li><a href="/usn/pub/bumedinst-5216.17b/">BUMEDINST 5216.17B</a> — Enterprise Task Management Solution System Business Rules — 12/10/2025</li>
+                <li><a href="/usn/pub/bumedinst-5220.5a/">BUMEDINST 5220.5A</a> — Navy Medicine Performance Improvement Management Program — 7/30/2021</li>
+                <li><a href="/usn/pub/bumedinst-5240.1/">BUMEDINST 5240.1</a> — Navy Medicine Counterintelligence Activities Supporting Research, Development, And Acquisition — 5/26/2026</li>
+                <li><a href="/usn/pub/bumedinst-5263.1c/">BUMEDINST 5263.1C</a> — Privacy And Civil Liberties Program — 5/26/2026</li>
+                <li><a href="/usn/pub/bumedinst-5292.1/">BUMEDINST 5292.1</a> — Provisioning Navy Enterprise Resource Planning Access — 4/9/2025</li>
+                <li><a href="/usn/pub/bumedinst-5305.3d/">BUMEDINST 5305.3D</a> — Medical Logistics Awards Program — 1/3/2025</li>
+                <li><a href="/usn/pub/bumedinst-5311.1/">BUMEDINST 5311.1</a> — Navy Total Force Manpower Labor Reporting Guidelines For Contract Employees — 12/20/2018</li>
+                <li><a href="/usn/pub/bumedinst-5312.3b/">BUMEDINST 5312.3B</a> — Defense Medical Human Resource System - Internet — 12/3/2020</li>
+                <li><a href="/usn/pub/bumedinst-5350.4b/">BUMEDINST 5350.4B</a> — Navy Medicine Alcohol And Drug Misuse Prevention And Control Program — 5/21/2026</li>
+                <li><a href="/usn/pub/bumedinst-5350.6/">BUMEDINST 5350.6</a> — Use Of Hand-held Alcohol Detection Devices — 8/12/2013</li>
+                <li><a href="/usn/pub/bumedinst-5353.4c/">BUMEDINST 5353.4C</a> — Standards For Alcohol And Substance Misuse Services — 8/30/2023</li>
+                <li><a href="/usn/pub/bumedinst-5360.24b/">BUMEDINST 5360.24B</a> — Definition Of Death — 2/23/2022</li>
+                <li><a href="/usn/pub/bumedinst-5420.12h/">BUMEDINST 5420.12H</a> — Roles And Responsibilities Related To Medical Department Specialty Leaders — 11/25/2025</li>
+                <li><a href="/usn/pub/bumedinst-5420.13e/">BUMEDINST 5420.13E</a> — Enlisted Technical Leader Program — 2/20/2025</li>
+                <li><a href="/usn/pub/bumedinst-5420.23b/">BUMEDINST 5420.23B</a> — Navy Medicine Representatives For North Atlantic Treaty Organization — 6/5/2025</li>
+                <li><a href="/usn/pub/bumedinst-5420.28/">BUMEDINST 5420.28</a> — Boards, Bureaus, Centers, Cells, Working Groups, Battle Rhythm, And Commander's Decision-making Process — 9/8/2023</li>
+                <li><a href="/usn/pub/bumedinst-5450.167b/">BUMEDINST 5450.167B</a> — Mission, Functions, And Tasks Of Naval Medical Research Unit San Antonio — 6/30/2025</li>
+                <li><a href="/usn/pub/bumedinst-5450.168a/">BUMEDINST 5450.168A</a> — Mission, Functions, And Tasks Of U.s. Naval Medical Reseach Unit Number Three, Cairo, Arab Republic Of Egypt — 10/24/2011</li>
+                <li><a href="/usn/pub/bumedinst-5450.169/">BUMEDINST 5450.169</a> — Mission, Functions, And Tasks Of Naval Medical Research Center — 9/26/2011</li>
+                <li><a href="/usn/pub/bumedinst-5450.170a/">BUMEDINST 5450.170A</a> — Mission, Functions, And Tasks Of Naval Medical Research Unit Dayton — 6/30/2025</li>
+                <li><a href="/usn/pub/bumedinst-5450.171/">BUMEDINST 5450.171</a> — Mission, Functions, And Tasks Of U.s. Naval Medical Research Unit Six — 11/16/2011</li>
+                <li><a href="/usn/pub/bumedinst-5450.172/">BUMEDINST 5450.172</a> — Mission, Functions, And Tasks Of Naval Medical Research Unit 2 Pacific, Pearl Harbor, Hawaii — 4/11/2012</li>
+                <li><a href="/usn/pub/bumedinst-5450.173/">BUMEDINST 5450.173</a> — Mission, Functions, And Tasks Of Navy Expeditionary Medical Support Command — 4/11/2012</li>
+                <li><a href="/usn/pub/bumedinst-5450.174b/">BUMEDINST 5450.174B</a> — Mission, Functions, And Tasks For Budget Submitting Office 18 Activities — 7/24/2024</li>
+                <li><a href="/usn/pub/bumedinst-5450.175/">BUMEDINST 5450.175</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Unit, Mayport, Florida — 7/1/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.176/">BUMEDINST 5450.176</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Unit Key West Florida — 7/1/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.178a/">BUMEDINST 5450.178A</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Command, Jacksonville, Florida — 7/1/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.181a/">BUMEDINST 5450.181A</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Command Fort Belvoir, Virginia — 8/20/2026</li>
+                <li><a href="/usn/pub/bumedinst-5450.182/">BUMEDINST 5450.182</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Command Bethesda, Maryland — 7/10/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.183a/">BUMEDINST 5450.183A</a> — Mission, Functions, And Tasks Of Naval Medical Forces Pacific San Diego, California — 5/31/2023</li>
+                <li><a href="/usn/pub/bumedinst-5450.184a/">BUMEDINST 5450.184A</a> — Mission, Functions, And Tasks Of Naval Medical Forces Atlantic Portsmouth, Virginia — 5/31/2023</li>
+                <li><a href="/usn/pub/bumedinst-5450.185/">BUMEDINST 5450.185</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Unit Albany, Georgia — 7/1/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.186/">BUMEDINST 5450.186</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Unit Kings Bay, Georgia — 7/1/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.187/">BUMEDINST 5450.187</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Command, Pensacola, Florida — 7/10/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.188/">BUMEDINST 5450.188</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Unit Memphis, Tennessee — 7/10/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.189/">BUMEDINST 5450.189</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Unit Meridian, Mississippi — 7/10/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.190/">BUMEDINST 5450.190</a> — MISSION, FUNCTIONS, AND TASKS OF NAVY MEDICINE READINESS AND TRAINING UNIT BELLE CHASSE, LOUISIANA (Corrected -  July 23, 2020) — 7/10/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.191/">BUMEDINST 5450.191</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Unit Whiting Field, Florida — 7/10/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.192/">BUMEDINST 5450.192</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Unit Gulfport, Mississippi — 7/24/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.193a/">BUMEDINST 5450.193A</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Command Camp Lejeune, North Carolina — 8/20/2026</li>
+                <li><a href="/usn/pub/bumedinst-5450.194a/">BUMEDINST 5450.194A</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Command Portsmouth, Virginia — 3/4/2026</li>
+                <li><a href="/usn/pub/bumedinst-5450.195/">BUMEDINST 5450.195</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Unit Oceana, Virginia — 7/27/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.196/">BUMEDINST 5450.196</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Unit Little Creek, Virginia — 8/5/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.197/">BUMEDINST 5450.197</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Unit Naval Station Norfolk, Virginia — 7/28/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.198/">BUMEDINST 5450.198</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Command Beaufort, South Carolina — 6/30/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.199/">BUMEDINST 5450.199</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Unit, Marine Corps Recruit Depot Parris Island, South Carolina — 6/30/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.1h/">BUMEDINST 5450.1H</a> — Mission, Functions, And Tasks Of Naval Medical Logistics Command — 4/27/2012</li>
+                <li><a href="/usn/pub/bumedinst-5450.200/">BUMEDINST 5450.200</a> — Mission, Functions, And Tasks Of United States Navy Medicine Readiness And Training Command Guantanamo, Cuba — 9/28/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.201/">BUMEDINST 5450.201</a> — Mission, Functions, And Tasks Of United States Navy Medicine Readiness And Training Command Sigonella, Italy — 9/28/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.202/">BUMEDINST 5450.202</a> — Mission, Functions, And Tasks Of United States Navy Medicine Readiness And Training Unit, Bahrain — 9/16/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.203/">BUMEDINST 5450.203</a> — Mission, Functions, And Tasks Of United States Navy Medicine Readiness And Training Command Naples, Italy — 9/28/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.204/">BUMEDINST 5450.204</a> — Mission, Functions, And Tasks Of United States Navy Medicine Readiness And Training Command Rota, Spain — 9/28/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.205/">BUMEDINST 5450.205</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Command Charleston, South Carolina — 7/1/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.206/">BUMEDINST 5450.206</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Command Cherry Point, North Carolina — 6/30/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.207a/">BUMEDINST 5450.207A</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Command Great Lakes, Illinois — 8/20/2026</li>
+                <li><a href="/usn/pub/bumedinst-5450.208/">BUMEDINST 5450.208</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Command Quantico, Virginia — 6/30/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.209/">BUMEDINST 5450.209</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Command Annapolis, Maryland — 9/15/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.210/">BUMEDINST 5450.210</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Unit Earle, New Jersey — 10/20/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.211/">BUMEDINST 5450.211</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Command New England, Newport, Rhode Island — 7/7/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.212/">BUMEDINST 5450.212</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Unit Portsmouth, New Hampshire — 7/10/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.213/">BUMEDINST 5450.213</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Unit Groton, Connecticut — 7/6/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.214a/">BUMEDINST 5450.214A</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Command Patuxent River Maryland — 4/27/2026</li>
+                <li><a href="/usn/pub/bumedinst-5450.215/">BUMEDINST 5450.215</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Unit Dahlgren, Virginia — 11/13/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.216a/">BUMEDINST 5450.216A</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Command Corpus Christi, Texas — 9/2/2026</li>
+                <li><a href="/usn/pub/bumedinst-5450.217/">BUMEDINST 5450.217</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Unit Kingsville, Texas — 7/10/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.218/">BUMEDINST 5450.218</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Unit Fort Worth, Texas — 7/10/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.219/">BUMEDINST 5450.219</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Command San Diego, California — 9/28/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.220/">BUMEDINST 5450.220</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Unit Point Loma, California — 9/15/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.221/">BUMEDINST 5450.221</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Unit North Island, California — 9/15/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.222/">BUMEDINST 5450.222</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Unit Naval Base San Diego, California — 9/15/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.223/">BUMEDINST 5450.223</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Unit Marine Corps Recruit Depot San Diego, California — 9/15/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.224/">BUMEDINST 5450.224</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Command Oak Harbor, Washington — 7/1/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.225/">BUMEDINST 5450.225</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Command Bremerton, Washington — 10/22/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.226/">BUMEDINST 5450.226</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Unit Bangor, Washington — 10/21/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.227/">BUMEDINST 5450.227</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Unit Everett, Washington — 10/22/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.228/">BUMEDINST 5450.228</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Command Pearl Harbor, Hawaii — 7/24/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.229/">BUMEDINST 5450.229</a> — Mission, Functions, And Tasks Of United States Navy Medicine Readiness And Training Command Okinawa, Japan — 9/28/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.230/">BUMEDINST 5450.230</a> — Mission, Functions, And Tasks Of United States Navy Medicine Readiness And Training Command Guam, Mariana Islands — 9/28/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.231/">BUMEDINST 5450.231</a> — Mission, Functions, And Tasks Of United States Navy Medicine Readiness And Training Command Yokosuka, Japan — 9/28/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.232/">BUMEDINST 5450.232</a> — Mission, Functions, And Tasks Of United States Navy Medicine Readiness And Training Unit Atsugi, Japan — 9/16/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.233/">BUMEDINST 5450.233</a> — Mission, Functions, And Tasks Of United States Navy Medicine Readiness And Training Unit Iwakuni, Japan — 9/16/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.234/">BUMEDINST 5450.234</a> — Mission, Functions, And Tasks Of United States Navy Medicine Readiness And Training Unit Sasebo, Japan — 9/16/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.235/">BUMEDINST 5450.235</a> — Mission, Functions, And Tasks Of United States Navy Medicine Readiness And Training Unit Diego Garcia — 9/16/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.236a/">BUMEDINST 5450.236A</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Command Camp Pendleton, California — 6/8/2026</li>
+                <li><a href="/usn/pub/bumedinst-5450.237/">BUMEDINST 5450.237</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Unit Port Hueneme, California — 10/22/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.238/">BUMEDINST 5450.238</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Unit Yuma, Arizona — 10/21/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.239/">BUMEDINST 5450.239</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Command Twentynine Palms, California — 9/15/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.240/">BUMEDINST 5450.240</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Unit China Lake, California — 9/15/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.241/">BUMEDINST 5450.241</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Command Lemoore, California — 7/27/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.242/">BUMEDINST 5450.242</a> — Mission, Functions, And Tasks Of Navy Medicine Readiness And Training Unit Fallon, Nevada — 7/27/2020</li>
+                <li><a href="/usn/pub/bumedinst-5450.243b/">BUMEDINST 5450.243B</a> — Mission, Functions, And Tasks Of Naval Medical Forces Development Command — 4/14/2026</li>
+                <li><a href="/usn/pub/bumedinst-5450.244/">BUMEDINST 5450.244</a> — Mission, Functions, And Tasks Of Naval Medical Administrative Unit, Monterey, California — 11/24/2021</li>
+                <li><a href="/usn/pub/bumedinst-5450.245/">BUMEDINST 5450.245</a> — Mission, Functions, And Tasks Of Naval Submarine Medical Research Laboratory New London Connecticut — 6/27/2025</li>
+                <li><a href="/usn/pub/bumedinst-5450.246/">BUMEDINST 5450.246</a> — Mission, Functions, And Tasks Of United States Naval Medical Research Unit Europe Africa Central — 6/30/2025</li>
+                <li><a href="/usn/pub/bumedinst-5450.247/">BUMEDINST 5450.247</a> — Mission, Functions, And Tasks Of Naval Health Research Center — 10/22/2025</li>
+                <li><a href="/usn/pub/bumedinst-5450.248/">BUMEDINST 5450.248</a> — Mission, Functions, And Tasks Of United States Naval Medical Research Unit South — 8/4/2025</li>
+                <li><a href="/usn/pub/bumedinst-5450.250/">BUMEDINST 5450.250</a> — Mission, Functions, And Tasks Of Naval Medical Research Unit Indo Pacific — 6/27/2025</li>
+                <li><a href="/usn/pub/bumedinst-5450.252/">BUMEDINST 5450.252</a> — Mission, Functions, And Tasks Of Navy And Marine Corps Force Health Protection Command Portsmouth, Virginia — 8/8/2025</li>
+                <li><a href="/usn/pub/bumedinst-5450.253/">BUMEDINST 5450.253</a> — Mission, Functions, And Tasks Of Naval Medical Readiness Logistics Command — 7/23/2025</li>
+                <li><a href="/usn/pub/bumedinst-5450.254/">BUMEDINST 5450.254</a> — Mission, Functions, And Tasks Of Naval Medical Readiness Logistics Command Detachment Fort Detrick, Maryland — 8/5/2025</li>
+                <li><a href="/usn/pub/bumedinst-5450.255/">BUMEDINST 5450.255</a> — Mission, Functions, And Tasks Of Navy Medicine Operational Training Command — 1/13/2026</li>
+                <li><a href="/usn/pub/bumedinst-5450.256/">BUMEDINST 5450.256</a> — Mission, Functions, And Tasks Of Navy Medicine Operational Training Command Detachment, Surface Warfare Medical Institute — 9/18/2025</li>
+                <li><a href="/usn/pub/bumedinst-5450.257/">BUMEDINST 5450.257</a> — Mission, Functions And Tasks Of Navy Medicine Operational Training Command Detachment, Naval Special Operations Medical Institute — 8/22/2025</li>
+                <li><a href="/usn/pub/bumedinst-5450.258/">BUMEDINST 5450.258</a> — Mission, Functions, And Tasks Of Naval Medical Leader And Professional Development Command — 8/22/2025</li>
+                <li><a href="/usn/pub/bumedinst-5450.259/">BUMEDINST 5450.259</a> — Mission, Functions, And Tasks Of Navy Medicine Operational Training Command Detachment, Naval Aerospace Medical Institute — 9/18/2025</li>
+                <li><a href="/usn/pub/bumedinst-5450.260/">BUMEDINST 5450.260</a> — Mission, Functions, And Tasks Of Navy Medicine Operational Training Command Detachment, Naval Undersea Medical Institute — 1/9/2026</li>
+                <li><a href="/usn/pub/bumedinst-5450.261/">BUMEDINST 5450.261</a> — Mission, Functions And Tasks Of Navy Medicine Operational Training Command Detachment, Naval Survival Training Institute — 1/9/2026</li>
+                <li><a href="/usn/pub/bumedinst-5450.262/">BUMEDINST 5450.262</a> — Mission, Functions, And Tasks Of Navy Medicine Training Support Command Fort Sam Houston, Texas — 3/4/2026</li>
+                <li><a href="/usn/pub/bumedinst-5450.263/">BUMEDINST 5450.263</a> — Mission, Functions, And Tasks Of Navy Drug Screening Laboratory Great Lakes, Illinois — 3/25/2026</li>
+                <li><a href="/usn/pub/bumedinst-5450.264/">BUMEDINST 5450.264</a> — Mission, Functions, And Tasks Of Navy Drug Screening Laboratory Jacksonville, Florida — 2/4/2026</li>
+                <li><a href="/usn/pub/bumedinst-5450.265/">BUMEDINST 5450.265</a> — Mission, Functions, And Tasks Of Navy Entomology Center Of Excellence — 2/2/2026</li>
+                <li><a href="/usn/pub/bumedinst-5450.266/">BUMEDINST 5450.266</a> — Mission, Functions, And Tasks Of Navy Environmental And Preventive Medicine Unit Two Norfolk, Virginia — 4/27/2026</li>
+                <li><a href="/usn/pub/bumedinst-5450.267/">BUMEDINST 5450.267</a> — Mission, Functions, And Tasks Of Navy Bloodborne Infection Management Center — 3/12/2026</li>
+                <li><a href="/usn/pub/bumedinst-5450.268/">BUMEDINST 5450.268</a> — Mission, Functions, And Tasks Of Navy Environmental And Preventive Medicine Unit Six Pearl Harbor, Hawaii — 4/27/2026</li>
+                <li><a href="/usn/pub/bumedinst-5450.270/">BUMEDINST 5450.270</a> — Mission, Functions, And Tasks Of Navy Environmental Preventive Medicine Unit Five San Diego California — 3/9/2026</li>
+                <li><a href="/usn/pub/bumedinst-5450.271/">BUMEDINST 5450.271</a> — Mission, Functions, And Tasks Of The Naval Dosimetry Center Bethesda — 4/22/2026</li>
+                <li><a href="/usn/pub/bumedinst-5450.72e/">BUMEDINST 5450.72E</a> — Mission, Functions, And Tasks Of Naval Ophthalmic Support And Training Activity — 10/24/2011</li>
+                <li><a href="/usn/pub/bumedinst-5510.10/">BUMEDINST 5510.10</a> — Information Security Program — 4/22/2016</li>
+                <li><a href="/usn/pub/bumedinst-5510.11/">BUMEDINST 5510.11</a> — Personnel Security Program — 4/6/2016</li>
+                <li><a href="/usn/pub/bumedinst-5510.9c/">BUMEDINST 5510.9C</a> — Insider Threat Program — 3/18/2026</li>
+                <li><a href="/usn/pub/bumedinst-5721.3e/">BUMEDINST 5721.3E</a> — Approval Process For Public Release Of Information — 4/16/2021</li>
+                <li><a href="/usn/pub/bumedinst-5830.1c/">BUMEDINST 5830.1C</a> — Health Care Investigation Procedures For Specialty Reviews — 1/24/2025</li>
+                <li><a href="/usn/pub/bumedinst-5870.1a/">BUMEDINST 5870.1A</a> — Use Of Copyrighted Materials And Official Navy Imaging — 10/21/2020</li>
+                <li><a href="/usn/pub/bumedinst-6000.14c/">BUMEDINST 6000.14C</a> — Support Of Service Members In Lactation And Breastfeeding — 7/31/2026</li>
+                <li><a href="/usn/pub/bumedinst-6000.16/">BUMEDINST 6000.16</a> — Establishment Of Clinical Informatics Workforce — 5/7/2014</li>
+                <li><a href="/usn/pub/bumedinst-6000.22/">BUMEDINST 6000.22</a> — High Reliability Organization Implementation — 1/21/2026</li>
+                <li><a href="/usn/pub/bumedinst-6000.23/">BUMEDINST 6000.23</a> — Command Notification Of Pregnancy — 8/7/2026</li>
+                <li><a href="/usn/pub/bumedinst-6010.13a/">BUMEDINST 6010.13A</a> — Medical Quality Assurance Program And Clinical Quality Management Program — 1/22/2026</li>
+                <li><a href="/usn/pub/bumedinst-6010.17d/">BUMEDINST 6010.17D</a> — Navy Medical Staff Bylaws — 4/24/2025</li>
+                <li><a href="/usn/pub/bumedinst-6010.18c/">BUMEDINST 6010.18C</a> — Participation In The National Practitioner Data Bank — 6/5/2024</li>
+                <li><a href="/usn/pub/bumedinst-6010.21/">BUMEDINST 6010.21</a> — Risk Management Program — 10/29/1996</li>
+                <li><a href="/usn/pub/bumedinst-6010.23a/">BUMEDINST 6010.23A</a> — Operational Clinical Patient Safety Program — 7/15/2025</li>
+                <li><a href="/usn/pub/bumedinst-6010.25c/">BUMEDINST 6010.25C</a> — Medical Ethics — 6/11/2026</li>
+                <li><a href="/usn/pub/bumedinst-6010.29a/">BUMEDINST 6010.29A</a> — Reserve Component Medical Executive Committee And Reserve Component Nursing Executive Committee Policies And Procedures — 3/29/2016</li>
+                <li><a href="/usn/pub/bumedinst-6010.30/">BUMEDINST 6010.30</a> — Credentialing And Privileging Program — 3/27/2015</li>
+                <li><a href="/usn/pub/bumedinst-6010.31a/">BUMEDINST 6010.31A</a> — Clinical Adverse Actions And Health Care Related Misconduct — 4/24/2025</li>
+                <li><a href="/usn/pub/bumedinst-6010.33/">BUMEDINST 6010.33</a> — Organizational Incident Operational Nexus — 10/29/2021</li>
+                <li><a href="/usn/pub/bumedinst-6010.34/">BUMEDINST 6010.34</a> — Valproic Acid Monitoring Protocol — 8/12/2019</li>
+                <li><a href="/usn/pub/bumedinst-6010.35a/">BUMEDINST 6010.35A</a> — Program Objective Memorandum Policy — 1/12/2026</li>
+                <li><a href="/usn/pub/bumedinst-6010.37/">BUMEDINST 6010.37</a> — Navy Reserve Medicine Credentialing And Privileging Renewal For Privileged Providers And Clinical Support Staff — 4/17/2024</li>
+                <li><a href="/usn/pub/bumedinst-6110.13b/">BUMEDINST 6110.13B</a> — Health Promotion And Wellness Program — 4/2/2018</li>
+                <li><a href="/usn/pub/bumedinst-6110.14a/">BUMEDINST 6110.14A</a> — Assessing, Documenting, And Reporting Individual Medical Readiness Data — 12/22/2023</li>
+                <li><a href="/usn/pub/bumedinst-6110.15c/">BUMEDINST 6110.15C</a> — Medical Department Responsibilities For The Physical Readiness Program — 11/18/2024</li>
+                <li><a href="/usn/pub/bumedinst-6110.16b/">BUMEDINST 6110.16B</a> — Medical Department Responsibilities For Shipshape Program — 3/28/2023</li>
+                <li><a href="/usn/pub/bumedinst-6120.20d/">BUMEDINST 6120.20D</a> — Competence For Duty Examinations, Evaluations Of Sobriety, And Other Bodily Views And Intrusions Performed By Medical Personnel — 6/30/2025</li>
+                <li><a href="/usn/pub/bumedinst-6120.27/">BUMEDINST 6120.27</a> — Advanced Practice Registered Nurse Roles In Reserve Component Medical Exams — 12/21/2022</li>
+                <li><a href="/usn/pub/bumedinst-6150.38a/">BUMEDINST 6150.38A</a> — Coding Program Standard Business Practices, Processes, And Reporting Guidelines — 7/10/2013</li>
+                <li><a href="/usn/pub/bumedinst-6200.12b/">BUMEDINST 6200.12B</a> — Comprehensive Tobacco Control For Navy Medicine — 4/17/2023</li>
+                <li><a href="/usn/pub/bumedinst-6200.14d/">BUMEDINST 6200.14D</a> — Childhood Lead Poisoning Prevention — 8/30/2017</li>
+                <li><a href="/usn/pub/bumedinst-6200.15b/">BUMEDINST 6200.15B</a> — Suspension Of Diving And Special Operations Duty During Pregnancy — 6/20/2023</li>
+                <li><a href="/usn/pub/bumedinst-6200.16a/">BUMEDINST 6200.16A</a> — Prevention Of Latex Sensitization And Minimizing Its Effects Among Health Care Workers And Patients — 6/14/2017</li>
+                <li><a href="/usn/pub/bumedinst-6200.17b/">BUMEDINST 6200.17B</a> — Public Health Emergency Officers — 5/18/2023</li>
+                <li><a href="/usn/pub/bumedinst-6210.4a/">BUMEDINST 6210.4A</a> — Ship Sanitation Certificate Program — 11/14/2023</li>
+                <li><a href="/usn/pub/bumedinst-6210.5a/">BUMEDINST 6210.5A</a> — Security Standards And Processes For Safeguarding Biological Select Agents And Toxins — 5/21/2026</li>
+                <li><a href="/usn/pub/bumedinst-6210.6/">BUMEDINST 6210.6</a> — Certification Of Competent Medical Authorities For Biological Select Agents And Toxins — 3/16/2023</li>
+                <li><a href="/usn/pub/bumedinst-6220.12d/">BUMEDINST 6220.12D</a> — Medical Surveillance And Response — 5/14/2025</li>
+                <li><a href="/usn/pub/bumedinst-6220.13b/">BUMEDINST 6220.13B</a> — Rabies Prevention And Control — 5/22/2018</li>
+                <li><a href="/usn/pub/bumedinst-6220.14a/">BUMEDINST 6220.14A</a> — Bloodborne Pathogen Control Program — 1/21/2026</li>
+                <li><a href="/usn/pub/bumedinst-6220.8c/">BUMEDINST 6220.8C</a> — Streptococcal Infection Prevention Program — 10/6/2025</li>
+                <li><a href="/usn/pub/bumedinst-6220.9b/">BUMEDINST 6220.9B</a> — Healthcare-associated Infection Prevention And Control Program — 4/14/2011</li>
+                <li><a href="/usn/pub/bumedinst-6222.10d/">BUMEDINST 6222.10D</a> — Prevention And Management Of Sexually Transmitted Infections — 6/1/2021</li>
+                <li><a href="/usn/pub/bumedinst-6224.8d/">BUMEDINST 6224.8D</a> — Tuberculosis Surveillance And Control Program — 5/26/2026</li>
+                <li><a href="/usn/pub/bumedinst-6230.15b/">BUMEDINST 6230.15B</a> — Immunizations And Chemoprophylaxis For The Prevention Of Infectious Diseases — 10/7/2013</li>
+                <li><a href="/usn/pub/bumedinst-6230.16a/">BUMEDINST 6230.16A</a> — Malaria Prevention And Control — 1/16/2018</li>
+                <li><a href="/usn/pub/bumedinst-6240.10e/">BUMEDINST 6240.10E</a> — Department Of The Navy Medical Drinking Water Program — 6/9/2026</li>
+                <li><a href="/usn/pub/bumedinst-6240.12b/">BUMEDINST 6240.12B</a> — Defense Occupational And Environmental Health Readiness System-industrial Hygiene-environmental Health Module — 1/13/2026</li>
+                <li><a href="/usn/pub/bumedinst-6250.12e/">BUMEDINST 6250.12E</a> — Pesticide Applicator Training And Certification For Medical  Personnel — 12/6/2023</li>
+                <li><a href="/usn/pub/bumedinst-6260.30b/">BUMEDINST 6260.30B</a> — Mercury Control Program For Dental Treatment Spaces — 10/15/2015</li>
+                <li><a href="/usn/pub/bumedinst-6270.8d/">BUMEDINST 6270.8D</a> — Occupational Health Hazard Assessments — 5/8/2025</li>
+                <li><a href="/usn/pub/bumedinst-6270.9/">BUMEDINST 6270.9</a> — Analysis Of Removed Combat-related Metal Fragments — 5/21/2018</li>
+                <li><a href="/usn/pub/bumedinst-6280.1d/">BUMEDINST 6280.1D</a> — Management Of  Regulated Medical Waste — 6/8/2026</li>
+                <li><a href="/usn/pub/bumedinst-6300.10c/">BUMEDINST 6300.10C</a> — Medical And Dental Treatment Facility Customer Relations Program — 3/14/2018</li>
+                <li><a href="/usn/pub/bumedinst-6300.16a/">BUMEDINST 6300.16A</a> — Navy Abortion Policy — 4/28/2014</li>
+                <li><a href="/usn/pub/bumedinst-6300.21a/">BUMEDINST 6300.21A</a> — Human Cells, Tissues, And Cellular And Tissue-based Products Management Program — 12/31/2018</li>
+                <li><a href="/usn/pub/bumedinst-6300.24/">BUMEDINST 6300.24</a> — Caregiver Occupational Stress Control Program — 5/3/2019</li>
+                <li><a href="/usn/pub/bumedinst-6310.11a/">BUMEDINST 6310.11A</a> — Sexual Assault Prevention And Response Medical-forensic Program — 5/2/2013</li>
+                <li><a href="/usn/pub/bumedinst-6310.13a/">BUMEDINST 6310.13A</a> — Guidance For Conducting Baseline Pre-deployment Neurocognitive Functional Assessments — 4/4/2023</li>
+                <li><a href="/usn/pub/bumedinst-6310.14/">BUMEDINST 6310.14</a> — Navy Medicine Diabetes Mellitus Care And Management Policy — 9/18/2012</li>
+                <li><a href="/usn/pub/bumedinst-6310.15/">BUMEDINST 6310.15</a> — Navy Medicine Asthma Care And Management Policy — 9/10/2012</li>
+                <li><a href="/usn/pub/bumedinst-6310.16/">BUMEDINST 6310.16</a> — Navy Medicine Traumatic Brain Injury Training Requirement For Healthcare Personnel — 6/1/2022</li>
+                <li><a href="/usn/pub/bumedinst-6320.100/">BUMEDINST 6320.100</a> — Medical, Chiropractic, And Licensed Acupuncture — 3/11/2013</li>
+                <li><a href="/usn/pub/bumedinst-6320.101/">BUMEDINST 6320.101</a> — Long-term Opioid Therapy Safety Program — 3/14/2018</li>
+                <li><a href="/usn/pub/bumedinst-6320.104/">BUMEDINST 6320.104</a> — Medical Cognizance Of Navy And Marine Corps Service Members In Support Of Medical Readiness — 7/21/2026</li>
+                <li><a href="/usn/pub/bumedinst-6320.38d/">BUMEDINST 6320.38D</a> — Hyperbaric Oxygen Treatment In Navy Recompression Chambers — 3/28/2023</li>
+                <li><a href="/usn/pub/bumedinst-6320.79b/">BUMEDINST 6320.79B</a> — Medical Examinations For Members On The Temporary Disability Retired List — 4/1/2022</li>
+                <li><a href="/usn/pub/bumedinst-6320.82b/">BUMEDINST 6320.82B</a> — Standards Of Oral Health Care — 1/23/2018</li>
+                <li><a href="/usn/pub/bumedinst-6320.83c/">BUMEDINST 6320.83C</a> — Standbys During Medical Examinations — 5/29/2024</li>
+                <li><a href="/usn/pub/bumedinst-6320.85a/">BUMEDINST 6320.85A</a> — Medical Cognizance Of Navy And Marine Corps Patients In Non-naval Health Care Facilities — 5/22/2015</li>
+                <li><a href="/usn/pub/bumedinst-6320.92a/">BUMEDINST 6320.92A</a> — Navy Cancer Registry Program — 12/19/2018</li>
+                <li><a href="/usn/pub/bumedinst-6320.97a/">BUMEDINST 6320.97A</a> — Navy Medical Treatment Facility Intensive Care Unit Model And Re-designation — 3/13/2015</li>
+                <li><a href="/usn/pub/bumedinst-6400.10/">BUMEDINST 6400.10</a> — Navy Global Health Engagement Activities — 11/23/2021</li>
+                <li><a href="/usn/pub/bumedinst-6400.3b/">BUMEDINST 6400.3B</a> — Use And Supervision Of Psychological Testing And Test Materials — 3/27/2023</li>
+                <li><a href="/usn/pub/bumedinst-6400.8a/">BUMEDINST 6400.8A</a> — Independent Duty Corpsman Formulary — 3/31/2022</li>
+                <li><a href="/usn/pub/bumedinst-6410.10/">BUMEDINST 6410.10</a> — Designation Of Navy Aerospace Medicine Physicians As Federal Aviation Administration Senior Aviation Medical Examiners — 5/21/2026</li>
+                <li><a href="/usn/pub/bumedinst-6410.9b/">BUMEDINST 6410.9B</a> — Medical Monitoring Of Flight Personnel In Locations Where Aerospace Medical Clinicians Are Not Available — 5/4/2026</li>
+                <li><a href="/usn/pub/bumedinst-6440.10/">BUMEDINST 6440.10</a> — GUIDANCE FOR IN GARRISON ACTIVE COMPONENT ECHELON 5 EXPEDITIONARY MEDICAL FACILITIES (Corrected 2/8/2023) — 2/1/2023</li>
+                <li><a href="/usn/pub/bumedinst-6440.5d/">BUMEDINST 6440.5D</a> — Navy Medicine's Augmentation Program — 5/12/2016</li>
+                <li><a href="/usn/pub/bumedinst-6440.8b/">BUMEDINST 6440.8B</a> — Operational Forces Medical Liaison Services — 2/22/2018</li>
+                <li><a href="/usn/pub/bumedinst-6470.10c/">BUMEDINST 6470.10C</a> — Management Of Irradiated Or Radioactively Contaminated Personnel — 2/23/2021</li>
+                <li><a href="/usn/pub/bumedinst-6470.20a/">BUMEDINST 6470.20A</a> — Radioactive Material Permit Program For Medical Use — 7/21/2015</li>
+                <li><a href="/usn/pub/bumedinst-6470.21b/">BUMEDINST 6470.21B</a> — Appointment, Functions, And Responsibilities Of The Radiation Effects Advisory Board — 2/13/2023</li>
+                <li><a href="/usn/pub/bumedinst-6470.22b/">BUMEDINST 6470.22B</a> — Navy Diagnostic Imaging Equipment Performance Survey Program — 7/20/2016</li>
+                <li><a href="/usn/pub/bumedinst-6470.23a/">BUMEDINST 6470.23A</a> — Operational Non-ionizing Radiation Health Protection — 1/10/2023</li>
+                <li><a href="/usn/pub/bumedinst-6470.25b/">BUMEDINST 6470.25B</a> — Navy Medical Physics Advisory Board — 8/15/2025</li>
+                <li><a href="/usn/pub/bumedinst-6470.26/">BUMEDINST 6470.26</a> — Navy Medicine Radiation Health Program Oversight — 6/20/2023</li>
+                <li><a href="/usn/pub/bumedinst-6490.1/">BUMEDINST 6490.1</a> — Warfighter Refractive Surgery Program — 6/8/2018</li>
+                <li><a href="/usn/pub/bumedinst-6500.3b/">BUMEDINST 6500.3B</a> — Research Integrity, Responsible Conduct Of Research Education, And Research Misconduct — 12/12/2023</li>
+                <li><a href="/usn/pub/bumedinst-6520.3a/">BUMEDINST 6520.3A</a> — Healthcare Provider Training On Personnel With Suicidal Ideation Or Behavior — 6/8/2026</li>
+                <li><a href="/usn/pub/bumedinst-6520.4/">BUMEDINST 6520.4</a> — Special Psychiatric Rapid Intervention Team — 4/19/2023</li>
+                <li><a href="/usn/pub/bumedinst-6530.16/">BUMEDINST 6530.16</a> — Pathogen Reduction Technology For Apheresis Platelets — 7/3/2018</li>
+                <li><a href="/usn/pub/bumedinst-6530.17/">BUMEDINST 6530.17</a> — Use Of Low-titer Group O Whole Blood At United States Navy Medical Centers — 6/25/2019</li>
+                <li><a href="/usn/pub/bumedinst-6530.18/">BUMEDINST 6530.18</a> — Use Of Non-united States Food And Drug Administration Compliant Blood Products — 9/29/2020</li>
+                <li><a href="/usn/pub/bumedinst-6550.10c/">BUMEDINST 6550.10C</a> — Utilization Guidelines For Nurse Practitioners And Certified Nurse-midwives — 9/2/2026</li>
+                <li><a href="/usn/pub/bumedinst-6550.14a/">BUMEDINST 6550.14A</a> — Policy For Administrative And Clinical Management Of Unlicensed Nurse Corps Officers — 9/8/2025</li>
+                <li><a href="/usn/pub/bumedinst-6550.15a/">BUMEDINST 6550.15A</a> — Utilization Guidelines For Clinical Nurse Specialists — 10/27/2025</li>
+                <li><a href="/usn/pub/bumedinst-6550.7c/">BUMEDINST 6550.7C</a> — Utilization Guidelines For Nurse Anesthetists — 6/30/2025</li>
+                <li><a href="/usn/pub/bumedinst-6550.9c/">BUMEDINST 6550.9C</a> — Policy And Guidance For Sick Call Screener Program — 4/7/2022</li>
+                <li><a href="/usn/pub/bumedinst-6570.3a/">BUMEDINST 6570.3A</a> — Safe Handling And Disposal Of Occupationally Hazardous Drugs And Environmentally Hazardous Drugs — 12/22/2016</li>
+                <li><a href="/usn/pub/bumedinst-6570.4/">BUMEDINST 6570.4</a> — Implementation And Management Of Prescription Drug Take Back Program — 3/9/2017</li>
+                <li><a href="/usn/pub/bumedinst-6600.12c/">BUMEDINST 6600.12C</a> — Dental Health Questionnaire — 3/7/2025</li>
+                <li><a href="/usn/pub/bumedinst-6600.16b/">BUMEDINST 6600.16B</a> — ORAL DISEASE RISK MANAGEMENT PROTOCOLS IN NAVY MEDICINE (Corrected - 12 October 2021) — 10/4/2021</li>
+                <li><a href="/usn/pub/bumedinst-6600.18a/">BUMEDINST 6600.18A</a> — DENTAL READINESS CLASSIFICATION GUIDELINES  (Corrected - 5 Oct 2021) — 9/28/2021</li>
+                <li><a href="/usn/pub/bumedinst-6600.19a/">BUMEDINST 6600.19A</a> — Documenting Dental Examinations In Absence Of Electronic Dental Records — 2/25/2022</li>
+                <li><a href="/usn/pub/bumedinst-6600.22/">BUMEDINST 6600.22</a> — Precious And Special Dental Metals Audit And Management — 6/6/2019</li>
+                <li><a href="/usn/pub/bumedinst-6600.24/">BUMEDINST 6600.24</a> — Plaque Control Record And Periodontal Chart — 4/9/2019</li>
+                <li><a href="/usn/pub/bumedinst-6630.3c/">BUMEDINST 6630.3C</a> — Dental Implants — 8/23/2018</li>
+                <li><a href="/usn/pub/bumedinst-6670.2b/">BUMEDINST 6670.2B</a> — Orthodontic Care In Naval Medical Treatment Facilities — 12/27/2017</li>
+                <li><a href="/usn/pub/bumedinst-6670.3a/">BUMEDINST 6670.3A</a> — Endodontic Treatment Forms — 10/28/2024</li>
+                <li><a href="/usn/pub/bumedinst-6700.13h/">BUMEDINST 6700.13H</a> — Management Of Expeditionary Medicine Family Of Systems Authorized Medical And Dental Allowance Lists — 4/24/2025</li>
+                <li><a href="/usn/pub/bumedinst-6710.63d/">BUMEDINST 6710.63D</a> — Reporting Of Defective, Unsafe, Or Unsatisfactory Medical And Dental Materiel — 8/15/2025</li>
+                <li><a href="/usn/pub/bumedinst-6710.67c/">BUMEDINST 6710.67C</a> — Administration Of Sedation And Anesthesia By Non-anesthesiologists And Non-certified Registered Nurse Anesthetists In Naval Medical Treatment Facilities — 12/19/2015</li>
+                <li><a href="/usn/pub/bumedinst-6710.71b/">BUMEDINST 6710.71B</a> — Navy Medicine Pharmaceuticals Shelf-life Extension Program — 10/6/2025</li>
+                <li><a href="/usn/pub/bumedinst-6710.72/">BUMEDINST 6710.72</a> — Management Of Controlled Substances For Expeditionary Medicine Units — 8/20/2026</li>
+                <li><a href="/usn/pub/bumedinst-6750.6a/">BUMEDINST 6750.6A</a> — Custom Magnification Loupes For Navy Medical And Dental Clinical Personnel — 11/3/2017</li>
+                <li><a href="/usn/pub/bumedinst-7050.1b/">BUMEDINST 7050.1B</a> — Support Agreements — 3/30/2011</li>
+                <li><a href="/usn/pub/bumedinst-7050.3a/">BUMEDINST 7050.3A</a> — Training Affiliation Agreement (taa) Program — 9/15/2004</li>
+                <li><a href="/usn/pub/bumedinst-7100.1a/">BUMEDINST 7100.1A</a> — Procedures For Funding Of Contracted Audiovisual Production And Production Support — 8/23/2021</li>
+                <li><a href="/usn/pub/bumedinst-7220.4a/">BUMEDINST 7220.4A</a> — Approved Courses For Registered Nurse Consolidated Special Pay — 12/17/2018</li>
+                <li><a href="/usn/pub/bumedinst-8120.1b/">BUMEDINST 8120.1B</a> — Navy Nuclear Deterrence Mission Personnel Reliability Program Responsiblities And Authorities — 3/28/2023</li>
+                <li><a href="/usn/pub/bumedinst-of-522-gsa-approved-dod-exception/">BUMEDINST OF 522 (GSA Approved DoD Exception)</a> — Medical Record - Request For Administration Of Anesthesia And For Performance Of Operations And Other Procedures</li>
+                <li><a href="/usn/pub/manmed-change-120/">MANMED CHANGE 120</a> — Navmed P-117, Manual Of The Medical Department, Change 120, Chapter 18, Medical Evaluation Boards — 1/10/2005</li>
+                <li><a href="/usn/pub/manmed-change-122/">MANMED CHANGE 122</a> — Navmed P-117, Manual Of The Medical Department, Change 122, Chapter 10, Civilians — 5/6/2005</li>
+                <li><a href="/usn/pub/manmed-change-125/">MANMED CHANGE 125</a> — Navmed P-117, Manual Of The Medical Department, Change 125, Chapter 20, Research And Development — 8/4/2005</li>
+                <li><a href="/usn/pub/manmed-change-134/">MANMED CHANGE 134</a> — Navmed P-117, Manual Of The Medical Department, Change 134, Chapter 8, Nurse Corps — 9/11/2009</li>
+                <li><a href="/usn/pub/manmed-change-135/">MANMED CHANGE 135</a> — Navmed P-117, Manual Of The Medical Department, Change 135, Chapter 15 (revises Chapter. 15, Article 15-107, Explosives Motor Vehicle Operator And Explosives Handler Examinations And Standards Only) — 10/30/2009</li>
+                <li><a href="/usn/pub/manmed-change-136/">MANMED CHANGE 136</a> — Navmed P-117, Manual Of The Medical Department, Change 136, Chapter 15 (revises Chapter 15, Articles 15-103, 15-104, 15-106 Only - Female Submariner Candidates) — 4/16/2010</li>
+                <li><a href="/usn/pub/manmed-change-137/">MANMED CHANGE 137</a> — Navmed P-117, Manual Of The Medical Department, Change 137, Chapter 15,(revises Articles 15-111 And 15-112 Only - Update To Cervical And Breast Cancer Screening Recommendations) — 10/15/2010</li>
+                <li><a href="/usn/pub/manmed-change-138/">MANMED CHANGE 138</a> — NAVMED P-117, Manual of the Medical Department, Change 138, Chapter 15, (Revises article 15-112, paragraph 7(b) only) — 5/2/2011</li>
+                <li><a href="/usn/pub/manmed-change-140/">MANMED CHANGE 140</a> — NAVMED P-117, MANUAL OF THE MEDICAL DEPARTMENT, CHANGE 140, CHAPTER 15 (Revises article 15-31, Waivers of Physical Standards) — 5/3/2012</li>
+                <li><a href="/usn/pub/manmed-change-141/">MANMED CHANGE 141</a> — Navmed P-117, Manual Of The Medical Department, Change 141, Chapter 22,preventive Medicine And Occupational Health — 6/8/2012</li>
+                <li><a href="/usn/pub/manmed-change-142/">MANMED CHANGE 142</a> — Navmed P-117, Manual Of The Medical Department, Change 142, Chapter 14, New Section Iv, Clinical Laboratory And Anatomic Pathology Services — 10/22/2012</li>
+                <li><a href="/usn/pub/manmed-change-143/">MANMED CHANGE 143</a> — Navmed P-117, Manual Of The Medical Department, Change 143, Chapter 14, Special Activities, Section Iii, Naval Aerospace/operational Physiology Program (naopp) — 7/8/2013</li>
+                <li><a href="/usn/pub/manmed-change-145/">MANMED CHANGE 145</a> — NAVMED P-117 - Manual of the Medical Department,  Chapter 15, Section V, Article 15-111 and 15-112, REFERENCES AND RESOURCES AND ANNUAL HEALTH ASSESSMENT RECOMMENDATIONS FOR ACTIVE DUTY WOMEN. — 12/16/2013</li>
+                <li><a href="/usn/pub/manmed-change-148/">MANMED CHANGE 148</a> — Navmed P-117, Manual Of The Medical Department, Chapter 2, Article 2-13, Medical Journal — 4/7/2014</li>
+                <li><a href="/usn/pub/manmed-change-150/">MANMED CHANGE 150</a> — Navmed P-117, Manual Of The Medical Department, Chapter 15, Article 15-63 And Article 15-96, (updates Unmanned Aircraft Systems Standards) — 6/8/2015</li>
+                <li><a href="/usn/pub/manmed-change-152/">MANMED CHANGE 152</a> — Navmed P-117, Manual Of The Medical Department, Chapter 15, Section Iv, Articles 15-36 And 15-109 — 10/28/2015</li>
+                <li><a href="/usn/pub/manmed-change-153/">MANMED CHANGE 153</a> — Navmed P-117, Manual Of The Medical Department, Chapter 14, Articles 14-11 And 14-14 — 10/23/2015</li>
+                <li><a href="/usn/pub/manmed-change-154/">MANMED CHANGE 154</a> — Navmed P-117, Manual Of The Medical Department, Chapter 15, Articles 15-34 And 15-36 — 12/8/2015</li>
+                <li><a href="/usn/pub/manmed-change-155/">MANMED CHANGE 155</a> — Navmed P-117, Manual Of The Medical Department, Chapter 15, Section Iv, Article 15-109 Only — 2/1/2016</li>
+                <li><a href="/usn/pub/manmed-change-156/">MANMED CHANGE 156</a> — Navmed P-117, Manual Of The Medical Department, Chapter 15, Section Iv, Article 15-107 — 3/10/2016</li>
+                <li><a href="/usn/pub/manmed-change-157/">MANMED CHANGE 157</a> — Navmed P-117, Manual Of The Medical Department, Chapter 1, Section Iii, Article 1-22, Off-duty Employment — 3/29/2016</li>
+                <li><a href="/usn/pub/manmed-change-158/">MANMED CHANGE 158</a> — Chapter 12 - Education And Training — 11/1/2016</li>
+                <li><a href="/usn/pub/manmed-change-161/">MANMED CHANGE 161</a> — Navmed P-117, Manual Of The Medical Department, Change 161, Chapter 6, Dental Corps — 3/6/2017</li>
+                <li><a href="/usn/pub/manmed-change-162/">MANMED CHANGE 162</a> — Navmed P-117, Manual Of The Medical Department, Change 162, Chapter 7, Medical Service Corps — 8/30/2017</li>
+                <li><a href="/usn/pub/manmed-change-163/">MANMED CHANGE 163</a> — Navmed P-117, Manual Of The Medical Department, Change 163, Chapter 21, Pharmacy Operation And Drug Control — 3/5/2018</li>
+                <li><a href="/usn/pub/manmed-change-164/">MANMED CHANGE 164</a> — Navmed P-117, Manual Of The Medical Department, Change 164, Chapter 15, Articles 15-102, 15-103, 15-105, And 15-106 — 5/22/2018</li>
+                <li><a href="/usn/pub/manmed-change-165/">MANMED CHANGE 165</a> — Navmed P-117, Manual Of The Medical Department, Change 165, Chapter 15, Articles 15-63 Through 15-101 — 6/1/2018</li>
+                <li><a href="/usn/pub/manmed-change-166/">MANMED CHANGE 166</a> — Navmed P-117, Manual Of The Medical Department, Change 166, Chapter 15, Article 15-107 — 12/20/2018</li>
+                <li><a href="/usn/pub/manmed-change-167/">MANMED CHANGE 167</a> — Navmed P-117, Manual Of The Medical Department, Change 167, Chapter 15, Articles 15-20 Through 15-23 And 15-30 And 15-31 (medical Waivers) — 2/15/2019</li>
+                <li><a href="/usn/pub/manmed-change-168/">MANMED CHANGE 168</a> — NAVMED P-117, MANUAL OF THE MEDICAL DEPARTMENT, CHANGE 168, CHAPTER 15, ARTICLE 15-105(4)(n)(9) - VACCINATIONS — 2/3/2023</li>
+                <li><a href="/usn/pub/manmed-change-169/">MANMED CHANGE 169</a> — Navmed P-117, Manual Of The Medical Department, Change 169, Chapter 15, Article 21-5 — 4/17/2023</li>
+                <li><a href="/usn/pub/manmed-change-170/">MANMED CHANGE 170</a> — Navmedp-117 Manual Of The Medical Department, Change 170, Chapter 15: Medical Examinations — 10/22/2025</li>
+                <li><a href="/usn/pub/manmed-change-171/">MANMED CHANGE 171</a> — Navmed P-117, Manual Of The Medical Department, Chapter 10, Civilians — 12/1/2025</li>
+                <li><a href="/usn/pub/manmed-change-172/">MANMED CHANGE 172</a> — Navmed P-117, Manual Of The Medical Department, Chapter 9, Hospital Corps - Complete Revision — 1/22/2026</li>
+                <li><a href="/usn/pub/manmed-change-173/">MANMED CHANGE 173</a> — Navmed P-117, Manual Of The Medical Department, Chapter 7, Medical Service Corps — 1/28/2026</li>
+                <li><a href="/usn/pub/manmed-change-174/">MANMED CHANGE 174</a> — Navmed P-117, Manual Of The Medical Department, Chapter 8, Nurse Corps — 8/20/2026</li>
+                <li><a href="/usn/pub/navmed-1300-1/">NAVMED 1300/1</a> — Medical, Dental And Educational Suitability Screening For Service And Family Members</li>
+                <li><a href="/usn/pub/navmed-1300-14/">NAVMED 1300/14</a> — Maritime Expeditionary Security Force Duty Medical Screening Questionnaire</li>
+                <li><a href="/usn/pub/navmed-1300-2/">NAVMED 1300/2</a> — Medical, Dental, And Educational Suitability Screening Checklist And Worksheet</li>
+                <li><a href="/usn/pub/navmed-1300-4/">NAVMED 1300/4</a> — Expeditionary Medical And Dental Screening For Individual Augmentee (ia) And Support Assignments To Overseas Contingency Operations (oco)</li>
+                <li><a href="/usn/pub/navmed-1410-1/">NAVMED 1410/1</a> — Bureau Of Medicine And Surgery Milestone Screening Application</li>
+                <li><a href="/usn/pub/navmed-1412-1/">NAVMED 1412/1</a> — Bureau Of Medicine And Surgery Command Screening Application</li>
+                <li><a href="/usn/pub/navmed-1520-16/">NAVMED 1520/16</a> — Dental Residency Duins Application Brief Sheet</li>
+                <li><a href="/usn/pub/navmed-1520-17/">NAVMED 1520/17</a> — Evaluation For Advanced Dental Education</li>
+                <li><a href="/usn/pub/navmed-1730-1/">NAVMED 1730/1</a> — Record Of Annual Professional Naval Chaplaincy Counseling</li>
+                <li><a href="/usn/pub/navmed-1755-10/">NAVMED 1755/10</a> — Eligibility Based On Informed Opinion (io)</li>
+                <li><a href="/usn/pub/navmed-1755-11/">NAVMED 1755/11</a> — Child Outcomes Summary</li>
+                <li><a href="/usn/pub/navmed-1755-12/">NAVMED 1755/12</a> — Family Outcomes Survey</li>
+                <li><a href="/usn/pub/navmed-1755-3-1/">NAVMED 1755/3-1</a> — INDIVIDUALIZED FAMILY SERVICE PLAN (iIFSP) REVIEW/CHANGE</li>
+                <li><a href="/usn/pub/navmed-1755-6/">NAVMED 1755/6</a> — Permission To Screen/evaluate</li>
+                <li><a href="/usn/pub/navmed-1755-8/">NAVMED 1755/8</a> — Entry/entitlement</li>
+                <li><a href="/usn/pub/navmed-1755-9/">NAVMED 1755/9</a> — Notice Of Proposed Action</li>
+                <li><a href="/usn/pub/navmed-5300-1/">NAVMED 5300/1</a> — Mentorship Application</li>
+                <li><a href="/usn/pub/navmed-5300-2/">NAVMED 5300/2</a> — Mentorship Program Mentor/protege Agreement</li>
+                <li><a href="/usn/pub/navmed-5721-2/">NAVMED 5721/2</a> — Navy Medicine Clearance Of Authored Works Form</li>
+                <li><a href="/usn/pub/navmed-6000-6/">NAVMED 6000/6</a> — Bso-18 Personnel Weekly Attestation Of Negative Covid-19 Test</li>
+                <li><a href="/usn/pub/navmed-6110-4/">NAVMED 6110/4</a> — Physical Fitness Assessment Medical Clearance/waiver</li>
+                <li><a href="/usn/pub/navmed-6110-5/">NAVMED 6110/5</a> — Combat Fitness Assessment Medical Clearance/waiver</li>
+                <li><a href="/usn/pub/navmed-6210-1/">NAVMED 6210/1</a> — United States Navy Ship Sanitation Control Exemption Certificate / Ship Sanitation Control Certificate</li>
+                <li><a href="/usn/pub/navmed-6210-2/">NAVMED 6210/2</a> — United States Navy Ship Sanitation Control Exemption Certificate (sscec) Notification Of 30 Day Extention</li>
+                <li><a href="/usn/pub/navmed-6210-3/">NAVMED 6210/3</a> — U.s. Navy Declaration Of Health</li>
+                <li><a href="/usn/pub/navmed-6300-20/">NAVMED 6300/20</a> — Caregiver Occupational Stress Control Program Quarterly Report</li>
+                <li><a href="/usn/pub/navmed-6310-5/">NAVMED 6310/5</a> — Don Sexual Assault Restricted Reporting Evidence Submission Chain Of Custody</li>
+                <li><a href="/usn/pub/navmed-6410-10/">NAVMED 6410/10</a> — Abbreviated Aviation Medicine Examination</li>
+                <li><a href="/usn/pub/navmed-6410-13/">NAVMED 6410/13</a> — Unmanned Aircraft System (uas) Groups 1 And 2 Physical Worksheet</li>
+                <li><a href="/usn/pub/navmed-6410-14/">NAVMED 6410/14</a> — Medical Examination For Class Iii Flight Deck Personnel And Personnel Who Maintain Aviator Night Vision Systems</li>
+                <li><a href="/usn/pub/navmed-6470-13/">NAVMED 6470/13</a> — Ionizing Radiation Medical Examination</li>
+                <li><a href="/usn/pub/navmed-6490-1/">NAVMED 6490/1</a> — Navy Warfighter Refractive Surgery Consult</li>
+                <li><a href="/usn/pub/navmed-6600-12/">NAVMED 6600/12</a> — Reserve Dental Assessment And Certification</li>
+                <li><a href="/usn/pub/navmed-6630-10/">NAVMED 6630/10</a> — Orthodontic Patient Evaluation Summary Sheet</li>
+                <li><a href="/usn/pub/navmed-6630-11/">NAVMED 6630/11</a> — Orthodontic Discrepancy Index</li>
+                <li><a href="/usn/pub/navmed-6630-12/">NAVMED 6630/12</a> — Orthodontic Statement Of Understanding</li>
+                <li><a href="/usn/pub/navmed-6630-13/">NAVMED 6630/13</a> — Benefits, Risks And Limitations Of Orthodontic Treatment</li>
+                <li><a href="/usn/pub/navmed-6630-8/">NAVMED 6630/8</a> — Commander’s Concurrence Form</li>
+                <li><a href="/usn/pub/navmed-6630-9/">NAVMED 6630/9</a> — Dental Implant Patient Treatment Policy</li>
+                <li><a href="/usn/pub/navmed-8120-1/">NAVMED 8120/1</a> — Navy Nuclear Deterrence Mission (nndm) Issue Resolution</li>
+                <li><a href="/usn/pub/navmed-p-5010-chapter-1/">NAVMED P-5010 Chapter 1</a> — Navmed P-5010, Chapter 1, Tri-service Food Code (tb Med 530/navmed P-5010-1/afman 48-147_ip) — 3/1/2019</li>
+                <li><a href="/usn/pub/navmed-p-5010-chapter-10/">NAVMED P-5010 Chapter 10</a> — Navmed P-5010-10 Sanitary Control And Surveillance Of Field Water Supplies — 5/1/2010</li>
+                <li><a href="/usn/pub/navmed-p-5010-chapter-2/">NAVMED P-5010 Chapter 2</a> — Navmed P-5010, Chapter 2, Sanitation Of Living Spaces And Related Service Facilities — 6/17/2019</li>
+                <li><a href="/usn/pub/navmed-p-5010-chapter-3/">NAVMED P-5010 Chapter 3</a> — Navmed P-5010, Chapter 3, Prevention Of Heat And Cold Stress Injuries (ashore, Afloat, And Ground Forces) — 8/15/2023</li>
+                <li><a href="/usn/pub/navmed-p-5010-chapter-4/">NAVMED P-5010 Chapter 4</a> — Navmed P-5010, Chapter 4, Recreational Water Facilities — 6/30/2020</li>
+                <li><a href="/usn/pub/navmed-p-5010-chapter-5/">NAVMED P-5010 Chapter 5</a> — Navmed P-5010, Chapter 5, Water Quality For Shore Installations — 7/1/2019</li>
+                <li><a href="/usn/pub/navmed-p-5010-chapter-6/">NAVMED P-5010 Chapter 6</a> — Navmed P-5010, Chapter 6, Water Supply Afloat — 01/26/2022</li>
+                <li><a href="/usn/pub/navmed-p-5010-chapter-7/">NAVMED P-5010 Chapter 7</a> — Navmed P-5010, Chapter 7,  Waste Water Treatment And Disposal – Ashore And Afloat — 7/7/2023</li>
+                <li><a href="/usn/pub/navmed-p-5010-chapter-8/">NAVMED P-5010 Chapter 8</a> — Navmed P-5010, Chapter 8, Navy Entomology And Pest Control Technology — 6/13/2023</li>
+                <li><a href="/usn/pub/navmed-p-5010-chapter-9/">NAVMED P-5010 Chapter 9</a> — Navmed P-5010, Chapter 9, Preventive Medicine For Ground Forces — 6/1/1991</li>
+                <li><a href="/usn/pub/navmed-p-5042/">NAVMED P-5042</a> — Navmed P-5042, Treatment Of Biological Warfare Agent Casualties — 7/17/2000</li>
+                <li><a href="/usn/pub/navmed-p-5052-26/">NAVMED P-5052-26</a> — Navmed P-5052-26, U.s. Navy Shipboard Pest Management Manual — 3/28/2023</li>
+                <li><a href="/usn/pub/navmed-p-5055/">NAVMED P-5055</a> — Navmed P-5055, Radiation Health Protection Manual Ch-2 — 12/02/2022</li>
+                <li><a href="/usn/pub/navmed-p-5055-and-ch2/">NAVMED P-5055 and CH2</a> — NAVMED P-5055, RADIATION HEALTH PROTECTION MANUAL with CH1 and CH2 — 02/03/2011</li>
+                <li><a href="/usn/pub/navmed-p-5123/">NAVMED P-5123</a> — Navmed P-5123, Technical Manual, Operational Procedures For The Armed Services Blood Program Elements — 9/1/2007</li>
+            </ul>
+            <p><a href="/">Ask Reggie.Bot about BUMEDINST publications</a></p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

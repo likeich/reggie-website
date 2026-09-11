@@ -8,7 +8,7 @@
          asks for /pub/composeResources/... and 404s, which throws out of
          composition and freezes the canvas. Must precede the first script. -->
     <base href="/">
-    <meta name="description" content="Every Army publication, grouped by series: ADP, ARMYDIR, AR, ATP, PAM, FM, MISC, STP, TC. Dates, proponents, status and download links for each.">
+    <meta name="description" content="Every Army publication, grouped by series: ADP, ARMYDIR, AR, ATP, PAM, FM, MISC, STP, TC, Travel, Justice, Issuance. Dates, proponents, status and download links for each.">
     <title>Browse Army Publications by Series</title>
     <link rel="canonical" href="https://reggie.bot/usa/pubs/">
     <!-- The shell is shared by every page, so this names no one service.
@@ -22,7 +22,7 @@
     <meta property="og:url" content="https://reggie.bot/usa/pubs/">
     <meta property="og:site_name" content="Reggie.Bot">
     <meta property="og:title" content="Browse Army Publications by Series">
-    <meta property="og:description" content="Every Army publication, grouped by series: ADP, ARMYDIR, AR, ATP, PAM, FM, MISC, STP, TC. Dates, proponents, status and download links for each.">
+    <meta property="og:description" content="Every Army publication, grouped by series: ADP, ARMYDIR, AR, ATP, PAM, FM, MISC, STP, TC, Travel, Justice, Issuance. Dates, proponents, status and download links for each.">
     <!-- icon-512, not icon_round: that one is 192x192, and previews commonly
          refuse an image below 200x200 outright -- which is why a shared answer
          arrived with no picture at all rather than a small one. Dimensions are
@@ -35,7 +35,7 @@
     <meta property="og:image:alt" content="Reggie.Bot">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Browse Army Publications by Series">
-    <meta name="twitter:description" content="Every Army publication, grouped by series: ADP, ARMYDIR, AR, ATP, PAM, FM, MISC, STP, TC. Dates, proponents, status and download links for each.">
+    <meta name="twitter:description" content="Every Army publication, grouped by series: ADP, ARMYDIR, AR, ATP, PAM, FM, MISC, STP, TC, Travel, Justice, Issuance. Dates, proponents, status and download links for each.">
     <meta name="twitter:image" content="https://reggie.bot/icon-512.png">
 
     <script type="application/ld+json">
@@ -43,7 +43,7 @@
   "@context": "https://schema.org",
   "@type": "WebSite",
   "name": "Browse Army Publications by Series",
-  "description": "Every Army publication, grouped by series: ADP, ARMYDIR, AR, ATP, PAM, FM, MISC, STP, TC. Dates, proponents, status and download links for each.",
+  "description": "Every Army publication, grouped by series: ADP, ARMYDIR, AR, ATP, PAM, FM, MISC, STP, TC, Travel, Justice, Issuance. Dates, proponents, status and download links for each.",
   "url": "https://reggie.bot/pubs/"
 }
     </script>
@@ -124,6 +124,14 @@
                     "favicon192": "/favicon-192-usmc.png",
                     "favicon96": "/favicon-96-usmc.png",
                     "appIcon": "/icon-192-usmc.png"
+                },
+                "usn": {
+                    "accent": "#3377FF",
+                    "mark": "/icon_round_usn.png",
+                    "manifest": "/manifest-usn.webmanifest",
+                    "favicon192": "/favicon-192-usn.png",
+                    "favicon96": "/favicon-96-usn.png",
+                    "appIcon": "/icon-192-usn.png"
                 },
                 "usaf": {
                     "accent": "#7FB3F0",
@@ -681,17 +689,20 @@
              instant before the app boots. -->
         <div id="seo-fallback">
             <h1>Browse Army Publications</h1>
-            <p>Every Army publication, grouped by series: ADP, ARMYDIR, AR, ATP, PAM, FM, MISC, STP, TC. Dates, proponents, status and download links for each.</p>
+            <p>Every Army publication, grouped by series: ADP, ARMYDIR, AR, ATP, PAM, FM, MISC, STP, TC, Travel, Justice, Issuance. Dates, proponents, status and download links for each.</p>
             <ul>
                 <li><a href="/pubs/adp/">ADP</a> &mdash; Army Doctrine Publications</li>
                 <li><a href="/pubs/ar/">AR</a> &mdash; Army Regulations</li>
                 <li><a href="/pubs/armydir/">ARMYDIR</a> &mdash; Army Directives</li>
                 <li><a href="/pubs/atp/">ATP</a> &mdash; Army Techniques Publications</li>
                 <li><a href="/pubs/fm/">FM</a> &mdash; Field Manuals</li>
+                <li><a href="/pubs/issuance/">Issuance</a> &mdash; DoD Issuances</li>
+                <li><a href="/pubs/justice/">Justice</a> &mdash; Military Justice</li>
                 <li><a href="/pubs/misc/">MISC</a> &mdash; Manual For Courts-martial</li>
                 <li><a href="/pubs/pam/">PAM</a> &mdash; Da Pamphlets</li>
                 <li><a href="/pubs/stp/">STP</a> &mdash; Soldier Training Publications</li>
                 <li><a href="/pubs/tc/">TC</a> &mdash; Training Circulars</li>
+                <li><a href="/pubs/travel/">Travel</a> &mdash; Travel and Transportation</li>
             </ul>
         </div>
     </div>

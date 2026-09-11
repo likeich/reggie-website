@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Compose resolves relative asset paths (./composeResources/...) against
+         the document URL. Without this, every deep link such as /pub/ar-670-1
+         asks for /pub/composeResources/... and 404s, which throws out of
+         composition and freezes the canvas. Must precede the first script. -->
+    <base href="/">
+    <meta name="description" content="All 768 MILPERSMAN publications (Military Personnel Manual), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.">
+    <title>MILPERSMAN - Military Personnel Manual</title>
+    <link rel="canonical" href="https://reggie.bot/usn/pubs/milpersman/">
+    <!-- The shell is shared by every page, so this names no one service.
+         It said "Army regulations, AR 670-1, ... armypubs" while the Army
+         owned the root, which put one service on the Coast Guard's pages
+         too. Search engines ignore this tag; it is corrected because it
+         was wrong, not because it ranks. -->
+    <meta name="keywords" content="military regulations, Army regulations, Marine Corps orders, Coast Guard instructions, Space Force publications, Air Force instructions, armypubs, MCPEL, e-Publishing, military publications search">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://reggie.bot/usn/pubs/milpersman/">
+    <meta property="og:site_name" content="Reggie.Bot">
+    <meta property="og:title" content="MILPERSMAN - Military Personnel Manual">
+    <meta property="og:description" content="All 768 MILPERSMAN publications (Military Personnel Manual), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.">
+    <!-- icon-512, not icon_round: that one is 192x192, and previews commonly
+         refuse an image below 200x200 outright -- which is why a shared answer
+         arrived with no picture at all rather than a small one. Dimensions are
+         declared so a preview can lay out its card without fetching the image
+         first. -->
+    <meta property="og:image" content="https://reggie.bot/icon-512.png">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:alt" content="Reggie.Bot">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="MILPERSMAN - Military Personnel Manual">
+    <meta name="twitter:description" content="All 768 MILPERSMAN publications (Military Personnel Manual), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.">
+    <meta name="twitter:image" content="https://reggie.bot/icon-512.png">
+
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "MILPERSMAN - Military Personnel Manual",
+  "description": "All 768 MILPERSMAN publications (Military Personnel Manual), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.",
+  "url": "https://reggie.bot/usn/pubs/milpersman/"
+}
+    </script>
+    <!-- A disc that touches all four edges, cropped tight to the mark.
+         The old favicon was the app icon as drawn for the app: its circle sat
+         inset inside the square with transparent margin, and the head filled
+         only 63% of that circle. Google crops favicons to a circle of its own,
+         so what arrived was a small disc inside a ring of page background --
+         the white padding in a search result. Now the disc fills the square
+         exactly, so Google's crop lands on the artwork's own edge, and the
+         head fills more of it.
+         Still a circle rather than a square: a tab draws the icon as given,
+         with no crop, and a circle is what this app looks like.
+         PNGs first and sized -- Google wants a square multiple of 48px -- with
+         the .ico kept for anything that asks for one. -->
+    <!-- Neutral, not the Army's. The boot script below repaints these for a
+         reader who has chosen a service, but only once it runs: before that,
+         and for every crawler, link preview and background tab that never
+         executes it, what stands is what the document declares. Shipping gold
+         here undid the neutral boot the script exists to provide. -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192-neutral.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96-neutral.png">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <!-- Installable. theme-color paints the browser chrome and the splash
+         screen; without apple-touch-icon iOS renders a screenshot instead. -->
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#141414">
+    <link rel="apple-touch-icon" href="/icon-192-neutral.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Reggie.Bot">
+    <!-- The branch, decided before the first paint.
+
+         The app takes seconds to boot -- 15MB of wasm has to arrive and start
+         -- and until it does, this file is the whole of what a reader sees.
+         Both branch-coloured things on it, the spinner and the mark, used to
+         be the Army's outright, so anyone who had chosen another service
+         watched a gold screen resolve into their own colour on every single
+         load. On the 1,546 generated pages too: all of them are rendered from
+         this template.
+
+         So the two colours are read from the same localStorage key the app
+         writes ("branch", set by SettingsBranchStore) and applied as custom
+         properties on the root element, inline and synchronously, before the
+         stylesheet below is ever used to draw anything.
+
+         Kept deliberately dumb -- a literal table, no fetch, no dependency on
+         the wasm having loaded -- because anything that can fail here fails in
+         the one window where nothing else is running yet. An unreadable or
+         unrecognised value leaves the Army showing, which is what every
+         reader who has never chosen a service should see anyway.
+
+         model.seo.BootPaletteTest pins this table against Branch: plain HTML
+         is invisible to the compiler, so nothing else would notice the day a
+         service is added or a palette is retuned. -->
+    <script>
+        (function () {
+            // Valid JSON on purpose: model.seo.BootPaletteTest parses this
+            // table and checks every path in it against Branch and against
+            // the files on disk. Plain HTML is invisible to the compiler, and
+            // the exhaustive `when`s that stop Branch drifting elsewhere have
+            // no reach in here, so this is the only thing that will notice the
+            // day a service is added or a palette retuned.
+            var BRANDS = {
+                "usa": {
+                    "accent": "#FFCB05",
+                    "mark": "/icon_round.png",
+                    "manifest": "/manifest-usa.webmanifest",
+                    "favicon192": "/favicon-192.png",
+                    "favicon96": "/favicon-96.png",
+                    "appIcon": "/icon-192.png"
+                },
+                "usmc": {
+                    "accent": "#E04B4B",
+                    "mark": "/icon_round_usmc.png",
+                    "manifest": "/manifest-usmc.webmanifest",
+                    "favicon192": "/favicon-192-usmc.png",
+                    "favicon96": "/favicon-96-usmc.png",
+                    "appIcon": "/icon-192-usmc.png"
+                },
+                "usn": {
+                    "accent": "#3377FF",
+                    "mark": "/icon_round_usn.png",
+                    "manifest": "/manifest-usn.webmanifest",
+                    "favicon192": "/favicon-192-usn.png",
+                    "favicon96": "/favicon-96-usn.png",
+                    "appIcon": "/icon-192-usn.png"
+                },
+                "usaf": {
+                    "accent": "#7FB3F0",
+                    "mark": "/icon_round_usaf.png",
+                    "manifest": "/manifest-usaf.webmanifest",
+                    "favicon192": "/favicon-192-usaf.png",
+                    "favicon96": "/favicon-96-usaf.png",
+                    "appIcon": "/icon-192-usaf.png"
+                },
+                "ussf": {
+                    "accent": "#C8D2E0",
+                    "mark": "/icon_round_ussf.png",
+                    "manifest": "/manifest-ussf.webmanifest",
+                    "favicon192": "/favicon-192-ussf.png",
+                    "favicon96": "/favicon-96-ussf.png",
+                    "appIcon": "/icon-192-ussf.png"
+                },
+                "uscg": {
+                    "accent": "#F57C00",
+                    "mark": "/icon_round_uscg.png",
+                    "manifest": "/manifest-uscg.webmanifest",
+                    "favicon192": "/favicon-192-uscg.png",
+                    "favicon96": "/favicon-96-uscg.png",
+                    "appIcon": "/icon-192-uscg.png"
+                }
+            };
+
+            // Nobody's colours until somebody has chosen. The Army was the
+            // default here, so a reader who had never answered the picker
+            // watched the app load in gold behind a gold favicon -- the
+            // question still on screen and already answered underneath.
+            //
+            // Grey is ui.theme.NEUTRAL_PRIMARY, the same colour the app paints
+            // while the picker is open, so the handover from HTML to Compose
+            // is invisible instead of a flash of the wrong service.
+            var NEUTRAL = {
+                "accent": "#D4D4D4",
+                "mark": "/icon_round_neutral.png",
+                "manifest": "/manifest.webmanifest",
+                "favicon192": "/favicon-192-neutral.png",
+                "favicon96": "/favicon-96-neutral.png",
+                "appIcon": "/icon-192-neutral.png"
+            };
+
+            var slug = null;
+            // Saved before the services were renamed. Those strings sit in
+            // browsers and keep arriving; Branch.bySlug and the database's
+            // branch_canonical() map them the same way.
+            var LEGACY = {"army": "usa", "navy": "usn", "marine-corps": "usmc",
+                          "air-force": "usaf", "space-force": "ussf",
+                          "coast-guard": "uscg"};
+            // localStorage throws outright rather than returning null when a
+            // browser blocks storage, so the read is guarded and not just the
+            // value it returns.
+            // The address first. A shared link names the service, and that is
+            // a firmer answer than whatever this browser chose last time --
+            // reading only localStorage meant arriving cold at /usaf/news/
+            // painted Army gold until Compose started. Route.serviceOf is the
+            // same rule in Kotlin; an unprefixed path is nobody's here,
+            // because the picker has to be free to ask.
+            var first = (location.pathname.split("/")[1] || "").toLowerCase();
+            first = LEGACY[first] || first;
+            if (BRANDS[first]) slug = first;
+
+            // localStorage throws outright rather than returning null when a
+            // browser blocks storage, so the read is guarded and not just the
+            // value it returns.
+            if (slug === null) {
+                try {
+                    var stored = localStorage.getItem("branch");
+                    stored = LEGACY[stored] || stored;
+                    if (BRANDS[stored]) slug = stored;
+                } catch (e) { /* no reachable choice; stay neutral and ask */ }
+            }
+
+            var brand = slug === null ? NEUTRAL : BRANDS[slug];
+            var root = document.documentElement;
+            root.setAttribute("data-branch", slug === null ? "neutral" : slug);
+            root.style.setProperty("--brand", brand.accent);
+            root.style.setProperty("--brand-logo", "url(" + brand.mark + ")");
+
+            // The tab icon, and the app if it has been installed.
+            //
+            // These are rewritten rather than written, so this script has to
+            // sit below the links it edits -- which is why it is at the end of
+            // <head> rather than the top. Still ahead of the stylesheet and of
+            // every element it colours, which is what matters for the paint.
+            //
+            // The manifest is the one branch-coloured thing nothing above can
+            // reach: an installed app's splash screen is drawn by the
+            // operating system, from icons it fetched for itself, so the only
+            // lever we have is which URL the link names. One manifest per
+            // service is written into the distribution by GenerateSeoPages,
+            // derived from the neutral base; all six share an id, so
+            // switching service re-skins the installed app rather than
+            // offering a second copy of it.
+            function repoint(selector, href) {
+                var link = document.querySelector(selector);
+                if (link) link.href = href;
+            }
+            repoint('link[rel="manifest"]', brand.manifest);
+            repoint('link[rel="icon"][sizes="192x192"]', brand.favicon192);
+            repoint('link[rel="icon"][sizes="96x96"]', brand.favicon96);
+            repoint('link[rel="apple-touch-icon"]', brand.appIcon);
+        })();
+    </script>
+    <style>
+        /* The flex centering that used to live here sized #root to its
+           content rather than stretching it, so the app rendered in a narrow
+           column once ComposeViewport replaced the fixed-size canvas. */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #0a0a0a;
+            color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+
+        #ComposeTarget {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        /* Readable if the app never boots, invisible the moment it does. */
+        #seo-fallback {
+            max-width: 46rem;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            font-family: Arial, sans-serif;
+            line-height: 1.5;
+        }
+
+        /* No flex centering here: it existed to centre the old fixed-size
+           canvas. As a flex item the Compose container sized to its content
+           (300px) instead of stretching, so the app rendered in a narrow
+           column. ComposeViewport fills whatever container it is given. */
+        #root {
+            width: 100%;
+            height: 100%;
+            /* Anchors #boot, which is layered over the app rather than sitting
+               inside it. */
+            position: relative;
+        }
+
+        /* The SEO copy has to be real markup in the initial response, but a
+           wall of unstyled text is not what a visitor should stare at for the
+           seconds wasm takes to boot. #boot covers it with the app's own
+           colours; both are removed the moment Compose paints. */
+        /* Layered over the app, not inside it. It used to live inside
+           #ComposeTarget so that Compose would tear it down on mount -- which
+           it did, instantly and before any transition could run, so the
+           loading screen vanished in a hard cut. Out here its removal is ours
+           to time, and it can fade.
+
+           pointer-events: none is what makes that safe. An earlier overlay
+           swallowed the pointer, and Compose, never having seen the pointer
+           enter its canvas, ignored the first click anywhere in the app even
+           after the overlay was gone. Transparent to input from the first
+           frame, the canvas underneath gets every event as usual. Absolute
+           within #root, never fixed. */
+        #boot {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #141414;
+            transition: opacity .45s ease;
+
+            /* The ring sits immediately outside the logo, touching it, so the
+               two sizes are derived from one another rather than set
+               independently. */
+            --boot-logo: clamp(160px, 42vmin, 300px);
+            --boot-ring-width: 7px;
+        }
+
+        #boot.done { opacity: 0; }
+
+        /* Square by construction: the ring is a border on a circle, and a
+           circle drawn on a non-square box is an ellipse. */
+        /* Only ever inserted when the app did not start. Centred over the
+           fallback text rather than replacing it, so the page still says what
+           the site is. */
+        #boot-failed {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            max-width: 22rem;
+            padding: 1.25rem 1.5rem;
+            border-radius: 12px;
+            background: #1c1c1c;
+            color: #f2f2f2;
+            font: 16px/1.5 system-ui, -apple-system, sans-serif;
+            text-align: center;
+        }
+
+        #boot-failed p { margin: 0 0 1rem; }
+
+        #boot-failed button {
+            font: inherit;
+            padding: 0.5rem 1.25rem;
+            border: 0;
+            border-radius: 8px;
+            background: var(--brand, #FFCB05);
+            color: #141414;
+            cursor: pointer;
+        }
+
+        #boot-mark {
+            position: relative;
+            width: calc(var(--boot-logo) + 2 * var(--boot-ring-width));
+            height: calc(var(--boot-logo) + 2 * var(--boot-ring-width));
+        }
+
+        /* A background image, not an <img>: the source has to be settled
+           before the first paint, and the script that settles it runs in
+           <head>, where there is no element yet to set a src on. A custom
+           property crosses that gap; a DOM write cannot. */
+        #boot-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: var(--boot-logo);
+            height: var(--boot-logo);
+            margin: calc(var(--boot-logo) / -2) 0 0 calc(var(--boot-logo) / -2);
+            border-radius: 50%;
+            background-image: var(--brand-logo, url(/icon_round.png));
+            background-size: cover;
+        }
+
+        /* One arc travelling around the logo. The track is drawn in the same
+           near-black the app uses for a raised surface, so only the coloured
+           arc reads as motion.
+
+           The fallbacks here and on the mark are what a reader sees if the
+           script above never ran at all -- scripting off, or a CSP that
+           refuses it. The Army's colours, which is what the app itself falls
+           back to. */
+        #boot-ring {
+            position: absolute;
+            inset: 0;
+            border: var(--boot-ring-width) solid #2D2D2D;
+            border-top-color: var(--brand, #FFCB05);
+            border-radius: 50%;
+            animation: boot-spin 1.1s linear infinite;
+        }
+
+        @keyframes boot-spin { to { transform: rotate(360deg); } }
+
+        /* Respect a reduced-motion preference: keep the indicator, drop the
+           spin. */
+        @media (prefers-reduced-motion: reduce) {
+            #boot-ring { animation: none; }
+            /* Uncover the app at once rather than dissolving into it. */
+            #boot { transition: none; }
+        }
+    </style>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CEQC3WB0MN"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-CEQC3WB0MN');
+    </script>
+    <script type="application/javascript">
+        // Function to create an object from a list of parameters and values
+        function createParamValueObject(params, values) {
+            var paramArray = params.split(',');
+            var valueArray = values.split(',');
+
+            if (paramArray.length !== valueArray.length) {
+                throw new Error('The number of parameters must match the number of values');
+            }
+
+            var result = {};
+            for (var i = 0; i < paramArray.length; i++) {
+                result[paramArray[i].trim()] = valueArray[i].trim();
+            }
+
+            return result;
+        }
+
+        // Read one archived publication and hand back its text.
+        //
+        // The corpus is stored gzipped -- 616MB of Air Force text is 169MB
+        // packed -- and the services after the Army keep no text column in
+        // Postgres, so a result card's supporting line is found here from the
+        // archive instead. DecompressionStream unpacks the body as it
+        // arrives, which is why this is a few lines of JS rather than an
+        // inflate implementation in Kotlin, and why the bytes never cross the
+        // wasm boundary.
+        //
+        // Resolves to null for anything at all -- a 404, an offline browser,
+        // a body that is not gzip. A missing snippet is a card with one less
+        // line on it; a thrown error is a search that looks broken.
+        function fetchArchivedText(url) {
+            return fetch(url)
+                .then(function (response) {
+                    if (!response.ok || !response.body) return null;
+                    return new Response(
+                        response.body.pipeThrough(new DecompressionStream('gzip'))
+                    ).text();
+                })
+                .catch(function () { return null; });
+        }
+
+        function shareContent(text) {
+            const url = window.location.href; // Get the current page URL
+            if (navigator.share) {
+                navigator.share({
+                    // Named explicitly rather than taken from document.title.
+                    // What is being shared is an answer, not the page it was
+                    // read on, and the sheet showed whichever page the app had
+                    // been served as -- "Army Links" on top of a regulation
+                    // answer, for anyone who arrived through that link.
+                    title: 'Reggie.Bot',
+                    text: text,
+                    url: url
+                }).then(() => {
+                    console.log('Successfully shared');
+                }).catch((error) => {
+                    console.error('Error sharing:', error);
+                });
+            } else {
+                console.error('Web Share API not supported in this browser');
+            }
+        }
+
+        // Waits for the helpers the app expects, but not forever.
+        //
+        // This polled every 100ms with no limit. Anything it waited on that
+        // never arrived -- a blocked third-party script, an extension that
+        // removed a global -- was a permanent, silent blank page: no error, no
+        // timeout, and the wasm never even requested. Loading the app late is
+        // recoverable; never loading it is not, so the deadline calls through
+        // anyway rather than giving up.
+        function waitForFunctions(functionNames, callback) {
+            var deadline = Date.now() + 5000;
+
+            function checkFunctions() {
+                for (let i = 0; i < functionNames.length; i++) {
+                    if (typeof window[functionNames[i]] !== "function") {
+                        if (Date.now() > deadline) {
+                            console.warn('proceeding without ' + functionNames[i]);
+                            break;
+                        }
+                        setTimeout(checkFunctions, 100);
+                        return;
+                    }
+                }
+                callback();
+            }
+
+            checkFunctions();
+        }
+
+        function detectUnsupportedBrowser() {
+            const userAgent = navigator.userAgent;
+
+            // Check if the browser is Safari and not Chrome or Firefox on iOS
+            const isSafari = /^((?!chrome|android|crios|fxios).)*safari/i.test(userAgent);
+
+            if (isSafari) {
+                // Extract the Safari version from the userAgent
+                const versionMatch = userAgent.match(/Version\/(\d+\.\d+)/);
+                if (versionMatch) {
+                    const safariVersion = parseFloat(versionMatch[1]);
+                    console.log(`Safari version detected: ${safariVersion}`);
+                    return safariVersion < 18.2;
+                }
+            }
+            console.log("Browser is not Safari or version not detected.");
+            return false;
+        }
+
+        if (detectUnsupportedBrowser()) {
+            window.location.href = "unsupported_browser.html";
+        } else {
+            window.onload = function() {
+                function dismissBootScreen() {
+                    var boot = document.getElementById('boot');
+                    if (!boot || boot.classList.contains('done')) return;
+                    boot.classList.add('done');
+                    // transitionend removes it as soon as the fade finishes;
+                    // the timer is the backstop for a browser that never fires
+                    // one (a reduced-motion setting removes the transition
+                    // altogether), so the overlay can never be left behind.
+                    boot.addEventListener('transitionend', function () { boot.remove(); });
+                    setTimeout(function () { boot.remove(); }, 1000);
+                }
+
+                // Compose renders to a canvas, and that canvas is the signal
+                // that the app is really up. It is not in the document though:
+                // Compose Multiplatform 1.11 puts it inside a shadow root, so
+                // document.querySelector('canvas') returns null forever and
+                // waiting on that meant waiting on something that never came.
+                function composeCanvas(root) {
+                    if (root.querySelector('canvas')) return true;
+                    var hosts = root.querySelectorAll('*');
+                    for (var i = 0; i < hosts.length; i++) {
+                        var shadow = hosts[i].shadowRoot;
+                        if (shadow && shadow.querySelector('canvas')) return true;
+                    }
+                    return false;
+                }
+
+                // Two frames after it mounts it has painted, so the overlay can
+                // dissolve into the app rather than off a blank canvas.
+                function dismissWhenComposePaints() {
+                    var target = document.getElementById('ComposeTarget');
+                    if (!target) return;
+                    var observer = new MutationObserver(function () {
+                        if (!composeCanvas(target)) return;
+                        observer.disconnect();
+                        requestAnimationFrame(function () {
+                            requestAnimationFrame(dismissBootScreen);
+                        });
+                    });
+                    observer.observe(target, { childList: true, subtree: true });
+
+                    // If wasm never boots, say so. This used to dismiss the
+                    // overlay and nothing else, so a failed boot and a slow one
+                    // looked the same -- and both looked like a broken site
+                    // with no way out but knowing to reload.
+                    setTimeout(function () {
+                        observer.disconnect();
+                        // Dismiss the cover only when there is an app behind
+                        // it. This used to dismiss unconditionally and then
+                        // report the failure, which uncovered the SEO copy --
+                        // so a reader whose wasm never booted was left staring
+                        // at crawler text with an error box over it, which
+                        // reads as a broken site rather than as this app.
+                        if (composeCanvas(target)) {
+                            dismissBootScreen();
+                        } else {
+                            showBootFailed();
+                        }
+                    }, 25000);
+                }
+
+                dismissWhenComposePaints();
+
+                // Registered after load, and deliberately after the wasm has
+                // been asked for: the app is ~15MB and the worker must not
+                // compete with it on a first visit. It pays off on the second.
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('/sw.js').catch(function (e) {
+                        // Not fatal - the app works without it.
+                        console.warn('service worker registration failed', e);
+                    });
+                }
+
+                // Shown only when the app really did not start. The fallback
+                // text underneath says what the site is; this says what
+                // happened and offers the one thing that fixes it.
+                function showBootFailed() {
+                    if (document.getElementById('boot-failed')) return;
+                    // The SEO copy is for crawlers and has never been for
+                    // readers. #boot normally covers it and is left in place
+                    // on this path, but hide it outright as well: this is the
+                    // one moment we know the app is not coming, and it must
+                    // not depend on an overlay still being there.
+                    var seo = document.getElementById('seo-fallback');
+                    if (seo) seo.setAttribute('hidden', '');
+                    var box = document.createElement('div');
+                    box.id = 'boot-failed';
+                    box.setAttribute('role', 'alert');
+                    box.innerHTML =
+                        '<p>Reggie could not finish loading.</p>' +
+                        '<button type="button">Reload</button>';
+                    box.querySelector('button').addEventListener('click', function () {
+                        // Bypass both caches: the likeliest cause is a cached
+                        // copy that is no longer whole.
+                        if (window.caches && caches.keys) {
+                            caches.keys().then(function (names) {
+                                return Promise.all(names.map(function (n) { return caches.delete(n); }));
+                            }).catch(function () {}).then(function () { location.reload(); });
+                        } else {
+                            location.reload();
+                        }
+                    });
+                    document.getElementById('root').appendChild(box);
+                }
+
+                // A tab the browser reclaimed and then restored.
+                //
+                // Everything here runs inside window.onload, and a page
+                // restored from the back/forward cache never fires load again
+                // -- so if whatever was on screen is gone, nothing rebuilds
+                // it. Storage pressure can also empty the cache the app was
+                // served from, which is what leaves a blank white document
+                // rather than this app's own dark shell.
+                window.addEventListener('pageshow', function (event) {
+                    if (!event.persisted) return;
+                    var target = document.getElementById('ComposeTarget');
+                    if (target && composeCanvas(target)) return;
+                    location.reload();
+                });
+
+                function loadWasm() {
+                    var canvas = document.getElementById('ComposeTarget');
+                    canvas.focus();
+
+                    var script = document.createElement('script');
+                    // Absolute: this same file is served at /news, /pubs and
+                    // friends so deep links work, and a relative path would
+                    // look for /news/composeApp.js and never boot.
+                    script.src = "/composeApp.js";
+                    document.head.appendChild(script);
+                }
+
+                // List of functions to wait for
+                const functionsToWaitFor = ["createParamValueObject", "gtag", "shareContent"];
+
+                // Wait for all functions before loading Wasm
+                waitForFunctions(functionsToWaitFor, loadWasm);
+            };
+        }
+    </script>
+</head>
+<body>
+<!-- ComposeViewport (Compose Multiplatform 1.11, which replaced
+     CanvasBasedWindow) attaches to a CONTAINER and creates its own canvas
+     inside it. Leaving a <canvas> here gives an unsized 300x150 default that
+     renders nothing, and a second canvas nested inside it. -->
+<div id="root">
+    <!-- No visible text: the mark and the ring around it say "loading" on
+         their own. aria-label keeps that legible to a screen reader without
+         putting a caption back on the screen. -->
+    <div id="boot" role="status" aria-live="polite" aria-label="Loading Reggie.Bot">
+        <div id="boot-mark">
+            <div id="boot-ring"></div>
+            <div id="boot-logo"></div>
+        </div>
+    </div>
+
+    <!-- Compose replaces the contents of #ComposeTarget on boot, so users never
+         see this. Crawlers do: the app renders to a <canvas>, which search
+         engines cannot read at all, leaving the site with no indexable text
+         whatsoever. This is the only content Google gets today. -->
+    <div id="ComposeTarget" aria-label="Interactive application area" tabindex="0">
+        <!-- Not wrapped in <noscript>: crawlers that execute JS ignore it, and
+             this needs to be real markup in the initial response. Compose
+             clears the container when it mounts, so users see it only for the
+             instant before the app boots. -->
+        <div id="seo-fallback">
+            <h1>MILPERSMAN - Military Personnel Manual</h1>
+            <p>All 768 MILPERSMAN publications (Military Personnel Manual), with dates, proponents and links. Browse them or ask Reggie.Bot a question about any of them.</p>
+            <h2>768 Publications</h2>
+            <ul>
+                <li><a href="/usn/pub/milpersman-1000-020/">MILPERSMAN 1000-020</a> — Pay &amp; Personnel Record Maintenance Responsibilities — 11 Apr 2015</li>
+                <li><a href="/usn/pub/milpersman-1000-021/">MILPERSMAN 1000-021</a> — Command Pay and Personnel Administrator (CPPA) Program — 18 Oct 2021</li>
+                <li><a href="/usn/pub/milpersman-1000-025/">MILPERSMAN 1000-025</a> — Personnel Transaction Timeliness — 14 Jan 2020</li>
+                <li><a href="/usn/pub/milpersman-1000-030/">MILPERSMAN 1000-030</a> — Active Duty Service Date (ADSD) for Enlisted Personnel — 02 Apr 2025</li>
+                <li><a href="/usn/pub/milpersman-1000-060/">MILPERSMAN 1000-060</a> — Military Personnel Social Security Number (SSN) — 20 Oct 2013</li>
+                <li><a href="/usn/pub/milpersman-1000-090/">MILPERSMAN 1000-090</a> — Race Entries on Forms, Records, and Reports — 20 Jun 2007</li>
+                <li><a href="/usn/pub/milpersman-1000-100/">MILPERSMAN 1000-100</a> — Home of Record and Place from Which Ordered to Active Duty — 21 Nov 2015</li>
+                <li><a href="/usn/pub/milpersman-1000-110/">MILPERSMAN 1000-110</a> — Name and Address Lists of Members of the Navy and Navy Reserve — 10 Nov 2005</li>
+                <li><a href="/usn/pub/milpersman-1000-120/">MILPERSMAN 1000-120</a> — Correction of Date of Birth — 8 Nov 2011</li>
+                <li><a href="/usn/pub/milpersman-1000-130/">MILPERSMAN 1000-130</a> — Name Change of Service Member — 05 May 2024</li>
+                <li><a href="/usn/pub/milpersman-1000-140/">MILPERSMAN 1000-140</a> — Mailing Address of Members on Inactive Duty — 24 Feb 2011</li>
+                <li><a href="/usn/pub/milpersman-1000-150/">MILPERSMAN 1000-150</a> — Board for Correction of Naval Records (BCNR) — 2 Feb 2006</li>
+                <li><a href="/usn/pub/milpersman-1000-160/">MILPERSMAN 1000-160</a> — Naval Discharge Review Board (NDRB) — 21 Aug 2006</li>
+                <li><a href="/usn/pub/milpersman-1000-170/">MILPERSMAN 1000-170</a> — Sailing Diary — 29 May 2025</li>
+                <li><a href="/usn/pub/milpersman-1001-020/">MILPERSMAN 1001-020</a> — Training and Administration of the Reserve (TAR) Navy Reserve Officer Program — 06 Dec 2023</li>
+                <li><a href="/usn/pub/milpersman-1001-021/">MILPERSMAN 1001-021</a> — Full-Time Support (FTS) of the Navy Reserve Enlisted Program — 3 Jul 2019</li>
+                <li><a href="/usn/pub/milpersman-1001-022/">MILPERSMAN 1001-022</a> — Permanent Professional Recruiter (PPR) Designator of the Navy Reserve Officer Program — 02 Oct 2023</li>
+                <li><a href="/usn/pub/milpersman-1001-030/">MILPERSMAN 1001-030</a> — Civilian Employment of Inactive Duty Navy Reservists — 16 Sep 2005</li>
+                <li><a href="/usn/pub/milpersman-1001-040/">MILPERSMAN 1001-040</a> — Foreign Travel and Residence of Inactive Duty Navy Reservists — 13 Sep 2005</li>
+                <li><a href="/usn/pub/milpersman-1001-060/">MILPERSMAN 1001-060</a> — Assignment of Enlisted Naval Reservists to Active Duty — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1001-070/">MILPERSMAN 1001-070</a> — Inactive Duty Reservists Who are Students or Graduates of Medical Schools or Theological Studies — 15 Sep 2005</li>
+                <li><a href="/usn/pub/milpersman-1001-080/">MILPERSMAN 1001-080</a> — Minimum Required Service of Naval Reserve Officers with an Initial 3 To 6 Months of Active Duty for Training in Lieu of 2 or More Years Active Duty</li>
+                <li><a href="/usn/pub/milpersman-1001-090/">MILPERSMAN 1001-090</a> — Minimum Required Active Service of Reserve Officers — 1 Jun 2016</li>
+                <li><a href="/usn/pub/milpersman-1001-100/">MILPERSMAN 1001-100</a> — Navy Reserve Status and Categories — 12 Oct 2015</li>
+                <li><a href="/usn/pub/milpersman-1001-125/">MILPERSMAN 1001-125</a> — Requirements for Transfer From Selected Reserve or Individual Ready Reserve-Voluntary Training Unit to the Individual Ready Reserve-Active Status Pool, Standby Reserve-Active, or Standby Reserve-Inactive — 9 Oct 2019</li>
+                <li><a href="/usn/pub/milpersman-1001-135/">MILPERSMAN 1001-135</a> — Screening Requirements for Individual Ready Reserve-Active Status Pool — 20 Feb 2018</li>
+                <li><a href="/usn/pub/milpersman-1001-145/">MILPERSMAN 1001-145</a> — Requirements for Transfer From Active Component to the Individual Ready Reserve-Active Status Pool, Standby Reserve-Active, or Standby Reserve-Inactive — 8 Oct 2019</li>
+                <li><a href="/usn/pub/milpersman-1001-150/">MILPERSMAN 1001-150</a> — Navy Reserve Participation Requirements — 24 Jan 2013</li>
+                <li><a href="/usn/pub/milpersman-1001-170/">MILPERSMAN 1001-170</a> — Reserve Family Member Identification Cards and Defense Enrollment Eligibility System (DEERS) Enrollment Program — 14 Aug 2024</li>
+                <li><a href="/usn/pub/milpersman-1001-260/">MILPERSMAN 1001-260</a> — Targeted Re-Entry Program — 29 Sep 2020</li>
+                <li><a href="/usn/pub/milpersman-1050-010/">MILPERSMAN 1050-010</a> — Leave Policy — 29 Mar 2013</li>
+                <li><a href="/usn/pub/milpersman-1050-050/">MILPERSMAN 1050-050</a> — Hospitalization While on Leave — 16 Feb 2012</li>
+                <li><a href="/usn/pub/milpersman-1050-070/">MILPERSMAN 1050-070</a> — Special Leave Accrual — 22 Jan 2010</li>
+                <li><a href="/usn/pub/milpersman-1050-080/">MILPERSMAN 1050-080</a> — Computation of Leave – Overview — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1050-081/">MILPERSMAN 1050-081</a> — Computation of Leave – General Instructions — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1050-082/">MILPERSMAN 1050-082</a> — Computation of Leave – Examples of Charging Leave, Proceed, and Travel Time — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1050-083/">MILPERSMAN 1050-083</a> — Computation of Leave – Example of Charging Leave   During PCS with TDY En Route — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1050-084/">MILPERSMAN 1050-084</a> — Computation of Leave – Example of Charging Leave When No Travel and Proceed Time Authorized — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1050-085/">MILPERSMAN 1050-085</a> — Computation of Leave – Example of Charging Leave When Unaccounted Time Exists — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1050-090/">MILPERSMAN 1050-090</a> — Leave: Day of Departure/Return — 17 May 2022</li>
+                <li><a href="/usn/pub/milpersman-1050-100/">MILPERSMAN 1050-100</a> — Leave: Check-in/Check-out Procedures — 05 Sep 2025</li>
+                <li><a href="/usn/pub/milpersman-1050-110/">MILPERSMAN 1050-110</a> — Absences Over Leave or Liberty (AOL) — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1050-120/">MILPERSMAN 1050-120</a> — Separation Leave — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1050-130/">MILPERSMAN 1050-130</a> — Emergency Leave — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1050-140/">MILPERSMAN 1050-140</a> — Computation of Emergency Leave Involving Government - Funded Travel — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1050-150/">MILPERSMAN 1050-150</a> — Leave En Route in Execution of Orders — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1050-160/">MILPERSMAN 1050-160</a> — Leave During Temporary Duty or Temporary Additional Duty — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1050-170/">MILPERSMAN 1050-170</a> — Leave in Conjunction with Temporary Additional Duty — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1050-180/">MILPERSMAN 1050-180</a> — Convalescent Leave — 27 Mar 2023</li>
+                <li><a href="/usn/pub/milpersman-1050-190/">MILPERSMAN 1050-190</a> — Sick in Quarters (SIQ) Status — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1050-200/">MILPERSMAN 1050-200</a> — Rest and Recuperation on Leave Program — 4 Apr 2012</li>
+                <li><a href="/usn/pub/milpersman-1050-210/">MILPERSMAN 1050-210</a> — Environmental and Morale Leave (EML) — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1050-220/">MILPERSMAN 1050-220</a> — Recruiting Assistance Leave Program — 10 Sep 2014</li>
+                <li><a href="/usn/pub/milpersman-1050-230/">MILPERSMAN 1050-230</a> — Leave for Midshipmen — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1050-240/">MILPERSMAN 1050-240</a> — Leave for Naval Academy Midshipmen Candidates Who Are Graduates of Naval Academy Preparatory School — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1050-250/">MILPERSMAN 1050-250</a> — Foreign Leave Travel — 14 Jun 2007</li>
+                <li><a href="/usn/pub/milpersman-1050-260/">MILPERSMAN 1050-260</a> — Leave/Emergency Leave in the Republic of the Philippines — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1050-270/">MILPERSMAN 1050-270</a> — Administrative Absences — 10 May 2017</li>
+                <li><a href="/usn/pub/milpersman-1050-271/">MILPERSMAN 1050-271</a> — Post-Deployment Mobilization Respite Absence for Active Duty Personnel — 2 Aug 2007</li>
+                <li><a href="/usn/pub/milpersman-1050-272/">MILPERSMAN 1050-272</a> — Post-Deployment/Mobilization Respite Absence for Mobilized Reserve Component Personnel — 11 Apr 2015</li>
+                <li><a href="/usn/pub/milpersman-1050-280/">MILPERSMAN 1050-280</a> — Definition of Liberty — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1050-290/">MILPERSMAN 1050-290</a> — Policy Concerning Liberty — 25 Feb 2015</li>
+                <li><a href="/usn/pub/milpersman-1050-310/">MILPERSMAN 1050-310</a> — Appellate Leave — 21 Nov 2023</li>
+                <li><a href="/usn/pub/milpersman-1050-320/">MILPERSMAN 1050-320</a> — Request (Voluntary) Appellate Leave — 24 Jan 2024</li>
+                <li><a href="/usn/pub/milpersman-1050-340/">MILPERSMAN 1050-340</a> — Mandatory (INVOLUNTARY) Appellate Leave — 28 Feb 2024</li>
+                <li><a href="/usn/pub/milpersman-1050-350/">MILPERSMAN 1050-350</a> — Appellate Review — 28 Feb 2024</li>
+                <li><a href="/usn/pub/milpersman-1050-360/">MILPERSMAN 1050-360</a> — Procedures for Recalling a Member from Appellate Leave — 23 Feb 2009</li>
+                <li><a href="/usn/pub/milpersman-1050-400/">MILPERSMAN 1050-400</a> — Accrued Leave Creditable Upon Retirement — 20 Apr 2012</li>
+                <li><a href="/usn/pub/milpersman-1050-410/">MILPERSMAN 1050-410</a> — Consecutive Overseas Tour (COT) and In-Place Consecutive Overseas Tour (IPCOT) Leave Travel Entitlement Policy — 22 Feb 2020</li>
+                <li><a href="/usn/pub/milpersman-1050-440/">MILPERSMAN 1050-440</a> — Administrative Absence to Obtain a Legal Marriage — 25 Sep 2013</li>
+                <li><a href="/usn/pub/milpersman-1070-020/">MILPERSMAN 1070-020</a> — Officer Official Military Personnel File (OMPF) — 18 Apr 2024</li>
+                <li><a href="/usn/pub/milpersman-1070-030/">MILPERSMAN 1070-030</a> — Creating the Officer Permanent Personnel Record — 27 Mar 2024</li>
+                <li><a href="/usn/pub/milpersman-1070-080/">MILPERSMAN 1070-080</a> — Enlisted Official Military Personnel File (OMPF) — 26 Jun 2024</li>
+                <li><a href="/usn/pub/milpersman-1070-090/">MILPERSMAN 1070-090</a> — Creating the Enlisted Permanent Personnel Record — 11 Apr 2024</li>
+                <li><a href="/usn/pub/milpersman-1070-111/">MILPERSMAN 1070-111</a> — Submission of Navy Standard Integrated Personnel   System (NSIPS) and Electronic Service Record (ESR) Documents to the Official Military Personnel File (OMPF) — 02 Sep 2026</li>
+                <li><a href="/usn/pub/milpersman-1070-150/">MILPERSMAN 1070-150</a> — Requests for Records Included in the Official Military Personnel File (OMPF) — 24 Jul 2026</li>
+                <li><a href="/usn/pub/milpersman-1070-181/">MILPERSMAN 1070-181</a> — Officer Photographs — 30 Sep 2024</li>
+                <li><a href="/usn/pub/milpersman-1070-230/">MILPERSMAN 1070-230</a> — DD4, Enlistment/Reenlistment Document – Armed Forces of the United States — 12 Jun 2023</li>
+                <li><a href="/usn/pub/milpersman-1070-240/">MILPERSMAN 1070-240</a> — NAVPERS 1070/601 Immediate Reenlistment Contract — 02 Sep 2026</li>
+                <li><a href="/usn/pub/milpersman-1070-250/">MILPERSMAN 1070-250</a> — NAVPERS 1070/621 Agreement to Extend Enlistment — 24 Jul 2026</li>
+                <li><a href="/usn/pub/milpersman-1070-260/">MILPERSMAN 1070-260</a> — NAVPERS 1070/622 Agreement to Recall or Extend    Active Duty — 12 Aug 2026</li>
+                <li><a href="/usn/pub/milpersman-1070-270/">MILPERSMAN 1070-270</a> — Dependency Application — 1 May 2019</li>
+                <li><a href="/usn/pub/milpersman-1070-271/">MILPERSMAN 1070-271</a> — Record of Emergency Data — 20 Jan 2019</li>
+                <li><a href="/usn/pub/milpersman-1070-300/">MILPERSMAN 1070-300</a> — NAVPERS 1070/606 Record of Unauthorized Absence — 04 May 2026</li>
+                <li><a href="/usn/pub/milpersman-1070-310/">MILPERSMAN 1070-310</a> — NAVPERS 1070/607 Court Memorandum — 04 May 2026</li>
+                <li><a href="/usn/pub/milpersman-1070-320/">MILPERSMAN 1070-320</a> — Administrative Remarks — 21 Oct 2019</li>
+                <li><a href="/usn/pub/milpersman-1070-330/">MILPERSMAN 1070-330</a> — NAVPERS 1070/615, Record of Discharge from the U.S. Navy Reserve (Inactive) — 14 Mar 2017</li>
+                <li><a href="/usn/pub/milpersman-1070-340/">MILPERSMAN 1070-340</a> — DD214 Certificate of Release or Discharge from Active Duty — 15 May 2023</li>
+                <li><a href="/usn/pub/milpersman-1070-360/">MILPERSMAN 1070-360</a> — NAVPERS 1070/887 Sex Offense Accountability Record — 30 Dec 2015</li>
+                <li><a href="/usn/pub/milpersman-1080-010/">MILPERSMAN 1080-010</a> — NAVPERS 18068F, Manual of Navy Enlisted Manpower and Personnel Classifications and Occupational Standards — 18 Jul 2008</li>
+                <li><a href="/usn/pub/milpersman-1100-011/">MILPERSMAN 1100-011</a> — First Enlistments and the Military Service Obligation — 09 Jan 2026</li>
+                <li><a href="/usn/pub/milpersman-1100-020/">MILPERSMAN 1100-020</a> — Appointment in the Nurse Corps of the Navy on Active  Duty — 15 Aug 2007</li>
+                <li><a href="/usn/pub/milpersman-1100-030/">MILPERSMAN 1100-030</a> — Procedures for Effecting Appointments and Delivering Original Commissions — 30 Jul 2024</li>
+                <li><a href="/usn/pub/milpersman-1100-050/">MILPERSMAN 1100-050</a> — Eligibility Requirements for Membership in the Ready Reserve — 28 Jul 2005</li>
+                <li><a href="/usn/pub/milpersman-1100-060/">MILPERSMAN 1100-060</a> — Submission of Application for Voluntary Termination of Temporary Appointment and Reversion of Limited Duty Officers (LDOs) — 15 Sep 2006</li>
+                <li><a href="/usn/pub/milpersman-1131-040/">MILPERSMAN 1131-040</a> — Appointment of Officers in the Navy Reserve, Prior Service — 28 May 2024</li>
+                <li><a href="/usn/pub/milpersman-1131-050/">MILPERSMAN 1131-050</a> — Medical Enlisted Commissioning Program — 21 Jun 2007</li>
+                <li><a href="/usn/pub/milpersman-1133-020/">MILPERSMAN 1133-020</a> — Navy Reserve Enlistment Program – Policy — 24 May 2018</li>
+                <li><a href="/usn/pub/milpersman-1133-060/">MILPERSMAN 1133-060</a> — Prior Service (PRISE) III Program — 20 May 2017</li>
+                <li><a href="/usn/pub/milpersman-1133-061/">MILPERSMAN 1133-061</a> — Prior Service Reenlistment Eligibility - Reserve (PRISE-R) Program — 28 Oct 2024</li>
+                <li><a href="/usn/pub/milpersman-1133-062/">MILPERSMAN 1133-062</a> — Active Component and Full Time Support (FTS) to Selected Reserve (SELRES) Delayed Affiliation Program (DAP) — 13 Jan 2020</li>
+                <li><a href="/usn/pub/milpersman-1133-070/">MILPERSMAN 1133-070</a> — Fulfillment of the 8-year Obligation — 13 Apr 2005</li>
+                <li><a href="/usn/pub/milpersman-1133-090/">MILPERSMAN 1133-090</a> — New Accession Training (NAT) Program — 24 Apr 2018</li>
+                <li><a href="/usn/pub/milpersman-1160-010/">MILPERSMAN 1160-010</a> — Age Limitation of Enlisted Personnel for Continuation on Active Duty — 1 Feb 2020</li>
+                <li><a href="/usn/pub/milpersman-1160-020/">MILPERSMAN 1160-020</a> — Enlistment and Reenlistment Ceremony and Recognition Items — 06 Mar 2026</li>
+                <li><a href="/usn/pub/milpersman-1160-030/">MILPERSMAN 1160-030</a> — Enlistments and Reenlistments Under Continuous Service Conditions</li>
+                <li><a href="/usn/pub/milpersman-1160-031/">MILPERSMAN 1160-031</a> — Required Counseling Upon Enlistment and Reenlistment — 30 Jul 2024</li>
+                <li><a href="/usn/pub/milpersman-1160-040/">MILPERSMAN 1160-040</a> — Extension of Enlistments — 11 Apr 2021</li>
+                <li><a href="/usn/pub/milpersman-1160-050/">MILPERSMAN 1160-050</a> — Voluntary or Involuntary Extension of Enlisted Personnel Beyond Expiration of Enlistment, Fulfillment of Service Obligation, or Expiration of Tour of Active Service — 29 Dec 2025</li>
+                <li><a href="/usn/pub/milpersman-1160-060/">MILPERSMAN 1160-060</a> — Agreements of Enlisted Naval Reservists, Fleet Reservists, and Inductees to Remain on Active Duty — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1160-070/">MILPERSMAN 1160-070</a> — Reenlistment/Extension of Enlistment in the Individual Ready Reserve (IRR) — 28 Dec 2006</li>
+                <li><a href="/usn/pub/milpersman-1160-100/">MILPERSMAN 1160-100</a> — Selective Training and Reenlistment (STAR) Program — 13 Feb 2023</li>
+                <li><a href="/usn/pub/milpersman-1160-120/">MILPERSMAN 1160-120</a> — Active Component and Training and Administration of the Reserve High Year Tenure Program — 13 Jul 2023</li>
+                <li><a href="/usn/pub/milpersman-1160-135/">MILPERSMAN 1160-135</a> — High Year Tenure and Length of Service for Selected Reserve, Individual Ready Reserve (Voluntary Training Unit &amp; Active Status Pool), and Standby Reserve–Active (USNR-S1) — 22 Apr 2025</li>
+                <li><a href="/usn/pub/milpersman-1160-140/">MILPERSMAN 1160-140</a> — Career Waypoints — 06 May 2026</li>
+                <li><a href="/usn/pub/milpersman-1200-010/">MILPERSMAN 1200-010</a> — Submarine Patrol Insignia Qualifications — 23 Jan 2024</li>
+                <li><a href="/usn/pub/milpersman-1200-020/">MILPERSMAN 1200-020</a> — Deep Submergence Insignia Qualifications — 23 Jan 2024</li>
+                <li><a href="/usn/pub/milpersman-1200-030/">MILPERSMAN 1200-030</a> — Small Craft Insignia — 23 Jul 2021</li>
+                <li><a href="/usn/pub/milpersman-1200-040/">MILPERSMAN 1200-040</a> — Craftmaster Insignia — 17 Oct 2022</li>
+                <li><a href="/usn/pub/milpersman-1200-050/">MILPERSMAN 1200-050</a> — Organization of the Enlisted Classification Program — 14 Jul 2009</li>
+                <li><a href="/usn/pub/milpersman-1200-070/">MILPERSMAN 1200-070</a> — Nuclear Weapons Security (NWS) Insignia — 20 May 2024</li>
+                <li><a href="/usn/pub/milpersman-1210-010/">MILPERSMAN 1210-010</a> — Naval Aviator and Flight Officer Designations — 30 May 2017</li>
+                <li><a href="/usn/pub/milpersman-1210-020/">MILPERSMAN 1210-020</a> — Naval Astronaut Designation — 18 Apr 2008</li>
+                <li><a href="/usn/pub/milpersman-1210-030/">MILPERSMAN 1210-030</a> — Flight Surgeon — 7 Feb 2020</li>
+                <li><a href="/usn/pub/milpersman-1210-040/">MILPERSMAN 1210-040</a> — Flight Nurse Subspecialty Designation — 11 Apr 2021</li>
+                <li><a href="/usn/pub/milpersman-1210-081/">MILPERSMAN 1210-081</a> — Medical Service Corps Flight Officer Designation — 1 Jun 2019</li>
+                <li><a href="/usn/pub/milpersman-1210-090/">MILPERSMAN 1210-090</a> — Surface Warfare Officer (SWO) Designation — 27 Sep 2006</li>
+                <li><a href="/usn/pub/milpersman-1210-100/">MILPERSMAN 1210-100</a> — Line Officer Designation: Qualified in Submarines — 9 Jan 2015</li>
+                <li><a href="/usn/pub/milpersman-1210-110/">MILPERSMAN 1210-110</a> — Engineering Duty Officer Designation: Qualified in Submarines — 12 Aug 2021</li>
+                <li><a href="/usn/pub/milpersman-1210-111/">MILPERSMAN 1210-111</a> — Engineering Duty Officer Diver — 19 Mar 2026</li>
+                <li><a href="/usn/pub/milpersman-1210-120/">MILPERSMAN 1210-120</a> — Supply Corps Officer Designation: Qualified in Submarines — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1210-130/">MILPERSMAN 1210-130</a> — Medical Officer Designation: Qualified in Submarines — 18 Apr 2024</li>
+                <li><a href="/usn/pub/milpersman-1210-145/">MILPERSMAN 1210-145</a> — Diving Chief Warrant Officer (7201) — 14 Jul 2025</li>
+                <li><a href="/usn/pub/milpersman-1210-150/">MILPERSMAN 1210-150</a> — Surface Warfare Supply Corps Officer Designation — 27 Sep 2006</li>
+                <li><a href="/usn/pub/milpersman-1210-160/">MILPERSMAN 1210-160</a> — Surface Warfare Officers (SWO) (111X) Requirements for Command of Surface Ships</li>
+                <li><a href="/usn/pub/milpersman-1210-170/">MILPERSMAN 1210-170</a> — Command at Sea Insignia: Qualifications — 24 Apr 2021</li>
+                <li><a href="/usn/pub/milpersman-1210-180/">MILPERSMAN 1210-180</a> — Command Ashore Insignia:  Qualifications — 12 Mar 2023</li>
+                <li><a href="/usn/pub/milpersman-1210-190/">MILPERSMAN 1210-190</a> — Active Duty Engineering Duty Officer (1440) Qualifications — 3 Apr 2009</li>
+                <li><a href="/usn/pub/milpersman-1210-200/">MILPERSMAN 1210-200</a> — Inactive Duty Engineering Duty Officer (1445) Qualifications — 29 Dec 2006</li>
+                <li><a href="/usn/pub/milpersman-1210-210/">MILPERSMAN 1210-210</a> — Information Warfare Officer Qualification — 13 Apr 2010</li>
+                <li><a href="/usn/pub/milpersman-1210-220/">MILPERSMAN 1210-220</a> — Naval Special Warfare (NSW) Officer - Sea, Air, Land (SEAL) — 8 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1210-230/">MILPERSMAN 1210-230</a> — Explosive Ordnance Disposal (EOD) Officer — 09 Mar 2026</li>
+                <li><a href="/usn/pub/milpersman-1210-240/">MILPERSMAN 1210-240</a> — Flight Meteorologist Qualifications — 24 Apr 2018</li>
+                <li><a href="/usn/pub/milpersman-1210-250/">MILPERSMAN 1210-250</a> — Special Evaluator/Non-Aeronautically Designated Officers Assigned Duty Involving Flying — 16 Jul 2007</li>
+                <li><a href="/usn/pub/milpersman-1210-260/">MILPERSMAN 1210-260</a> — Aviation Operations Officers and Non-Aeronautically Designated Officers and Enlisted Assigned Duty Involving Flying — 2 Aug 2018</li>
+                <li><a href="/usn/pub/milpersman-1210-270/">MILPERSMAN 1210-270</a> — Officer Designation Codes — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1210-280/">MILPERSMAN 1210-280</a> — Designation of Limited Duty or Chief Warrant Officer as Eligible to Succeed to Command — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1210-300/">MILPERSMAN 1210-300</a> — Surface Warfare Medical Department Officer (SWMDO) Qualifications and Designation — 27 Sep 2006</li>
+                <li><a href="/usn/pub/milpersman-1210-310/">MILPERSMAN 1210-310</a> — Navy Ocean Facilities Program (OFP) Officer — 14 Mar 2017</li>
+                <li><a href="/usn/pub/milpersman-1210-320/">MILPERSMAN 1210-320</a> — Navy Expeditionary Supply Corps Officer Designation — 2 Oct 2013</li>
+                <li><a href="/usn/pub/milpersman-1212-010/">MILPERSMAN 1212-010</a> — Lateral Transfer and Change of Designator Codes of Regular and Reserve Officers — 21 Jun 2022</li>
+                <li><a href="/usn/pub/milpersman-1212-020/">MILPERSMAN 1212-020</a> — Redesignation Procedures for Limited Duty Officers (LDOs) and Chief Warrant Officers (CWOs) within their Respective Community — 24 Aug 2021</li>
+                <li><a href="/usn/pub/milpersman-1212-030/">MILPERSMAN 1212-030</a> — Redesignation of Limited Duty Officers — 29 Nov 2022</li>
+                <li><a href="/usn/pub/milpersman-1212-040/">MILPERSMAN 1212-040</a> — Engineering Duty (ED) Option Program — 22 Feb 2020</li>
+                <li><a href="/usn/pub/milpersman-1212-050/">MILPERSMAN 1212-050</a> — Information Warfare Community (IWC) Option Program — 3 Jul 2019</li>
+                <li><a href="/usn/pub/milpersman-1213-020/">MILPERSMAN 1213-020</a> — Suspension and Removal of Foreign Area Officer (FAO) Additional Qualification Designators (AQDs) — 8 Oct 2011</li>
+                <li><a href="/usn/pub/milpersman-1214-010/">MILPERSMAN 1214-010</a> — Officer Subspecialty System — 23 Jan 2008</li>
+                <li><a href="/usn/pub/milpersman-1220-010/">MILPERSMAN 1220-010</a> — Aircrew and Aviation Rescue Swimmer Programs — 22 Aug 2025</li>
+                <li><a href="/usn/pub/milpersman-1220-020/">MILPERSMAN 1220-020</a> — Naval Aircrew Warfare Specialist (NAWS) Designation — 9 Feb 2019</li>
+                <li><a href="/usn/pub/milpersman-1220-022/">MILPERSMAN 1220-022</a> — U.S. Marine Corps (USMC) Combat Aircrew Insignia and Designation — 17 Oct 2008</li>
+                <li><a href="/usn/pub/milpersman-1220-030/">MILPERSMAN 1220-030</a> — Parachutist Designation and Duty — 18 Apr 2020</li>
+                <li><a href="/usn/pub/milpersman-1220-040/">MILPERSMAN 1220-040</a> — Submarine Qualifications Designation for Enlisted Members — 14 Jun 2018</li>
+                <li><a href="/usn/pub/milpersman-1220-050/">MILPERSMAN 1220-050</a> — Enlisted Surface Warfare Specialist (ESWS) Designation — 27 Sep 2006</li>
+                <li><a href="/usn/pub/milpersman-1220-060/">MILPERSMAN 1220-060</a> — Enlisted Aviation Warfare Specialist (EAWS) Designation — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1220-070/">MILPERSMAN 1220-070</a> — Enlisted Explosive Ordnance Disposal Warfare (EWS) Specialist Designation — 10 Mar 2010</li>
+                <li><a href="/usn/pub/milpersman-1220-080/">MILPERSMAN 1220-080</a> — Enlisted Diving Warfare Specialist (DWS) Designation — 30 Sep 2022</li>
+                <li><a href="/usn/pub/milpersman-1220-100/">MILPERSMAN 1220-100</a> — Navy Diver (ND) Rating — 18 Aug 2025</li>
+                <li><a href="/usn/pub/milpersman-1220-101/">MILPERSMAN 1220-101</a> — U.S. Marine Corps (USMC) Marine Combatant Diver Breast Insignia and Designation — 24 Apr 2018</li>
+                <li><a href="/usn/pub/milpersman-1220-102/">MILPERSMAN 1220-102</a> — Self-Contained Underwater Breathing Apparatus  (SCUBA) Diver Program — 14 May 2025</li>
+                <li><a href="/usn/pub/milpersman-1220-200/">MILPERSMAN 1220-200</a> — Explosive Ordnance Disposal (EOD) Rating — 14 Aug 2024</li>
+                <li><a href="/usn/pub/milpersman-1220-280/">MILPERSMAN 1220-280</a> — Hazardous Duty Incentive Pay (HDIP) for Demolition Duty — 6 Aug 2022</li>
+                <li><a href="/usn/pub/milpersman-1220-300/">MILPERSMAN 1220-300</a> — Special Warfare Operator (SO) Rating — 24 Jun 2022</li>
+                <li><a href="/usn/pub/milpersman-1220-350/">MILPERSMAN 1220-350</a> — Assault Boat Coxswain Qualifications</li>
+                <li><a href="/usn/pub/milpersman-1220-360/">MILPERSMAN 1220-360</a> — Damage Control Scene Leader Qualifications — 16 May 2006</li>
+                <li><a href="/usn/pub/milpersman-1220-370/">MILPERSMAN 1220-370</a> — Enlisted Expeditionary Warfare (EXW) Specialist Designation — 22 Dec 2006</li>
+                <li><a href="/usn/pub/milpersman-1220-400/">MILPERSMAN 1220-400</a> — Special Warfare Boat Operator (SB) Rating — 02 May 2023</li>
+                <li><a href="/usn/pub/milpersman-1220-410/">MILPERSMAN 1220-410</a> — Sea-Air- Land (SEAL) /Explosive Ordnance Disposal (EOD) /Special Warfare Combatant-Craft Crewman (SWCC) /Diver/ Aviation Rescue Swimmer (AIRR) Physical Screening Testing Standards and Procedures — 3 Dec 2021</li>
+                <li><a href="/usn/pub/milpersman-1221-021/">MILPERSMAN 1221-021</a> — Navy Enlisted Classification (NEC) Code Award and Removal Procedures — 11 Jun 2024</li>
+                <li><a href="/usn/pub/milpersman-1221-030/">MILPERSMAN 1221-030</a> — Purpose and Scope of Navy Personnel Classification System — 17 Oct 2008</li>
+                <li><a href="/usn/pub/milpersman-1223-010/">MILPERSMAN 1223-010</a> — Enlisted Pay Grades and Titles — 18 Jul 2008</li>
+                <li><a href="/usn/pub/milpersman-1236-010/">MILPERSMAN 1236-010</a> — Armed Forces Classification Test (AFCT) Administration and Procedures for Navy Personnel — 14 Apr 2021</li>
+                <li><a href="/usn/pub/milpersman-1236-030/">MILPERSMAN 1236-030</a> — Safeguarding Enlisted Classification Test Material — 4 Jun 2011</li>
+                <li><a href="/usn/pub/milpersman-1300-010/">MILPERSMAN 1300-010</a> — Flag Level Review Concerning Personnel Assignment — 29 Aug 2005</li>
+                <li><a href="/usn/pub/milpersman-1300-035/">MILPERSMAN 1300-035</a> — Assignments Outside the Department of Defense (DoD) — 21 Oct 2016</li>
+                <li><a href="/usn/pub/milpersman-1300-060/">MILPERSMAN 1300-060</a> — Administration of Naval Members Performing Duty with Army, Air Force or Coast Guard — 29 Aug 2005</li>
+                <li><a href="/usn/pub/milpersman-1300-070/">MILPERSMAN 1300-070</a> — Administration of Army and Air Force Members Performing Duty with the Navy — 4 May 2016</li>
+                <li><a href="/usn/pub/milpersman-1300-081/">MILPERSMAN 1300-081</a> — Interservice Transfer of an Officer Out of the Navy — 3 Jun 2011</li>
+                <li><a href="/usn/pub/milpersman-1300-082/">MILPERSMAN 1300-082</a> — Inter-service Transfer of an Officer Into the Navy — 28 May 2024</li>
+                <li><a href="/usn/pub/milpersman-1300-090/">MILPERSMAN 1300-090</a> — Permanent Change of Station (PCS) Entitlement Policy – Overview — 2 Nov 2018</li>
+                <li><a href="/usn/pub/milpersman-1300-100/">MILPERSMAN 1300-100</a> — Permanent Change of Station (PCS) Entitlement Policy – General and Specific Policies</li>
+                <li><a href="/usn/pub/milpersman-1300-120/">MILPERSMAN 1300-120</a> — Permanent Change of Station (PCS) Entitlement Policy – Issuing Change of Home Port Certificates — 20 Aug 2010</li>
+                <li><a href="/usn/pub/milpersman-1300-150/">MILPERSMAN 1300-150</a> — Command Sponsorship of Dependents at Overseas Duty Stations – Overview — 18 Aug 2010</li>
+                <li><a href="/usn/pub/milpersman-1300-160/">MILPERSMAN 1300-160</a> — Command Sponsorship of Dependents at Overseas Duty Stations – Applicability and Definition — 10 Dec 2008</li>
+                <li><a href="/usn/pub/milpersman-1300-170/">MILPERSMAN 1300-170</a> — Command Sponsorship of Dependents at Overseas Duty Stations – Criteria and Status — 20 Aug 2010</li>
+                <li><a href="/usn/pub/milpersman-1300-180/">MILPERSMAN 1300-180</a> — Command Sponsorship of Dependents at Overseas Duty Stations – Status Change, Prohibitions, and Dependent Entry Approval — 26 Aug 2010</li>
+                <li><a href="/usn/pub/milpersman-1300-190/">MILPERSMAN 1300-190</a> — Command Sponsorship of Dependents at Overseas Duty Stations – Policies on Transportation at Government Expense — 8 Nov 2010</li>
+                <li><a href="/usn/pub/milpersman-1300-200/">MILPERSMAN 1300-200</a> — Command Sponsorship of Dependents at Overseas Duty Stations – Policies on Overseas Station Allowances — 10 Dec 2008</li>
+                <li><a href="/usn/pub/milpersman-1300-210/">MILPERSMAN 1300-210</a> — Command Sponsorship of Dependents at Overseas Duty Stations – Policies on Non-Command-Sponsored Dependents — 8 Nov 2010</li>
+                <li><a href="/usn/pub/milpersman-1300-302/">MILPERSMAN 1300-302</a> — Suitability for Overseas/ Remote Duty Assignment and Suitability Reporting — 20 Mar 2024</li>
+                <li><a href="/usn/pub/milpersman-1300-306/">MILPERSMAN 1300-306</a> — Overseas Screening Deficiency Reports and Early Return Request — 3 Dec 2009</li>
+                <li><a href="/usn/pub/milpersman-1300-308/">MILPERSMAN 1300-308</a> — Overseas Tour Lengths and Types — 26 Nov 2018</li>
+                <li><a href="/usn/pub/milpersman-1300-310/">MILPERSMAN 1300-310</a> — Overseas Extensions — 2 Sep 2010</li>
+                <li><a href="/usn/pub/milpersman-1300-312/">MILPERSMAN 1300-312</a> — Units Transitioning to Overseas Locations — 12 Jun 2026</li>
+                <li><a href="/usn/pub/milpersman-1300-314/">MILPERSMAN 1300-314</a> — Diego Garcia Assignments — 3 Aug 2014</li>
+                <li><a href="/usn/pub/milpersman-1300-316/">MILPERSMAN 1300-316</a> — Dependent Entry Approval Information — 30 Apr 2007</li>
+                <li><a href="/usn/pub/milpersman-1300-320/">MILPERSMAN 1300-320</a> — Nuclear Weapons (NW) Personnel Reliability Program (PRP) Preliminary Suitability Screening — 20 Feb 2018</li>
+                <li><a href="/usn/pub/milpersman-1300-400/">MILPERSMAN 1300-400</a> — Dislocation Allowance (DLA) and Secretary of the Navy Finds (SECNAVFIND) — 12 Dec 2006</li>
+                <li><a href="/usn/pub/milpersman-1300-500/">MILPERSMAN 1300-500</a> — Reassignments for Humanitarian Reasons (HUMS) — 12 Oct 2019</li>
+                <li><a href="/usn/pub/milpersman-1300-600/">MILPERSMAN 1300-600</a> — Twilight Tours — 2 Aug 2019</li>
+                <li><a href="/usn/pub/milpersman-1300-700/">MILPERSMAN 1300-700</a> — Exceptional Family Member (EFMP) Program — 5 Nov 2018</li>
+                <li><a href="/usn/pub/milpersman-1300-800/">MILPERSMAN 1300-800</a> — Transfer of Personnel to Operational Duty (Operational Screening) — 14 Nov 2011</li>
+                <li><a href="/usn/pub/milpersman-1300-802/">MILPERSMAN 1300-802</a> — Navy Expeditionary Intelligence Command (NAVEXINTCOM) — 10 Jul 2024</li>
+                <li><a href="/usn/pub/milpersman-1300-803/">MILPERSMAN 1300-803</a> — Coastal Riverine Force (CRF) — 26 May 2016</li>
+                <li><a href="/usn/pub/milpersman-1300-804/">MILPERSMAN 1300-804</a> — Assignment to Coastal Riverine Force (CRF) Training Evaluation Unit (TEU) — 7 Oct 2013</li>
+                <li><a href="/usn/pub/milpersman-1300-807/">MILPERSMAN 1300-807</a> — Navy Expeditionary Logistics Support Group (NAVELSG) Type 2 Sea Duty Components — 21 Nov 2023</li>
+                <li><a href="/usn/pub/milpersman-1300-996/">MILPERSMAN 1300-996</a> — Assignment to Naval Criminal Investigative Service — 25 Jul 2019</li>
+                <li><a href="/usn/pub/milpersman-1301-100/">MILPERSMAN 1301-100</a> — Officer Distribution – Overview — 1 Mar 2016</li>
+                <li><a href="/usn/pub/milpersman-1301-102/">MILPERSMAN 1301-102</a> — Officer Distribution – Process — 18 Nov 2015</li>
+                <li><a href="/usn/pub/milpersman-1301-104/">MILPERSMAN 1301-104</a> — Officer Distribution – General Tour Lengths and  Rotations</li>
+                <li><a href="/usn/pub/milpersman-1301-106/">MILPERSMAN 1301-106</a> — Officer Distribution – Time on Station (TOS) — 28 May 2021</li>
+                <li><a href="/usn/pub/milpersman-1301-108/">MILPERSMAN 1301-108</a> — Officer Distribution – Retainability — 28 May 2021</li>
+                <li><a href="/usn/pub/milpersman-1301-110/">MILPERSMAN 1301-110</a> — Officer Distribution – Prescribed Sea Tour (PST) and Recommended Shore Tour Lengths — 08 Oct 2024</li>
+                <li><a href="/usn/pub/milpersman-1301-112/">MILPERSMAN 1301-112</a> — Officer Distribution – Command Tour Lengths — 22 Mar 2021</li>
+                <li><a href="/usn/pub/milpersman-1301-114/">MILPERSMAN 1301-114</a> — Officer Distribution –Assignment to/from Navy Personnel Command (NAVPERSCOM) — 8 Jul 2022</li>
+                <li><a href="/usn/pub/milpersman-1301-116/">MILPERSMAN 1301-116</a> — Officer Distribution – U.S. Military Academy and U.S. Air Force Academy Instructor Tour Lengths — 22 Aug 2020</li>
+                <li><a href="/usn/pub/milpersman-1301-118/">MILPERSMAN 1301-118</a> — Officer Distribution – Major Defense Acquisition Position Tour Lengths — 11 Apr 2021</li>
+                <li><a href="/usn/pub/milpersman-1301-120/">MILPERSMAN 1301-120</a> — Officer Distribution – Joint Duty Assignment Tour Lengths (O-6 and Below) — 1 Sep 2017</li>
+                <li><a href="/usn/pub/milpersman-1301-122/">MILPERSMAN 1301-122</a> — Officer Distribution – Transfer of Officers to Operational Duty (Operational Screening)</li>
+                <li><a href="/usn/pub/milpersman-1301-200/">MILPERSMAN 1301-200</a> — Officer Special Assignments — 29 Dec 2020</li>
+                <li><a href="/usn/pub/milpersman-1301-201/">MILPERSMAN 1301-201</a> — Officer Special Assignments – Ensign “Stash” Assignments</li>
+                <li><a href="/usn/pub/milpersman-1301-202/">MILPERSMAN 1301-202</a> — Officer Special Assignments – Nominative Billets/Nomination of Officers — 20 Mar 2025</li>
+                <li><a href="/usn/pub/milpersman-1301-203/">MILPERSMAN 1301-203</a> — Officer Special Assignments – Aide Assignments — 1 Apr 2016</li>
+                <li><a href="/usn/pub/milpersman-1301-205/">MILPERSMAN 1301-205</a> — Officer Special Assignments – U.S. Naval Academy — 21 Jun 2007</li>
+                <li><a href="/usn/pub/milpersman-1301-207/">MILPERSMAN 1301-207</a> — Officer Special Assignments – Defense Attache’ Service (DAS): Attache' Assignments — 3 Feb 2015</li>
+                <li><a href="/usn/pub/milpersman-1301-208/">MILPERSMAN 1301-208</a> — Officer Special Assignments – Navy Recruiting  Command — 27 Apr 2007</li>
+                <li><a href="/usn/pub/milpersman-1301-209/">MILPERSMAN 1301-209</a> — Officer Special Assignments – Naval Reserve Officer Training Corps (NROTC) — 16 Apr 2008</li>
+                <li><a href="/usn/pub/milpersman-1301-210/">MILPERSMAN 1301-210</a> — Officer Special Assignments – Recruit Training  Command (NAVCRUITRACOM) — 21 Jun 2007</li>
+                <li><a href="/usn/pub/milpersman-1301-211/">MILPERSMAN 1301-211</a> — Officer Special Assignments – Navy Headquarters/Staff Level Equal Opportunity B illets — 15 Jun 2007</li>
+                <li><a href="/usn/pub/milpersman-1301-212/">MILPERSMAN 1301-212</a> — Officer Special Assignments – Navy Flight Demonstration Squadron (Blue Angels) Assignments — 4 Aug 2006</li>
+                <li><a href="/usn/pub/milpersman-1301-213/">MILPERSMAN 1301-213</a> — Officer Special Assignments – Reserve Fleet Logistics Support Squadron (VR) — 09 Jul 2024</li>
+                <li><a href="/usn/pub/milpersman-1301-214/">MILPERSMAN 1301-214</a> — Officer Special Assignments – Naval Leadership Instructor (Facilitator) Assignments — 14 Feb 2021</li>
+                <li><a href="/usn/pub/milpersman-1301-215/">MILPERSMAN 1301-215</a> — Officer Special Assignments – Brig and Transient Personnel Unit (TPU)/Regional Restriction Barracks (RRB) — 15 Dec 2009</li>
+                <li><a href="/usn/pub/milpersman-1301-216/">MILPERSMAN 1301-216</a> — Officer Special Assignments – Joint Duty Assignments (JDAs) — 3 Jul 2019</li>
+                <li><a href="/usn/pub/milpersman-1301-219/">MILPERSMAN 1301-219</a> — Officer Special Assignments – Limited Duty Officer  (LDO) and Chief Warrant Officer (CWO) Assignments</li>
+                <li><a href="/usn/pub/milpersman-1301-220/">MILPERSMAN 1301-220</a> — Officer Special Assignments – Engineering Duty Officer (EDO) — 17 May 2022</li>
+                <li><a href="/usn/pub/milpersman-1301-221/">MILPERSMAN 1301-221</a> — Officer Special Assignments – Training and Administration of the Reserve (TAR) — 3 Jul 2024</li>
+                <li><a href="/usn/pub/milpersman-1301-222/">MILPERSMAN 1301-222</a> — Officer Special Assignments – Surface Warfare Officer (SWO) Department Head and Division Officer Assignments to Afloat Billets</li>
+                <li><a href="/usn/pub/milpersman-1301-223/">MILPERSMAN 1301-223</a> — Officer Special Assignments – Nuclear Qualified Surface Warfare Officers (SWOs) to Conventionally Powered Ships — 22 Apr 2019</li>
+                <li><a href="/usn/pub/milpersman-1301-224/">MILPERSMAN 1301-224</a> — Officer Special Assignments – Prisoners of War (POW) Reassignments — 10 Nov 2020</li>
+                <li><a href="/usn/pub/milpersman-1301-226/">MILPERSMAN 1301-226</a> — Officer Special Assignments – Training Instructor Duty</li>
+                <li><a href="/usn/pub/milpersman-1301-227/">MILPERSMAN 1301-227</a> — Officer Special Assignments – Officers Without Security Clearances — 1 Jun 2016</li>
+                <li><a href="/usn/pub/milpersman-1301-228/">MILPERSMAN 1301-228</a> — Officer Special Assignments – Officers not in Compliance with Physical Readiness Standards — 24 Aug 2018</li>
+                <li><a href="/usn/pub/milpersman-1301-229/">MILPERSMAN 1301-229</a> — Officer Special Assignments – Naval Inspector General Assignments to Staffs of Major Commands — 15 Mar 2007</li>
+                <li><a href="/usn/pub/milpersman-1301-233/">MILPERSMAN 1301-233</a> — Specialty Career Path — 14 Mar 2019</li>
+                <li><a href="/usn/pub/milpersman-1301-234/">MILPERSMAN 1301-234</a> — Officer Special Assignments - Human Resources Community — 05 Apr 2024</li>
+                <li><a href="/usn/pub/milpersman-1301-235/">MILPERSMAN 1301-235</a> — Command Policies and Procedures - Specific Policies Related to Screening Engineering Duty Officers to Command or Major Program Manager Assignments — 21 Feb 2026</li>
+                <li><a href="/usn/pub/milpersman-1301-236/">MILPERSMAN 1301-236</a> — Officer Special Assignments - Aviation Acquisition Professionals (AP) Unrestricted Line (URL) Major Program Manager Eligible (MPM-E) Career Path — 12 Aug 2024</li>
+                <li><a href="/usn/pub/milpersman-1301-237/">MILPERSMAN 1301-237</a> — Officer Special Assignments - Information Warfare Line (IWL) Officer Selection and Assignment to O-4 Milestone and Leadership, and O-5 Milestone and Command Billets, and O-6 Major Command and Information Warfare Commander Billets — 16 Feb 2026</li>
+                <li><a href="/usn/pub/milpersman-1301-239/">MILPERSMAN 1301-239</a> — Public Affairs Officer (PAO) Milestone and Command Screening Qualification and Assignment or Declination — 20 Feb 2024</li>
+                <li><a href="/usn/pub/milpersman-1301-240/">MILPERSMAN 1301-240</a> — Officer Special Assignments- Navy Cyber Warfare Development Group — 15 Dec 2022</li>
+                <li><a href="/usn/pub/milpersman-1301-500/">MILPERSMAN 1301-500</a> — Consideration of Accessions, Interservice Transfers, and Recalls for Active Duty Promotion Section Boards — 29 Dec 2006</li>
+                <li><a href="/usn/pub/milpersman-1301-600/">MILPERSMAN 1301-600</a> — Voluntary and Involuntary Recall/Mobilization of Navy Reserve Component (RC) Personnel — 22 Sep 2003</li>
+                <li><a href="/usn/pub/milpersman-1301-700/">MILPERSMAN 1301-700</a> — Acquisition Professional Membership (APM) — 30 Sep 2024</li>
+                <li><a href="/usn/pub/milpersman-1301-710/">MILPERSMAN 1301-710</a> — Command Policies and Procedures - Active Component Chaplain Corps Officer Screening and Assignment to Commander and Captain Milestone Billets — 23 Jan 2021</li>
+                <li><a href="/usn/pub/milpersman-1301-800/">MILPERSMAN 1301-800</a> — Command Policies and Procedures – Overview — 4 Oct 2014</li>
+                <li><a href="/usn/pub/milpersman-1301-802/">MILPERSMAN 1301-802</a> — Command Policies and Procedures - Specific Policies Related to Command — 11 Nov 2018</li>
+                <li><a href="/usn/pub/milpersman-1301-804/">MILPERSMAN 1301-804</a> — Officer Policies and Procedures – Command Screen Procedures — 4 Sep 2020</li>
+                <li><a href="/usn/pub/milpersman-1301-806/">MILPERSMAN 1301-806</a> — Command Policies and Procedures – Command Ashore — 2 Oct 2014</li>
+                <li><a href="/usn/pub/milpersman-1301-809/">MILPERSMAN 1301-809</a> — Command Policies and Procedures - Foreign Area Officer (FAO) Assignments to Milestone Billets — 14 Jul 2025</li>
+                <li><a href="/usn/pub/milpersman-1301-810/">MILPERSMAN 1301-810</a> — Command Policies and Procedures – Command of Major Laboratories — 13 Aug 2007</li>
+                <li><a href="/usn/pub/milpersman-1301-812/">MILPERSMAN 1301-812</a> — Command Policies and Procedures – Screening for Full Time Support Command and Navy Reserve Echelon IV and V Command — 21 Sep 2015</li>
+                <li><a href="/usn/pub/milpersman-1301-815/">MILPERSMAN 1301-815</a> — Policies and Procedures-Active Component Medical Department Officer Screening and Assignment to Medical Department Career Milestone Billets — 16 Feb 2017</li>
+                <li><a href="/usn/pub/milpersman-1301-816/">MILPERSMAN 1301-816</a> — Command Policies and Procedures – Navy Recruiting District Executive Officer (XO) to Commanding Officer (CO) Fleet-Up Policy — 16 Jun 2012</li>
+                <li><a href="/usn/pub/milpersman-1301-818/">MILPERSMAN 1301-818</a> — Procedures for Officers Not Desiring Orders to Command or Executive Officer — 29 Dec 2020</li>
+                <li><a href="/usn/pub/milpersman-1301-819/">MILPERSMAN 1301-819</a> — Procedures for Surface Limited Duty Officers  (LDO) not Desiring Orders to Command or Milestone Tour at Sea — 13 May 2026</li>
+                <li><a href="/usn/pub/milpersman-1301-820/">MILPERSMAN 1301-820</a> — Command Policies and Procedures – Command – Executive Officer (XO) Assignment Coordination — 22 Sep 2003</li>
+                <li><a href="/usn/pub/milpersman-1301-824/">MILPERSMAN 1301-824</a> — Command Policies and Procedures – Major Fleet Readiness Center Executive Officer (XO) to Commanding Officer (CO) Fleet Up Policy — 28 Apr 2012</li>
+                <li><a href="/usn/pub/milpersman-1301-826/">MILPERSMAN 1301-826</a> — Command Policies and Procedures – Shore Station Senior Leadership (SSSL) Training Requirements — 12 Jun 2024</li>
+                <li><a href="/usn/pub/milpersman-1301-900/">MILPERSMAN 1301-900</a> — Subspecialty Management, Graduate Education, and Service Colleges — 12 Sep 2005</li>
+                <li><a href="/usn/pub/milpersman-1301-902/">MILPERSMAN 1301-902</a> — Selection for Fully-Funded Graduate Education — 26 Sep 2008</li>
+                <li><a href="/usn/pub/milpersman-1301-904/">MILPERSMAN 1301-904</a> — Service Colleges — 17 Apr 2024</li>
+                <li><a href="/usn/pub/milpersman-1301-906/">MILPERSMAN 1301-906</a> — Navy Officer Leadership Continuum Training — 7 Mar 2021</li>
+                <li><a href="/usn/pub/milpersman-1301-907/">MILPERSMAN 1301-907</a> — Naval Leader Legal Training Continuum — 08 May 2025</li>
+                <li><a href="/usn/pub/milpersman-1306-100/">MILPERSMAN 1306-100</a> — Enlisted Distribution Management System — 21 Jul 2026</li>
+                <li><a href="/usn/pub/milpersman-1306-101/">MILPERSMAN 1306-101</a> — Enlisted Assignment System — 5 Nov 2010</li>
+                <li><a href="/usn/pub/milpersman-1306-102/">MILPERSMAN 1306-102</a> — Type Duty Assignment Codes — 16 Jun 2026</li>
+                <li><a href="/usn/pub/milpersman-1306-104/">MILPERSMAN 1306-104</a> — Projected Rotation Date (PRD) — 8 Aug 2014</li>
+                <li><a href="/usn/pub/milpersman-1306-106/">MILPERSMAN 1306-106</a> — Time on Station (TOS) and Retainability Obligated Service (OBLISERV) — 4 May 2019</li>
+                <li><a href="/usn/pub/milpersman-1306-108/">MILPERSMAN 1306-108</a> — Enlisted Manning Inquiry Report (EMIR) — 4 May 2019</li>
+                <li><a href="/usn/pub/milpersman-1306-110/">MILPERSMAN 1306-110</a> — Enlisted Duty Preference — 30 Aug 2011</li>
+                <li><a href="/usn/pub/milpersman-1306-112/">MILPERSMAN 1306-112</a> — NAVPERS 1306/7, Enlisted Personnel Action Request — 9 Jan 2015</li>
+                <li><a href="/usn/pub/milpersman-1306-114/">MILPERSMAN 1306-114</a> — Early Return for Cause (ERFC) of Enlisted Personnel — 14 Nov 2011</li>
+                <li><a href="/usn/pub/milpersman-1306-116/">MILPERSMAN 1306-116</a> — Prescribed Sea Tour (PST)/Normal Shore Tour (NST) — 9 Mar 2007</li>
+                <li><a href="/usn/pub/milpersman-1306-118/">MILPERSMAN 1306-118</a> — Activity Tour Upon Completion of an Overseas Department of Defense (DOD) Area Tour — 27 Apr 2007</li>
+                <li><a href="/usn/pub/milpersman-1306-120/">MILPERSMAN 1306-120</a> — Commanding Officer Shipboard Operational Holds (OPHOLD) — 11 Dec 2019</li>
+                <li><a href="/usn/pub/milpersman-1306-122/">MILPERSMAN 1306-122</a> — Permanent Change of Station (PCS) and Permanent Change of Activity (PCA) Move Determination — 14 May 2007</li>
+                <li><a href="/usn/pub/milpersman-1306-124/">MILPERSMAN 1306-124</a> — Tour Extensions and Split Tours — 30 Aug 2011</li>
+                <li><a href="/usn/pub/milpersman-1306-125/">MILPERSMAN 1306-125</a> — Enlisted Record Flags — 3 Sep 2014</li>
+                <li><a href="/usn/pub/milpersman-1306-126/">MILPERSMAN 1306-126</a> — First-Term Personnel Assignment Policy — 22 Apr 2010</li>
+                <li><a href="/usn/pub/milpersman-1306-128/">MILPERSMAN 1306-128</a> — Rotation for Construction Rating Personnel — 14 Feb 2005</li>
+                <li><a href="/usn/pub/milpersman-1306-130/">MILPERSMAN 1306-130</a> — Post-Confinement Assignment Procedures — 3 May 2020</li>
+                <li><a href="/usn/pub/milpersman-1306-132/">MILPERSMAN 1306-132</a> — Reassignment of Enlisted Personnel Ashore - Completion of Tour (COMPTOUR) — 26 Jul 2013</li>
+                <li><a href="/usn/pub/milpersman-1306-134/">MILPERSMAN 1306-134</a> — Assignment Policy When Not in Compliance With  Physical Readiness Standards — 30 Aug 2011</li>
+                <li><a href="/usn/pub/milpersman-1306-136/">MILPERSMAN 1306-136</a> — Security Limitations for Surface Nuclear Powered Ships — 28 Sep 2010</li>
+                <li><a href="/usn/pub/milpersman-1306-141/">MILPERSMAN 1306-141</a> — Voluntary Sea Duty Program — 16 Jan 2020</li>
+                <li><a href="/usn/pub/milpersman-1306-200/">MILPERSMAN 1306-200</a> — Isolated Duty Tours — 13 Jan 2020</li>
+                <li><a href="/usn/pub/milpersman-1306-300/">MILPERSMAN 1306-300</a> — Overseas Tour Extension Incentives Program (OTEIP) — 29 Sep 2017</li>
+                <li><a href="/usn/pub/milpersman-1306-400/">MILPERSMAN 1306-400</a> — Submarine Duty — 8 Feb 2007</li>
+                <li><a href="/usn/pub/milpersman-1306-402/">MILPERSMAN 1306-402</a> — Qualification for Assignment to Submarine Duty — 27 Apr 2025</li>
+                <li><a href="/usn/pub/milpersman-1306-404/">MILPERSMAN 1306-404</a> — Request for Submarine Training and Assignment — 12 Apr 2007</li>
+                <li><a href="/usn/pub/milpersman-1306-406/">MILPERSMAN 1306-406</a> — Reassignment of Qualified Submariners — 12 Apr 2007</li>
+                <li><a href="/usn/pub/milpersman-1306-408/">MILPERSMAN 1306-408</a> — Performance Monitoring Team (PMT) — 28 Feb 2007</li>
+                <li><a href="/usn/pub/milpersman-1306-410/">MILPERSMAN 1306-410</a> — Chief of the Boat — 1 Feb 2020</li>
+                <li><a href="/usn/pub/milpersman-1306-412/">MILPERSMAN 1306-412</a> — New Construction, Overhaul (OVHL), Depot Modernization Period (DMP), Conversion, Deactivation, or Decommissioning (DECOM) — 25 Jul 2017</li>
+                <li><a href="/usn/pub/milpersman-1306-414/">MILPERSMAN 1306-414</a> — Special Procedures for Assignment of SSBN Personnel — 9 Mar 2016</li>
+                <li><a href="/usn/pub/milpersman-1306-416/">MILPERSMAN 1306-416</a> — Processing of Personnel Disqualified from Submarine Duty — 05 Mar 2003</li>
+                <li><a href="/usn/pub/milpersman-1306-418/">MILPERSMAN 1306-418</a> — Submarine NR-1 and Deep Submergence Unit (DSU) Duty — 13 Apr 2007</li>
+                <li><a href="/usn/pub/milpersman-1306-420/">MILPERSMAN 1306-420</a> — Assignment to Flag Writer Training for Submarine Qualified Yeoman — 28 Feb 2007</li>
+                <li><a href="/usn/pub/milpersman-1306-422/">MILPERSMAN 1306-422</a> — Assignment to Submarine Surveillance Equipment Program (SSEP) Groom Teams and Support Billets — 08 Apr 2025</li>
+                <li><a href="/usn/pub/milpersman-1306-423/">MILPERSMAN 1306-423</a> — Assignment To Undersea Surveillance Billets — 18 Dec 2019</li>
+                <li><a href="/usn/pub/milpersman-1306-424/">MILPERSMAN 1306-424</a> — Physical Qualifications for Submarine Duty — 8 Feb 2007</li>
+                <li><a href="/usn/pub/milpersman-1306-425/">MILPERSMAN 1306-425</a> — Assignment to- Navy Data Center Billets — 12 Jun 2024</li>
+                <li><a href="/usn/pub/milpersman-1306-500/">MILPERSMAN 1306-500</a> — Nuclear Power Training Program — 28 Feb 2007</li>
+                <li><a href="/usn/pub/milpersman-1306-502/">MILPERSMAN 1306-502</a> — Qualifications for Assignment to Nuclear Propulsion Program Schools — 14 Jun 2007</li>
+                <li><a href="/usn/pub/milpersman-1306-504/">MILPERSMAN 1306-504</a> — Requests for Assignment to Nuclear Propulsion Training — 13 Apr 2007</li>
+                <li><a href="/usn/pub/milpersman-1306-600/">MILPERSMAN 1306-600</a> — Service Schools — 22 Sep 2005</li>
+                <li><a href="/usn/pub/milpersman-1306-602/">MILPERSMAN 1306-602</a> — Class &quot;A&quot; and Service School Requirements — 3 Sep 2018</li>
+                <li><a href="/usn/pub/milpersman-1306-604/">MILPERSMAN 1306-604</a> — Active Obligated Service (OBLISERV) for Service Schools — 17 May 2022</li>
+                <li><a href="/usn/pub/milpersman-1306-611/">MILPERSMAN 1306-611</a> — Professional Apprenticeship Career Tract (PACT) Program — 15 Dec 2022</li>
+                <li><a href="/usn/pub/milpersman-1306-614/">MILPERSMAN 1306-614</a> — Transfer Orders, Family Member Travel, Household Goods Information, and Leave — 30 Apr 2007</li>
+                <li><a href="/usn/pub/milpersman-1306-616/">MILPERSMAN 1306-616</a> — Ineligible Students Received by Training Activity — 31 Oct 2018</li>
+                <li><a href="/usn/pub/milpersman-1306-618/">MILPERSMAN 1306-618</a> — Class “A” School and Rating Entry Requirements — 14 Jul 2025</li>
+                <li><a href="/usn/pub/milpersman-1306-700/">MILPERSMAN 1306-700</a> — Exchanges of Duty (SWAPS) — 21 Jul 2012</li>
+                <li><a href="/usn/pub/milpersman-1306-800/">MILPERSMAN 1306-800</a> — Special Procedures for Units Undergoing Construction, Conversion — 15 Aug 2007</li>
+                <li><a href="/usn/pub/milpersman-1306-802/">MILPERSMAN 1306-802</a> — Surface Ships Undergoing Construction and Conversion — 22 Aug 2020</li>
+                <li><a href="/usn/pub/milpersman-1306-803/">MILPERSMAN 1306-803</a> — Special Procedures for Newly Established/Recommissioned Naval Construction Force (NCF) Units — 17 Jan 2007</li>
+                <li><a href="/usn/pub/milpersman-1306-804/">MILPERSMAN 1306-804</a> — Newly Establishing or Transitioning Aircraft Squadrons — 29 Dec 2006</li>
+                <li><a href="/usn/pub/milpersman-1306-900/">MILPERSMAN 1306-900</a> — Assignment of Enlisted Personnel to Special Programs — 24 Jun 2026</li>
+                <li><a href="/usn/pub/milpersman-1306-901/">MILPERSMAN 1306-901</a> — Navy Food Management Teams (NFTMs) — 8 Feb 2007</li>
+                <li><a href="/usn/pub/milpersman-1306-902/">MILPERSMAN 1306-902</a> — Regional Maintenance Center (RMC)/Ship Repair Facility (SRF) Program — 29 Aug 2008</li>
+                <li><a href="/usn/pub/milpersman-1306-904/">MILPERSMAN 1306-904</a> — Brig/Transient Personnel Unit (TPU)/Transient Personnel Detachment (TPD) Staff — 28 Feb 2024</li>
+                <li><a href="/usn/pub/milpersman-1306-905/">MILPERSMAN 1306-905</a> — Command Career Counselor Program — 11 Aug 2022</li>
+                <li><a href="/usn/pub/milpersman-1306-906/">MILPERSMAN 1306-906</a> — Naval Intelligence Support Center — 14 Jul 2025</li>
+                <li><a href="/usn/pub/milpersman-1306-907/">MILPERSMAN 1306-907</a> — Navy Ceremonial Guard — 19 Nov 2022</li>
+                <li><a href="/usn/pub/milpersman-1306-912/">MILPERSMAN 1306-912</a> — Seabee Construction Diver (CD) Program — 04 Apr 2025</li>
+                <li><a href="/usn/pub/milpersman-1306-913/">MILPERSMAN 1306-913</a> — Flag Writer (NEC 791D) — 20 Mar 2025</li>
+                <li><a href="/usn/pub/milpersman-1306-914/">MILPERSMAN 1306-914</a> — Military Assistance Advisory Groups (MAAGS), Military Groups, North Atlantic Treaty Organization (NATO) Commands, Joint Staffs, Attaché (Embassy) Duty, and Similar Activities — 6 Jun 2017</li>
+                <li><a href="/usn/pub/milpersman-1306-915/">MILPERSMAN 1306-915</a> — Professional Development Instructor (PDI) — 24 Apr 2018</li>
+                <li><a href="/usn/pub/milpersman-1306-916/">MILPERSMAN 1306-916</a> — Navy Drug and Alcohol Counselor and Intern — 24 Jul 2018</li>
+                <li><a href="/usn/pub/milpersman-1306-917/">MILPERSMAN 1306-917</a> — Navy Command Climate Specialist (CCS) — 15 Sep 2018</li>
+                <li><a href="/usn/pub/milpersman-1306-918/">MILPERSMAN 1306-918</a> — Naval Support Unit, State Department — 27 May 2014</li>
+                <li><a href="/usn/pub/milpersman-1306-919/">MILPERSMAN 1306-919</a> — Navy Flight Demonstration Squadron (NAVFLIGHTDEMRON) (Blue Angels) — 27 Apr 2007</li>
+                <li><a href="/usn/pub/milpersman-1306-920/">MILPERSMAN 1306-920</a> — USS Constitution — 22 Sep 2022</li>
+                <li><a href="/usn/pub/milpersman-1306-921/">MILPERSMAN 1306-921</a> — Personnel Exchange Program (PEP) — 18 May 2018</li>
+                <li><a href="/usn/pub/milpersman-1306-924/">MILPERSMAN 1306-924</a> — Mobile Utilities Support Equipment (MUSE) Program — 24 Apr 2018</li>
+                <li><a href="/usn/pub/milpersman-1306-925/">MILPERSMAN 1306-925</a> — Senior Enlisted Academies (SEAs) — 25 Jan 2024</li>
+                <li><a href="/usn/pub/milpersman-1306-926/">MILPERSMAN 1306-926</a> — Joint Staff Duty with Military Entrance Processing Stations (MEPS) — 23 Oct 2017</li>
+                <li><a href="/usn/pub/milpersman-1306-927/">MILPERSMAN 1306-927</a> — Navy Harbor Pilot Program — 1 Mar 2007</li>
+                <li><a href="/usn/pub/milpersman-1306-928/">MILPERSMAN 1306-928</a> — Navy Music Program (MU) — 18 Apr 2024</li>
+                <li><a href="/usn/pub/milpersman-1306-929/">MILPERSMAN 1306-929</a> — Navy Manpower Analysis Center (NAVMAC) — 30 Aug 2011</li>
+                <li><a href="/usn/pub/milpersman-1306-930/">MILPERSMAN 1306-930</a> — Historic Ship Nautilus (SSN 571) — 27 Dec 2006</li>
+                <li><a href="/usn/pub/milpersman-1306-931/">MILPERSMAN 1306-931</a> — Navy Absentee Collection and Information Center (NACIC) — 28 Jul 2018</li>
+                <li><a href="/usn/pub/milpersman-1306-934/">MILPERSMAN 1306-934</a> — Nuclear Trained Personnel Assigned to Nuclear Capable Intermediate Maintenance Activities (IMA) — 20 Apr 2006</li>
+                <li><a href="/usn/pub/milpersman-1306-935/">MILPERSMAN 1306-935</a> — Command Master Chief (CMC) Program — 16 Mar 2007</li>
+                <li><a href="/usn/pub/milpersman-1306-936/">MILPERSMAN 1306-936</a> — Advancement Examination Developer and Military Exam Leader — 3 May 2012</li>
+                <li><a href="/usn/pub/milpersman-1306-937/">MILPERSMAN 1306-937</a> — Culinary Specialist Executive Services Program — 02 May 2025</li>
+                <li><a href="/usn/pub/milpersman-1306-939/">MILPERSMAN 1306-939</a> — White House Communications Agency (WHCA) — 29 Feb 2016</li>
+                <li><a href="/usn/pub/milpersman-1306-940/">MILPERSMAN 1306-940</a> — Naval Reserve Officer Training Corps (NROTC) Training and Support Personnel — 16 Mar 2007</li>
+                <li><a href="/usn/pub/milpersman-1306-942/">MILPERSMAN 1306-942</a> — USS Arizona Memorial — 22 Sep 2022</li>
+                <li><a href="/usn/pub/milpersman-1306-943/">MILPERSMAN 1306-943</a> — Mobile Environmental Teams (METs) — 30 May 2003</li>
+                <li><a href="/usn/pub/milpersman-1306-944/">MILPERSMAN 1306-944</a> — Naval Special Warfare Tactical Communications Commands (TACCOMM) — 10 Nov 2020</li>
+                <li><a href="/usn/pub/milpersman-1306-945/">MILPERSMAN 1306-945</a> — Flag Officer (STAFF) Duty — 20 Dec 2017</li>
+                <li><a href="/usn/pub/milpersman-1306-946/">MILPERSMAN 1306-946</a> — Navy Tugmaster Program — 25 Mar 2026</li>
+                <li><a href="/usn/pub/milpersman-1306-947/">MILPERSMAN 1306-947</a> — Navy Exchange Service Command (NEXCOM) Fleet Assistance Teams — 25 Apr 2018</li>
+                <li><a href="/usn/pub/milpersman-1306-948/">MILPERSMAN 1306-948</a> — Commander Naval Air Forces (CNAF) Aviation Maintenance Management Team (AMMT) — 29 Dec 2006</li>
+                <li><a href="/usn/pub/milpersman-1306-949/">MILPERSMAN 1306-949</a> — Landing Craft, Air Cushion (LCAC) — 8 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1306-950/">MILPERSMAN 1306-950</a> — Marine Helicopter Squadron One (HMX 1) (Nighthawks) — 24 Apr 2018</li>
+                <li><a href="/usn/pub/milpersman-1306-953/">MILPERSMAN 1306-953</a> — Instructor Duty — 30 Aug 2011</li>
+                <li><a href="/usn/pub/milpersman-1306-954/">MILPERSMAN 1306-954</a> — Recruit Division Commander (RDC) Duty — 08 Jul 2024</li>
+                <li><a href="/usn/pub/milpersman-1306-955/">MILPERSMAN 1306-955</a> — Survival, Evasion, Resistance, and Escape (SERE) Instructor — 14 Jan 2020</li>
+                <li><a href="/usn/pub/milpersman-1306-956/">MILPERSMAN 1306-956</a> — Naval Reserve Instructor Duty — 24 Apr 2018</li>
+                <li><a href="/usn/pub/milpersman-1306-957/">MILPERSMAN 1306-957</a> — Naval Nuclear Power Program Training Activities — 2 Aug 2018</li>
+                <li><a href="/usn/pub/milpersman-1306-958/">MILPERSMAN 1306-958</a> — Academic Remedial Training (ART) Instruction Duty — 30 Aug 2011</li>
+                <li><a href="/usn/pub/milpersman-1306-959/">MILPERSMAN 1306-959</a> — Afloat Training Groups (ATGs) — 27 Sep 2018</li>
+                <li><a href="/usn/pub/milpersman-1306-960/">MILPERSMAN 1306-960</a> — Instructor Duty at Field Medical Service Schools (FLDMEDSERVSCOLs) — 24 Apr 2018</li>
+                <li><a href="/usn/pub/milpersman-1306-961/">MILPERSMAN 1306-961</a> — Cryptologic Technician Interpretive (CTI) Language Instructor Candidates — 15 Nov 2024</li>
+                <li><a href="/usn/pub/milpersman-1306-962/">MILPERSMAN 1306-962</a> — Instructor Duty at Naval School of Music — 05 May 2024</li>
+                <li><a href="/usn/pub/milpersman-1306-964/">MILPERSMAN 1306-964</a> — Recruiting Duty — 10 Dec 2024</li>
+                <li><a href="/usn/pub/milpersman-1306-965/">MILPERSMAN 1306-965</a> — Career Recruiter Force (CRF) — 24 Apr 2018</li>
+                <li><a href="/usn/pub/milpersman-1306-966/">MILPERSMAN 1306-966</a> — Enlisted Rating Detailer — 21 Apr 2022</li>
+                <li><a href="/usn/pub/milpersman-1306-968/">MILPERSMAN 1306-968</a> — Camp David (Naval Support Facility, Thurmont, MD) — 24 Aug 2018</li>
+                <li><a href="/usn/pub/milpersman-1306-970/">MILPERSMAN 1306-970</a> — Joint Communications Support Element (JCSE) — 25 Mar 2026</li>
+                <li><a href="/usn/pub/milpersman-1306-971/">MILPERSMAN 1306-971</a> — Navy Military Training Instructor Duty — 31 Oct 2018</li>
+                <li><a href="/usn/pub/milpersman-1306-972/">MILPERSMAN 1306-972</a> — Patrol Coastal (PC) Crew — 18 Oct 2017</li>
+                <li><a href="/usn/pub/milpersman-1306-973/">MILPERSMAN 1306-973</a> — Navy Provisional Guard Battalion (CUBA) — 24 Apr 2018</li>
+                <li><a href="/usn/pub/milpersman-1306-975/">MILPERSMAN 1306-975</a> — Naval Special Warfare Meteorology and Oceanography Support Teams (NSW METOC) — 12 May 2006</li>
+                <li><a href="/usn/pub/milpersman-1306-976/">MILPERSMAN 1306-976</a> — Milpersman 1306-976 — 17 Apr 2024</li>
+                <li><a href="/usn/pub/milpersman-1306-979/">MILPERSMAN 1306-979</a> — Recruitment/Assignment to Commander, Naval Special Warfare Development Group (COMNAVESPECWARDEVGRU) — 3 May 2012</li>
+                <li><a href="/usn/pub/milpersman-1306-980/">MILPERSMAN 1306-980</a> — Navy Interactive ON-NET (ION) Computer Network Exploitation (CNE) Operator Certification Program — 08 Apr 2025</li>
+                <li><a href="/usn/pub/milpersman-1306-981/">MILPERSMAN 1306-981</a> — Navy Interactive ON-NET (ION) Computer Network Exploitation (CNE) Trainer Certification Program — 29 May 2007</li>
+                <li><a href="/usn/pub/milpersman-1306-982/">MILPERSMAN 1306-982</a> — Assignment of Nuclear-Trained Master Chief Petty Officers (MCPO) as Reactor Department Master Chief (RDMC) — 14 Jan 2019</li>
+                <li><a href="/usn/pub/milpersman-1306-983/">MILPERSMAN 1306-983</a> — Medical Deep Sea Diving / Fleet Marine Force Reconnaissance Corpsman Programs — 24 Apr 2018</li>
+                <li><a href="/usn/pub/milpersman-1306-984/">MILPERSMAN 1306-984</a> — Naval Special Warfare Command (NAVSPECWARCOM) Tactical Information Operations (TIO) Program — 12 Oct 2019</li>
+                <li><a href="/usn/pub/milpersman-1306-985/">MILPERSMAN 1306-985</a> — United States Special Operations Command (USSOCOM) — 30 Nov 2017</li>
+                <li><a href="/usn/pub/milpersman-1306-986/">MILPERSMAN 1306-986</a> — Qualification for Assignment to Naval Special Warfare Support Activity Duty — 24 Aug 2021</li>
+                <li><a href="/usn/pub/milpersman-1306-987/">MILPERSMAN 1306-987</a> — Instructor Duty for Enlisted Medical Education and Training Campus (METC) — 18 Oct 2010</li>
+                <li><a href="/usn/pub/milpersman-1306-989/">MILPERSMAN 1306-989</a> — Assignment to Cryptologic Warfare Maritime Activity Sixty One (CWMA-61) Special Projects — 29 May 2025</li>
+                <li><a href="/usn/pub/milpersman-1306-990/">MILPERSMAN 1306-990</a> — Defense Courier Duty — 29 Oct 2024</li>
+                <li><a href="/usn/pub/milpersman-1306-991/">MILPERSMAN 1306-991</a> — Marine Barracks Washington, DC (8th AND I) — 18 Oct 2017</li>
+                <li><a href="/usn/pub/milpersman-1306-992/">MILPERSMAN 1306-992</a> — Assignment to Submarine Learning Center Staff or Site Instructor Duty — 18 Dec 2019</li>
+                <li><a href="/usn/pub/milpersman-1306-993/">MILPERSMAN 1306-993</a> — Harbor Patrol Unit (HPU) Level II Coxswain (NEC 853A) - Master-at-Arms — 2 Aug 2018</li>
+                <li><a href="/usn/pub/milpersman-1306-994/">MILPERSMAN 1306-994</a> — 3M System Coordinator at Sea and Shore — 21 Apr 2026</li>
+                <li><a href="/usn/pub/milpersman-1306-995/">MILPERSMAN 1306-995</a> — Assignment to Cryptologic Aircrew Billets — 18 Dec 2019</li>
+                <li><a href="/usn/pub/milpersman-1306-996/">MILPERSMAN 1306-996</a> — Naval Network Warfare Command Blue Teams — 21 Aug 2024</li>
+                <li><a href="/usn/pub/milpersman-1306-997/">MILPERSMAN 1306-997</a> — Assignment to Navy Information Operations Detachment Jacksonville, Florida — 7 Jul 2021</li>
+                <li><a href="/usn/pub/milpersman-1306-999/">MILPERSMAN 1306-999</a> — Assignment to Naval Intelligence Special Career Program — 16 Feb 2026</li>
+                <li><a href="/usn/pub/milpersman-1320-020/">MILPERSMAN 1320-020</a> — Message Orders for Inactive Duty Reserve Officers — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1320-030/">MILPERSMAN 1320-030</a> — Delegation of Authority to Issue Orders and Administrative Control of Orders and Travel — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1320-060/">MILPERSMAN 1320-060</a> — Permanent Change of Station Transfer Order (PCSTO), Delivery, Interpretation, and Execution — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1320-090/">MILPERSMAN 1320-090</a> — Proceed Time in Execution of Orders — 12 Dec 2008</li>
+                <li><a href="/usn/pub/milpersman-1320-100/">MILPERSMAN 1320-100</a> — Travel Time in Execution of Permanent Change of Station Orders and Temporary Additional Duty Orders — 22 Aug 2005</li>
+                <li><a href="/usn/pub/milpersman-1320-110/">MILPERSMAN 1320-110</a> — Travel Time in Connection with Call to or Release from Active Duty — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1320-140/">MILPERSMAN 1320-140</a> — Permanent Change of Station (PCS) Transfer Order Reporting Policy — 5 Aug 2014</li>
+                <li><a href="/usn/pub/milpersman-1320-170/">MILPERSMAN 1320-170</a> — Medical Examination of Firefighting Instructor Personnel — 24 Apr 2023</li>
+                <li><a href="/usn/pub/milpersman-1320-200/">MILPERSMAN 1320-200</a> — Temporary Duty Travel Entitlement Policy — 4 Feb 2011</li>
+                <li><a href="/usn/pub/milpersman-1320-210/">MILPERSMAN 1320-210</a> — Permissive Temporary (PTDY) For House Hunting — 03 Apr 2023</li>
+                <li><a href="/usn/pub/milpersman-1320-220/">MILPERSMAN 1320-220</a> — Permissive Temporary Duty (PDTY) Authorization for Job/House Hunting — 14 Jul 2009</li>
+                <li><a href="/usn/pub/milpersman-1320-300/">MILPERSMAN 1320-300</a> — Types of Orders — 25 Jul 2014</li>
+                <li><a href="/usn/pub/milpersman-1320-306/">MILPERSMAN 1320-306</a> — Permanent Change of Station (PCS) Transfer Order Delivery and Interpretation — 27 Apr 2007</li>
+                <li><a href="/usn/pub/milpersman-1320-307/">MILPERSMAN 1320-307</a> — Permanent Change of Station/Temporary Additional Duty Warm Hand-Off Procedures FACT SHEET — 11 Dec 2023</li>
+                <li><a href="/usn/pub/milpersman-1320-308/">MILPERSMAN 1320-308</a> — Permanent Change of Station (PCS) Transfer Order Execution — 29 May 2007</li>
+                <li><a href="/usn/pub/milpersman-1320-310/">MILPERSMAN 1320-310</a> — Permanent Change of Station (PCS) Transfer Order Endorsements — 17 Jun 2003</li>
+                <li><a href="/usn/pub/milpersman-1320-311/">MILPERSMAN 1320-311</a> — Permanent Change of Station (PCS) Orders Modification or Cancellation — 30 Apr 2007</li>
+                <li><a href="/usn/pub/milpersman-1320-312/">MILPERSMAN 1320-312</a> — Order Clarification and Claims — 21 Mar 2007</li>
+                <li><a href="/usn/pub/milpersman-1320-314/">MILPERSMAN 1320-314</a> — Temporary Duty (TDY) Travel Orders — 1 Jun 2016</li>
+                <li><a href="/usn/pub/milpersman-1320-316/">MILPERSMAN 1320-316</a> — General Court-Martial Orders — 15 Aug 2007</li>
+                <li><a href="/usn/pub/milpersman-1320-320/">MILPERSMAN 1320-320</a> — Permanent Change of Station (PCS) Orders to Ships Under Construction at Civilian Shipbuilding Companies or Yards — 30 Apr 2007</li>
+                <li><a href="/usn/pub/milpersman-1320-322/">MILPERSMAN 1320-322</a> — Change of Homeport or Permanent Duty Station (PDS) of a Vessel, Ship-Based or Staff, or Mobile Unit — 22 May 2007</li>
+                <li><a href="/usn/pub/milpersman-1320-324/">MILPERSMAN 1320-324</a> — Permanent Change of Station (PCS) Procedures for Forward Deployed Commands of the Military Sealift Command</li>
+                <li><a href="/usn/pub/milpersman-1320-326/">MILPERSMAN 1320-326</a> — Personnel Support Functions for NATO Southern Region — 30 Apr 2007</li>
+                <li><a href="/usn/pub/milpersman-1321-020/">MILPERSMAN 1321-020</a> — Officer Flight Orders (Non-Aeronautically Designated) — 10 Nov 2005</li>
+                <li><a href="/usn/pub/milpersman-1321-030/">MILPERSMAN 1321-030</a> — Officers Detailed to Recruiting Duty — 22 Nov 2006</li>
+                <li><a href="/usn/pub/milpersman-1321-040/">MILPERSMAN 1321-040</a> — Detail of Chiefs of Staff, Executive Assistants, Flag Secretaries, Flag Lieutenants, and Aides — 1 Apr 2016</li>
+                <li><a href="/usn/pub/milpersman-1321-050/">MILPERSMAN 1321-050</a> — Assignment to Duty of Limited Duty Officers — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1321-100/">MILPERSMAN 1321-100</a> — Orders for Officer Special Programs — 18 Dec 2023</li>
+                <li><a href="/usn/pub/milpersman-1321-105/">MILPERSMAN 1321-105</a> — Active Component (AC), Indefinite Recall Program for Reserve Component (RC) Officers — 5 Nov 2018</li>
+                <li><a href="/usn/pub/milpersman-1321-110/">MILPERSMAN 1321-110</a> — Active Component (AC), MPN-Funded, Definite Recall Program for Officers — 10 May 2017</li>
+                <li><a href="/usn/pub/milpersman-1326-010/">MILPERSMAN 1326-010</a> — Transfer of Enlisted Personnel on Bureau of Naval Personnel Orders — 6 Sep 2005</li>
+                <li><a href="/usn/pub/milpersman-1326-020/">MILPERSMAN 1326-020</a> — Permanent and Temporary Flight Order to Enlisted Personnel — 26 Apr 2007</li>
+                <li><a href="/usn/pub/milpersman-1326-040/">MILPERSMAN 1326-040</a> — Military Personnel, Navy (MPN) - Funded Active Duty (ACDU) Definite Recall Program for Enlisted Personnel — 11 Apr 2021</li>
+                <li><a href="/usn/pub/milpersman-1331-030/">MILPERSMAN 1331-030</a> — Officer Applications for Information Warfare Duty Assignment — 19 Sep 2007</li>
+                <li><a href="/usn/pub/milpersman-1331-040/">MILPERSMAN 1331-040</a> — Navy Chaplain Corps (CHC) Officer Career Status — 27 Mar 2024</li>
+                <li><a href="/usn/pub/milpersman-1401-010/">MILPERSMAN 1401-010</a> — Communication with Administrative Selection Boards — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1401-020/">MILPERSMAN 1401-020</a> — Advancement Exam Readiness Review (AERR) — 5 Nov 2018</li>
+                <li><a href="/usn/pub/milpersman-1414-010/">MILPERSMAN 1414-010</a> — Swimmer Training and Qualifications — 6 May 2021</li>
+                <li><a href="/usn/pub/milpersman-1420-010/">MILPERSMAN 1420-010</a> — Communication with Officer Promotion Selection Boards — 23 Jan 2021</li>
+                <li><a href="/usn/pub/milpersman-1420-050/">MILPERSMAN 1420-050</a> — Counseling of Officers Who Fail to Select for Promotion — 3 Jan 2018</li>
+                <li><a href="/usn/pub/milpersman-1420-060/">MILPERSMAN 1420-060</a> — Frocking of Enlisted Personnel — 15 Sep 2021</li>
+                <li><a href="/usn/pub/milpersman-1420-070/">MILPERSMAN 1420-070</a> — Commander's Responsibility in the Review Process Involving Withhold or Delay of an Officer's Promotion — 27 Jul 2012</li>
+                <li><a href="/usn/pub/milpersman-1420-100/">MILPERSMAN 1420-100</a> — Joint Stamp Requirements for Active Duty and Reserve Full Time Support Promotion Boards — 15 Aug 2014</li>
+                <li><a href="/usn/pub/milpersman-1426-010/">MILPERSMAN 1426-010</a> — Permanent Appointment to Active Duty Chief Warrant Officer and Limited Duty Officer Status — 31 May 2005</li>
+                <li><a href="/usn/pub/milpersman-1427-010/">MILPERSMAN 1427-010</a> — Precedence Among Enlisted Members — 3 Aug 2014</li>
+                <li><a href="/usn/pub/milpersman-1430-010/">MILPERSMAN 1430-010</a> — Accelerated Advancement of Recruit Training, Class “A” School Graduates, and Ceremonial Guard — 30 Oct 2015</li>
+                <li><a href="/usn/pub/milpersman-1430-020/">MILPERSMAN 1430-020</a> — Advancement After Reduction in Rate — 3 Sep 2018</li>
+                <li><a href="/usn/pub/milpersman-1430-040/">MILPERSMAN 1430-040</a> — Accelerated Advancement for Enlisted Musician (MU) Assignments to Navy Premier Bands — 05 Feb 2024</li>
+                <li><a href="/usn/pub/milpersman-1430-050/">MILPERSMAN 1430-050</a> — Accelerated Advancement for Hospital Corpsmen Earning Independent Duty Corpsmen (IDC) Navy Enlisted Classifications (NEC) — 8 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1440-010/">MILPERSMAN 1440-010</a> — Conversion Authorizations — 24 Apr 2018</li>
+                <li><a href="/usn/pub/milpersman-1440-011/">MILPERSMAN 1440-011</a> — Forced Conversion — 2 Apr 2021</li>
+                <li><a href="/usn/pub/milpersman-1440-020/">MILPERSMAN 1440-020</a> — Conversion to the Navy Counselor (NC) (Counselor) Rating — 04 May 2026</li>
+                <li><a href="/usn/pub/milpersman-1440-040/">MILPERSMAN 1440-040</a> — No Fault Reversion to Former Rating — 2 Mar 2015</li>
+                <li><a href="/usn/pub/milpersman-1450-010/">MILPERSMAN 1450-010</a> — Reduction in Rate — 13 Apr 2005</li>
+                <li><a href="/usn/pub/milpersman-1500-010/">MILPERSMAN 1500-010</a> — Survival Training Requirements — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1500-020/">MILPERSMAN 1500-020</a> — First Aid Training Requirements — 4 Mar 2024</li>
+                <li><a href="/usn/pub/milpersman-1500-030/">MILPERSMAN 1500-030</a> — Medical Department Schools — 5 Sep 2023</li>
+                <li><a href="/usn/pub/milpersman-1510-030/">MILPERSMAN 1510-030</a> — Advanced Electronics Field, Advanced Technical Field, and Nuclear Field Programs — 16 Mar 2026</li>
+                <li><a href="/usn/pub/milpersman-1520-020/">MILPERSMAN 1520-020</a> — Officer Education Reports — 11 Jul 2024</li>
+                <li><a href="/usn/pub/milpersman-1520-030/">MILPERSMAN 1520-030</a> — Submarine Officer Training — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1520-040/">MILPERSMAN 1520-040</a> — Surface Warfare Officer (SWO) Department Head Screening and Training — 29 May 2007</li>
+                <li><a href="/usn/pub/milpersman-1520-050/">MILPERSMAN 1520-050</a> — Nuclear Propulsion Training (Surface and Submarine) — 24 May 2019</li>
+                <li><a href="/usn/pub/milpersman-1520-060/">MILPERSMAN 1520-060</a> — Nurse Candidate Program — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1530-020/">MILPERSMAN 1530-020</a> — United States Military Academy and Air Force Academy Preparatory Schools — 26 Sep 2006</li>
+                <li><a href="/usn/pub/milpersman-1531-010/">MILPERSMAN 1531-010</a> — Naval Academy Program — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1531-020/">MILPERSMAN 1531-020</a> — Disposition of Midshipmen Disenrolled from the Naval Academy — 21 Apr 2006</li>
+                <li><a href="/usn/pub/milpersman-1540-010/">MILPERSMAN 1540-010</a> — Required Service of Officers Disenrolled from Special Navy Training Programs — 24 May 2021</li>
+                <li><a href="/usn/pub/milpersman-1542-010/">MILPERSMAN 1542-010</a> — Lateral Transfer into Naval Aviation — 4 Jul 2021</li>
+                <li><a href="/usn/pub/milpersman-1542-020/">MILPERSMAN 1542-020</a> — Aviation Officer Cross-Training in Different Type Aircraft — 12 Dec 2014</li>
+                <li><a href="/usn/pub/milpersman-1570-010/">MILPERSMAN 1570-010</a> — Training and Participation of Navy Reserve Flag Officers on Inactive Duty — 13 Sep 2005</li>
+                <li><a href="/usn/pub/milpersman-1600-010/">MILPERSMAN 1600-010</a> — Deserters — 16 Apr 2015</li>
+                <li><a href="/usn/pub/milpersman-1600-020/">MILPERSMAN 1600-020</a> — Apprehension of Absentees and Deserters — 6 Dec 2012</li>
+                <li><a href="/usn/pub/milpersman-1600-030/">MILPERSMAN 1600-030</a> — Acceptance and Disposition of Returned Deserters — 22 Feb 2015</li>
+                <li><a href="/usn/pub/milpersman-1600-040/">MILPERSMAN 1600-040</a> — Procedures for Commands to Which Enlisted and Officer Absentees are Attached — 29 Dec 2025</li>
+                <li><a href="/usn/pub/milpersman-1600-050/">MILPERSMAN 1600-050</a> — Procedures When an Enlisted Absentee Returns to Naval Jurisdiction — 6 Dec 2012</li>
+                <li><a href="/usn/pub/milpersman-1600-060/">MILPERSMAN 1600-060</a> — Declaration of Desertion — 28 Jan 2025</li>
+                <li><a href="/usn/pub/milpersman-1600-070/">MILPERSMAN 1600-070</a> — Declaration of Return from Desertion — 27 Aug 2015</li>
+                <li><a href="/usn/pub/milpersman-1600-090/">MILPERSMAN 1600-090</a> — Removal of Marks of Desertion — 13 Aug 2007</li>
+                <li><a href="/usn/pub/milpersman-1600-100/">MILPERSMAN 1600-100</a> — Lost Time — 14 Dec 2005</li>
+                <li><a href="/usn/pub/milpersman-1600-120/">MILPERSMAN 1600-120</a> — Procedures for Reporting Members as Failed to Report Under Permanent Change of Station (PCS)/Temporary  Duty (TEMDU) Orders — 28 Dec 2006</li>
+                <li><a href="/usn/pub/milpersman-1610-010/">MILPERSMAN 1610-010</a> — Navy Performance Evaluation and Counseling System — 6 May 2015</li>
+                <li><a href="/usn/pub/milpersman-1610-015/">MILPERSMAN 1610-015</a> — Documentation on Fitness Reports and Performance Evaluations for Failure to Maintain Deployability or Individual Medical Readiness — 01 Oct 2018</li>
+                <li><a href="/usn/pub/milpersman-1610-020/">MILPERSMAN 1610-020</a> — Disqualification of Officers for Duty Involving Flying — 19 Jun 2021</li>
+                <li><a href="/usn/pub/milpersman-1610-030/">MILPERSMAN 1610-030</a> — Procedures for Commands to Which Inactive Reserve Personnel (Officer and Enlisted) Fail to Report for Involuntary Active Duty — 29 Sep 2005</li>
+                <li><a href="/usn/pub/milpersman-1610-040/">MILPERSMAN 1610-040</a> — NAVPERS 5354/2 (Rev 2-02) Navy Equal Opportunity (EO)/ Sexual Harassment (SH) Formal Complaint Form — 15 Jun 2007</li>
+                <li><a href="/usn/pub/milpersman-1611-010/">MILPERSMAN 1611-010</a> — Officer Performance and Separations for Cause — 16 Dec 2025</li>
+                <li><a href="/usn/pub/milpersman-1611-020/">MILPERSMAN 1611-020</a> — Officer Detachment for Cause (DFC) — 30 Mar 2007</li>
+                <li><a href="/usn/pub/milpersman-1616-010/">MILPERSMAN 1616-010</a> — Detachment for Cause (DFC) of Enlisted Personnel — 18 Oct 2010</li>
+                <li><a href="/usn/pub/milpersman-1616-030/">MILPERSMAN 1616-030</a> — Denial of Reenlistment for Career Petty Officers — 13 Apr 2005</li>
+                <li><a href="/usn/pub/milpersman-1616-040/">MILPERSMAN 1616-040</a> — Enlisted Performance (E-6/7/8/9) — 24 Mar 2022</li>
+                <li><a href="/usn/pub/milpersman-1616-050/">MILPERSMAN 1616-050</a> — Enlisted Performance (E-5 and Below) — 24 Mar 2022</li>
+                <li><a href="/usn/pub/milpersman-1620-020/">MILPERSMAN 1620-020</a> — Reservists Subject to the Uniform Code of Military Justice — 14 Aug 2015</li>
+                <li><a href="/usn/pub/milpersman-1626-020/">MILPERSMAN 1626-020</a> — Enlisted Service Record Entries After Nonjudicial Punishment (NJP) — 8 Oct 2019</li>
+                <li><a href="/usn/pub/milpersman-1626-030/">MILPERSMAN 1626-030</a> — Disposition of Enlisted Personnel Upon Completion of Disciplinary Action — 13 Apr 2005</li>
+                <li><a href="/usn/pub/milpersman-1640-010/">MILPERSMAN 1640-010</a> — Confinement Policy — 18 Oct 2017</li>
+                <li><a href="/usn/pub/milpersman-1640-030/">MILPERSMAN 1640-030</a> — Types of Navy Confinement Facilities,  Military Correctional Facilities and Confinement Parameters — 29 Dec 2025</li>
+                <li><a href="/usn/pub/milpersman-1640-060/">MILPERSMAN 1640-060</a> — When to Transfer Post-Trial Prisoners Using Permanent Change of Station (PCS) or Temporary Additional Duty (TDY) Status to a Shore Military Confinement Facility — 07 Dec 2023</li>
+                <li><a href="/usn/pub/milpersman-1640-090/">MILPERSMAN 1640-090</a> — Who Pays for the Transfer — 24 Jun 2011</li>
+                <li><a href="/usn/pub/milpersman-1640-100/">MILPERSMAN 1640-100</a> — What the Member Needs Upon Initial Transfer to    Confinement — 24 Jun 2011</li>
+                <li><a href="/usn/pub/milpersman-1640-105/">MILPERSMAN 1640-105</a> — Transferring Prisoners Between Confinement Facilities — 30 Jun 2011</li>
+                <li><a href="/usn/pub/milpersman-1640-110/">MILPERSMAN 1640-110</a> — Transporting Personnel to Confinement Facilities — 14 Jul 2025</li>
+                <li><a href="/usn/pub/milpersman-1640-140/">MILPERSMAN 1640-140</a> — Escaped Prisoners — 21 Nov 2023</li>
+                <li><a href="/usn/pub/milpersman-1640-150/">MILPERSMAN 1640-150</a> — Navy Parolees/Supervised Releases — 21 Nov 2023</li>
+                <li><a href="/usn/pub/milpersman-1700-010/">MILPERSMAN 1700-010</a> — Political Activity of Members on Active Duty — 16 Mar 2006</li>
+                <li><a href="/usn/pub/milpersman-1700-020/">MILPERSMAN 1700-020</a> — Participation in Civil Rights Demonstrations — 12 May 2006</li>
+                <li><a href="/usn/pub/milpersman-1710-010/">MILPERSMAN 1710-010</a> — Navy Recreation Program Operational Policies — 21 Mar 2005</li>
+                <li><a href="/usn/pub/milpersman-1730-010/">MILPERSMAN 1730-010</a> — Use of Lay Leaders in Religious Services — 30 May 2017</li>
+                <li><a href="/usn/pub/milpersman-1730-020/">MILPERSMAN 1730-020</a> — Immunization Exemptions for Religious Beliefs — 15 Aug 2020</li>
+                <li><a href="/usn/pub/milpersman-1731-010/">MILPERSMAN 1731-010</a> — Religious Observance — 1 Aug 2006</li>
+                <li><a href="/usn/pub/milpersman-1740-020/">MILPERSMAN 1740-020</a> — Information Concerning Pregnant Members — 9 Jan 2019</li>
+                <li><a href="/usn/pub/milpersman-1740-030/">MILPERSMAN 1740-030</a> — Maternity Care Available Before and After Separation — 10 Nov 2020</li>
+                <li><a href="/usn/pub/milpersman-1741-020/">MILPERSMAN 1741-020</a> — Government Life Insurance — 29 Jul 2024</li>
+                <li><a href="/usn/pub/milpersman-1741-030/">MILPERSMAN 1741-030</a> — Family Servicemembers' Group Life Insurance (FSGLI) — 15 Mar 2016</li>
+                <li><a href="/usn/pub/milpersman-1746-010/">MILPERSMAN 1746-010</a> — Procedures when Government Messing is not Available — 1 May 2019</li>
+                <li><a href="/usn/pub/milpersman-1746-020/">MILPERSMAN 1746-020</a> — Procedures when Authorized to Mess Separately</li>
+                <li><a href="/usn/pub/milpersman-1746-030/">MILPERSMAN 1746-030</a> — Meal Passes for Enlisted Personnel — 26 Feb 2025</li>
+                <li><a href="/usn/pub/milpersman-1750-010/">MILPERSMAN 1750-010</a> — Transportation of Student Dependents Between CONUS and Overseas Duty Stations — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1754-010/">MILPERSMAN 1754-010</a> — Sea Legs — 7 Jun 2005</li>
+                <li><a href="/usn/pub/milpersman-1754-020/">MILPERSMAN 1754-020</a> — Family Contacts and Assistance During Deployment — 7 Jun 2005</li>
+                <li><a href="/usn/pub/milpersman-1754-030/">MILPERSMAN 1754-030</a> — Support of Family Members — 8 Dec 2021</li>
+                <li><a href="/usn/pub/milpersman-1754-040/">MILPERSMAN 1754-040</a> — Military Spouse Licensure/Business Cost Reimbursement — 18 Apr 2024</li>
+                <li><a href="/usn/pub/milpersman-1770-010/">MILPERSMAN 1770-010</a> — Definitions and Acronyms — 20 Mar 2024</li>
+                <li><a href="/usn/pub/milpersman-1770-020/">MILPERSMAN 1770-020</a> — Duty Status - Whereabouts Unknown (DUSTWUN) and &quot;Missing&quot; Status Recommendations — 31 Oct 2023</li>
+                <li><a href="/usn/pub/milpersman-1770-030/">MILPERSMAN 1770-030</a> — Personnel Casualty Report Procedures — 29 Jan 2026</li>
+                <li><a href="/usn/pub/milpersman-1770-040/">MILPERSMAN 1770-040</a> — Reporting The Death Of Non-Active Duty Sailors — 9 Mar 2010</li>
+                <li><a href="/usn/pub/milpersman-1770-060/">MILPERSMAN 1770-060</a> — Judge Advocate General Manual (JAGMAN) Reporting Requirements for Line of Duty (LOD) Determinations — 30 Aug 2022</li>
+                <li><a href="/usn/pub/milpersman-1770-090/">MILPERSMAN 1770-090</a> — Reporting Requirements for Suicide Related Behaviors — 29 Dec 2020</li>
+                <li><a href="/usn/pub/milpersman-1770-100/">MILPERSMAN 1770-100</a> — Reporting Requirements in the Event of a Naval Disaster — 9 Mar 2010</li>
+                <li><a href="/usn/pub/milpersman-1770-140/">MILPERSMAN 1770-140</a> — Commanding Officer's Letter to Next of Kin — 8 Aug 2016</li>
+                <li><a href="/usn/pub/milpersman-1770-150/">MILPERSMAN 1770-150</a> — Release of Casualty Information to the Media or General Public — 19 Mar 2010</li>
+                <li><a href="/usn/pub/milpersman-1770-160/">MILPERSMAN 1770-160</a> — Casualty Assistance Calls Program (CACP) — 22 Jul 2011</li>
+                <li><a href="/usn/pub/milpersman-1770-170/">MILPERSMAN 1770-170</a> — Notification of Next of Kin In Case of Death, “Duty Status Whereabouts Unknown” (DUSTWUN), or Missing Casualties — 17 May 2022</li>
+                <li><a href="/usn/pub/milpersman-1770-200/">MILPERSMAN 1770-200</a> — Deceased Member Personal Effects — 03 May 2024</li>
+                <li><a href="/usn/pub/milpersman-1770-210/">MILPERSMAN 1770-210</a> — Manual for Escorts of Deceased Naval Personnel — 10 Mar 2005</li>
+                <li><a href="/usn/pub/milpersman-1770-230/">MILPERSMAN 1770-230</a> — Wounded, Ill, and Injured Sailors:  Casualty Reporting, Notification, and Bedside Travel — 31 Jan 2023</li>
+                <li><a href="/usn/pub/milpersman-1770-260/">MILPERSMAN 1770-260</a> — Civilian Employee Casualty Reporting, Notification, and Assistance — 5 Jan 2013</li>
+                <li><a href="/usn/pub/milpersman-1770-270/">MILPERSMAN 1770-270</a> — Funeral Travel — 24 Feb 2011</li>
+                <li><a href="/usn/pub/milpersman-1770-271/">MILPERSMAN 1770-271</a> — Memorial Service Travel — 2 Aug 2010</li>
+                <li><a href="/usn/pub/milpersman-1770-275/">MILPERSMAN 1770-275</a> — Presentation of Burial Flags — 20 Apr 2009</li>
+                <li><a href="/usn/pub/milpersman-1770-280/">MILPERSMAN 1770-280</a> — Death Gratuity — 4 Aug 2014</li>
+                <li><a href="/usn/pub/milpersman-1772-010/">MILPERSMAN 1772-010</a> — Reserve Component Survivor Benefit Plan (RC-SBP) — 15 May 2025</li>
+                <li><a href="/usn/pub/milpersman-1780-011/">MILPERSMAN 1780-011</a> — Transfer of Education Benefits — 17 May 2022</li>
+                <li><a href="/usn/pub/milpersman-1800-010/">MILPERSMAN 1800-010</a> — General Guidelines for Conducting Ceremony for Retirement or Transfer to the Fleet Reserve — 2 Oct 2013</li>
+                <li><a href="/usn/pub/milpersman-1800-020/">MILPERSMAN 1800-020</a> — Effective Date of Retirement, Issuance of Retirement Orders and Authorization — 24 Feb 2016</li>
+                <li><a href="/usn/pub/milpersman-1800-060/">MILPERSMAN 1800-060</a> — Authorization of Navy Reserve Retirement Point Credit for Instruction Received in Connection with Professional Conventions or Similar Meetings — 3 Aug 2013</li>
+                <li><a href="/usn/pub/milpersman-1800-070/">MILPERSMAN 1800-070</a> — Benefits of the Armed Forces Retirement Home (United States Naval Home and US Soldier's and Airmen's Home) — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-1810-010/">MILPERSMAN 1810-010</a> — Voluntary Retirement of Enlisted Personnel - 30 Years of More of Active Service — 19 Jan 2020</li>
+                <li><a href="/usn/pub/milpersman-1810-020/">MILPERSMAN 1810-020</a> — Submission of Application for Voluntary Retirement from Active Duty (Officer) — 17 Jul 2026</li>
+                <li><a href="/usn/pub/milpersman-1810-080/">MILPERSMAN 1810-080</a> — Enrollment in the Blended Retirement System — 15 Nov 2018</li>
+                <li><a href="/usn/pub/milpersman-1810-081/">MILPERSMAN 1810-081</a> — Continuation Pay for Members Enrolled in the Blended Retirement System — 22 Feb 2020</li>
+                <li><a href="/usn/pub/milpersman-1810-082/">MILPERSMAN 1810-082</a> — Lump-Sum Payment of the Retirement Annuity for Service Members Enrolled in the Blended Retirement System — 24 Aug 2018</li>
+                <li><a href="/usn/pub/milpersman-1811-010/">MILPERSMAN 1811-010</a> — Retention on or Recall to Active Duty in a Retired Status — 23 Apr 2012</li>
+                <li><a href="/usn/pub/milpersman-1820-010/">MILPERSMAN 1820-010</a> — Retirement of Members of the Fleet Reserve — 3 Aug 2013</li>
+                <li><a href="/usn/pub/milpersman-1820-020/">MILPERSMAN 1820-020</a> — Non-Regular Reserve Retirement Without Pay - Qualification, Procedures, Submissions, and Processing — 21 Sep 2015</li>
+                <li><a href="/usn/pub/milpersman-1820-030/">MILPERSMAN 1820-030</a> — Non-Regular Reserve Retirement With Pay - Qualification, Procedures, Submissions, and Processing — 1 Dec 2015</li>
+                <li><a href="/usn/pub/milpersman-1820-040/">MILPERSMAN 1820-040</a> — Notification of Eligibility for Non-Regular (Reserve) Retired Pay — 16 Feb 2026</li>
+                <li><a href="/usn/pub/milpersman-1820-050/">MILPERSMAN 1820-050</a> — Requirements for a Year of Qualifying Service Toward a Non-Regular (Reserve) Retirement — 5 Jan 2015</li>
+                <li><a href="/usn/pub/milpersman-1830-010/">MILPERSMAN 1830-010</a> — Members of Fleet Reserve Subject to the Uniform Code of Military Justice — 24 Oct 2005</li>
+                <li><a href="/usn/pub/milpersman-1830-030/">MILPERSMAN 1830-030</a> — Physical Examination in Connection with Retirement, Transfers to Fleet Reserve, and as a Fleet Reservist — 7 Dec 2005</li>
+                <li><a href="/usn/pub/milpersman-1830-040/">MILPERSMAN 1830-040</a> — Transfer to Fleet Reserve and Release from Active Duty- 20 Years — 08 Oct 2024</li>
+                <li><a href="/usn/pub/milpersman-1850-020/">MILPERSMAN 1850-020</a> — Action Following Approved Disability Retirement — 08 Oct 2024</li>
+                <li><a href="/usn/pub/milpersman-1850-030/">MILPERSMAN 1850-030</a> — Temporary Disability Retired List — 26 Nov 2025</li>
+                <li><a href="/usn/pub/milpersman-1900-015/">MILPERSMAN 1900-015</a> — Separation, Fleet Reserve, and Retirement Document Submission — 01 Oct 2025</li>
+                <li><a href="/usn/pub/milpersman-1900-020/">MILPERSMAN 1900-020</a> — Convenience of the Government Separation Based on Conscientious Objection (Enlisted and Officer) — 29 Dec 2020</li>
+                <li><a href="/usn/pub/milpersman-1900-030/">MILPERSMAN 1900-030</a> — Separation of Enlisted or Officer Personnel by Reason of Convenience of the Government – Surviving Family Member — 29 Dec 2020</li>
+                <li><a href="/usn/pub/milpersman-1900-040/">MILPERSMAN 1900-040</a> — Transfer to the Retired List, Retired Reserve, or the Fleet Reserve in a Restricted Status — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1900-120/">MILPERSMAN 1900-120</a> — Separation by Reason of Convenience of the Government - Medical Conditions Not Amounting to a Disability — 9 Nov 2018</li>
+                <li><a href="/usn/pub/milpersman-1900-808/">MILPERSMAN 1900-808</a> — Physical Examination for Separation — 21 Nov 2023</li>
+                <li><a href="/usn/pub/milpersman-1910-010/">MILPERSMAN 1910-010</a> — Enlisted Administrative Separation (ADSEP) Policy and General Information — 18 Oct 2019</li>
+                <li><a href="/usn/pub/milpersman-1910-050/">MILPERSMAN 1910-050</a> — Enlisted Involuntary Separation Pay (Non-Disability) - Reserve Requirements and Obligations — 24 Aug 2018</li>
+                <li><a href="/usn/pub/milpersman-1910-100/">MILPERSMAN 1910-100</a> — Reasons for Separation — 8 Mar 2024</li>
+                <li><a href="/usn/pub/milpersman-1910-102/">MILPERSMAN 1910-102</a> — Separation by Reason of Changes in Service Obligation (Active Duty and Inactive Navy Reservists) Including Inter-Service Transfer or Commission — 29 Dec 2025</li>
+                <li><a href="/usn/pub/milpersman-1910-104/">MILPERSMAN 1910-104</a> — Separation by Reason of Expiration of Active Obligation Service (EAOS) — 03 May 2023</li>
+                <li><a href="/usn/pub/milpersman-1910-106/">MILPERSMAN 1910-106</a> — Separation in Lieu of Trial by Court-Martial — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-108/">MILPERSMAN 1910-108</a> — Separation by Reason of Convenience of the Government –  Early Release to Further Education — 6 Jun 2020</li>
+                <li><a href="/usn/pub/milpersman-1910-110/">MILPERSMAN 1910-110</a> — Separation by Reason of Convenience of the Government – Hardship — 29 Dec 2020</li>
+                <li><a href="/usn/pub/milpersman-1910-112/">MILPERSMAN 1910-112</a> — Separation by Reason of Convenience of the Government - Pregnancy — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-118/">MILPERSMAN 1910-118</a> — Separation by Reason of Convenience of the Government – When a Reservist Becomes a Minister — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-124/">MILPERSMAN 1910-124</a> — Separation by Reason of Convenience of the Government – Parenthood — 29 Dec 2020</li>
+                <li><a href="/usn/pub/milpersman-1910-125/">MILPERSMAN 1910-125</a> — Failure to Complete Initial Skills Training Pipeline — 31 May 2013</li>
+                <li><a href="/usn/pub/milpersman-1910-126/">MILPERSMAN 1910-126</a> — Separation by Reason of Convenience of the Government – Review Action — 24 Mar 2022</li>
+                <li><a href="/usn/pub/milpersman-1910-127/">MILPERSMAN 1910-127</a> — Separation by Reason of Convenience of the Government – Being an Alien — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-128/">MILPERSMAN 1910-128</a> — Separation by Reason of Defective Enlistments and Inductions – Minor — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-130/">MILPERSMAN 1910-130</a> — Separation by Reason of Defective Enlistments and Inductions – Erroneous Enlistment — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-132/">MILPERSMAN 1910-132</a> — Separation by Reason of Defective Enlistments and Inductions – Defective Enlistments — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-133/">MILPERSMAN 1910-133</a> — Failure to Complete Change of Rating (Conversion) Process — 29 Dec 2020</li>
+                <li><a href="/usn/pub/milpersman-1910-134/">MILPERSMAN 1910-134</a> — Separations by Reason of Defective Enlistments and Inductions – Fraudulent Entry Into Naval Service — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-136/">MILPERSMAN 1910-136</a> — Separation From the Delayed Entry Program (DEP) — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-138/">MILPERSMAN 1910-138</a> — Separation by Reason of Misconduct – Minor Disciplinary Infractions — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-140/">MILPERSMAN 1910-140</a> — Separation by Reason of Misconduct – Pattern of Misconduct — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-142/">MILPERSMAN 1910-142</a> — Separation by Reason of Misconduct – Commission of a Serious Offense — 12 Jun 2024</li>
+                <li><a href="/usn/pub/milpersman-1910-144/">MILPERSMAN 1910-144</a> — Separation by Reason of Misconduct – Civilian Conviction — 9 Oct 2019</li>
+                <li><a href="/usn/pub/milpersman-1910-146/">MILPERSMAN 1910-146</a> — Separation by Reason of Misconduct – Drug Abuse — 9 Oct 2019</li>
+                <li><a href="/usn/pub/milpersman-1910-152/">MILPERSMAN 1910-152</a> — Separation by Reason of Non-Compliance with Alcohol Rehabilitation Treatment — 02 May 2024</li>
+                <li><a href="/usn/pub/milpersman-1910-153/">MILPERSMAN 1910-153</a> — Separation by Reason of Multiple Incidents of Driving Under The Influence (DUI)/Driving While Intoxicated (DWI) — 11 Feb 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-154/">MILPERSMAN 1910-154</a> — Separation by Reason of Entry Level Performance and Conduct — 18 Dec 2023</li>
+                <li><a href="/usn/pub/milpersman-1910-156/">MILPERSMAN 1910-156</a> — Separation by Reason of Unsatisfactory Performance — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-157/">MILPERSMAN 1910-157</a> — Separation by Reason of Failure to Maintain Security Clearance — 03 Jan 2024</li>
+                <li><a href="/usn/pub/milpersman-1910-158/">MILPERSMAN 1910-158</a> — Separation by Reason of Unsatisfactory Participation in the Ready Reserve — 6 Jun 2020</li>
+                <li><a href="/usn/pub/milpersman-1910-160/">MILPERSMAN 1910-160</a> — Separation by Reason of Supremacist or Extremist Conduct — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-162/">MILPERSMAN 1910-162</a> — Separation by Reason of Family Advocacy Program (FAP) Rehabilitation Failure — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-164/">MILPERSMAN 1910-164</a> — Separation by Reason of Best Interest of the Service (BIOTS) — 13 Jul 2019</li>
+                <li><a href="/usn/pub/milpersman-1910-166/">MILPERSMAN 1910-166</a> — Administrative Action for Fleet Reserve/Retired Reserve Eligible Personnel — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-168/">MILPERSMAN 1910-168</a> — Separation by Reason of Physical Disability — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-171/">MILPERSMAN 1910-171</a> — Separation By Reason of Physical Fitness Assessment Failure — 22 Jan 2026</li>
+                <li><a href="/usn/pub/milpersman-1910-182/">MILPERSMAN 1910-182</a> — Disposition of Personnel Disenrolled from a Navy Officer Candidate Program — 9 Jan 2015</li>
+                <li><a href="/usn/pub/milpersman-1910-184/">MILPERSMAN 1910-184</a> — Disposition of Enlisted Personnel Accepted for Appointment to the U.S. Military Academy, the Air Force Academy, or the Coast Guard Academy — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-186/">MILPERSMAN 1910-186</a> — Disposition of Enlisted Personnel Disenrolled from the Military Academy, the Air Force Academy, or the Coast Guard Academy — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-202/">MILPERSMAN 1910-202</a> — Counseling and Rehabilitation — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-206/">MILPERSMAN 1910-206</a> — Temporary Duty (TEMDU) Transfer for Separation Processing — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-208/">MILPERSMAN 1910-208</a> — Administrative Separation (ADSEP) Processing for Members Beyond Expiration of Active Obligated Service (EAOS) or Expiration of obligated Service (EOS) — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-210/">MILPERSMAN 1910-210</a> — Processing for all Reasons — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-212/">MILPERSMAN 1910-212</a> — Factors Considered in Retention or Separation — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-214/">MILPERSMAN 1910-214</a> — Adverse Matter From a Prior Enlistment — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-216/">MILPERSMAN 1910-216</a> — Members Awaiting Medical Board Action — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-218/">MILPERSMAN 1910-218</a> — Members Assigned to Limited Duty (LIMDU) — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-220/">MILPERSMAN 1910-220</a> — Limitations on Separation Actions — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-222/">MILPERSMAN 1910-222</a> — Suspension of Separation — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-224/">MILPERSMAN 1910-224</a> — Action During the Period of Suspension — 16 Jun 2008</li>
+                <li><a href="/usn/pub/milpersman-1910-226/">MILPERSMAN 1910-226</a> — Conditional Waivers — 8 Oct 2019</li>
+                <li><a href="/usn/pub/milpersman-1910-228/">MILPERSMAN 1910-228</a> — Uniforms and Pay Upon Separation — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-230/">MILPERSMAN 1910-230</a> — Administrative Separation Processing &amp; Discharge in Absentia — 03 May 2023</li>
+                <li><a href="/usn/pub/milpersman-1910-232/">MILPERSMAN 1910-232</a> — Pre-Separation Treatment for Drug/Alcohol Dependent Personnel — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-233/">MILPERSMAN 1910-233</a> — Mandatory Separation Processing — 9 Oct 2019</li>
+                <li><a href="/usn/pub/milpersman-1910-300/">MILPERSMAN 1910-300</a> — Guidelines on Characterization of Service — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-302/">MILPERSMAN 1910-302</a> — General Considerations on Characterization of Service — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-304/">MILPERSMAN 1910-304</a> — Description of Characterization of Service — 07 Dec 2023</li>
+                <li><a href="/usn/pub/milpersman-1910-306/">MILPERSMAN 1910-306</a> — Limitations on Characterization of Service — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-308/">MILPERSMAN 1910-308</a> — Entry Level and Uncharacterized Separations — 2 Oct 2023</li>
+                <li><a href="/usn/pub/milpersman-1910-402/">MILPERSMAN 1910-402</a> — Administrative Board and Notification Procedures — 9 Oct 2019</li>
+                <li><a href="/usn/pub/milpersman-1910-406/">MILPERSMAN 1910-406</a> — Consultation with Counsel Prior to Electing Rights — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-408/">MILPERSMAN 1910-408</a> — Response Time to Notice — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-410/">MILPERSMAN 1910-410</a> — When a Member is Processed for Multiple Reasons — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-412/">MILPERSMAN 1910-412</a> — How to Prepare a Sworn Affidavit of Service by Mail — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-414/">MILPERSMAN 1910-414</a> — Actions of the Commanding Officer — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-500/">MILPERSMAN 1910-500</a> — Guidelines on Conducting an Administrative Board — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-502/">MILPERSMAN 1910-502</a> — Administrative Board Composition — 27 Jul 2026</li>
+                <li><a href="/usn/pub/milpersman-1910-504/">MILPERSMAN 1910-504</a> — Right to Counsel — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-506/">MILPERSMAN 1910-506</a> — Senior Member of Board — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-508/">MILPERSMAN 1910-508</a> — Witnesses at Administrative Board — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-510/">MILPERSMAN 1910-510</a> — Presentation of Evidence — 27 Jul 2026</li>
+                <li><a href="/usn/pub/milpersman-1910-512/">MILPERSMAN 1910-512</a> — Rights of the Respondent — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-514/">MILPERSMAN 1910-514</a> — What is binding on Administrative Boards — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-516/">MILPERSMAN 1910-516</a> — Record of Proceedings for Administrative Separation (ADSEP) Boards — 24 Jan 2024</li>
+                <li><a href="/usn/pub/milpersman-1910-518/">MILPERSMAN 1910-518</a> — Findings and Recommendations — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-600/">MILPERSMAN 1910-600</a> — Forwarding Cases to the Separation Authority (SA) — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-700/">MILPERSMAN 1910-700</a> — Separation Authority — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-702/">MILPERSMAN 1910-702</a> — General Guidance for Separation Authorities (SA) — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-704/">MILPERSMAN 1910-704</a> — Determining Separation Authority — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-708/">MILPERSMAN 1910-708</a> — Separation Authority Action When Using Notification Procedures or Administrative Board is Waived — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-710/">MILPERSMAN 1910-710</a> — Procedures When an Administrative Separation Board was Held — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-712/">MILPERSMAN 1910-712</a> — General Court Martial Convening Authority (GCMCA) Letter and Message Formats for Directing Administrative Separation (ADSEP) — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-800/">MILPERSMAN 1910-800</a> — Actions Which Effect the Separation — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-802/">MILPERSMAN 1910-802</a> — Pre-separation Interview of Enlisted Personnel — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-804/">MILPERSMAN 1910-804</a> — Information to be Provided Upon Separation Regarding Claims for Compensation, Pension, or Hospitalization to be Filed with the Department of Veterans Affairs (VA) — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-806/">MILPERSMAN 1910-806</a> — Acknowledgment of Service Upon Separation — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-810/">MILPERSMAN 1910-810</a> — Issuance of Certificates, Buttons, and Pins Upon Separation — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1910-812/">MILPERSMAN 1910-812</a> — Place of Separation — 20 Feb 2025</li>
+                <li><a href="/usn/pub/milpersman-1916-010/">MILPERSMAN 1916-010</a> — Release from Active Duty of Reserve and Retired Enlisted Personnel — 05 May 2024</li>
+                <li><a href="/usn/pub/milpersman-1920-010/">MILPERSMAN 1920-010</a> — Transfer of an Officer for Administrative Separation Processing — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1920-020/">MILPERSMAN 1920-020</a> — Involuntary Separation Pay (Non-Disability) – Overview — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1920-030/">MILPERSMAN 1920-030</a> — Involuntary Separation Pay (Non-Disability) – Definitions and Policy — 23 Mar 2007</li>
+                <li><a href="/usn/pub/milpersman-1920-040/">MILPERSMAN 1920-040</a> — Involuntary Separation Pay (Non-Disability) – Eligibility Criteria and Restrictions — 20 Sep 2011</li>
+                <li><a href="/usn/pub/milpersman-1920-050/">MILPERSMAN 1920-050</a> — Officer Involuntary Separation Pay (Non-Disability) – Reserve Requirements and Obligations — 15 May 2011</li>
+                <li><a href="/usn/pub/milpersman-1920-060/">MILPERSMAN 1920-060</a> — Involuntary Separation Pay (Non-Disability) – Pay Calculation and Payment Documentation — 20 Oct 2005</li>
+                <li><a href="/usn/pub/milpersman-1920-070/">MILPERSMAN 1920-070</a> — Separation of Officer Personnel by Reason of Supremacist or Extremist Conduct — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1920-080/">MILPERSMAN 1920-080</a> — Release of Officers from Active Duty Prior to Completion of Minimum Required Service — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1920-090/">MILPERSMAN 1920-090</a> — Release from Active Duty (RAD) Procedures — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1920-100/">MILPERSMAN 1920-100</a> — Early Release of Officers from Active Duty — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1920-110/">MILPERSMAN 1920-110</a> — Involuntary Release from Active Duty Orders of Ready Reserve Officers — 15 Sep 2017</li>
+                <li><a href="/usn/pub/milpersman-1920-120/">MILPERSMAN 1920-120</a> — Revocation of Commissions, Terminations of Appointments, and Discharge of Officers by Other Than Selection Board Action — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1920-130/">MILPERSMAN 1920-130</a> — Officer Separations, General — 29 Dec 2020</li>
+                <li><a href="/usn/pub/milpersman-1920-140/">MILPERSMAN 1920-140</a> — Separation Order for Officers — 8 Oct 2015</li>
+                <li><a href="/usn/pub/milpersman-1920-160/">MILPERSMAN 1920-160</a> — Separation of Navy Reserve Officers on Inactive Duty — 24 Jul 2006</li>
+                <li><a href="/usn/pub/milpersman-1920-170/">MILPERSMAN 1920-170</a> — Contingent Resignation for Acceptance to Attend Medical Training Under the Armed Forces Health Professions Scholarship Program (AFHPSP) or at the Uniformed Services University of the Health Sciences (USUHS) — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1920-180/">MILPERSMAN 1920-180</a> — Separation of Officers at the Convenience of the Government on the Basis of Pregnancy/Childbirth — 22 Dec 2015</li>
+                <li><a href="/usn/pub/milpersman-1920-200/">MILPERSMAN 1920-200</a> — Officer Resignation Types and Procedures — 12 Aug 2024</li>
+                <li><a href="/usn/pub/milpersman-1920-210/">MILPERSMAN 1920-210</a> — Types of Discharge for Officers — 22 Aug 2016</li>
+                <li><a href="/usn/pub/milpersman-1920-230/">MILPERSMAN 1920-230</a> — Separation of Officers Under Various Statutory Provisions not Included in Other Articles — 11 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-1920-240/">MILPERSMAN 1920-240</a> — Release of Officers From Active Duty Prior to Completion of Minimum Service Requirement (MSR) to Participate in Activities With Potential Recruiting or Public Affairs Benefit to the Navy — 28 Oct 2011</li>
+                <li><a href="/usn/pub/milpersman-1920-250/">MILPERSMAN 1920-250</a> — Administrative Separation of Navy Chaplain Corps Officers Upon Loss of Professional Qualifications — 26 Nov 2007</li>
+                <li><a href="/usn/pub/milpersman-1920-260/">MILPERSMAN 1920-260</a> — Officer Unauthorized Absence (UA)</li>
+                <li><a href="/usn/pub/milpersman-3060-010/">MILPERSMAN 3060-010</a> — Command Augmentee Coordinator (CIAC) — 10 Jul 2025</li>
+                <li><a href="/usn/pub/milpersman-3060-020/">MILPERSMAN 3060-020</a> — Individual Augmentee Manpower Management (IAMM) — 10 Jul 2025</li>
+                <li><a href="/usn/pub/milpersman-3060-030/">MILPERSMAN 3060-030</a> — Global Support Assignment (GSA) — 10 Jul 2025</li>
+                <li><a href="/usn/pub/milpersman-3060-040/">MILPERSMAN 3060-040</a> — Overseas Support Assignment (OSA) — 10 Jul 2025</li>
+                <li><a href="/usn/pub/milpersman-3060-050/">MILPERSMAN 3060-050</a> — Accessing the Ready Reserve — 07 Jul 2025</li>
+                <li><a href="/usn/pub/milpersman-3060-060/">MILPERSMAN 3060-060</a> — Delay, Deferment, and Exemption Requests and Special Cases Boards (SCB) — 01 Apr 2025</li>
+                <li><a href="/usn/pub/milpersman-3060-070/">MILPERSMAN 3060-070</a> — Selected Reserve and Voluntary Training Unit Activation Screening Criteria — 27 Apr 2025</li>
+                <li><a href="/usn/pub/milpersman-3060-080/">MILPERSMAN 3060-080</a> — Readiness and Screening for Active Component  (AC)  and Reserve Component (RC) Sailors on Augmentation Orders — 10 Jul 2025</li>
+                <li><a href="/usn/pub/milpersman-3060-090/">MILPERSMAN 3060-090</a> — Management of Misconduct Allegations Involving Active Component (AC) and Reserve Component (RC) Sailors While on Augmentation Orders — 20 Mar 2025</li>
+                <li><a href="/usn/pub/milpersman-4050-010/">MILPERSMAN 4050-010</a> — Privately Owned Vehicle (POV) Shipment Entitlement Policy — 25 Jan 2024</li>
+                <li><a href="/usn/pub/milpersman-4050-020/">MILPERSMAN 4050-020</a> — Household Goods (HHG) Shipment and Storage Entitlement Policy — 08 Jul 2024</li>
+                <li><a href="/usn/pub/milpersman-4650-010/">MILPERSMAN 4650-010</a> — Entry Into and Departure From the United States by Alien Members of the Navy and Their Families — 17 Mar 2006</li>
+                <li><a href="/usn/pub/milpersman-5215-010/">MILPERSMAN 5215-010</a> — Procedures for Preparing Articles and Submitting Changes to NAVPERS 15560D, Naval Military Personnel Manual (MILPERSMAN) — 09 Jan 2026</li>
+                <li><a href="/usn/pub/milpersman-5216-010/">MILPERSMAN 5216-010</a> — Congressional Correspondence — 4 Feb 2011</li>
+                <li><a href="/usn/pub/milpersman-5219-010/">MILPERSMAN 5219-010</a> — Forms and Publications Under The Purview of the Bureau of Naval Personnel — 12 Jun 2024</li>
+                <li><a href="/usn/pub/milpersman-5312-010/">MILPERSMAN 5312-010</a> — Utilization of Civilian and Military Personnel in Navy Morale, Welfare or Recreational Functions (MWR) — 21 Mar 2005</li>
+                <li><a href="/usn/pub/milpersman-5352-010/">MILPERSMAN 5352-010</a> — Naturalization and Derived Citizenship of Military Personnel — 25 Jun 2021</li>
+                <li><a href="/usn/pub/milpersman-5352-020/">MILPERSMAN 5352-020</a> — Naturalization of Alien Spouse and/or Alien Adopted Children of Military Personnel Ordered to a Foreign Country</li>
+                <li><a href="/usn/pub/milpersman-5352-030/">MILPERSMAN 5352-030</a> — Marriage of Naval Personnel to Foreign Nationals — 26 Oct 2017</li>
+                <li><a href="/usn/pub/milpersman-5360-010/">MILPERSMAN 5360-010</a> — Navy Military Funerals — 10 Mar 2005</li>
+                <li><a href="/usn/pub/milpersman-5360-020/">MILPERSMAN 5360-020</a> — Chaplain (Reserve Component) Support of Military Funerals — 24 Mar 2005</li>
+                <li><a href="/usn/pub/milpersman-5370-010/">MILPERSMAN 5370-010</a> — Outside Employment of Members on Active Duty — 14 Apr 2006</li>
+                <li><a href="/usn/pub/milpersman-5370-030/">MILPERSMAN 5370-030</a> — Restrictions on Civilian Employment of Retired Members — 16 Dec 2005</li>
+                <li><a href="/usn/pub/milpersman-5510-010/">MILPERSMAN 5510-010</a> — Security Clearance Requirements and Procedures for Members Scheduled to Attend Classified Courses of Instruction — 14 Nov 2005</li>
+                <li><a href="/usn/pub/milpersman-5726-010/">MILPERSMAN 5726-010</a> — Liaison with Civil Agencies — 20 Jun 2005</li>
+                <li><a href="/usn/pub/milpersman-5760-010/">MILPERSMAN 5760-010</a> — Navy Spouse Organizations and Activities — 23 Sep 2018</li>
+                <li><a href="/usn/pub/milpersman-5800-010/">MILPERSMAN 5800-010</a> — Paternity Complaints — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-5812-010/">MILPERSMAN 5812-010</a> — Setting Aside Nonjudicial Punishment (NJP) — 18 Aug 2025</li>
+                <li><a href="/usn/pub/milpersman-5815-010/">MILPERSMAN 5815-010</a> — Executing a Dishonorable or Bad Conduct Discharge — 21 Nov 2023</li>
+                <li><a href="/usn/pub/milpersman-5821-010/">MILPERSMAN 5821-010</a> — Delivery of Personnel to Civilian Authorities — 21 Feb 2024</li>
+                <li><a href="/usn/pub/milpersman-6110-020/">MILPERSMAN 6110-020</a> — Physical Risk Classification for Officer and Enlisted Personnel on Inactive Duty — 15 Sep 2016</li>
+                <li><a href="/usn/pub/milpersman-6120-010/">MILPERSMAN 6120-010</a> — Enlisted Physical Qualifications for Certain Duty Assignment and Physical Examination/Medical Screening Prior to Transfer of Duty — 30 Aug 2011</li>
+                <li><a href="/usn/pub/milpersman-6120-020/">MILPERSMAN 6120-020</a> — Physical Examinations and Medical Screening of Officer Personnel Prior to Transfer — 26 Sep 2005</li>
+                <li><a href="/usn/pub/milpersman-7040-010/">MILPERSMAN 7040-010</a> — BUPERSINST 7040.6/7040.7 Financial Mgmt Guide for Permanent Change of Station Travel — 23 Jan 2006</li>
+                <li><a href="/usn/pub/milpersman-7220-010/">MILPERSMAN 7220-010</a> — General Information Concerning Pay and Allowances — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-7220-070/">MILPERSMAN 7220-070</a> — Special Pay for Hardship Duty (HDP) — 17 Dec 2024</li>
+                <li><a href="/usn/pub/milpersman-7220-075/">MILPERSMAN 7220-075</a> — Guidelines for Hardship Duty Pay - Tempo (HDP-T) — 18 Nov 2014</li>
+                <li><a href="/usn/pub/milpersman-7220-080/">MILPERSMAN 7220-080</a> — Incentive Pay for Hazardous Duty — 28 Jan 2025</li>
+                <li><a href="/usn/pub/milpersman-7220-090/">MILPERSMAN 7220-090</a> — Hazardous Duty Incentive Pay (HDIP) for Diving Duty — 24 Feb 2025</li>
+                <li><a href="/usn/pub/milpersman-7220-100/">MILPERSMAN 7220-100</a> — Command Responsibility Pay (CRP)</li>
+                <li><a href="/usn/pub/milpersman-7220-110/">MILPERSMAN 7220-110</a> — Special Pay for Duty Subject to Imminent Danger or Hostile Fire — 21 Nov 2023</li>
+                <li><a href="/usn/pub/milpersman-7220-112/">MILPERSMAN 7220-112</a> — Pay and Allowance Continuation (PAC) Program — 15 Dec 2009</li>
+                <li><a href="/usn/pub/milpersman-7220-113/">MILPERSMAN 7220-113</a> — Special Compensation for Assistance with Activities of Daily Living (SCAADL) — 10 Aug 2026</li>
+                <li><a href="/usn/pub/milpersman-7220-114/">MILPERSMAN 7220-114</a> — Naval Special Warfare Skill Incentive Pay — 18 Nov 2021</li>
+                <li><a href="/usn/pub/milpersman-7220-120/">MILPERSMAN 7220-120</a> — Family Separation Allowance (FSA) — 31 Oct 2023</li>
+                <li><a href="/usn/pub/milpersman-7220-130/">MILPERSMAN 7220-130</a> — Methods of Computing Retainer Pay for a Member of the Fleet Reserve — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-7220-150/">MILPERSMAN 7220-150</a> — Basic Allowance for Subsistence (BAS) – Specialized Terms — 27 Aug 2018</li>
+                <li><a href="/usn/pub/milpersman-7220-160/">MILPERSMAN 7220-160</a> — Basic Allowance for Subsistence (BAS) – General Policies — 1 Jun 2019</li>
+                <li><a href="/usn/pub/milpersman-7220-180/">MILPERSMAN 7220-180</a> — Basic Allowance for Subsistence (BAS) – Procedures for Service Members on Sea Duty — 1 Oct 2025</li>
+                <li><a href="/usn/pub/milpersman-7220-182/">MILPERSMAN 7220-182</a> — Basic Allowance for Subsistence (BAS) II — 21 Nov 2023</li>
+                <li><a href="/usn/pub/milpersman-7220-210/">MILPERSMAN 7220-210</a> — Dislocation Allowance and SECNAVFIND — 29 Aug 2005</li>
+                <li><a href="/usn/pub/milpersman-7220-220/">MILPERSMAN 7220-220</a> — Dislocation Allowance (DLA) Entitlement Policy — 15 Dec 2008</li>
+                <li><a href="/usn/pub/milpersman-7220-230/">MILPERSMAN 7220-230</a> — Civilian Clothing Allowance (CCA) For Officers and Enlisted Personnel — 19 Dec 2016</li>
+                <li><a href="/usn/pub/milpersman-7220-240/">MILPERSMAN 7220-240</a> — Overseas Station Allowances Policy — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-7220-250/">MILPERSMAN 7220-250</a> — Overseas Cost-of-Living Allowance (COLA) Policy — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-7220-260/">MILPERSMAN 7220-260</a> — Overseas Housing Allowance (OHA) Policy — 24 Nov 2010</li>
+                <li><a href="/usn/pub/milpersman-7220-270/">MILPERSMAN 7220-270</a> — Overseas Temporary Lodging Allowance (TLA) Policy — 5 Feb 2009</li>
+                <li><a href="/usn/pub/milpersman-7220-280/">MILPERSMAN 7220-280</a> — CONUS Temporary Lodging Expense (TLE) Policy — 30 Nov 2010</li>
+                <li><a href="/usn/pub/milpersman-7220-300/">MILPERSMAN 7220-300</a> — Advance Pay on Permanent Change of Station — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-7220-310/">MILPERSMAN 7220-310</a> — Advance Pay and Allowances — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-7220-320/">MILPERSMAN 7220-320</a> — Pay and Allowances While on Leave — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-7220-330/">MILPERSMAN 7220-330</a> — Checkage of Pay for Excess Leave — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-7220-340/">MILPERSMAN 7220-340</a> — Lump-Sum Payment for Accrued Leave — 25 Sep 2018</li>
+                <li><a href="/usn/pub/milpersman-7220-350/">MILPERSMAN 7220-350</a> — Pay and Allowance While Awaiting on Leave Orders or While Sick or Wounded — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-7220-360/">MILPERSMAN 7220-360</a> — Entitlement to Pay and Allowances While Under Investigation for Fraudulent Enlistment Other Than Underage — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-7220-370/">MILPERSMAN 7220-370</a> — Pay Accounts of Retiring Personnel — 2 Mar 2012</li>
+                <li><a href="/usn/pub/milpersman-7220-380/">MILPERSMAN 7220-380</a> — Dual Compensation Regulation Applicable to the Naval Reserve — 2 Nov 2016</li>
+                <li><a href="/usn/pub/milpersman-7220-390/">MILPERSMAN 7220-390</a> — Sell Back of Leave — 22 Aug 2002</li>
+                <li><a href="/usn/pub/milpersman-7220-410/">MILPERSMAN 7220-410</a> — Retroactive Stop Loss Special Pay Compensation — 2 Aug 2018</li>
+            </ul>
+            <p><a href="/">Ask Reggie.Bot about MILPERSMAN publications</a></p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

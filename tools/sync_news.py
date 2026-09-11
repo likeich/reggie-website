@@ -1,39 +1,38 @@
 """
-Cache army.mil news into Supabase.
+Cache army.mil and DVIDS news into Supabase.
 
 api.army.mil sits behind Akamai, which returns 403 to any request carrying a
 browser User-Agent and separately rejects Cloud Run's egress range regardless
 of User-Agent. So the wasm client cannot call it and neither can our /proxy.
 This job fetches it from a GitHub Actions runner and writes the result to a
-table the client already has access to.
+table the client already has access to. Every other service reads
+api.dvidshub.net instead, which needs DVIDS_API_KEY.
 
-    SUPABASE_SERVICE_KEY=... python sync_news.py            # dry run
-    SUPABASE_SERVICE_KEY=... python sync_news.py --apply
+    SUPABASE_SERVICE_KEY=... python sync_news.py                       # dry run, Army
+    SUPABASE_SERVICE_KEY=... DVIDS_API_KEY=... python sync_news.py --branch usn --apply
 
 The scheduled job that runs this lives in likeich/reggie-website (tools/), not
 here: that repo is public and public repos get unlimited Actions minutes.
 
-This file is the source. The release workflow copies it there on every publish,
-so the copy is a build output and must not be edited by hand -- which is what
-went wrong before: the two were kept in step by a note in this docstring, the
-note was not enough, and the copy sat 277 lines behind knowing nothing about
-DVIDS while four services' news went unsynced.
+This file is the source. The release workflow copies it to
+likeich/reggie-website on every publish -- the copy there is a build output
+and must not be edited by hand. It must never carry a key literal: read both
+keys from the environment only.
 """
 import argparse
+import json
 import os
-import email.utils
 import re
-from xml.etree import ElementTree
 import sys
+from datetime import datetime
 
 import requests
 
 LEADS_URL = os.getenv('LEADS_URL', 'https://api.army.mil/api/v1/leads')
 SUPABASE_URL = os.getenv('SUPABASE_URL', 'https://ziftzxigjayekmvvopkf.supabase.co')
 
-# Must match Kotlin's Lead, which has no @SerialName annotations - the property
-# names are the JSON keys. ga_id is the only nullable one. Pinned by
-# test_supabase_contract.py, which reads the required set out of the Kotlin.
+# Must match Kotlin's Lead verbatim -- no @SerialName annotations, so these
+# are the JSON keys. ga_id is the only nullable one. See test_supabase_contract.py.
 REQUIRED = ('id', 'title', 'short_title', 'body', 'url', 'page_url', 'author',
             'date', 'last_updated', 'short_description', 'description',
             'section', 'category', 'keywords', 'image')
@@ -50,11 +49,9 @@ def storage_url(name):
 def upload_image(key, url, session=None):
     """Mirror a lead image into Supabase storage, returning its public URL.
 
-    The images live on api.army.mil alongside the leads, so they are blocked
-    for the browser and for our Cloud Run proxy exactly the same way. Leaving
-    the upstream URL in the row means every image 403s. Returns None if the
-    image cannot be fetched, which drops the story rather than rendering it
-    broken.
+    api.army.mil blocks the browser the same way it blocks our proxy, so the
+    upstream URL would 403 in the row. Returns None on failure, which drops
+    the story rather than rendering it broken.
     """
     get = (session or requests).get
     try:
@@ -79,30 +76,24 @@ def upload_image(key, url, session=None):
         return None
 
 
-# Scoped by branch, not by unit search.
+DVIDS_API_URL = 'https://api.dvidshub.net/search'
+
+# The branch name api.dvidshub.net's `branch` parameter expects, not the RSS
+# path segment -- they differ only in "Coast Guard"/"Space Force"/"Air Force"
+# needing their space, which `requests` encodes for us.
 #
-# /rss/unit/USMC is a search feed and returns whatever is tagged that way --
-# "U.S. Army Soldiers Conduct Operations in the Middle East" came back third,
-# which is exactly the confusion having services at all is meant to remove.
-# /rss/branch/Marines is the Marine Corps: 53 of 54 items mention no other
-# service, and the one that does is a joint story.
-#
-# Keyed by the canonical slug, the same spelling branch_canonical() uses. A
-# feed written under the old slug would insert rows the prune below cannot
-# reach -- it scopes its delete by branch, so 'marine-corps' rows and 'usmc'
-# rows are two sets that never clean each other up, and the News tab would
-# show every story twice.
-DVIDS_FEEDS = {
-    'usmc': 'https://www.dvidshub.net/rss/branch/Marines',
-    'uscg': 'https://www.dvidshub.net/rss/branch/Coast%20Guard',
-    'ussf': 'https://www.dvidshub.net/rss/branch/Space%20Force',
-    'usaf': 'https://www.dvidshub.net/rss/branch/Air%20Force',
+# Keyed by the canonical slug: an entry written under a legacy slug would
+# insert rows the prune below cannot reach, since it scopes its delete by
+# branch.
+DVIDS_BRANCHES = {
+    'usn': 'Navy',
+    'usmc': 'Marines',
+    'uscg': 'Coast Guard',
+    'ussf': 'Space Force',
+    'usaf': 'Air Force',
 }
 
-# What a service used to be called, so a slug from an older script or an old
-# invocation still lands on the rows it means. 'navy' stays mapped even though
-# the service is gone: rows written under it should still resolve to one
-# spelling if anything ever reads them.
+# Legacy slugs, so an old invocation still lands on the rows it means.
 LEGACY_BRANCHES = {
     'army': 'usa', 'navy': 'usn', 'marine-corps': 'usmc',
     'air-force': 'usaf', 'space-force': 'ussf', 'coast-guard': 'uscg',
@@ -115,46 +106,58 @@ def canonical_branch(slug):
     s = (slug or '').strip().lower()
     return LEGACY_BRANCHES.get(s, s)
 
-# How many stories to carry per service. The Army endpoint decides its own;
-# this is a feed of 400+ and the News tab shows a handful.
-DVIDS_LIMIT = int(os.getenv('DVIDS_LIMIT', '40'))
+# How many stories to carry per service. api.dvidshub.net's `type=news`
+# filter alone returns 1000+ per branch, but getNews() in the client has no
+# pagination -- every row synced here is fetched on every News tab open, so
+# this stays well short of that ceiling rather than chasing it. 60 is a
+# comfortable scroll's worth per service and keeps five services' worth of
+# rows small against Supabase's free-tier row and bandwidth limits.
+DVIDS_LIMIT = int(os.getenv('DVIDS_LIMIT', '60'))
 
-# "6th Marine Regiment relief and appointment ceremony [Image 6 of 31]" -- one
-# story, published once per photograph.
+# DVIDS publishes a photo gallery as one item per photograph, e.g.
+# "... ceremony [Image 6 of 31]" -- one story, not thirty-one.
 GALLERY_MARKER = re.compile(r'\s*\[Image \d+ of \d+\]\s*$', re.I)
 
 
 def as_stored_date(value):
-    """An RFC-822 pubDate in the format the Army's stories already use.
+    """DVIDS' ISO-8601 date, in the format the Army's stories already use.
 
-    DVIDS sends "Fri, 14 Aug 2026 16:19:26 -0400"; army.mil sends
-    "2026-08-25 11:10:42", and the client parses the second. Stored verbatim
-    the first threw DateTimeFormatException in the app, and one unparseable
-    row emptied the whole News tab -- four services had a blank News screen
-    from the day their news was first synced, while the rows sat correct in
-    the database.
-
-    A date that cannot be read becomes empty rather than a guess. A story with
-    no date still reads; a story with an invented one is wrong on the screen.
+    DVIDS sends "2026-08-25T11:10:42Z"; army.mil sends "2026-08-25 11:10:42",
+    and the client parses only the second -- storing the first verbatim
+    throws DateTimeFormatException and blanks the whole News tab. A date that
+    cannot be read becomes empty rather than a guess.
     """
     if not value:
         return ''
     try:
-        parsed = email.utils.parsedate_to_datetime(value)
+        parsed = datetime.fromisoformat(value.replace('Z', '+00:00'))
     except (TypeError, ValueError):
         return ''
-    if parsed is None:
-        return ''
     return parsed.strftime('%Y-%m-%d %H:%M:%S')
+
+
+# DVIDS' search API answers `thumbnail` at a fixed 122x92 -- a contact sheet
+# size, not a card image. The CDN serves the same asset at other sizes from
+# the same path, and DVIDS' own og:image uses 1000w, so ask for that. Falls
+# back to whatever was given if the path is not the shape we expect: a
+# smaller picture beats none.
+THUMB_SIZE = re.compile(r'/\d+x\d+(_q\d+\.[a-z]+)$')
+
+
+def full_size(thumbnail):
+    """A card-sized version of a DVIDS thumbnail URL, or it unchanged."""
+    if not thumbnail:
+        return ''
+    return THUMB_SIZE.sub(r'/1000w\1', thumbnail)
 
 
 def og_image(html):
     """The first og:image on an article page, or None.
 
-    The DVIDS feed carries no images at all -- 0 of 407 items -- and the news
-    cards are built around one, so it has to come from the page. None means
-    drop the story, the same rule the Army images follow: a card with a broken
-    picture is worse than one story fewer.
+    Most api.dvidshub.net results carry their own `thumbnail`; this is the
+    fallback for the minority that do not (roughly half of some services'
+    results, e.g. the Coast Guard, in a spot check). None means drop the
+    story: a card with a broken picture is worse than one story fewer.
     """
     m = re.search(r'<meta[^>]+property=["\']og:image["\'][^>]+content=["\']([^"\']+)',
                   html or '', re.I)
@@ -164,47 +167,67 @@ def og_image(html):
     return m.group(1) if m else None
 
 
-def dvids_leads(xml_text, limit=None):
-    """The feed's items, projected onto the shape news_row expects.
+# api.dvidshub.net's `type=news` parameter already excludes photos, video,
+# webcasts, audio and base newspapers server-side -- that used to be a client
+# job against the RSS branch feed, which carried all six asset types ten
+# apiece. This stays as a second, free check: the item's own link still names
+# its type, and trusting one field over a query parameter is one field too
+# many for a screen that goes blank if a non-story slips through.
+DVIDS_ASSET = re.compile(r'dvidshub\.net/(\w+)/')
 
-    Returns [] for anything unparseable rather than raising: a truncated or
-    rejected download has to look like "no news", not like a crash that takes
-    the Army sync down with it in the same job.
+
+def is_story(link):
+    """Whether a result is an article rather than a photo or a video.
+
+    A link that names no DVIDS asset type is not a DVIDS item at all -- the
+    Army's stories come from army.mil -- so it passes. Only a link that
+    positively identifies itself as something else is dropped.
+    """
+    found = DVIDS_ASSET.search(link or '')
+    return found is None or found.group(1) == 'news'
+
+
+def dvids_leads(json_text, limit=None):
+    """api.dvidshub.net's results, projected onto the shape news_row expects.
+
+    Returns [] for anything unparseable or carrying an `errors` body rather
+    than raising: a truncated or rejected response must look like "no news",
+    not a crash in the same job.
     """
     try:
-        root = ElementTree.fromstring(xml_text or '')
-    except ElementTree.ParseError:
+        data = json.loads(json_text or '')
+    except (TypeError, ValueError):
         return []
-
-    def text(item, tag):
-        node = item.find(tag)
-        return (node.text or '').strip() if node is not None else ''
+    if not isinstance(data, dict) or 'errors' in data:
+        return []
+    results = data.get('results')
+    if not isinstance(results, list):
+        return []
 
     leads = []
     seen = set()
     cap = limit or DVIDS_LIMIT
-    for item in root.findall('.//item'):
+    for item in results:
         if len(leads) >= cap:
             break
+        if not isinstance(item, dict):
+            continue
         # "news:573607" -- the number is the story, and Lead.id is an Int.
-        digits = re.sub(r'\D', '', text(item, 'guid'))
+        digits = re.sub(r'\D', '', str(item.get('id') or ''))
         if not digits:
             continue
-        # DVIDS publishes a photo gallery as one item per photograph, all
-        # sharing a title and differing only in "[Image 6 of 31]". The Marine
-        # Corps News tab shipped with four of them, reading as four separate
-        # stories about the same ceremony.
-        title = GALLERY_MARKER.sub('', text(item, 'title')).strip()
-        # The Coast Guard feed goes further: five consecutive items carry one
-        # title exactly. Whichever came first is the freshest telling, since
-        # the feed is newest first.
+        title = GALLERY_MARKER.sub('', str(item.get('title') or '')).strip()
+        # Some results also carry duplicate items sharing one exact title;
+        # whichever came first wins, since results are newest first.
         key = ' '.join(title.lower().split())
         if not key or key in seen:
             continue
         seen.add(key)
-        body = text(item, 'description')
-        link = text(item, 'link')
-        when = text(item, 'pubDate')
+        link = item.get('url') or ''
+        if not link or not is_story(link):
+            continue
+        body = str(item.get('short_description') or '')
+        when = item.get('date') or item.get('date_published') or ''
         leads.append({
             'id': int(digits),
             'title': title,
@@ -212,7 +235,7 @@ def dvids_leads(xml_text, limit=None):
             'body': body,
             'url': link,
             'page_url': link,
-            'author': text(item, 'author') or 'DVIDS',
+            'author': item.get('credit') or 'DVIDS',
             'date': as_stored_date(when),
             'last_updated': as_stored_date(when),
             'short_description': body[:200],
@@ -220,7 +243,7 @@ def dvids_leads(xml_text, limit=None):
             'section': 'News',
             'category': 'News',
             'keywords': '',
-            'image': '',
+            'image': full_size(item.get('thumbnail')),
         })
     return leads
 
@@ -232,18 +255,10 @@ SMALL_FEED = 4
 def may_prune(fetched, cached):
     """Whether this feed is complete enough to delete against.
 
-    DVIDS returned 6 Marine Corps stories where it had been returning 20. The
-    prune deletes whatever it did not just fetch, so it took the other 14, and
-    the run reported success. A short feed and 14 genuine removals look
-    identical from here -- which is corpus_gate.py's whole argument, and this
-    is the same script one table over.
-
-    So the ambiguous case does nothing. The upsert still runs and the new
-    stories still land; only the deletion waits for a feed big enough to
-    believe. A feed that has really shrunk stays shrunk for one more run.
-
-    A first sync has no cache to protect, and a handful of stories churns
-    proportionally harder than a full one, so neither is held to the floor.
+    A short feed and a genuine wave of removals look identical from here
+    (corpus_gate.py's argument, one table over), so the ambiguous case does
+    nothing: the upsert still runs, only the deletion waits for a feed big
+    enough to believe. A first sync has no cache to protect, so it is exempt.
     """
     if cached <= 0 or cached < SMALL_FEED:
         return True
@@ -272,14 +287,7 @@ def stale_ids(rows, branch, key):
     """The ids this run's prune would delete, or None if we cannot tell.
 
     Read-only, so the dry run can report exactly what --apply would remove.
-    It could not before: `if not a.apply: return` sat above the prune
-    entirely, so the preview listed five upserts and never mentioned that the
-    same command would also delete -- which is the mistake CLAUDE.md records
-    against sync_vector_store.py, whose preview called every file new and hid
-    409 pending deletions.
-
-    None for any failure, and the caller then skips rather than guesses. Not
-    knowing what is there is not a licence to delete from it.
+    None on any failure, and the caller skips rather than guesses.
     """
     try:
         r = requests.get(f'{SUPABASE_URL}/rest/v1/news',
@@ -297,10 +305,8 @@ def stale_ids(rows, branch, key):
 def prune_filter(rows, branch):
     """Which stories a sync may delete: this service's, minus what it just wrote.
 
-    The branch clause is the whole point. Without it a Marine Corps run deletes
-    every story it did not fetch -- all of the Army's -- and reports "DONE.
-    cached 23 stories" while doing it. Same shape as stale_to_delete in
-    sync_supabase.py; I fixed that one and did not think to look for a second.
+    The branch clause is the whole point -- without it a Marine Corps run
+    deletes every story it did not fetch, including all of the Army's.
     """
     keep = ','.join(str(row['id']) for row in rows)
     return {'id': f'not.in.({keep})', 'branch': f'eq.{branch}'}
@@ -319,9 +325,6 @@ def news_row(lead, image_url, branch='usa'):
     if not image_url:
         return None
     row = {k: lead[k] for k in REQUIRED}
-    # Which service's News tab this belongs on. Without it a Marine Corps
-    # story lands on the Army's, which is the mistake publication_tables
-    # already made once today.
     row['branch'] = branch
     for k in OPTIONAL:
         row[k] = lead.get(k)
@@ -359,10 +362,8 @@ def main(argv=None):
     ap.add_argument('--apply', action='store_true')
     ap.add_argument('--branch', default='usa',
                     help="which service's news to sync: usa, or any of "
-                         + ', '.join(sorted(DVIDS_FEEDS)))
+                         + ', '.join(sorted(DVIDS_BRANCHES)))
     a = ap.parse_args(argv)
-    # Accept the old spelling and write the new one, so an old invocation
-    # cannot create a second, un-prunable set of rows.
     a.branch = canonical_branch(a.branch)
 
     key = os.getenv('SUPABASE_SERVICE_KEY')
@@ -370,28 +371,35 @@ def main(argv=None):
         sys.exit('SUPABASE_SERVICE_KEY not set')
 
     if a.branch == 'usa':
-        # Deliberately no browser User-Agent: that is what Akamai rejects.
+        # deliberately no browser User-Agent: that is what Akamai rejects
         r = requests.get(LEADS_URL, headers={'accept': 'application/json'}, timeout=120)
         if r.status_code != 200:
             sys.exit(f'army.mil returned {r.status_code} - refusing to touch the '
                      f'cached news rather than replace it with nothing')
         leads = r.json()
     else:
-        # No service but the Army publishes a leads endpoint, so the rest come
-        # from their DVIDS feed. Same rule on failure: an empty answer must
-        # not be written over stories we already hold.
-        feed = DVIDS_FEEDS.get(a.branch)
-        if not feed:
-            sys.exit(f'no news feed known for {a.branch}')
-        r = requests.get(feed, timeout=120)
+        # every other service comes from DVIDS, same rule on failure
+        branch_name = DVIDS_BRANCHES.get(a.branch)
+        if not branch_name:
+            sys.exit(f'no DVIDS branch known for {a.branch}')
+        dvids_key = os.getenv('DVIDS_API_KEY')
+        if not dvids_key:
+            sys.exit('DVIDS_API_KEY not set - refusing to sync without it')
+        r = requests.get(DVIDS_API_URL, params={
+            'type': 'news', 'branch': branch_name, 'max_results': DVIDS_LIMIT,
+            'api_key': dvids_key,
+        }, timeout=120)
         if r.status_code != 200:
             sys.exit(f'dvids returned {r.status_code} - refusing to touch the '
                      f'cached news rather than replace it with nothing')
         leads = dvids_leads(r.text)
         if not leads:
-            sys.exit('the feed parsed to nothing - refusing to touch the cached news')
-        # The feed has no images; the article pages do.
+            sys.exit('the API returned nothing usable - refusing to touch the cached news')
+        # Most results already carry a thumbnail; only the rest need the
+        # article page.
         for lead in leads:
+            if lead['image']:
+                continue
             try:
                 page = requests.get(lead['url'], headers={'User-Agent': 'Mozilla/5.0'},
                                     timeout=60)
@@ -430,19 +438,9 @@ def main(argv=None):
     if resp.status_code >= 300:
         sys.exit(f'upsert failed {resp.status_code}: {resp.text[:300]}')
 
-    # Drop stories no longer carried upstream, so the screen matches the feed.
-    #
-    # Scoped to the branch being synced. Without `branch=eq.`, a Marine Corps
-    # run deletes every story it did not just fetch -- which is all of the
-    # Army's -- and reports "DONE. cached 23 stories" while doing it. That is
-    # exactly the shape of stale_to_delete in sync_supabase.py, and I did not
-    # think to look for a second one.
-    #
-    # Asking for the deleted rows back, rather than firing and hoping. A prune
-    # that removed more than it should used to leave no trace at all: the run
-    # printed "DONE. cached 21 stories" whether it had deleted one row or every
-    # row in the table. 103 stories went missing between two checks here and
-    # the logs could not say what took them, because nothing recorded a count.
+    # Drop stories no longer carried upstream. Scoped to `branch`, same
+    # reason as prune_filter. `return=representation` so a prune that
+    # removes more than expected leaves a trace instead of a bare count.
     cached = cached_count(branch, key)
     if cached is None:
         print(f'  skipping prune: could not count {branch} stories, '
