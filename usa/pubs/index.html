@@ -8,7 +8,7 @@
          asks for /pub/composeResources/... and 404s, which throws out of
          composition and freezes the canvas. Must precede the first script. -->
     <base href="/">
-    <meta name="description" content="Every Army publication, grouped by series: ADP, ARMYDIR, AR, ATP, PAM, FM, MISC, STP, TC, Travel, Justice, Issuance. Dates, proponents, status and download links for each.">
+    <meta name="description" content="Every Army publication, grouped by series: ADP, ARMYDIR, AR, ATP, PAM, FM, MISC, STP, TC, MCO, MCBul, NAVMC, Doctrine, Legal, UM, OPNAVINST, SECNAVINST, MILPERSMAN, BUPERSINST, BUMEDINST, NAVPERS, CI, CIM, I, MAN, PD, MD, TP, GM, PM, H, OTHER, VA, I, MAN, PD, MD, TTP, TP, PAM, GM, H, OTHER, Travel, ">
     <title>Browse Army Publications by Series</title>
     <link rel="canonical" href="https://reggie.bot/usa/pubs/">
     <!-- The shell is shared by every page, so this names no one service.
@@ -22,7 +22,7 @@
     <meta property="og:url" content="https://reggie.bot/usa/pubs/">
     <meta property="og:site_name" content="Reggie.Bot">
     <meta property="og:title" content="Browse Army Publications by Series">
-    <meta property="og:description" content="Every Army publication, grouped by series: ADP, ARMYDIR, AR, ATP, PAM, FM, MISC, STP, TC, Travel, Justice, Issuance. Dates, proponents, status and download links for each.">
+    <meta property="og:description" content="Every Army publication, grouped by series: ADP, ARMYDIR, AR, ATP, PAM, FM, MISC, STP, TC, MCO, MCBul, NAVMC, Doctrine, Legal, UM, OPNAVINST, SECNAVINST, MILPERSMAN, BUPERSINST, BUMEDINST, NAVPERS, CI, CIM, I, MAN, PD, MD, TP, GM, PM, H, OTHER, VA, I, MAN, PD, MD, TTP, TP, PAM, GM, H, OTHER, Travel, ">
     <!-- icon-512, not icon_round: that one is 192x192, and previews commonly
          refuse an image below 200x200 outright -- which is why a shared answer
          arrived with no picture at all rather than a small one. Dimensions are
@@ -35,7 +35,7 @@
     <meta property="og:image:alt" content="Reggie.Bot">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Browse Army Publications by Series">
-    <meta name="twitter:description" content="Every Army publication, grouped by series: ADP, ARMYDIR, AR, ATP, PAM, FM, MISC, STP, TC, Travel, Justice, Issuance. Dates, proponents, status and download links for each.">
+    <meta name="twitter:description" content="Every Army publication, grouped by series: ADP, ARMYDIR, AR, ATP, PAM, FM, MISC, STP, TC, MCO, MCBul, NAVMC, Doctrine, Legal, UM, OPNAVINST, SECNAVINST, MILPERSMAN, BUPERSINST, BUMEDINST, NAVPERS, CI, CIM, I, MAN, PD, MD, TP, GM, PM, H, OTHER, VA, I, MAN, PD, MD, TTP, TP, PAM, GM, H, OTHER, Travel, ">
     <meta name="twitter:image" content="https://reggie.bot/icon-512.png">
 
     <script type="application/ld+json">
@@ -43,7 +43,7 @@
   "@context": "https://schema.org",
   "@type": "WebSite",
   "name": "Browse Army Publications by Series",
-  "description": "Every Army publication, grouped by series: ADP, ARMYDIR, AR, ATP, PAM, FM, MISC, STP, TC, Travel, Justice, Issuance. Dates, proponents, status and download links for each.",
+  "description": "Every Army publication, grouped by series: ADP, ARMYDIR, AR, ATP, PAM, FM, MISC, STP, TC, MCO, MCBul, NAVMC, Doctrine, Legal, UM, OPNAVINST, SECNAVINST, MILPERSMAN, BUPERSINST, BUMEDINST, NAVPERS, CI, CIM, I, MAN, PD, MD, TP, GM, PM, H, OTHER, VA, I, MAN, PD, MD, TTP, TP, PAM, GM, H, OTHER, Travel, Justice, Issuance. Dates, proponents, status and download links for each.",
   "url": "https://reggie.bot/pubs/"
 }
     </script>
@@ -448,6 +448,27 @@
                 .catch(function () { return null; });
         }
 
+        // Returns true if the share sheet was opened, false if the text was
+        // copied instead. navigator.share and navigator.clipboard both need a
+        // secure context, so neither exists over plain http -- and Firefox has
+        // no share sheet at all. The caller tells the reader which happened;
+        // logging to a console nobody has open is not an answer.
+        function copyFallback(payload) {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(payload).catch(function () {});
+                return;
+            }
+            const field = document.createElement('textarea');
+            field.value = payload;
+            field.setAttribute('readonly', '');
+            field.style.position = 'fixed';
+            field.style.opacity = '0';
+            document.body.appendChild(field);
+            field.select();
+            try { document.execCommand('copy'); } catch (e) { /* nothing left to try */ }
+            document.body.removeChild(field);
+        }
+
         function shareContent(text) {
             const url = window.location.href; // Get the current page URL
             if (navigator.share) {
@@ -460,14 +481,15 @@
                     title: 'Reggie.Bot',
                     text: text,
                     url: url
-                }).then(() => {
-                    console.log('Successfully shared');
-                }).catch((error) => {
-                    console.error('Error sharing:', error);
+                }).catch(function (error) {
+                    // AbortError is the reader dismissing the sheet, which is
+                    // not a failure and must not be reported as one.
+                    if (error && error.name !== 'AbortError') copyFallback(text + ' ' + url);
                 });
-            } else {
-                console.error('Web Share API not supported in this browser');
+                return true;
             }
+            copyFallback(text + ' ' + url);
+            return false;
         }
 
         // Waits for the helpers the app expects, but not forever.
@@ -689,20 +711,54 @@
              instant before the app boots. -->
         <div id="seo-fallback">
             <h1>Browse Army Publications</h1>
-            <p>Every Army publication, grouped by series: ADP, ARMYDIR, AR, ATP, PAM, FM, MISC, STP, TC, Travel, Justice, Issuance. Dates, proponents, status and download links for each.</p>
+            <p>Every Army publication, grouped by series: ADP, ARMYDIR, AR, ATP, PAM, FM, MISC, STP, TC, MCO, MCBul, NAVMC, Doctrine, Legal, UM, OPNAVINST, SECNAVINST, MILPERSMAN, BUPERSINST, BUMEDINST, NAVPERS, CI, CIM, I, MAN, PD, MD, TP, GM, PM, H, OTHER, VA, I, MAN, PD, MD, TTP, TP, PAM, GM, H, OTHER, Travel, Justice, Issuance. Dates, proponents, status and download links for each.</p>
             <ul>
                 <li><a href="/pubs/adp/">ADP</a> &mdash; Army Doctrine Publications</li>
                 <li><a href="/pubs/ar/">AR</a> &mdash; Army Regulations</li>
                 <li><a href="/pubs/armydir/">ARMYDIR</a> &mdash; Army Directives</li>
                 <li><a href="/pubs/atp/">ATP</a> &mdash; Army Techniques Publications</li>
+                <li><a href="/pubs/bumedinst/">BUMEDINST</a> &mdash; Navy Medicine Directives</li>
+                <li><a href="/pubs/bupersinst/">BUPERSINST</a> &mdash; BUPERS Instructions</li>
+                <li><a href="/pubs/ci/">CI</a> &mdash; Commandant Instructions</li>
+                <li><a href="/pubs/cim/">CIM</a> &mdash; Commandant Instruction Manuals</li>
+                <li><a href="/pubs/doctrine/">Doctrine</a> &mdash; Doctrinal Publications</li>
                 <li><a href="/pubs/fm/">FM</a> &mdash; Field Manuals</li>
+                <li><a href="/pubs/gm/">GM</a> &mdash; Guidance Memoranda</li>
+                <li><a href="/pubs/gm/">GM</a> &mdash; Guidance Memoranda</li>
+                <li><a href="/pubs/h/">H</a> &mdash; Handbooks</li>
+                <li><a href="/pubs/h/">H</a> &mdash; Handbooks</li>
+                <li><a href="/pubs/i/">I</a> &mdash; Instructions</li>
+                <li><a href="/pubs/i/">I</a> &mdash; Instructions</li>
                 <li><a href="/pubs/issuance/">Issuance</a> &mdash; DoD Issuances</li>
                 <li><a href="/pubs/justice/">Justice</a> &mdash; Military Justice</li>
+                <li><a href="/pubs/legal/">Legal</a> &mdash; Legal References</li>
+                <li><a href="/pubs/man/">MAN</a> &mdash; Manuals</li>
+                <li><a href="/pubs/man/">MAN</a> &mdash; Manuals</li>
+                <li><a href="/pubs/mcbul/">MCBul</a> &mdash; Marine Corps Bulletins</li>
+                <li><a href="/pubs/mco/">MCO</a> &mdash; Marine Corps Orders</li>
+                <li><a href="/pubs/md/">MD</a> &mdash; Mission Directives</li>
+                <li><a href="/pubs/md/">MD</a> &mdash; Mission Directives</li>
+                <li><a href="/pubs/milpersman/">MILPERSMAN</a> &mdash; Military Personnel Manual</li>
                 <li><a href="/pubs/misc/">MISC</a> &mdash; Manual For Courts-martial</li>
+                <li><a href="/pubs/navmc/">NAVMC</a> &mdash; NAVMC Publications</li>
+                <li><a href="/pubs/navpers/">NAVPERS</a> &mdash; Uniform Regulations</li>
+                <li><a href="/pubs/opnavinst/">OPNAVINST</a> &mdash; OPNAV Instructions</li>
+                <li><a href="/pubs/other/">OTHER</a> &mdash; Other Publications</li>
+                <li><a href="/pubs/other/">OTHER</a> &mdash; Other Publications</li>
                 <li><a href="/pubs/pam/">PAM</a> &mdash; Da Pamphlets</li>
+                <li><a href="/pubs/pam/">PAM</a> &mdash; Pamphlets</li>
+                <li><a href="/pubs/pd/">PD</a> &mdash; Policy Directives</li>
+                <li><a href="/pubs/pd/">PD</a> &mdash; Policy Directives</li>
+                <li><a href="/pubs/pm/">PM</a> &mdash; Policy Memoranda</li>
+                <li><a href="/pubs/secnavinst/">SECNAVINST</a> &mdash; SECNAV Instructions</li>
                 <li><a href="/pubs/stp/">STP</a> &mdash; Soldier Training Publications</li>
                 <li><a href="/pubs/tc/">TC</a> &mdash; Training Circulars</li>
+                <li><a href="/pubs/tp/">TP</a> &mdash; Training Plans</li>
+                <li><a href="/pubs/tp/">TP</a> &mdash; Training Plans</li>
+                <li><a href="/pubs/ttp/">TTP</a> &mdash; Tactics, Techniques and Procedures</li>
                 <li><a href="/pubs/travel/">Travel</a> &mdash; Travel and Transportation</li>
+                <li><a href="/pubs/um/">UM</a> &mdash; User Manuals</li>
+                <li><a href="/pubs/va/">VA</a> &mdash; Visual Aids</li>
             </ul>
         </div>
     </div>

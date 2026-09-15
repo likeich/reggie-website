@@ -492,6 +492,27 @@ airmen">
                 .catch(function () { return null; });
         }
 
+        // Returns true if the share sheet was opened, false if the text was
+        // copied instead. navigator.share and navigator.clipboard both need a
+        // secure context, so neither exists over plain http -- and Firefox has
+        // no share sheet at all. The caller tells the reader which happened;
+        // logging to a console nobody has open is not an answer.
+        function copyFallback(payload) {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(payload).catch(function () {});
+                return;
+            }
+            const field = document.createElement('textarea');
+            field.value = payload;
+            field.setAttribute('readonly', '');
+            field.style.position = 'fixed';
+            field.style.opacity = '0';
+            document.body.appendChild(field);
+            field.select();
+            try { document.execCommand('copy'); } catch (e) { /* nothing left to try */ }
+            document.body.removeChild(field);
+        }
+
         function shareContent(text) {
             const url = window.location.href; // Get the current page URL
             if (navigator.share) {
@@ -504,14 +525,15 @@ airmen">
                     title: 'Reggie.Bot',
                     text: text,
                     url: url
-                }).then(() => {
-                    console.log('Successfully shared');
-                }).catch((error) => {
-                    console.error('Error sharing:', error);
+                }).catch(function (error) {
+                    // AbortError is the reader dismissing the sheet, which is
+                    // not a failure and must not be reported as one.
+                    if (error && error.name !== 'AbortError') copyFallback(text + ' ' + url);
                 });
-            } else {
-                console.error('Web Share API not supported in this browser');
+                return true;
             }
+            copyFallback(text + ' ' + url);
+            return false;
         }
 
         // Waits for the helpers the app expects, but not forever.

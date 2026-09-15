@@ -448,6 +448,27 @@
                 .catch(function () { return null; });
         }
 
+        // Returns true if the share sheet was opened, false if the text was
+        // copied instead. navigator.share and navigator.clipboard both need a
+        // secure context, so neither exists over plain http -- and Firefox has
+        // no share sheet at all. The caller tells the reader which happened;
+        // logging to a console nobody has open is not an answer.
+        function copyFallback(payload) {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(payload).catch(function () {});
+                return;
+            }
+            const field = document.createElement('textarea');
+            field.value = payload;
+            field.setAttribute('readonly', '');
+            field.style.position = 'fixed';
+            field.style.opacity = '0';
+            document.body.appendChild(field);
+            field.select();
+            try { document.execCommand('copy'); } catch (e) { /* nothing left to try */ }
+            document.body.removeChild(field);
+        }
+
         function shareContent(text) {
             const url = window.location.href; // Get the current page URL
             if (navigator.share) {
@@ -460,14 +481,15 @@
                     title: 'Reggie.Bot',
                     text: text,
                     url: url
-                }).then(() => {
-                    console.log('Successfully shared');
-                }).catch((error) => {
-                    console.error('Error sharing:', error);
+                }).catch(function (error) {
+                    // AbortError is the reader dismissing the sheet, which is
+                    // not a failure and must not be reported as one.
+                    if (error && error.name !== 'AbortError') copyFallback(text + ' ' + url);
                 });
-            } else {
-                console.error('Web Share API not supported in this browser');
+                return true;
             }
+            copyFallback(text + ' ' + url);
+            return false;
         }
 
         // Waits for the helpers the app expects, but not forever.
@@ -692,12 +714,12 @@
             <p>Ask a question about U.S. Army regulations and get an answer citing the governing publication. Searches the full text of ArmyPubs's publications.</p>
             <h2>Frequently Referenced Publications</h2>
             <ul>
-                <li><a href="/usa/pub/ar-1-1/">AR 1-1</a> &mdash; Planning, Programming, Budgeting, And Execution</li>
-                <li><a href="/usa/pub/ar-1-9/">AR 1-9</a> &mdash; White House Liaison And Communications</li>
-                <li><a href="/usa/pub/ar-1-10/">AR 1-10</a> &mdash; Fundraising Within The Department Of The Army</li>
-                <li><a href="/usa/pub/ar-1-19/">AR 1-19</a> &mdash; Secretary Of The Army Delegations Of Authority</li>
-                <li><a href="/usa/pub/ar-1-20/">AR 1-20</a> &mdash; Legislative Liaison</li>
-                <li><a href="/usa/pub/ar-1-33/">AR 1-33</a> &mdash; The Army Memorial Program</li>
+                <li><a href="/usa/pub/10afi10-101/">10AFI10-101</a> &mdash; 10th Air Force Combat Planning Council</li>
+                <li><a href="/usa/pub/10afi11-201/">10AFI11-201</a> &mdash; Tenth Air Force Training Period System</li>
+                <li><a href="/usa/pub/11afi38-101/">11AFI38-101</a> &mdash; Personnel Status Within The 176th Air Defense Squadron (ang)</li>
+                <li><a href="/usa/pub/11wgoi90-802/">11WGOI90-802</a> &mdash; Environmental Decisions Guide</li>
+                <li><a href="/usa/pub/12ftwi13-204/">12FTWI13-204</a> &mdash; Air Traffic Control And Airfield Operations</li>
+                <li><a href="/usa/pub/12ftwi15-101/">12FTWI15-101</a> &mdash; Weather Support</li>
             </ul>
             <h2>Browse by Series</h2>
             <ul>
@@ -710,6 +732,40 @@
                 <li><a href="/usa/pubs/misc/">MISC</a></li>
                 <li><a href="/usa/pubs/stp/">STP</a></li>
                 <li><a href="/usa/pubs/tc/">TC</a></li>
+                <li><a href="/usa/pubs/mco/">MCO</a></li>
+                <li><a href="/usa/pubs/mcbul/">MCBul</a></li>
+                <li><a href="/usa/pubs/navmc/">NAVMC</a></li>
+                <li><a href="/usa/pubs/doctrine/">Doctrine</a></li>
+                <li><a href="/usa/pubs/legal/">Legal</a></li>
+                <li><a href="/usa/pubs/um/">UM</a></li>
+                <li><a href="/usa/pubs/opnavinst/">OPNAVINST</a></li>
+                <li><a href="/usa/pubs/secnavinst/">SECNAVINST</a></li>
+                <li><a href="/usa/pubs/milpersman/">MILPERSMAN</a></li>
+                <li><a href="/usa/pubs/bupersinst/">BUPERSINST</a></li>
+                <li><a href="/usa/pubs/bumedinst/">BUMEDINST</a></li>
+                <li><a href="/usa/pubs/navpers/">NAVPERS</a></li>
+                <li><a href="/usa/pubs/ci/">CI</a></li>
+                <li><a href="/usa/pubs/cim/">CIM</a></li>
+                <li><a href="/usa/pubs/i/">I</a></li>
+                <li><a href="/usa/pubs/man/">MAN</a></li>
+                <li><a href="/usa/pubs/pd/">PD</a></li>
+                <li><a href="/usa/pubs/md/">MD</a></li>
+                <li><a href="/usa/pubs/tp/">TP</a></li>
+                <li><a href="/usa/pubs/gm/">GM</a></li>
+                <li><a href="/usa/pubs/pm/">PM</a></li>
+                <li><a href="/usa/pubs/h/">H</a></li>
+                <li><a href="/usa/pubs/other/">OTHER</a></li>
+                <li><a href="/usa/pubs/va/">VA</a></li>
+                <li><a href="/usa/pubs/i/">I</a></li>
+                <li><a href="/usa/pubs/man/">MAN</a></li>
+                <li><a href="/usa/pubs/pd/">PD</a></li>
+                <li><a href="/usa/pubs/md/">MD</a></li>
+                <li><a href="/usa/pubs/ttp/">TTP</a></li>
+                <li><a href="/usa/pubs/tp/">TP</a></li>
+                <li><a href="/usa/pubs/pam/">PAM</a></li>
+                <li><a href="/usa/pubs/gm/">GM</a></li>
+                <li><a href="/usa/pubs/h/">H</a></li>
+                <li><a href="/usa/pubs/other/">OTHER</a></li>
                 <li><a href="/usa/pubs/travel/">Travel</a></li>
                 <li><a href="/usa/pubs/justice/">Justice</a></li>
                 <li><a href="/usa/pubs/issuance/">Issuance</a></li>
